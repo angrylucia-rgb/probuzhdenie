@@ -86,7 +86,7 @@
       `a = 0.35*(0.45 + 1.8*nearK(p)); a *= fogK(p, 0.6, 80.0);`), D => smooth(13.95, 14.25, D)*(1 - smooth(14.5, 14.62, D)));
   }
   // 15 · кристалл → атом → гем
-  const L15 = {};
+  const L15 = {}; let softK = 0;
   { const g = LAY[15], sh = SHOW(15), latG = new THREE.Group(), atomG = new THREE.Group(), hemeG = new THREE.Group(), rbcG = new THREE.Group();
     sh.add(latG); sh.add(atomG);
     const at = [], a0 = 2.4, cz = 1.96;
@@ -104,18 +104,25 @@
     [[.3, 2], [.55, 8], [.85, 14], [1.15, 2]].forEach(([r, ne], si) => {
       for (let e = 0; e < ne; e++){ const nv = dir(), ph = e/ne*TAU + si; for (let q = 0; q < 10; q++) ap.push([nv[0], nv[1], nv[2], 2, r, ph - q*.06, q]); }
       for (let q = 0; q < 260; q++) ap.push([...sc3(dir(), r*(1 + rn()*.06)), 3, si, 0]); });
+    // uK — «расплывание»: 0 — электроны точками на окружностях (историческая картина Бора 1913),
+    // 1 — то же самое размазано по оболочке, то есть облако вероятности, каким электрон и является.
+    // В покое uK уже 0,45: орбиты читаются только как след, а не как проволочки с бусинами.
     const atP = A(ap, (o, v) => {
-      if (v[3] === 2){ o.rnd = [v[4], v[5], v[6]]; o.seed = 2; o.c = C(0xbfe8ff); o.s = 1.4 - v[6]*.1; }
+      if (v[3] === 2){ o.rnd = [v[4], v[5], v[6]]; o.seed = 2 + Math.random()*.9; o.c = C(0xbfe8ff); o.s = 1.4 - v[6]*.1; }
       else if (v[3] === 3){ o.rnd = [0, 0, 0]; o.seed = 3; o.c = C(0x7aa8ff); o.s = .6; }
       else { o.rnd = [0, 0, 0]; o.seed = v[4] ? 0 : 1; o.c = v[4] ? C(0xff6a5a) : C(0xf0f0ff); o.s = 1.2; } },
-      `if (aSeed > 1.5 && aSeed < 2.5){
+      `if (aSeed > 1.5 && aSeed < 2.95){
          vec3 nn = normalize(position); vec3 t1 = normalize(cross(abs(nn.y) < 0.9 ? vec3(0.0,1.0,0.0) : vec3(1.0,0.0,0.0), nn)); vec3 t2 = cross(nn, t1);
-         float an = aRnd.y + uTime*(2.2/aRnd.x);
-         p = (t1*cos(an) + t2*sin(an))*aRnd.x; a = 0.9 - aRnd.z*0.08;
-       } else if (aSeed > 2.5){ a = 0.1; } else { p += 0.01*vec3(sin(uTime*9.0 + aSeed*50.0)); a = 0.95; }
+         float r1 = fract(aSeed*97.0), r2 = fract(aSeed*53.0), r3 = fract(aSeed*29.0);
+         float an = aRnd.y + uTime*(2.2/aRnd.x) + uK*(r1 - 0.5)*6.28318;
+         float rr = aRnd.x*(1.0 + uK*0.30*(r2 - 0.5)*2.0);
+         p = (t1*cos(an) + t2*sin(an))*rr + nn*uK*aRnd.x*0.34*(r3 - 0.5)*2.0;
+         a = (0.9 - aRnd.z*0.08)*(1.0 - 0.42*uK); s *= 1.0 - 0.30*uK;
+         col = mix(col, vec3(0.44, 0.85, 1.0), uK*0.70);
+       } else if (aSeed > 2.95){ a = 0.10 + 0.40*uK; s *= 1.0 + 0.5*uK; col = mix(col, vec3(0.37, 0.94, 0.75), uK*0.55); } else { p += 0.01*vec3(sin(uTime*9.0 + aSeed*50.0)); a = 0.95; }
        ${FOG}`);
     atomG.add(atP);
-    add(atomG, atP, D => sf(15)(D) + smooth(14.8, 15.2, D), { sz:() => L15.as || 1 });
+    add(atomG, atP, D => sf(15)(D) + smooth(14.8, 15.2, D), { sz:() => L15.as || 1, k: D => .45 + .55*smooth(15.1, 15.95, D) });
     // гем: порфириновое кольцо, Fe в центре, O₂
     const hm = [], atoms = [];
     const atomAt = (p, kind) => { atoms.push([p, kind]); };
@@ -160,7 +167,7 @@ __PART5__
     [10.5, "410 км · оливин → вадслеит"], [11.5, "660 км · рингвудит → бриджманит"], [12.5, "Слой D″ · граница ядра · 2890 км"], [13.5, "Граница внутреннего ядра · 5150 км"], [14.5, "Кристаллическая решётка железа"]];
   const BND_BIO = [[6.25, "Облака · тропосфера"], [6.5, "Кроны и почва · живое вещество"]];
   const TNT_BIO = [[0, 0x0a0c20], [6, 0x0a1430], [6.5, 0x0c2a16], [7, 0x08200e], [8, 0x0a1a0c]].map(([d, h]) => [d, new THREE.Color(h)]);
-  const TNT = [[0, 0x0a0c20], [6, 0x0a1430], [6.5, 0x07304a], [7.4, 0x041630], [8, 0x050c1e], [9, 0x1a1008], [10, 0x121808], [11, 0x061426], [12, 0x1e0806], [13, 0x2a0e02], [14, 0x221a0a], [15, 0x160a1c], [16, 0x1a0610]].map(([d, h]) => [d, new THREE.Color(h)]);
+  const TNT = [[0, 0x0a0c20], [6, 0x0a1430], [6.5, 0x07304a], [7.4, 0x041630], [8, 0x050c1e], [9, 0x1a1008], [10, 0x121808], [11, 0x061426], [12, 0x1e0806], [13, 0x2a0e02], [14, 0x221a0a], [15, 0x140b20], [16, 0x0a2b31]].map(([d, h]) => [d, new THREE.Color(h)]);
   const bgM = new THREE.ShaderMaterial({
     uniforms:{ uA:{value:0}, uTint:{value:new THREE.Color()}, uC:{value:new THREE.Vector2(.6, .5)}, uAsp:{value:1} },
     vertexShader:`varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
@@ -176,6 +183,8 @@ __PART5__
   }
   let M = 0, lastT = 0;
   return {
+    // мягкий переход «Железо → Атом»: атом продолжает расти, пока растворяется
+    soft(k){ softK = k; },
     boundary(D, bio){ let best = null, bd = 1; for (const [b, t] of (bio ? BND_BIO : BND)){ const d = Math.abs(D - b); if (d < bd){ bd = d; best = t; } } return { text:best, o:M*(1 - smooth(.07, .24, bd)) }; },
     update(D, hE, T, px, py, portrait, bio){
       const dt = Math.min(.05, Math.max(0, T - lastT)); lastT = T;
@@ -205,7 +214,7 @@ __PART5__
       // уровень 15 — бесконечное приближение
       const x15 = smooth(14.55, 15, D);
       L15.s = 1 + 4*x15; L15.lat.scale.setScalar(L15.s);
-      L15.as = .38 + .62*x15 + .15*smooth(15.2, 15.9, D); L15.atom.scale.setScalar(L15.as);
+      L15.as = (.38 + .62*x15 + .15*smooth(15.2, 15.9, D))*(1 + softK*3.4); L15.atom.scale.setScalar(L15.as);
       desc.traverse(o => { if (o.userData.spin) o.rotation.y += dt*o.userData.spin; if (o.userData.osc){ o.userData.dg.rotation.y = .35*Math.sin(T*.14); o.userData.cg.rotation.y = -.5*Math.sin(T*.14 + .8); } });
       for (const it of ITEMS){
         if (bio ? it.L >= 7 : it.L === "bio"){ it.o.visible = false; continue; }

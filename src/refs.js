@@ -204,9 +204,17 @@ function refsTick(refs, dt, rc, act, probe, dive){
       }
     }
     if (key !== R.s1.key){
-      if (R.s1.h >= R.s0.h) R.s0 = R.s1;
-      R.s1 = { key, id, h:0, fx: id ? R.byId[id].fx : 0, part };
-      if (R.s1.id && R.s0.h < .01) R.cur.copy(R.curT);
+      // Ключ — это область И её часть (key = id*16 + номер части), а частей у одной кости несколько.
+      // Раньше любая смена ключа сбрасывала h в нуль, поэтому при движении курсора внутри одной
+      // кости «рентген» гас прямо под рукой и казалось, что просвечивание перестало работать.
+      // Теперь при переезде между частями одной области подсветка просто переезжает за курсором,
+      // а гаснет только при уходе на другую область.
+      if (id && id === R.s1.id){ R.s1.key = key; R.s1.part = part; }
+      else {
+        if (R.s1.h >= R.s0.h) R.s0 = R.s1;
+        R.s1 = { key, id, h:0, fx: id ? R.byId[id].fx : 0, part };
+        if (R.s1.id && R.s0.h < .01) R.cur.copy(R.curT);
+      }
     }
     if (diving) R.s1.h = Math.min(1, dive*1.4);
     else R.s1.h += ((R.s1.id ? 1 : 0) - R.s1.h)*Math.min(1, dt*2.6);
