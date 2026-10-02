@@ -1,8 +1,14 @@
 // Маршрут: Изнанка — центр. Любой переход из мира в мир идёт через неё.
-// Первый круг: Изнанка → следующий неоткрытый мир → Изнанка → ... → Свет → Изнанка. Потом свободно.
+// Первый круг: Изнанка → следующий неоткрытый мир → Изнанка → ... → Свет → Изнанка. Потом —
+// каждое новое погружение рождает процедурный мир (worlds/generator.js), а не выбор среди тех же восьми:
+// это ближе к самой идее Изнанки как непрерывно меняющейся реальности.
+import { WORLDS } from '../worlds/presets.js';
+import { generateWorld } from '../worlds/generator.js';
+
 export const HUB = 'iznanka';
-export const ORDER = ['frost', 'waterlights', 'flame', 'corona', 'nebula', 'field', 'prism'];
+export const ORDER = ['mandala', 'frost', 'waterlights', 'flame', 'corona', 'nebula', 'field', 'prism'];
 const KEY = 'iznanka.v2';
+const GEN_CAP = 12; // не копим сгенерированные миры бесконечно за долгую сессию
 
 export function createJourney(storage) {
   let completed = false;
@@ -14,13 +20,21 @@ export function createJourney(storage) {
   } catch { /* нет хранилища или битые данные */ }
 
   const angleOf = (id) => -Math.PI / 2 + ORDER.indexOf(id) * 2 * Math.PI / ORDER.length;
-  const wrap = (a) => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
 
-  function next(current, angle) {
+  const genIds = [];
+  let genCounter = 0;
+  function spawnGenerated() {
+    const id = 'gen' + (++genCounter);
+    WORLDS[id] = generateWorld();
+    genIds.push(id);
+    if (genIds.length > GEN_CAP) delete WORLDS[genIds.shift()];
+    return id;
+  }
+
+  function next(current) {
     if (current !== HUB) return HUB;
     if (!completed) return ORDER.find((id) => !opened.has(id)) || 'light';
-    if (typeof angle !== 'number') return ORDER[0];
-    return ORDER.reduce((best, id) => (Math.abs(wrap(angleOf(id) - angle)) < Math.abs(wrap(angleOf(best) - angle)) ? id : best));
+    return spawnGenerated();
   }
 
   function arrive(id) {

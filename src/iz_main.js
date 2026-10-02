@@ -1,7 +1,7 @@
 // «Изнанка» внутри Астролябии. Своё полотно WebGL2 поверх всей страницы и свой цикл кадров;
 // создаётся при первом входе, между входами спит. Логика кадра — та же, что в самостоятельной v3 (main.js):
 // ввод → разрыв реальности → сердце мира → звук и свет. Выход — двойное касание или Esc.
-let canvas = null, hint = null, vis = null, input = null, unbind = null, running = false, raf = 0, onExit = null;
+let canvas = null, hint = null, exitBtn = null, vis = null, input = null, unbind = null, running = false, raf = 0, onExit = null;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let storage = null; try { storage = localStorage; } catch (e) { /* нет хранилища */ }
 const ws = createWorldState();
@@ -25,8 +25,7 @@ function shake(t, g) {
     a * 0.6 * (n(9.7, 0.3) + 0.5 * n(17.1, 1.1)),
   ];
 }
-const glowOpen = new Float32Array(16), glowCol = new Float32Array(48);
-ORDER.forEach((id, i) => glowCol.set(WORLDS[id].color, i * 3));
+const ZERO8 = new Float32Array(8), ZERO3 = new Float32Array(3);
 function applyWorld(id) { const s = WORLDS[id].state; ws.setTarget({ energy: s.energy, density: s.density, dispersion: s.dispersion }); }
 applyWorld(HUB);
 
@@ -37,7 +36,12 @@ function mount() {
   hint = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   hint.setAttribute('class', 'izhint'); hint.setAttribute('viewBox', '0 0 24 24'); hint.setAttribute('aria-hidden', 'true');
   hint.innerHTML = '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>';
-  document.body.append(canvas, hint);
+  // ненавязчивый выход в углу: двойное касание и Esc не всем очевидны (а на мобильном Esc и вовсе нет)
+  exitBtn = document.createElement('button');
+  exitBtn.type = 'button'; exitBtn.className = 'izexit'; exitBtn.setAttribute('aria-label', 'Выйти из Изнанки');
+  exitBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  exitBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+  document.body.append(canvas, hint, exitBtn);
   try { vis = createVisualEngine(canvas); } catch (e) { vis = null; }
   input = createInputTracker({ stillnessSec: 240 });
   canvas.addEventListener('pointerdown', enter);
@@ -61,7 +65,7 @@ function open(opts = {}) {
   // из-за горизонта приходим в полную темноту — полотно сразу непрозрачно, плазма проявляется из черноты;
   // из меню полотно само наплывает поверх Астролябии
   canvas.style.transition = opts.fromBlack ? 'none' : 'opacity 1.2s ease';
-  canvas.style.display = 'block'; hint.style.display = 'block';
+  canvas.style.display = 'block'; hint.style.display = 'block'; exitBtn.style.display = 'flex';
   if (opts.fromBlack) canvas.style.opacity = '1'; else requestAnimationFrame(() => { canvas.style.opacity = '1'; });
   unbind = bindInput(canvas, input, close);
   entered = false; intro = 1; hint.classList.remove('gone');
@@ -82,7 +86,7 @@ function close() {
     // Астролябия возвращается под полотном, пока оно гаснет: так выход читается как всплытие, а не как смена страницы
     if (onExit) onExit();
     canvas.style.transition = 'opacity 1.1s ease'; canvas.style.opacity = '0';
-    setTimeout(() => { running = false; cancelAnimationFrame(raf); canvas.style.display = 'none'; hint.style.display = 'none'; audio.suspend(); if (unbind) unbind(); unbind = null; }, 1150);
+    setTimeout(() => { running = false; cancelAnimationFrame(raf); canvas.style.display = 'none'; hint.style.display = 'none'; exitBtn.style.display = 'none'; audio.suspend(); if (unbind) unbind(); unbind = null; }, 1150);
   }, 1500);
 }
 document.addEventListener('visibilitychange', () => { if (!running) return; document.hidden ? audio.suspend() : audio.resume(); });
@@ -96,7 +100,8 @@ function step(t, dt) {
       const angle = Math.atan2(inp.y - 0.5, (inp.x - 0.5) * innerWidth / innerHeight);
       if (director.begin(journey.next(cur, angle), { auto: inp.autoTrigger })) seed = Math.random();
     }
-    if (cur === 'light' && idle && t - arrivedAt > 30) director.begin(HUB, { auto: true });
+    // после первого круга свободные (в т.ч. процедурные) миры тоже мягко отпускают в Изнанку при бездействии
+    if ((cur === 'light' || journey.completed) && idle && t - arrivedAt > 30) director.begin(HUB, { auto: true });
   }
   const g = director.update(dt, inp.holding);
   if (g.event === 'rift') { audio.rift(); applyWorld(g.to); timeB = 0; }
@@ -110,28 +115,31 @@ function step(t, dt) {
   if (flareReq && allowFlash(t)) pulse = 1;
   flareReq = false;
   pulse *= Math.exp(-dt / 0.35);
-  ORDER.forEach((id, i) => {
-    const op = journey.completed && journey.opened.has(id) ? 0.5 : 0;
-    const aimed = g.to === id ? 0.5 + g.p : 0;
-    glowOpen[i] += (Math.max(op, aimed) - glowOpen[i]) * Math.min(1, dt * 2);
-  });
   intro += ((entered ? 0 : 1) - intro) * Math.min(1, dt * 1.5);
   // проявление из черноты медленнее, чем в самостоятельной версии: глаз только что был в полной темноте
   fade += (fadeTarget - fade) * Math.min(1, dt * (fadeTarget > fade ? 0.55 : 1.2));
   shown = Math.min(1, shown + dt / 2.5);
   timeA += dt; timeB += dt;
   const A = g.from, B = g.to || g.from, s = ws.current;
+  // индекс для рукописного world(id,...) в шейдере: у сгенерированных миров своего case нет —
+  // 1 просто помечает «не Изнанка», реальный выбор идёт через uGen/uFamily ниже
+  const wIdx = (id) => (id === HUB ? 0 : (WORLDS[id].idx ?? 1));
+  // ровно один из A/B — не Изнанка (переход всегда идёт через хаб): это и есть «активный» мир кадра
+  const activeId = A !== HUB ? A : (B !== HUB ? B : null);
+  const activeW = activeId ? WORLDS[activeId] : null;
+  const isGen = !!(activeW && activeW.gen);
   vis?.render({
     uTime: t, uTimeA: timeA, uTimeB: timeB, uSeed: seed,
     uShake: shake(t, g),
     uFold: foldAmount(g) * (reduced ? 0.4 : 1) + 0.6 * (1 - shown) * (reduced ? 0.3 : 1), uMicro: micro,
-    uA: WORLDS[A].idx, uB: WORLDS[B].idx, uMix: g.to ? g.mix : 0,
+    uA: wIdx(A), uB: wIdx(B), uMix: g.to ? g.mix : 0,
+    uGen: isGen ? 1 : 0, uFamily: isGen ? activeW.family : 0,
+    uP: isGen ? activeW.params : ZERO8, uColA: isGen ? activeW.colA : ZERO3, uColB: isGen ? activeW.colB : ZERO3,
     uBreath: s.breath, uEnergy: s.energy, uDensity: s.density, uDisp: s.dispersion,
     uLow: a.low, uMid: a.mid, uHigh: a.high, uPulse: pulse,
     uHold: Math.min(1, inp.holdTime / 2), uStill: Math.min(1, inp.stillFor / 25),
     uPtr: ptrP(inp.x, inp.y),
     uTrail: WORLDS[g.mix > 0.5 && g.to ? g.to : g.from].trail, uIntro: intro,
-    uGlowCount: ORDER.length, uGlowOpen: glowOpen, uGlowCol: glowCol,
     uExposure: 1, uFade: fade,
   }, dt);
 }

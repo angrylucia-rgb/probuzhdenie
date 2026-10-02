@@ -1,0 +1,5 @@
+node_modules/
+src/node_modules/
+src/preview.html
+src/astrolabia.html
+.DS_Store

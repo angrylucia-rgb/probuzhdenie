@@ -130,6 +130,7 @@ ul.list li{display:flex;gap:10px;line-height:1.5}
 .q{font:24px/1.25 var(--display);color:var(--brass);border-left:1px solid var(--line);padding-left:16px;margin:22px 0 0}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:24px;font-size:12px;color:var(--faint)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
+sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 .mk{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid currentColor;flex:none;margin-top:.5em}
 .legend .mk,.po-note .mk{margin:0}
 .mk.s{color:var(--sci);background:currentColor}.mk.h{color:var(--hyp);background:linear-gradient(90deg,currentColor 50%,transparent 50%)}.mk.t{color:var(--trad)}
@@ -276,6 +277,36 @@ body.j-white .dot{background:#b09a6a}
 
 .ch-path{inset:0;background:rgba(5,6,12,.94);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
 .ch-path.open{transform:none}
+.ch-ref{inset:0;background:rgba(5,6,12,.94);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
+.ch-ref.open{transform:none}
+.ref-in{width:min(980px,100%);margin:0 auto;display:grid;gap:28px}
+.ref-tabs{display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.reftab{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:8px 14px;border:1px solid var(--line);border-radius:999px;transition:color .3s,border-color .3s,background .3s}
+.reftab:hover{color:var(--muted)}
+.reftab.on{color:#FBEFD2;border-color:var(--brass);background:rgba(214,172,94,.1)}
+.ref-body{display:grid;gap:22px}
+.ref-body>h2{font:400 32px var(--display);margin:0}
+.ref-body .lede{color:var(--muted);margin:0;max-width:62ch}
+.ref-body .gsec{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:16px}
+.ref-body .gsec h3{font:400 20px var(--display);margin:0;color:var(--brass)}
+.ref-body .gsec p{margin:0;color:var(--muted)}
+.ref-body .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--muted);margin:0 0 8px}
+.ref-body .legend span{display:inline-flex;align-items:center;gap:6px}
+.pr-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.pr{border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:10px;align-content:start}
+.pr h3{margin:0;font:400 20px var(--display);color:var(--brass)}
+.pr p{margin:0;color:var(--ink)}
+.pr .tr{display:flex;gap:8px;font-size:12px;color:var(--muted)}
+.pr ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.pr ul li{display:flex;gap:8px;font-size:12px;color:var(--muted);align-items:flex-start}
+.rscroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+table.rtable{border-collapse:collapse;width:100%;font-size:13px}
+table.rtable th,table.rtable td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;min-width:170px}
+table.rtable thead th{color:var(--brass);font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;position:sticky;top:0;background:#0b0d1a}
+table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:0;background:#0b0d1a;min-width:120px}
+.src-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.src-list li{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.src-list a{color:var(--brass)}
 .path-in{width:min(1180px,100%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:48px;align-items:start}
 .path-head{grid-column:1/-1}
 .stages{border-top:1px solid var(--line)}
@@ -348,6 +379,9 @@ body.j-white .dot{background:#b09a6a}
 .izhint{position:fixed;left:50%;bottom:calc(40px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:28px;height:28px;opacity:.35;pointer-events:none;transition:opacity 3s;animation:izb 6s ease-in-out infinite;z-index:81;display:none;fill:none;stroke:#fff;stroke-width:1.2}
 .izhint.gone{opacity:0;animation:none}
 @keyframes izb{50%{opacity:.15}}
+.izexit{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:calc(14px + env(safe-area-inset-left,0px));width:40px;height:40px;display:none;align-items:center;justify-content:center;z-index:82;opacity:.32;background:transparent;border:0;padding:0;border-radius:50%;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .25s}
+.izexit:hover,.izexit:focus-visible{opacity:.8}
+.izexit:active{opacity:.95}
 /* погружение за горизонт: панель, интерфейс и курсор уходят вместе со светом */
 body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opacity:0!important;pointer-events:none!important;transition:opacity 1.6s!important}
 @media (prefers-reduced-motion:reduce){
@@ -428,6 +462,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <button class="chap" id="mEarth" data-hover><span class="mono eyebrow">Глава</span><b>Погружение в Землю</b><span>Сквозь поля, воздух, воду и камень — к железному сердцу планеты</span></button>
       <button class="chap" id="mBH" data-hover><span class="mono eyebrow">Ответвление</span><b>К центру Галактики</b><span>Чёрная дыра Стрелец A* и проход за горизонт — в Изнанку</span></button>
       <button class="chap" id="mPath" data-hover><span class="mono eyebrow">Глава</span><b>Путь из восьми этапов</b><span>Узнать, почувствовать, прожить, осмыслить</span></button>
+      <button class="chap" id="mRef" data-hover><span class="mono eyebrow">Справочник</span><b>Как пользоваться · сравнение традиций</b><span>Инструкция, Розеттский камень, десять принципов, источники</span></button>
     </div>
     <ol id="menuList"><li class="arc mono"><span>→ Нисхождение · макрокосм</span><span>Возвращение · микрокосм ←</span></li></ol>
   </div>
@@ -489,6 +524,19 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <div class="cnt" id="cnt">0 из 30 дыханий</div>
       <button class="btn" id="breathBtn" data-hover>Начать 5 минут</button>
     </aside>
+  </div>
+</section>
+
+<section class="chapter ch-ref" id="chRef" aria-hidden="true" aria-label="Справочник">
+  <button class="close mono" id="refClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="ref-in">
+    <nav class="ref-tabs" id="refTabs" aria-label="Разделы справочника">
+      <button class="reftab on" data-tab="guide" data-hover>Как пользоваться</button>
+      <button class="reftab" data-tab="rosetta" data-hover>Розеттский камень</button>
+      <button class="reftab" data-tab="principles" data-hover>Десять принципов</button>
+      <button class="reftab" data-tab="sources" data-hover>Источники</button>
+    </nav>
+    <div class="ref-body" id="refBody"></div>
   </div>
 </section>
 
@@ -561,6 +609,42 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const SUP = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"};
 const pow10 = n => "10" + String(n).split("").map(c => SUP[c]||c).join("");
 const frame = () => new Promise(r => requestAnimationFrame(r));
+// Степени. В шрифтах сайта есть только ¹ ² ³ (они из Latin-1), а ⁴…⁹, ⁰, ⁻ браузер добирает из запасного
+// шрифта — другой высоты и толщины, и показатель «пляшет»: 10²⁴ выглядит как две разные цифры. Поэтому
+// любые надстрочные символы в тексте страницы переписываются в <sup> с обычными цифрами ТОГО ЖЕ шрифта
+// (в SVG — в <tspan> со сдвигом). Делает это наблюдатель за DOM, так что правило работает для любого
+// текста — из данных, из шаблонов, из textContent — без правки каждого места отдельно
+(() => {
+  const RE = /([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+)/, MAP = {"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁻":"−","⁺":"+"};
+  const SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "SUP", "tspan", "TITLE"]);
+  const fix = tn => {
+    const s = tn.nodeValue, par = tn.parentNode;
+    if (!s || !par || SKIP.has(par.nodeName) || !RE.test(s)) return;
+    const svg = par.namespaceURI === "http://www.w3.org/2000/svg", frag = document.createDocumentFragment();
+    s.split(RE).forEach((part, k) => {
+      if (!part) return;
+      if (k % 2 === 0){ frag.appendChild(document.createTextNode(part)); return; }
+      const digits = [...part].map(c => MAP[c]).join("");
+      let el;
+      if (svg){ el = document.createElementNS("http://www.w3.org/2000/svg", "tspan"); el.setAttribute("baseline-shift", "super"); el.setAttribute("font-size", "70%"); }
+      else { el = document.createElement("sup"); el.className = "pw"; }
+      el.textContent = digits; frag.appendChild(el);
+    });
+    par.replaceChild(frag, tn);
+  };
+  const walk = root => {
+    if (root.nodeType === 3){ fix(root); return; }
+    if (root.nodeType !== 1 || SKIP.has(root.nodeName)) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), list = [];
+    for (let n = w.nextNode(); n; n = w.nextNode()) if (RE.test(n.nodeValue)) list.push(n);
+    list.forEach(fix);
+  };
+  walk(document.body);
+  new MutationObserver(ms => { for (const m of ms){
+    if (m.type === "characterData") fix(m.target);
+    else m.addedNodes.forEach(walk);
+  } }).observe(document.body, { childList:true, subtree:true, characterData:true });
+})();
 const mk = m => `<i class="mk ${m}" role="img" aria-label="${{s:"установлено",h:"гипотеза",t:"традиция"}[m]}"></i>`;
 
 /* ---------- загрузка ---------- */
@@ -688,6 +772,100 @@ __ANAT__
 __REFS__
 __SOLAR__
 /* ---------- 12 станций ---------- */
+// ===== Ланиакея: данные облака (черновик — Qwen по ТЗ; узлы, рёбра, нити и поток переписаны на ревью) =====
+// Координаты в единицах слоя: Местная группа в начале координат, Млечный Путь ровно в [0,0,0]
+// (его рисует сама галактика станции IV — крошечной, издали), всё остальное — вокруг.
+function buildLaniaData(Q){
+  const GA = [4.4, -1.7, -2.6];
+  const add3 = (a, b, k) => [a[0] + b[0]*k, a[1] + b[1]*k, a[2] + b[2]*k];
+  const dist3 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  const NODES = [
+    { p:[-3.6, 1.5, 0.6], r:.34, n:520 },     // скопление Девы
+    { p:GA, r:.48, n:760 },                    // Великий аттрактор
+    { p:[1.9, -3.3, 1.4], r:.22, n:220 }       // скопление Печи
+  ];
+  // малые узлы — по всему объёму, а не по одной оболочке (на оболочке паутина читалась контуром);
+  // ближе 2,4 к Местной группе узлов нет — вокруг неё в реальности тоже разреженный Местный лист
+  // и в проекции на экран (плоскость xy — слой стоит к зрителю лицом) узлы не заходят за Местную
+  // группу: иначе дальние скопления ложились бы ровно позади Млечного Пути и прятали его
+  for (let k = 0; k < 26; k++){
+    const f = fib(k, 26); let p;
+    do { const R = 2.4 + 4.2*Math.random(); p = [f[0]*R + rn()*.4, f[1]*R + rn()*.4, f[2]*R + rn()*.4]; }
+    while (Math.hypot(p[0], p[1]) < 1.8);
+    NODES.push({ p, r:.1 + .1*Math.random(), n:70 });
+  }
+  const O = { p:[0, 0, 0] };                     // Местная группа — виртуальный узел, частиц у него нет
+  // рёбра: каждый узел — к двум ближайшим; плюс Местный лист → Дева → Аттрактор и Печь → Аттрактор
+  const E = [], seen = new Set();
+  const edge = (a, b) => { const k = a < b ? a + "-" + b : b + "-" + a; if (a !== b && !seen.has(k)){ seen.add(k); E.push([a, b]); } };
+  const P = i => i < 0 ? O.p : NODES[i].p;
+  NODES.forEach((nd, i) => NODES.map((m, j) => [j, dist3(nd.p, m.p)]).filter(x => x[0] !== i)
+    .sort((a, b) => a[1] - b[1]).slice(0, 3).forEach(x => edge(i, x[0])));
+  edge(-1, 0); edge(0, 1); edge(2, 1);
+  // каждое ребро — квадратичная кривая Безье с контрольной точкой, отведённой от середины
+  const curves = E.map(([a, b]) => {
+    const A = P(a), B = P(b), len = dist3(A, B), off = dir();
+    return { A, B, len, M:add3([(A[0] + B[0])/2, (A[1] + B[1])/2, (A[2] + B[2])/2], off, len*.18) };
+  });
+  const onCurve = (cv, u) => {
+    const a = (1 - u)*(1 - u), b = 2*u*(1 - u), c = u*u;
+    const p = [a*cv.A[0] + b*cv.M[0] + c*cv.B[0], a*cv.A[1] + b*cv.M[1] + c*cv.B[1], a*cv.A[2] + b*cv.M[2] + c*cv.B[2]];
+    return add3(p, dir(), Math.abs(gauss())*.09*(.6 + 3.2*u*(1 - u)));   // нить толще к середине
+  };
+
+  const web = [];
+  for (const nd of NODES) for (let i = 0; i < Math.round(nd.n*Q); i++)
+    web.push({ p:[nd.p[0] + gauss()*nd.r*.6, nd.p[1] + gauss()*nd.r*.6, nd.p[2] + gauss()*nd.r*.6],
+               c:mixc(C(0xfff1d8), C(0xc8d4ff), Math.random()*.6), s:.7 + Math.random(), rnd:[1, rn(), rn()] });
+  for (const cv of curves) for (let i = 0, n = Math.round(150*Q*cv.len/3); i < n; i++)
+    web.push({ p:onCurve(cv, Math.random()), c:mixc(C(0x8fb0ff), C(0xf4f0ff), Math.random()),
+               s:.45 + Math.random()*.75, rnd:[.35 + .4*Math.random(), rn(), rn()] });
+  // стены: между узлом и двумя его соседями — слабое «полотно» галактик, из-за него сеть читается
+  // объёмной, а пустоты между стенами — настоящими пустотами
+  for (let i = 0; i < NODES.length; i++){
+    const nb = NODES.map((m, j) => [j, dist3(NODES[i].p, m.p)]).filter(x => x[0] !== i).sort((a, b) => a[1] - b[1]);
+    const A = NODES[i].p, B = NODES[nb[0][0]].p, Cc = NODES[nb[1][0]].p;
+    for (let k = 0; k < Math.round(70*Q); k++){
+      let u = Math.random(), v = Math.random(); if (u + v > 1){ u = 1 - u; v = 1 - v; }
+      const w = 1 - u - v;
+      web.push({ p:add3([A[0]*w + B[0]*u + Cc[0]*v, A[1]*w + B[1]*u + Cc[1]*v, A[2]*w + B[2]*u + Cc[2]*v], dir(), .06*Math.random()),
+                 c:mixc(C(0x7f96d8), C(0xcfd8ff), Math.random()), s:.35 + .4*Math.random(), rnd:[.16, rn(), rn()] });
+    }
+  }
+  for (let i = 0; i < Math.round(900*Q); i++)
+    web.push({ p:add3([0, 0, 0], dir(), 6.5*Math.cbrt(Math.random())), c:mixc(C(0x7f96d8), C(0xdfe6ff), Math.random()),
+               s:.3 + .4*Math.random(), rnd:[.12, rn(), rn()] });
+
+  // поток: точки на нитях, каждая со своим направлением к Великому аттрактору (длина сноса 0,7)
+  const flow = [];
+  for (let i = 0; i < Math.round(1600*Q); i++){
+    const p = onCurve(curves[Math.floor(Math.random()*curves.length)], Math.random());
+    const d = [GA[0] - p[0], GA[1] - p[1], GA[2] - p[2]], L = Math.hypot(d[0], d[1], d[2]) || 1;
+    flow.push({ p, s:1.1 + Math.random()*.7, seed:Math.random(), rnd:[d[0]/L*.7, d[1]/L*.7, d[2]/L*.7] });
+  }
+
+  const lg = [];
+  const Bc = [.68, .15, -.28];
+  for (let i = 0; i < Math.round(70*Q); i++)
+    lg.push({ p:[Bc[0] + gauss()*.75, Bc[1] + gauss()*.45, Bc[2] + gauss()*.6], c:mixc(C(0xd8e0ff), C(0xffe9c8), Math.random()),
+              s:.5 + Math.random()*.7, rnd:[0, rn(), rn()] });
+  const clump = (c0, sg, n) => { for (let i = 0; i < Math.round(n*Q); i++)
+    lg.push({ p:[c0[0] + gauss()*sg, c0[1] + gauss()*sg, c0[2] + gauss()*sg], c:C(0xe6ecff), s:.5 + Math.random()*.5, rnd:[0, rn(), rn()] }); };
+  clump([.42, -.2, .16], .05, 90);    // Большое Магелланово облако
+  clump([.5, -.33, .05], .035, 55);   // Малое Магелланово облако
+
+  const disc = (n, R, pw, core) => { const a = [];
+    for (let i = 0; i < Math.round(n*Q); i++){
+      const r = R*.05 + Math.pow(Math.random(), pw)*R, arm = Math.random() < .5 ? 0 : 1;
+      const ang = arm*Math.PI + 2.2*Math.log(r + .08) + gauss()*.35;
+      a.push({ p:[Math.cos(ang)*r, gauss()*.012, Math.sin(ang)*r],
+               c:r < core ? C(0xffe0b0) : mixc(C(0xf6f2ff), C(0x9fb8ff), Math.min(1, (r - core)/(R*.7))),
+               s:.35 + Math.random()*.6, rnd:[r, rn(), rn()] });
+    }
+    return a; };
+  return { web, flow, lg, m31:disc(1100, .5, 1.6, .1), m33:disc(260, .15, 1.5, .03), GA, VIRGO:NODES[0].p };
+}
+const fromRec = (a, chunk, size) => pts(a.length, (i, o) => { const r = a[i]; o.p = r.p; o.c = r.c; o.s = r.s; o.rnd = r.rnd; }, chunk, size);
 const BUILD = [
 // I · Абсолют
 g => {
@@ -803,8 +981,11 @@ g => {
     // увеличении дифференциальное вращение диска сдвигало бы кадр быстрее, чем идёт сам полёт
     `float r = position.x; float ang = position.y + uSpeed*0.3/(0.6 + r);
      p = vec3(cos(ang)*r, position.z, sin(ang)*r); a = 0.8;`);
-  g.add(gPts);
-  const gCore = glow(0xffd9a0, 4, .8); g.add(gCore);
+  // диск галактики живёт в своей подгруппе: на слое «Ланиакея» он — крошечная точка Млечного Пути
+  // в центре Местной группы, а при погружении растёт из неё (см. GL_K ниже)
+  const gal = new THREE.Group(); g.add(gal);
+  gal.add(gPts);
+  const gCore = glow(0xffd9a0, 4, .8); gal.add(gCore);
   // Место Солнца: 3,8 из 6,5 радиуса диска — это 0,58, ровно как 8,2 кпк из примерно 14 кпк
   // видимого радиуса Млечного Пути. Угол выбран между двумя рукавами — как Рукав Ориона
   const SUN_R = 3.8, SUN_A0 = 4.34, SUN_H = .03;
@@ -835,8 +1016,61 @@ g => {
   const gSpur = spurPt(1500, .58, .14, .055, .18, .40, .95, `a = (0.10 + 0.42*aRnd.x)*uSharp;`);
   // ближайшие соседи: тесное облако прямо вокруг Солнца — оно и проносится мимо в конце полёта
   const gNear = spurPt(1100, .17, .038, .016, .35, .55, 1.25, `a = (0.08 + 0.50*aRnd.x)*uSharp;`);
-  g.add(gSpur, gNear);
-  const gYou = glow(0xffe6b0, .85, 0); g.add(gYou);
+  gal.add(gSpur, gNear);
+  const gYou = glow(0xffe6b0, .85, 0); gal.add(gYou);
+
+  // ---- первый слой станции: космическая паутина, сверхскопление Ланиакея и Местная группа ----
+  // Млечный Путь здесь не отдельная точка, а сама галактика станции, уменьшенная в GL_K раз: при
+  // погружении слой Ланиакеи раздувается вокруг неё и уходит за камеру, а диск растёт из той же
+  // точки — один и тот же экспоненциальный закон, поэтому скорость приближения постоянна
+  const GL_K = Math.log(30), LAN_S = 1.5;   // LAN_S — чтобы паутина занимала кадр так же, как диск
+  const LD = buildLaniaData(Q);
+  const lan = new THREE.Group(); lan.visible = false; g.add(lan);
+  const lWeb = fromRec(LD.web, `a = (0.10 + 0.42*aRnd.x)*uSharp*(0.85 + 0.15*sin(uTime*0.7 + aSeed*30.0));`);
+  // поток к Великому аттрактору — то, по чему Ланиакею и определили (Тулли и др., 2014): каждая
+  // точка сносится вдоль своего направления aRnd и, погаснув в конце пути, начинает заново
+  // Каждая струйка — голова и три точки хвоста: хвост — та же точка, только чуть раньше на своём пути
+  // (сдвиг фазы через aSeed), поэтому направление течения читается без всякой стрелки. Цвет —
+  // насыщенное золото: бледно-золотые точки на сине-белой паутине при аддитивном смешении белели
+  const FTR = 4;
+  const lFlow = pts(LD.flow.length*FTR, (i, o) => {
+      const r = LD.flow[Math.floor(i/FTR)], k = i % FTR;
+      o.p = r.p; o.rnd = r.rnd; o.seed = r.seed - k*.016;
+      o.c = k ? mixc(C(0xffae45), C(0xff8526), k/FTR) : C(0xffd27a); o.s = r.s*(1 - .2*k); },
+    `float f = fract(uTime*0.11 + aSeed);
+     p += aRnd*f; a = 0.85*uSharp*smoothstep(0.0, 0.15, f)*(1.0 - smoothstep(0.75, 1.0, f));`);
+  const lLG = fromRec(LD.lg, `a = 0.7*uSharp;`);
+  const DISC = `a = (0.5 + 0.45*(1.0 - smoothstep(0.0, 0.2, aRnd.x)))*uSharp;`;
+  const lM31 = fromRec(LD.m31, DISC), lM33 = fromRec(LD.m33, DISC);
+  const m31 = new THREE.Group(), m33 = new THREE.Group(), m31Core = glow(0xffe3b8, .55, .75);
+  m31.add(lM31, m31Core); m31.position.set(1.25, .55, .2); m31.rotation.set(1.1, .3, .45);
+  m33.add(lM33); m33.position.set(1.75, .05, .05); m33.rotation.set(-.6, .2, .3);
+  // «вы здесь»: тонкое золотое кольцо вокруг Млечного Пути — точку в центре иначе не отличить от узлов
+  const youRing = new THREE.LineLoop(circleGeo(.34, 64, 0, 0), lineMat(0xD6AC5E, .55));
+  youRing.userData.self = true;
+  lan.add(lWeb, lFlow, lLG, m31, m33, youRing);
+  const LPTS = [lWeb, lFlow, lLG, lM31, lM33];
+  // подписи — шрифтом основного текста (Forum), тёплым золотом и с тёмной обводкой: на светлых узлах
+  // паутины белые буквы без обводки сливались. Рисуются последними (renderOrder), поверх точек
+  const lab = (txt, p) => {
+    const c = document.createElement("canvas"), x = c.getContext("2d"), F = "400 50px Forum, Georgia, serif";
+    x.font = F; const w = Math.ceil(x.measureText(txt).width) + 60; c.width = w; c.height = 96;
+    x.font = F; x.textAlign = "center"; x.textBaseline = "middle"; x.lineJoin = "round";
+    // тёмная подложка в два слоя: размытая тень гасит соседние узлы (их добеливает ещё и bloom),
+    // плотная обводка держит контур букв
+    x.shadowColor = "rgba(3,4,10,1)"; x.shadowBlur = 22;
+    x.lineWidth = 14; x.strokeStyle = "rgba(5,6,12,.92)"; x.strokeText(txt, w/2, 52); x.strokeText(txt, w/2, 52);
+    x.shadowBlur = 0; x.fillStyle = "#FFD88A"; x.fillText(txt, w/2, 52);
+    const tex = new THREE.CanvasTexture(c); tex.minFilter = THREE.LinearFilter;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthWrite:false, depthTest:false, opacity:0}));
+    s.scale.set(1.05*w/96, 1.05, 1); s.position.set(p[0], p[1], p[2]); s.renderOrder = 20; s.userData.self = true;
+    lan.add(s); return s; };
+  // подписи отнесены от узлов дальше, чем сам узел: прямо на ярком скоплении их не спасёт никакая обводка
+  const LABS = [lab("Млечный Путь · вы здесь", [0, -.7, 0]), lab("Андромеда", [1.25, 1.3, .2]),
+                lab("Скопление Девы", [LD.VIRGO[0], LD.VIRGO[1] + .95, LD.VIRGO[2]]),
+                lab("Великий аттрактор", [LD.GA[0], LD.GA[1] - 1.25, LD.GA[2]])];
+  let labK = 0, lanA = .25;
+  const qOwn = new THREE.Quaternion(), eOwn = new THREE.Euler();
   const gFoc = new THREE.Vector3();
   let gT = 0, glt = 0;
   g.rotation.x = 1.05; g.rotation.z = .35;
@@ -849,22 +1083,46 @@ g => {
     const spIn = H.zs === undefined ? 0 : smooth(1.1, 6, H.zs);
     gSpur.material.uniforms.uSharp.value = .26 + .74*spIn;
     gNear.material.uniforms.uSharp.value = .06 + .94*spIn;
+    // gl — где мы между слоями станции: 0 — Ланиакея (галактика — точка), 1 — сама галактика
+    const gl = H.gl === undefined ? 1 : H.gl, gs = Math.exp((gl - 1)*GL_K);
+    gal.scale.setScalar(gs);
     const ang = SUN_A0 + gT*0.3/(0.6 + SUN_R);
-    gFoc.set(Math.cos(ang)*SUN_R, SUN_H, Math.sin(ang)*SUN_R);
-    gYou.position.copy(gFoc);
+    gYou.position.set(Math.cos(ang)*SUN_R, SUN_H, Math.sin(ang)*SUN_R);
+    gFoc.copy(gYou.position).multiplyScalar(gs);             // в координатах станции, с учётом масштаба диска
     const fl = H.zs === undefined ? 0 : 1 - smooth(1.0, 3.5, H.zs);
-    gYou.material.opacity = (.16 + .5*H.h + .55*fl)*(1 - smooth(3, 8, H.zs === undefined ? 1 : H.zs));
+    gYou.material.opacity = (.16 + .5*H.h + .55*fl)*(1 - smooth(3, 8, H.zs === undefined ? 1 : H.zs))*smooth(.88, 1, gl);
     gYou.scale.setScalar(.85/Math.max(1, H.zs === undefined ? 1 : H.zs));
     if (H.zc) gYou.material.opacity = 0;                    // летим в ядро, а не к Солнцу
     g.rotation.x += (1.05 - H.y*.14*H.h - g.rotation.x)*.015; g.rotation.z += (.35 + H.x*.1*H.h - g.rotation.z)*.015;
     // на подлёте галактика ещё не разрешается в спираль: издали это точка, а не маленькая картинка
     // галактики с рукавами. Ядро раздуто относительно диска, точки мельче — рукава проявляются
     // по мере приближения, как при настоящем сближении
+    // «издали» галактика и на слое Ланиакеи: там она меньше в GL_K раз, чем в покое
     const zs = H.zs === undefined ? 1 : H.zs, big = Math.max(1, zs);
-    const far = 1 - smooth(.10, .55, zs);
+    const far = 1 - smooth(.10, .55, zs*gs);
     gCore.scale.setScalar(4*(1 + far*2.6)/big);           // мировой размер спрайта держим постоянным
     gCore.material.opacity = (.8 + far*.2)*(1 - smooth(1.8, 7, zs));
-    gPts.material.uniforms.uSize.value = 1 - far*.55; };
+    gPts.material.uniforms.uSize.value = 1 - far*.55;
+    // слой Ланиакеи: раздувается вокруг Млечного Пути и гаснет, пройдя мимо камеры
+    lan.visible = gl < .985;
+    if (lan.visible){
+      lan.scale.setScalar(LAN_S*Math.exp(gl*GL_K));
+      // наклон диска (g.rotation) паутине не нужен: в своей системе она стоит «лицом» к зрителю,
+      // подписи висят строго под объектами; живость даёт собственный медленный дрейф
+      // курсор паутину не мнёт (толчок шаблона uPush для неё обнулён), а лишь ускоряет её поворот
+      lanA += dt*(.012 + .085*H.h);
+      eOwn.set(.06*Math.sin(t*.05), lanA, 0); qOwn.setFromEuler(eOwn);
+      lan.quaternion.copy(g.quaternion).invert().multiply(qOwn);
+      const la = 1 - smooth(.5, .92, gl), boost = 1 + .9*smooth(.05, .6, gl);
+      for (const o of LPTS){ const u = o.material.uniforms; u.uSharp.value = la*boost; u.uSize.value = 1 + .9*smooth(.1, .7, gl); u.uPush.value = 0; }
+      const v = H.v === undefined ? 1 : H.v;
+      m31Core.material.opacity = .75*la*v;
+      // подписи — только когда стоим на слое: на подлёте и при погружении они бы мельтешили
+      labK += ((H.zs === undefined && gl < .15 ? 1 : 0) - labK)*Math.min(1, dt*2.2);
+      for (const s of LABS) s.material.opacity = .95*labK*(1 - smooth(.02, .2, gl))*v;
+      youRing.material.opacity = .55*labK*(1 - smooth(.02, .3, gl))*v;
+    }
+  };
   upd4.zoomFocus = () => gFoc;                            // куда летим: наше место в рукаве
   return upd4;
 },
@@ -1870,11 +2128,32 @@ const DNA_LV = [
           "Каббала — мир сотворён сочетаниями букв; смысл рождается из порядка знаков",
           "Закон Одного — разумная энергия принимает форму через закономерность, а не через случай"] }
 ];
+// Станция IV двухслойная: сначала космическая паутина и сверхскопление Ланиакея с Местной группой —
+// ступень шкалы между Вселенной (8,8·10²⁶ м) и Галактикой (10²¹ м), — затем сама галактика, которая
+// вырастает из точки Млечного Пути (см. GL_K в сцене станции)
+const GAL_LV = [
+  { short:"Ланиакея", kind:"lan", st:3, name:"Ланиакея", sub:"Космическая паутина · Местная группа",
+    scale:"≈5·10²⁴ м", lead:"Галактики не рассыпаны по Вселенной, а сплетены в сеть: нити, стены и узлы-скопления вокруг огромных пустот. Наш дом в этой сети — сверхскопление Ланиакея, а в нём, на одной из нитей, — Местная группа: Млечный Путь, Андромеда и десятки карликовых галактик.",
+    hint:"Листайте — вглубь, к Млечному Пути",
+    sci:[["s","Ланиакея — сверхскопление поперечником около 160 мегапарсек (≈520 млн световых лет), около 100 000 галактик и массой порядка 10¹⁷ масс Солнца. Его границы провели в 2014 году Тулли, Куртуа, Хоффман и Помаред по движению тысяч галактик"],
+         ["s","Ланиакею определяет не плотность, а течение: внутри её границ галактики, помимо общего расширения, сносятся к одной области — Великому аттрактору. Золотые точки на экране показывают это течение"],
+         ["s","Местная группа — более 80 галактик в объёме около 3 мегапарсек. Крупнейшие — Андромеда и Млечный Путь; рядом с нами — Большое и Малое Магеллановы облака"],
+         ["s","Андромеда в 2,5 млн световых лет от нас и сближается с Млечным Путём примерно на 110 км/с"],
+         ["h","Слияние с Андромедой долго считали неизбежным через 4–5 млрд лет; расчёт по данным «Хаббла» и Gaia (Савала и др., 2025) даёт около 50% вероятности в ближайшие 10 млрд лет"],
+         ["h","Сеть галактик и сеть нейронов мозга статистически похожи по структуре (Вацца и Фелетти, 2020) — любопытное совпадение формы, а не связь между ними"],
+         ["t","Масштабы на экране сжаты: в действительности Ланиакея больше Местной группы примерно в 50 раз, а расстояние до Андромеды — в 25 раз больше поперечника нашей галактики"]],
+    trad:["Буддизм хуаянь — сеть Индры: в каждом узле бесконечной сети висит жемчужина, и в каждой отражаются все остальные",
+          "Имя «Ланиакея» по-гавайски — «необъятные небеса»; его предложил преподаватель гавайского языка Нава‘а Наполеон в честь полинезийских мореходов, ходивших по звёздам",
+          "Герметизм — «что вверху, то и внизу»: одна и та же форма сети повторяется на разных масштабах",
+          "Закон Одного — всё сотворённое связано единым замыслом Логоса, и ни одна часть не существует отдельно"],
+    prac:"Полный адрес: медленно назвать свой адрес до конца — улица, город, страна, Земля, Солнечная система, Рукав Ориона, Млечный Путь, Местная группа, Ланиакея — и на каждом шаге почувствовать, как расширяется «дом»." },
+  { short:ST[3].short, kind:"g", st:3, name:ST[3].name, sub:ST[3].sub }
+];
 const JOURNEYS = {
   abs:{ st:0, kind:"a", levels:() => ALV, next:() => "g1" },
   g1:{ st:1, kind:"g", levels:() => GEN(1), next:() => "g2" },
   g2:{ st:2, kind:"g", levels:() => GEN(2), next:() => "g3" },
-  g3:{ st:3, kind:"g", levels:() => GEN(3), next:() => galBranch === "bh" ? "bh" : "g4" },
+  g3:{ st:3, kind:"g", levels:() => GAL_LV, start:1, next:() => galBranch === "bh" ? "bh" : "g4" },
   // ответвление станции IV: к центру Галактики, к чёрной дыре. Дальше пути по кольцу нет — только за горизонт
   bh:{ st:3, kind:"g", levels:() => BH_LV, next:() => "iz" },
   g4:{ st:4, kind:"g", levels:() => SUNLV, next:() => "earth" },
@@ -1953,14 +2232,16 @@ function renderLevel(L){
     h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>` + (v.hint ? `<p class="mono hd-try">${esc(coarse ? v.hint.replace("Наведите на", "Коснитесь").replace("и нажмите", "") : v.hint)}</p>` : "")
       + listHTML("Наука", v.sci) + listHTML("Традиции и философия", v.trad) + `<section><h3>Параллель с человеком</h3><p class="hd-par">${esc(v.par)}</p></section>` + listHTML("Практики", v.prac, "d t")
       + `<p class="note">${mk("t")}<span>Чёрная дыра здесь не нарисована, а рассчитана: каждый пиксель — луч света, прослеженный по уравнениям Эйнштейна. Яркость диска завышена для глаза; традиции говорят о том же рубеже — о пустоте в центре — языком опыта.</span></p>`;
-  } else if (jKind === "g" && v.kind === "mol"){
+  } else if (jKind === "g" && (v.kind === "mol" || v.kind === "lan")){
     name = v.name; sub = v.sub; hSel = -1;
     $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${v.scale}`;
     $("hdHint").textContent = v.hint;
     h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>`
-      + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad);
+      + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad)
+      + (v.prac ? `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>` : "");
   } else if (jKind === "g"){
     const r = DATA.ring[jSt]; name = r.name; sub = r.sub; hSel = -1;
+    $("hdHint").textContent = JHINT.g;            // подсказка соседнего слоя (Ланиакея, Молекула) не должна залипать
     if (JL.length > 1) $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${DATA.ring[jSt].scale}`;
     h = `<p class="hd-lead">${esc(LEDE[jSt])}</p>` + (jSt === 3 ? `<section class="hd-fork"><h3>Развилка пути</h3><button data-gb="sun" aria-pressed="${galBranch !== "bh"}" data-hover><b>Дальше по кольцу</b><span>Рукав Ориона → Солнце → Земля</span></button><button data-gb="bh" aria-pressed="${galBranch === "bh"}" data-hover><b>К центру — чёрная дыра</b><span>Стрелец A* → горизонт событий → Изнанка</span></button></section>` : "") + listHTML("Традиции", r.trad) + listHTML("Наука", r.sci) + `<section><h3>Практика</h3><p class="hd-par">${esc(r.prac)}</p></section><section><h3>Вопрос</h3><p class="quote" style="font:22px/1.3 var(--display);color:var(--brass);margin:0">${esc(r.q)}</p></section><button class="hd-open" id="hdOpen" data-hover>Таймер практики и дневник станции →</button>`;
   } else if (jKind === "a" && v.kind === "a0"){
@@ -2029,10 +2310,11 @@ function openJourney(id){
   closePath(); surface();
   jHist = [];
   setJourney(id); goTo(jSt);
-  humanOpen = true; hSel = -1; depth = 0; depthT = 0; shownLevel = -1;
+  // прямой вход в главу — с её «лицевого» слоя: у Галактики это сам диск, а не Ланиакея над ним
+  humanOpen = true; hSel = -1; depth = depthT = JOURNEYS[id].start || 0; shownLevel = -1;
   stations[6].api.focus("c", -1);
   chHuman.classList.add("open"); chHuman.setAttribute("aria-hidden","false"); syncBtns();
-  requestAnimationFrame(() => { drawDepth(); renderLevel(0); depthMark(); });
+  requestAnimationFrame(() => { drawDepth(); renderLevel(Math.round(depth)); depthMark(); });
   if (kbUser) $("hBack").focus({preventScroll:true});
   Music.dive();
 }
@@ -2106,7 +2388,7 @@ function transitTick(dt, now){
     setJourney(tr.to);
     // dir 0 — это прямой вход в главу (из меню или подлётом к Земле): начинать надо с первого слоя,
     // а не с последнего; назад (dir < 0) — наоборот, с последнего
-    depth = depthT = tr.dir < 0 ? DMAX - 1 : 0;
+    depth = depthT = tr.dir < 0 ? DMAX - 1 : tr.dir > 0 ? 0 : (JOURNEYS[tr.to].start || 0);
     shownLevel = -1; hSel = -1; lastDepthInput = now;
     stations[6].api.focus("c", -1);
     jumpRing(jSt, tr.dir || 1);
@@ -2169,11 +2451,11 @@ function startZoom(to, dir){
   while (dth > Math.PI) dth -= TAU; while (dth < -Math.PI) dth += TAU;
   zDustEnsure();
   zm = { t:0, dir, to, aSt, bSt, inward: to === pair[1], jumped:false, thA: thOf(aSt), dth, bh: pair[1] === "bh",
-         qA: stations[aSt].inner.quaternion.clone(), push: 0 };
+         dur: ZDUR, qA: stations[aSt].inner.quaternion.clone(), push: 0 };
   zStarRel = 0;
   Music.portal(dir > 0);
 }
-const zProg = () => { const e = smooth(0, 1, clamp(zm.t/ZDUR, 0, 1)); return zm.inward ? e : 1 - e; };
+const zProg = () => { const e = smooth(0, 1, clamp(zm.t/zm.dur, 0, 1)); return zm.inward ? e : 1 - e; };
 // Картинка станции на полёте. Обе станции стоят в одной точке кольца и масштабируются относительно
 // СВОЕГО ЦЕНТРА — а центр и есть точка, куда смотрит камера. Поэтому поток на экране строго радиальный
 // из середины кадра: паутина расходится и уходит за все четыре края, галактика растёт из точки ровно
@@ -2222,7 +2504,7 @@ function zoomTick(dt, now){
     drawDepth(); renderLevel(Math.round(depth)); depthMark(); syncBtns();
     Music.end();
   }
-  if (zm.t > ZDUR){ zoomEnd(); return; }
+  if (zm.t > zm.dur){ zoomEnd(); return; }
   // поле пролёта: держим его у камеры и гоним навстречу. Полтора оборота за полёт — достаточно,
   // чтобы поток читался, но не превращался в «гиперпространство»
   if (zDustG){
@@ -2257,7 +2539,19 @@ $("toEarth").onclick = openEarth;
 function openBH(){
   galBranch = "bh";
   if (humanOpen && jId === "bh") return;
-  if (humanOpen && jId === "g3"){ if (!tr && !zm) startTransit(1); return; }
+  if (humanOpen && jId === "g3"){
+    if (tr || zm) return;
+    // со слоя Ланиакеи сначала спускаемся к диску галактики — в ядро летим уже из неё
+    // ждём, пока диск действительно вырастет, а не фиксированное время: на медленной машине
+    // таймер отпустил бы полёт посреди погружения, и диск дёрнулся бы к полному размеру
+    depthT = 1; lastDepthInput = performance.now();
+    // если читатель сам прокрутил обратно (depthT ушёл с 1) — полёт отменяется
+    (function wait(){
+      if (!humanOpen || jId !== "g3" || tr || zm || depthT < .99) return;
+      if (depth > .97) startTransit(1); else setTimeout(wait, 120);
+    })();
+    return;
+  }
   openJourney("g3");
   setTimeout(() => { if (humanOpen && jId === "g3" && !tr && !zm) startTransit(1); }, 1500);
 }
@@ -2306,7 +2600,53 @@ function openPath(){ closeHuman(); surface(); pathOpen = true; chPath.classList.
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
 $("pathClose").onclick = closePath;
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
-function closeChapters(){ closeHuman(); closePath(); }
+function closeChapters(){ closeHuman(); closePath(); closeRef(); }
+
+/* ---------- Справочник ---------- */
+const REF_GUIDE = `
+  <h2>Как пользоваться Астролябией</h2>
+  <p class="lede">Короткая инструкция — если вы впервые открыли сайт.</p>
+  <div class="gsec"><h3>Кольцо станций</h3><p>Латунное кольцо из двенадцати станций — путь от Абсолюта (I) через космос, Землю и человека обратно к Пустоте (XII). Листайте колесом мыши, свайпайте на телефоне или используйте стрелки — камера идёт вдоль кольца от станции к станции.</p></div>
+  <div class="gsec"><h3>Погружение в станцию</h3><p>Наведите на объект станции и нажмите «Погрузиться в станцию» (или просто кликните по объекту) — откроется панель с традицией, наукой и практикой. Внутри можно пролистать разделы, включить таймер практики и записать мысль в дневник.</p></div>
+  <div class="gsec"><h3>Четыре слоя каждой станции</h3><p><b>Традиция</b> — что говорят учения; <b>Наука</b> — что установлено, а что лишь гипотеза; <b>Практика</b> — упражнение с таймером; <b>Символ</b> — образ, звук, цвет.</p></div>
+  <div class="gsec"><h3>Маркеры доверия</h3><div class="legend"><span>${mk("s")}установлено наукой</span><span>${mk("h")}гипотеза, исследуется</span><span>${mk("t")}традиция или образ</span></div><p>Они защищают от смешения веры и факта: одно и то же утверждение не всегда стоит на одном основании.</p></div>
+  <div class="gsec"><h3>Главы меню</h3><p>Кнопка «Станции» открывает список всех двенадцати. В меню выше — главы со своим погружением: «Человек» (тонкие тела → центры → тело → органы → клетка → ДНК), «Земля» (поля → атмосфера → океан → ядро планеты), «Путь из восьми этапов» (с дыхательной практикой) и ответвление «К центру Галактики» — чёрная дыра и переход в Изнанку.</p></div>
+  <div class="gsec"><h3>Звук</h3><p>Кнопка «Музыка» включает тихий фоновый звук станции — у каждой свой тон.</p></div>
+  <div class="gsec"><h3>Этот раздел</h3><p>Вкладки выше — Розеттский камень (как разные традиции называют одно и то же), десять сквозных принципов карты и список источников.</p></div>
+`;
+function renderPrinciplesHTML(){
+  return `<h2>Десять принципов, на которых стоит карта</h2><p class="lede">Сквозные идеи, которые повторяются во всех станциях на разных языках — традиций и науки.</p>
+  <div class="pr-grid">${DATA.principles.map(p => `
+    <article class="pr"><h3>${esc(p.name)}</h3><p>${esc(p.text)}</p>
+    <div class="tr">${mk("t")}<span>${esc(p.trad)}</span></div>
+    <ul>${p.sci.map(([m,t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}</ul></article>`).join("")}</div>`;
+}
+function renderRosettaHTML(){
+  const RT = DATA.rosetta;
+  return `<h2>Как называют одно и то же</h2><p class="lede">Одиннадцать традиций и наука — одним и тем же рядом уровней, их словами.</p>
+  <div class="rscroll"><table class="rtable">
+  <thead><tr><th scope="col">Уровень</th>${RT.cols.map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
+  <tbody>${RT.rows.map(r => `<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>
+  </table></div>`;
+}
+function renderSourcesHTML(){
+  return `<h2>Источники</h2><p class="lede">Традиции приведены как свидетельства человеческого опыта, наука — с пометкой степени уверенности.</p>
+  <ul class="src-list">${DATA.sources.map(s => `<li>${s.u ? `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t)}</li>`).join("")}</ul>`;
+}
+const REF = { guide: REF_GUIDE, rosetta: null, principles: null, sources: null };
+const chRef = $("chRef"), refBody = $("refBody"); let refOpen = false;
+function renderRefTab(tab){
+  if (tab === "rosetta" && !REF.rosetta) REF.rosetta = renderRosettaHTML();
+  if (tab === "principles" && !REF.principles) REF.principles = renderPrinciplesHTML();
+  if (tab === "sources" && !REF.sources) REF.sources = renderSourcesHTML();
+  refBody.innerHTML = REF[tab];
+  document.querySelectorAll(".reftab").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+}
+function openRef(tab){ closeHuman(); closePath(); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
+function closeRef(){ if (!refOpen) return; refOpen = false; chRef.classList.remove("open"); chRef.setAttribute("aria-hidden","true"); }
+$("mRef").onclick = () => { toggleMenu(false); openRef("guide"); };
+$("refClose").onclick = closeRef;
+document.querySelectorAll(".reftab").forEach(b => b.onclick = () => renderRefTab(b.dataset.tab));
 
 // дыхание
 (function(){
@@ -2737,6 +3077,10 @@ function loop(now){
       // станция VIII двухслойная: 0 — спираль, 1 — одна молекула из неё
       // на пролёте «Молекула → Атом» станцию держим в состоянии молекулы: после подмены путешествия
       // jSt уже 8, и без этого спираль вернулась бы прямо посреди полёта
+      // станция IV двухслойная: 0 — Ланиакея с Местной группой, 1 — сама галактика. На пролёте из
+      // «Вселенной» приходим на слой Ланиакеи, на пролётах к Солнцу и к чёрной дыре — на диск
+      if (i === 3) st.H.gl = zm && (zm.aSt === 3 || zm.bSt === 3) ? (zm.aSt === 2 ? 0 : 1)
+                           : (humanOpen && jKind === "g" && jId === "g3" ? smooth(0, 1, depth) : 1);
       if (i === 7) st.H.dna = zm && (zm.aSt === 7 || zm.bSt === 7) ? 1
                             : (humanOpen && jKind === "g" && jSt === 7 ? clamp(depth, 0, 1) : 0);
       // степень растворения в общую сферу (только у станций морф-пары; вне перехода всегда 0, поэтому
@@ -2887,7 +3231,7 @@ function loop(now){
   bhHotWas = bRes.disk;
   mscene.visible = Mh > .003 || Me > .003 || Ma > .003 || (hH > .001) || bV > .003;
   const Mv = Math.max(Mh, Me, Ma, bC);
-  { const eb = EARTH.boundary(dPos, earthBranch === "bio"), el = $("eBound"); if (eb.o > .01 && el.textContent !== eb.text) el.textContent = eb.text; el.style.opacity = String(jKind === "e" && humanOpen ? eb.o : 0); }
+  { const eb = EARTH.boundary(dPos, earthBranch === "bio"), el = $("eBound"); if (eb.o > .01 && el.dataset.t !== eb.text){ el.dataset.t = eb.text; el.textContent = eb.text; } el.style.opacity = String(jKind === "e" && humanOpen ? eb.o : 0); }
   scene.visible = Mv < .995;
   if (composer) composer.render(dt);
   else { renderer.clear(); renderer.render(scene, camera); if (mscene.visible){ renderer.clearDepth(); renderer.render(mscene, mcam); } if (k > .01){ renderer.clearDepth(); renderer.render(tscene, tcam); } }

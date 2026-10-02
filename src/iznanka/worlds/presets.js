@@ -23,4 +23,7 @@ export const WORLDS = {
     audio: { root: 65.41, harm: [1, .5, .33, .25, .2, .16], pulse: [4, .1], tex: 'wind', texGain: .03, event: 'glass', rate: 3.5 } },
   light:       { idx: 8, color: [1, 1, 1],    rim: [1, .97, .9],   state: { energy: .2, density: .2, dispersion: .1 }, trail: .9,
     audio: { root: 32.70, harm: [1, .5, .3, .2], pulse: [4, .1], tex: 'wind', texGain: .02, event: 'chord', rate: 10 } },
+  // Мандала: сакральная геометрия, золото и фиолет на чёрном — первым показывается новым посетителям
+  mandala:     { idx: 9, color: [.85, .55, 1], rim: [1, .85, .5],  state: { energy: .4, density: .55, dispersion: .4 }, trail: .93,
+    audio: { root: 36.71, harm: [1, .55, .4, .28, .18, .12], pulse: [3, .2], tex: 'wind', texGain: .07, event: 'shimmer', rate: 4.5 } },
 };
