@@ -152,17 +152,35 @@ sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 .ebound{position:fixed;left:31%;top:50%;z-index:6;transform:translate(-50%,-50%);pointer-events:none;opacity:0;color:#fff6e6;font-size:13px;letter-spacing:.24em;text-transform:uppercase;text-align:center;white-space:nowrap;text-shadow:0 0 18px rgba(255,210,150,.8),0 0 2px #000}
 .ebound::before,.ebound::after{content:"";display:block;height:1px;margin:10px auto;width:160px;background:linear-gradient(90deg,transparent,rgba(255,230,190,.8),transparent)}
 @media (max-width:760px){.ebound{left:50%;top:26%;font-size:11px;letter-spacing:.16em;white-space:normal;width:86vw}}
+/* Луна в углу кадра на «космических» слоях Земли: клик — в ветку «Луна» */
+.moonbtn{position:fixed;right:calc(var(--pad) + 120px);top:calc(env(safe-area-inset-top,0px) + 120px);z-index:6;display:grid;justify-items:center;gap:8px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .8s,visibility .8s}
+.moonbtn.on{opacity:1;visibility:visible;pointer-events:auto}
+.moonbtn i{position:relative;width:46px;height:46px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 62% 38%,#fbf8ef 0,#d9d4c7 32%,#a9a497 62%,#6b675f 100%);box-shadow:0 0 24px rgba(230,226,214,.35),0 0 2px rgba(255,255,255,.6);transition:transform .5s,box-shadow .5s}
+.moonbtn i::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 64%,rgba(70,70,80,.45) 0 9%,transparent 10%),radial-gradient(circle at 46% 30%,rgba(70,70,80,.35) 0 12%,transparent 13%),radial-gradient(circle at 70% 70%,rgba(70,70,80,.3) 0 7%,transparent 8%)}
+.moonbtn i::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 18% 50%,rgba(5,6,12,.88) 0 46%,transparent 64%)}
+.moonbtn span{color:var(--muted);font-size:10px;transition:color .5s}
+.moonbtn:hover i,.moonbtn:focus-visible i{transform:scale(1.14);box-shadow:0 0 34px rgba(240,236,224,.6),0 0 2px #fff}
+.moonbtn:hover span,.moonbtn:focus-visible span{color:var(--brass)}
+@media (max-width:760px){.moonbtn{right:14px;top:calc(env(safe-area-inset-top,0px) + 70px)}.moonbtn i{width:34px;height:34px}}
 .hd-fork{display:grid;gap:8px}
 .hd-fork button{display:grid;gap:3px;text-align:left;padding:11px 14px;border:1px solid var(--line);border-radius:4px;transition:border-color .3s,background .3s}
 .hd-fork button b{font:400 22px/1.1 var(--display)}
 .hd-fork button span{font-size:13px;color:var(--muted)}
 .hd-fork button[aria-pressed="true"]{border-color:var(--brass);background:rgba(214,172,94,.1)}
+.slit-ctl{display:grid;gap:10px}
+.cy-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.cy-row span{color:var(--faint)}.cy-row b{color:#FFD88A;font-weight:500;min-width:70px;text-align:right}
+.cy-row input{width:100%;accent-color:#D6AC5E;cursor:pointer}
+.slit-row{display:flex;flex-wrap:wrap;gap:8px}
+.slit-row .btn{font-size:13px;padding:8px 14px}
+.slit-row .btn[aria-pressed="true"]{border-color:var(--brass);color:#FFD88A;background:rgba(214,172,94,.12)}
+.slit-n{color:var(--faint);margin:0}.slit-n b{color:var(--ink);font-weight:500}
 .hd-open{justify-self:start;color:var(--brass);border-bottom:1px solid var(--line);padding:6px 0;font-size:14px}
 .hd-grid,.brand,.acts .act,.vign,.grain,.shade,.foot,.gauge,.ch-human{transition:opacity .9s,visibility .9s,color .9s,background .9s}
 body.j-white .ch-human{background:transparent!important;border-color:transparent!important;pointer-events:none}
 body.j-white .ch-human .back{pointer-events:auto;color:#5a4e38}
 body.j-white .hd-grid{opacity:0;visibility:hidden}
-body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white .brand{opacity:0;pointer-events:none}
+body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white .brand{opacity:0;pointer-events:none}
 body.j-white .act{color:#5a4e38}
 body.j-white .vign,body.j-white .grain,body.j-white .shade,body.j-white .foot,body.j-white .gauge{opacity:0!important;pointer-events:none}
 body.j-white .st,body.j-white .portal,body.j-white .intro{opacity:0!important;visibility:hidden!important}
@@ -275,6 +293,79 @@ body.j-white .dot{background:#b09a6a}
 .facts dd{margin:0}
 .note{font-size:12px;color:var(--muted);display:flex;gap:8px;margin:0}
 
+.ch-time{inset:0;background:radial-gradient(circle at 63% 53%,rgba(13,14,30,.97),rgba(5,6,12,.985) 72%);backdrop-filter:blur(14px);transform:scale(1.02)}
+.ch-time.open{transform:none}
+#tcv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:auto;touch-action:none}
+.time-in{position:absolute;left:var(--pad);top:calc(env(safe-area-inset-top,0px) + 76px);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:min(460px,36vw);display:grid;grid-template-rows:auto auto auto auto minmax(0,1fr);gap:10px;align-content:start;pointer-events:auto}
+.tm-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tm-now{display:grid;gap:2px;border-top:1px solid var(--line);padding-top:10px}
+.tm-ring{color:var(--faint)}
+.tm-date{font:400 26px/1.15 var(--display);color:var(--ink)}
+.tm-clock{color:var(--brass);white-space:nowrap}
+.tm-sub{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.tm-ago{font:400 18px/1.2 var(--display);color:#ffd9a0}
+.tm-unit{color:var(--muted)}
+.tm-track{height:2px;background:rgba(214,172,94,.18);margin-top:6px;position:relative}
+.tm-track i{position:absolute;left:0;top:0;bottom:0;background:var(--brass);box-shadow:0 0 8px rgba(214,172,94,.7)}
+.tm-ctl{display:flex;gap:8px 14px;align-items:center;flex-wrap:wrap}
+.tm-ctl .btn{padding:6px 14px;font-size:13px}
+.tm-link{color:var(--muted);font-size:13px;transition:color .3s}.tm-link:hover{color:var(--brass)}
+.tm-tog{color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:999px;padding:5px 12px;transition:color .3s,border-color .3s,background .3s}
+.tm-tog:hover{color:var(--brass)}
+.tm-tog[aria-pressed="true"]{color:var(--ink);border-style:solid;border-color:var(--brass);background:rgba(214,172,94,.1)}
+.tm-age{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12.5px;color:var(--muted)}
+.tm-age input{width:52px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:400 17px var(--display);padding:0 4px;text-align:center;outline:none}
+.tm-age input:focus{border-color:var(--brass)}
+#tmAgeOut{color:#ffbfe0;font:14px/1.3 var(--display)}
+#tmAgeOut:empty{display:none}
+.tm-scroll{overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent;min-height:0;border-top:1px solid var(--line);padding:12px 10px 28px 0;mask-image:linear-gradient(#000 92%,transparent);display:grid;gap:18px;align-content:start}
+.tm-card{display:grid;gap:10px;align-content:start}
+.tm-card.swap{animation:fadein .7s both}
+.tm-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tm-cat{min-width:0}
+.tm-nav{display:flex;gap:4px;flex:none}
+.tm-nav button{color:var(--muted);font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;transition:color .3s,border-color .3s}
+.tm-nav button:hover{color:var(--brass);border-color:var(--brass)}
+.tm-nav button:disabled{opacity:.3;pointer-events:none}
+.tm-card h3{font:400 32px/1.08 var(--display);margin:0;color:var(--ink)}
+.tm-ago2{margin:-4px 0 0;color:#ffd9a0;font:17px var(--display)}
+.tm-lead{margin:0;color:var(--ink);font:19px/1.4 var(--display)}
+.tm-art p{margin:0 0 10px;font-size:15px;line-height:1.62;color:#ddd6c6}
+.tm-art p:last-child{margin-bottom:0}
+.tm-card h4,.tm-cyc h4{font:500 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:6px 0 0}
+.tm-card ul.list{gap:7px;margin:0}
+.tm-card ul.list li{font-size:13.5px}
+.tm-pr{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+.tm-go{justify-self:start;margin-top:4px;font-size:13px}
+.tm-cyc{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.tm-cyc[hidden]{display:none}
+.tm-cyc ul.list{gap:8px;margin:0}.tm-cyc ul.list li{font-size:13px}.tm-cyc b{font-weight:500;color:var(--ink)}
+/* режим чтения: панель — во всю высоту, статья — главная */
+.ch-time.tm-max .tm-now,.ch-time.tm-max .tm-ctl,.ch-time.tm-max .tm-age{display:none}
+.ch-time.tm-max .time-in{width:min(640px,46vw);grid-template-rows:auto minmax(0,1fr)}
+.tm-max-btn{color:var(--muted);font-size:12.5px;transition:color .3s}.tm-max-btn:hover{color:var(--brass)}
+#treeCv,#treeLab{position:absolute;inset:0;width:100%;height:100%;display:block}
+#treeCv{pointer-events:auto;touch-action:none;cursor:grab}#treeLab{pointer-events:none}
+.ch-tree .time-in{grid-template-rows:auto auto minmax(0,1fr)}
+.ch-tree.tm-max .time-in{grid-template-rows:auto minmax(0,1fr)}
+.tr-hint{color:var(--faint);font-size:9.5px;letter-spacing:.14em}
+.tr-chain{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:12.5px;color:var(--muted)}
+.tr-chain button{color:var(--muted);padding:1px 2px;transition:color .3s}.tr-chain button:hover{color:var(--brass)}
+.tr-chain button[aria-current="true"]{color:var(--ink)}
+.tr-chain i{font-style:normal;color:var(--faint)}
+.tr-kids{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.tr-kids button{width:100%;display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center;text-align:left;padding:6px 8px;border-radius:3px;font:400 18px/1.15 var(--display);color:var(--ink);transition:background .3s}
+.tr-kids button:hover{background:rgba(214,172,94,.08)}
+.tr-kids .dotc{width:9px;height:9px;border-radius:50%}
+.tr-kids .mono{color:var(--faint);font-size:9.5px}
+@media (max-width:760px){
+  .time-in{left:var(--pad);right:var(--pad);top:47%;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:auto;gap:7px}
+  .tm-head .eyebrow{font-size:9.5px;letter-spacing:.14em}.tm-hide-m{display:none}
+  .tm-unit{display:none}
+  .tm-now{padding-top:7px}.tm-date{font-size:21px}.tm-ago{font-size:16px}
+  .tm-card h3{font-size:25px}.tm-lead{font-size:17px}.tm-art p{font-size:14.5px}
+  .ch-time.tm-max .time-in{width:auto;top:calc(env(safe-area-inset-top,0px) + 56px);background:rgba(5,6,12,.96);margin:0 calc(-1*var(--pad));padding:0 var(--pad)}
+}
 .ch-path{inset:0;background:rgba(5,6,12,.94);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
 .ch-path.open{transform:none}
 .ch-ref{inset:0;background:rgba(5,6,12,.94);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
@@ -418,6 +509,8 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <button class="act mono" id="btnEarth" aria-pressed="false" data-hover><span class="lbl">Земля</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M1.5 5.5h11M1.5 8.5h11M7 1c-2.4 3.4-2.4 8.6 0 12M7 1c2.4 3.4 2.4 8.6 0 12"/></svg></button>
       <button class="act mono" id="btnIz" data-hover><span class="lbl">Изнанка</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="2.2" fill="currentColor"/><path d="M1.2 7c1.6-3.4 10-3.4 11.6 0M1.2 7c1.6 3.4 10 3.4 11.6 0"/></svg></button>
       <button class="act mono" id="btnPath" aria-pressed="false" data-hover><span class="lbl">Путь</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M7 1v6l4 2"/></svg></button>
+      <button class="act mono" id="btnTime" aria-pressed="false" data-hover><span class="lbl">Время</span><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 1h9M1.5 13h9M2.5 1c0 3.5 3.5 4 3.5 6s-3.5 2.5-3.5 6M9.5 1c0 3.5-3.5 4-3.5 6s3.5 2.5 3.5 6"/></svg></button>
+      <button class="act mono" id="btnTree" aria-pressed="false" data-hover><span class="lbl">Древо</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.4" fill="currentColor"/><path d="M7 7L3 3M7 7l4-4M7 7v6M3 3L1.5 4.5M3 3l.5-2M11 3l1.5 1.5M11 3l-.5-2M7 13l-2 .5M7 13l2 .5"/></svg></button>
       <button class="act mono" id="sound" aria-pressed="false" data-hover><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="lbl">Музыка</span></button>
       <button class="act mono" id="menuBtn" data-hover><span class="lbl">Станции</span><span class="burger" aria-hidden="true"><i></i><i></i></span></button>
     </div>
@@ -461,6 +554,8 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <button class="chap" id="mAbs" data-hover><span class="mono eyebrow">Глава</span><b>Сквозной путь</b><span>От Абсолюта вглубь всех станций по кругу — с развилками</span></button>
       <button class="chap" id="mEarth" data-hover><span class="mono eyebrow">Глава</span><b>Погружение в Землю</b><span>Сквозь поля, воздух, воду и камень — к железному сердцу планеты</span></button>
       <button class="chap" id="mBH" data-hover><span class="mono eyebrow">Ответвление</span><b>К центру Галактики</b><span>Чёрная дыра Стрелец A* и проход за горизонт — в Изнанку</span></button>
+      <button class="chap" id="mTime" data-hover><span class="mono eyebrow">Ось времени</span><b>Космический календарь</b><span>13,8 млрд лет в одном году: от Большого взрыва до последней секунды</span></button>
+      <button class="chap" id="mTree" data-hover><span class="mono eyebrow">Родство всего живого</span><b>Древо жизни</b><span>От LUCA — через бактерии, растения, грибы и животных — к человеку</span></button>
       <button class="chap" id="mPath" data-hover><span class="mono eyebrow">Глава</span><b>Путь из восьми этапов</b><span>Узнать, почувствовать, прожить, осмыслить</span></button>
       <button class="chap" id="mRef" data-hover><span class="mono eyebrow">Справочник</span><b>Как пользоваться · сравнение традиций</b><span>Инструкция, Розеттский камень, десять принципов, источники</span></button>
     </div>
@@ -472,6 +567,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 <div class="reveal" id="reveal" aria-hidden="true"></div>
 <div class="loopfx" id="loopFx" aria-hidden="true"></div>
 <div class="ebound mono" id="eBound" aria-hidden="true"></div>
+<button class="moonbtn" id="moonBtn" aria-label="Луна — погрузиться" tabindex="-1" data-hover><i aria-hidden="true"></i><span class="mono">Луна</span></button>
 <div class="ptip" id="ptip" aria-live="polite"><span class="mono pk"></span><b></b><p class="pd"></p><p class="pn"></p></div>
 
 <section class="interior" id="interior" aria-hidden="true" aria-label="Станция изнутри">
@@ -524,6 +620,36 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <div class="cnt" id="cnt">0 из 30 дыханий</div>
       <button class="btn" id="breathBtn" data-hover>Начать 5 минут</button>
     </aside>
+  </div>
+</section>
+
+<section class="chapter ch-time" id="chTime" aria-hidden="true" aria-label="Космический календарь">
+  <canvas id="tcv" aria-label="Астролябия времени: вложенные кольца календаря"></canvas>
+  <button class="close mono" id="timeClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Космический календарь<span class="tm-hide-m"> · 13,8 млрд лет в году</span></span><button class="tm-max-btn" id="tmMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <div class="tm-now" title="Большой взрыв — 1 января, 00:00. Сейчас — полночь 31 декабря. Каждое следующее кольцо — последнее деление предыдущего, развёрнутое на весь круг.">
+      <span class="mono tm-ring" id="tmRing"></span>
+      <div class="tm-date"><span id="tmDay"></span> <span class="tm-clock" id="tmClock"></span></div>
+      <div class="tm-sub"><span class="tm-ago" id="tmAgo"></span><span class="mono tm-unit" id="tmUnit"></span></div>
+      <div class="tm-track"><i id="tmBar"></i></div>
+    </div>
+    <div class="tm-ctl"><button class="btn" id="tmPlay" aria-pressed="false" data-hover>Прожить год</button><button class="tm-link" id="tmReset" data-hover>⟲ К началу</button><button class="tm-tog" id="tmCycBtn" aria-pressed="false" data-hover>Циклы традиций</button></div>
+    <div class="tm-age"><label for="tmAge">Ваш возраст</label><input id="tmAge" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="—"><button class="tm-link" id="tmAgeGo" hidden data-hover>Показать</button><span id="tmAgeOut"></span></div>
+    <div class="tm-scroll" id="tmScroll"><article class="tm-card" id="tmCard" aria-live="polite"></article><section class="tm-cyc" id="tmCyc" hidden></section></div>
+  </div>
+</section></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-tree" id="chTree" aria-hidden="true" aria-label="Древо жизни">
+  <canvas id="treeCv" aria-label="Радиальное древо жизни: общий предок в центре, сегодняшний день — внешний край"></canvas>
+  <canvas id="treeLab" aria-hidden="true"></canvas>
+  <button class="close mono" id="treeClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Древо жизни<span class="tm-hide-m"> · 4 млрд лет родства</span></span><button class="tm-max-btn" id="trMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <div class="tm-ctl"><button class="tm-link" id="trHome" data-hover>⟲ Всё древо</button><span class="mono tm-hint tr-hint">Клик по узлу — ветвь · тяните — поворот · колесо — ближе</span></div>
+    <div class="tm-scroll" id="trScroll"><article class="tm-card" id="trCard" aria-live="polite"></article></div>
   </div>
 </section>
 
@@ -593,6 +719,8 @@ const RAD  = [2.2,2.0,2.2,2.4,2.0,1.8,1.4,1.6,2.8,2.2,2.0,2.2];
 const SEXT = [null, [5.8,6.1], [6.6,5.4], [9.3,7.3], null, null, null, [9.1,9.4], [7.8,6.8], [6.4,5.5], [7.5,7.4], [7.7,6.6]];
 // Станция V многослойная, и её габарит зависит от слоя: обзор системы вписывает себя сам
 // (свой fitCalc по настоящей проекции орбит), а на слое «Солнце» и глубже вписывать нужно звезду.
+// станция VII в ветке «Сон и сознание»: облако сна, спящий и монитор под ним
+SEXT[6] = () => jId === "dream" ? (W < 760 ? [3.9, 4.6] : [3.9, 3.85]) : null;
 SEXT[4] = () => (typeof SOLAR !== "undefined" && SOLAR && SOLAR.ext) ? SOLAR.ext() : null;
 const FIT_Y = .80, FIT_R = .93, FIT_L = .44;   // допустимые границы в NDC: по высоте, справа, слева
 const TAU = Math.PI*2, N = 12, NS_STOPS = 14;
@@ -733,6 +861,20 @@ function label(text, font, color, h){
   const s = new THREE.Sprite(new THREE.SpriteMaterial({map:t, transparent:true, depthWrite:false, opacity:.95}));
   s.scale.set(h*w/96, h, 1); return s;
 }
+// подпись в 3D шрифтом основного текста (Forum), тёплым золотом и с тёмной подложкой: на ярких точках
+// белые буквы без обводки сливаются (их ещё и добеливает bloom). Рисуется поверх всего (renderOrder);
+// прозрачностью управляет сама сцена — потому userData.self (общий фейд станции её не трогает)
+function haloLabel(txt, h, color){
+  const c = document.createElement("canvas"), x = c.getContext("2d"), F = "400 50px Forum, Georgia, serif";
+  x.font = F; const w = Math.ceil(x.measureText(txt).width) + 60; c.width = w; c.height = 96;
+  x.font = F; x.textAlign = "center"; x.textBaseline = "middle"; x.lineJoin = "round";
+  x.shadowColor = "rgba(3,4,10,1)"; x.shadowBlur = 22;
+  x.lineWidth = 14; x.strokeStyle = "rgba(5,6,12,.92)"; x.strokeText(txt, w/2, 52); x.strokeText(txt, w/2, 52);
+  x.shadowBlur = 0; x.fillStyle = color || "#FFD88A"; x.fillText(txt, w/2, 52);
+  const tex = new THREE.CanvasTexture(c); tex.minFilter = THREE.LinearFilter;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthWrite:false, depthTest:false, opacity:0}));
+  s.scale.set(h*w/96, h, 1); s.renderOrder = 20; s.userData.self = true; return s;
+}
 const GOLD = C(0xD6AC5E), CREAM = C(0xF6EBCF);
 
 /* ---------- маска силуэта ---------- */
@@ -866,6 +1008,121 @@ function buildLaniaData(Q){
   return { web, flow, lg, m31:disc(1100, .5, 1.6, .1), m33:disc(260, .15, 1.5, .03), GA, VIRGO:NODES[0].p };
 }
 const fromRec = (a, chunk, size) => pts(a.length, (i, o) => { const r = a[i]; o.p = r.p; o.c = r.c; o.s = r.s; o.rnd = r.rnd; }, chunk, size);
+// ===== Фигуры Хладни: слой 1 станции II «Первоимпульс» =====
+// Квадратная пластина, на ней песок. Колебание пластины — сумма собственных мод; каждая мода откликается
+// по резонансной кривой на частоту возбуждения. Песок подбрасывается там, где пластина движется, и
+// скатывается туда, где она стоит, — на узловые линии. Это не нарисованный узор, а маленькая симуляция:
+// песчинки сами ползут по градиенту u² и дрожат пропорционально |u|. Между резонансами амплитуда мала —
+// песок почти не движется и узора не находит, как и на настоящей пластине.
+// Моды — классическое приближение для свободной квадратной пластины:
+//   φ(n,m) = cos(nπx)·cos(mπy) ∓ cos(mπx)·cos(nπy),  x, y ∈ [0, 1],  частота ∝ n² + m²
+// (точные частоты свободной пластины другие — в тексте слоя это сказано)
+// у части мод знак «+» (cos·cos + cos·cos): узор без диагонали — кольца, кресты, звёзды
+const CY_MODES = [[1,2,-1],[1,3,1],[2,3,-1],[1,4,-1],[2,4,1],[3,4,-1],[2,5,-1],[3,5,1],[1,6,-1],[4,5,-1],[3,7,1],[5,6,-1]]
+  .map(([n, m, s]) => ({ n, m, s, f: 40*(n*n + m*m) }));
+const CY_FMIN = 150, CY_FMAX = 2600;
+let CYM = null;      // состояние опыта — панель управляет им отсюда
+function buildChladni(g){
+  const S = 3.7;                                        // полусторона пластины в единицах сцены
+  const plate = new THREE.Group(); plate.visible = false; g.add(plate);
+  const qTilt = new THREE.Quaternion().setFromEuler(new THREE.Euler(-.42, 0, 0)), qZ = new THREE.Quaternion(), AZ = new THREE.Vector3(0, 0, 1);
+  // рамка пластины и слабая подсветка её поверхности
+  const frame = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([[-1,-1],[1,-1],[1,1],[-1,1]].map(([x, y]) => new THREE.Vector3(x*S, y*S, 0))), lineMat(0xD6AC5E, .7));
+  frame.userData.self = true; plate.add(frame);
+  const stem = glow(0xD6AC5E, .5, .6); stem.userData.self = true; plate.add(stem);    // точка крепления в центре
+  // поверхность: сетка точек показывает саму вибрацию — светится там, где пластина колеблется
+  const GR = Math.round(70*Math.sqrt(Q));
+  const surf = pts(GR*GR, (i, o) => { const a = i % GR, b = Math.floor(i/GR);
+      o.p = [((a + .5)/GR*2 - 1)*S, ((b + .5)/GR*2 - 1)*S, -.02]; o.c = C(0x8f7bff); o.s = .9; },
+    `float k = aRnd.x;                                      // |u| в этой точке, пишется из JS
+     a = (0.03 + 0.30*k)*uSharp*(0.7 + 0.3*sin(uTime*30.0 + aSeed*20.0));
+     col = mix(vec3(0.35,0.28,0.85), vec3(0.75,0.62,1.0), k);`);
+  surf.geometry.attributes.aRnd.setUsage(THREE.DynamicDrawUsage);
+  plate.add(surf);
+  // песок: положение — из JS; uProg — растворение в общую сферу на стыке со «Вселенной» (та же формула,
+  // что у узла станции II и у паутины станции III, иначе облака на стыке не совпадут)
+  const NS = Math.round(7000*Q);
+  const X = new Float32Array(NS), Y = new Float32Array(NS);
+  for (let i = 0; i < NS; i++){ X[i] = Math.random(); Y[i] = Math.random(); }
+  const sand = pts(NS, (i, o) => { o.p = [0, 0, 0]; o.c = mixc(C(0xffe2a8), C(0xfff6e6), Math.random()); o.s = .55 + Math.random()*.5; },
+    `vec3 rdir = normalize(vec3(fract(aSeed*13.1), fract(aSeed*37.7), fract(aSeed*71.3)) - 0.5 + 0.0001);
+     vec3 dirv = normalize(mix(normalize(position + vec3(0.0001)), rdir, 0.45));
+     p = mix(position, dirv*(3.0 + fract(aSeed*7.3)*1.5), uProg);
+     col = mix(col, vec3(1.0, 0.96, 0.9), uProg*0.75);
+     s *= 1.0 + uProg*1.4;
+     a = (0.78 + 0.1*uProg)*uSharp;`);
+  sand.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
+  plate.add(sand);
+
+  const st = { f: CY_MODES[5].f, fT: CY_MODES[5].f, auto: true, lastInput: -1e9, onState: null, tone: null };
+  CYM = st;
+  // веса мод на текущей частоте (резонанс шириной ~3,5%) и сводка для панели
+  const W = new Float32Array(CY_MODES.length);
+  function weights(f){ let best = 0, bk = 0;
+    for (let k = 0; k < CY_MODES.length; k++){ const x = (f/CY_MODES[k].f - 1)/.035; W[k] = 1/(1 + x*x); if (W[k] > best){ best = W[k]; bk = k; } }
+    return { best, bk }; }
+  st.state = () => { const w = weights(st.f); return { f: Math.round(st.f), on: w.best > .45, n: CY_MODES[w.bk].n, m: CY_MODES[w.bk].m }; };
+  st.set = f => { st.fT = clamp(f, CY_FMIN, CY_FMAX); st.auto = false; st.lastInput = performance.now(); };
+  st.scatter = () => { for (let i = 0; i < NS; i++){ X[i] = Math.random(); Y[i] = Math.random(); } };
+  // к соседнему резонансу: от текущей цели — ближайшая мода выше (dir > 0) или ниже по частоте
+  st.next = dir => { const cand = CY_MODES.filter(M => dir > 0 ? M.f > st.fT*1.01 : M.f < st.fT*.99);
+    if (cand.length) st.set(dir > 0 ? cand[0].f : cand[cand.length - 1].f); };
+  // поле u и его градиент в точке (x, y) ∈ [0,1]²
+  let gx = 0, gy = 0;
+  function field(x, y, act){
+    let u = 0; gx = 0; gy = 0;
+    for (const k of act){ const M = CY_MODES[k], w = W[k], a = M.n*Math.PI, b = M.m*Math.PI;
+      const cax = Math.cos(a*x), sax = Math.sin(a*x), cbx = Math.cos(b*x), sbx = Math.sin(b*x);
+      const cay = Math.cos(a*y), say = Math.sin(a*y), cby = Math.cos(b*y), sby = Math.sin(b*y);
+      const sg = M.s;
+      u += w*(cax*cby + sg*cbx*cay);
+      gx += w*(-a*sax*cby - sg*b*sbx*cay);
+      gy += w*(-b*cax*sby - sg*a*cbx*say); }
+    return u;
+  }
+  const pos = sand.geometry.attributes.position, sr = surf.geometry.attributes.aRnd;
+  let stepT = 0;
+  return {
+    update(t, dt, cym, dis, vis, gz){
+      const o = smooth(.35, .9, cym);
+      plate.visible = o > .004;
+      if (!plate.visible){ if (st.tone) st.tone.gain.gain.value = 0; return; }
+      // пластину держим лицом к зрителю: станция II медленно вращается вокруг оси, пластине это ни к чему
+      qZ.setFromAxisAngle(AZ, -gz); plate.quaternion.copy(qZ).multiply(qTilt);
+      for (const p of [sand, surf]){ const u = p.material.uniforms; u.uSharp.value = o; u.uPush.value = 0; u.uProg.value = dis; }
+      frame.material.opacity = .7*o*vis*(1 - dis); stem.material.opacity = .6*o*vis*(1 - dis);
+      surf.material.uniforms.uSharp.value = o*(1 - dis);
+      // частота: плавно к цели; без касаний — сама переходит к следующему резонансу каждые ~9 с
+      if (!st.auto && performance.now() - st.lastInput > 15000) st.auto = true;
+      if (st.auto && cym > .97 && dis < .01){ stepT += dt; if (stepT > 9){ stepT = 0; const w = weights(st.fT); st.fT = CY_MODES[(w.bk + 1) % CY_MODES.length].f; } }
+      st.f += (st.fT - st.f)*Math.min(1, dt*1.6);
+      const w = weights(st.f), act = [];
+      for (let k = 0; k < CY_MODES.length; k++) if (W[k] > .02) act.push(k);
+      if (st.onState) st.onState(st.state());
+      if (st.tone){ st.tone.osc.frequency.value = st.f; st.tone.gain.gain.value = .035*w.best*o*(1 - dis); }
+      // песок: шаг по градиенту u² (к узлам) плюс подскок, пропорциональный |u|. Шаг ограничен, чтобы
+      // песчинки не перепрыгивали через тонкие линии высоких мод
+      if (dis < .02 && cym > .3){
+        const h = Math.min(dt, .033), amp = w.best;
+        for (let i = 0; i < NS; i++){
+          const u = field(X[i], Y[i], act);
+          let dx = -u*gx*h*.11, dy = -u*gy*h*.11;
+          const L = Math.hypot(dx, dy), lim = .006; if (L > lim){ dx *= lim/L; dy *= lim/L; }
+          const j = Math.abs(u)*h*.5*amp;
+          X[i] = clamp(X[i] + dx + (Math.random() - .5)*j, 0, 1);
+          Y[i] = clamp(Y[i] + dy + (Math.random() - .5)*j, 0, 1);
+        }
+      }
+      for (let i = 0; i < NS; i++){ pos.array[i*3] = (X[i]*2 - 1)*S; pos.array[i*3 + 1] = (Y[i]*2 - 1)*S; pos.array[i*3 + 2] = .02; }
+      pos.needsUpdate = true;
+      // подсветка поверхности: |u| в узлах сетки
+      for (let b = 0, i = 0; b < GR; b++) for (let a = 0; a < GR; a++, i++){
+        const u = field((a + .5)/GR, (b + .5)/GR, act); sr.array[i*3] = Math.min(1, Math.abs(u)*.6); }
+      sr.needsUpdate = true;
+    }
+  };
+}
+let SLIT = null;   // состояние опыта с двумя щелями (станция X), панель управляет им отсюда
 const BUILD = [
 // I · Абсолют
 g => {
@@ -883,7 +1140,7 @@ g => {
 },
 // II · Первоимпульс
 g => {
-  g.add(pts(6500*Q, (i,o) => { o.rnd = [rn()*.22, rn()*.22, rn()*.22]; o.s = .5 + Math.random()*.9; },
+  const knotP = pts(6500*Q, (i,o) => { o.rnd = [rn()*.22, rn()*.22, rn()*.22]; o.s = .5 + Math.random()*.9; },
     `float u = fract(aSeed + uTime*0.016) * 6.28318;
      float rr = 2.0 + 0.85*cos(3.0*u);
      vec3 knot = vec3(rr*cos(2.0*u), rr*sin(2.0*u), -0.85*sin(3.0*u)) * 1.2 + aRnd;
@@ -898,10 +1155,16 @@ g => {
      p = mix(knot, dirv*(3.0 + fract(aSeed*7.3)*1.5), uProg);
      col = mix(col, vec3(1.0, 0.96, 0.9), uProg*0.75);
      s *= 1.0 + uProg*1.4;
-     a = 0.8 + 0.1*uProg;`));
+     a = (0.8 + 0.1*uProg)*uSharp;`);
+  g.add(knotP);
   const pulse = glow(0x9d6bff, 6, .55); g.add(pulse);
   const tri = [0xffffff, 0xff8fb8, 0xffcf7a].map(c => { const s = glow(c, 1.3, 1); g.add(s); return s; });
+  const CY = buildChladni(g);            // слой 1 станции: фигуры Хладни
   let ph = 0, lt = 0; return (t, H) => { const dt = Math.min(.05, Math.max(0, t - lt)); lt = t; ph += dt*(.5 + H.h*.35);
+    // слой 0 ↔ слой 1: узел уступает место пластине; на переходе во «Вселенную» растворяется уже песок
+    const cym = H.cym || 0, kv = 1 - smooth(.05, .6, cym);
+    knotP.material.uniforms.uSharp.value = kv; knotP.visible = kv > .004;
+    CY.update(t, dt, cym, H.d || 0, H.v === undefined ? 1 : H.v, g.rotation.z);
     // «рождение из точки»: зеркало коллапса треугольника Триединства (ABS.uCollapse) — форма разворачивается
     // из единой яркой точки ровно за то время, что угасает вспышка перехода, поэтому одна абстракция зримо
     // перетекает в другую, а не просто сменяется. При первом заходе (g1EmergeT0 не установлен) grow=1 сразу.
@@ -912,12 +1175,12 @@ g => {
     const d = H.d || 0, live = 1 - d;
     tri.forEach((s,k) => { const a = ph + k*TAU/3, r = (.6 + H.h*.35)*grow + d*2.5;
       s.position.set(Math.cos(a)*r + H.x*H.h*.7*grow, Math.sin(a)*r + H.y*H.h*.7*grow, .2);
-      s.material.opacity = grow*live; s.scale.setScalar(1.3*(.4 + .6*grow)*(1 + d*0.8)); });
+      s.material.opacity = grow*live*kv; s.scale.setScalar(1.3*(.4 + .6*grow)*(1 + d*0.8)); });
     // курсор теперь ощутимо «раздувает» и смещает сам центральный импульс, а не только орбитальные искры
     const k = (5 + 1.6*Math.sin(t*2.2) + H.h*1.8)*(.12 + .88*grow)*(1 + d*1.4);
     pulse.scale.set(k, k, 1);
     pulse.position.set(H.x*H.h*.3*grow, H.y*H.h*.3*grow, .05);
-    pulse.material.opacity = (.4 + H.h*.3)*(.1 + .9*grow)*live;
+    pulse.material.opacity = (.4 + H.h*.3)*(.1 + .9*grow)*live*kv;
     g.rotation.z = t*.03; };
 },
 // III · Вселенная
@@ -1052,19 +1315,7 @@ g => {
   const LPTS = [lWeb, lFlow, lLG, lM31, lM33];
   // подписи — шрифтом основного текста (Forum), тёплым золотом и с тёмной обводкой: на светлых узлах
   // паутины белые буквы без обводки сливались. Рисуются последними (renderOrder), поверх точек
-  const lab = (txt, p) => {
-    const c = document.createElement("canvas"), x = c.getContext("2d"), F = "400 50px Forum, Georgia, serif";
-    x.font = F; const w = Math.ceil(x.measureText(txt).width) + 60; c.width = w; c.height = 96;
-    x.font = F; x.textAlign = "center"; x.textBaseline = "middle"; x.lineJoin = "round";
-    // тёмная подложка в два слоя: размытая тень гасит соседние узлы (их добеливает ещё и bloom),
-    // плотная обводка держит контур букв
-    x.shadowColor = "rgba(3,4,10,1)"; x.shadowBlur = 22;
-    x.lineWidth = 14; x.strokeStyle = "rgba(5,6,12,.92)"; x.strokeText(txt, w/2, 52); x.strokeText(txt, w/2, 52);
-    x.shadowBlur = 0; x.fillStyle = "#FFD88A"; x.fillText(txt, w/2, 52);
-    const tex = new THREE.CanvasTexture(c); tex.minFilter = THREE.LinearFilter;
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthWrite:false, depthTest:false, opacity:0}));
-    s.scale.set(1.05*w/96, 1.05, 1); s.position.set(p[0], p[1], p[2]); s.renderOrder = 20; s.userData.self = true;
-    lan.add(s); return s; };
+  const lab = (txt, p) => { const s = haloLabel(txt, 1.05); s.position.set(p[0], p[1], p[2]); lan.add(s); return s; };
   // подписи отнесены от узлов дальше, чем сам узел: прямо на ярком скоплении их не спасёт никакая обводка
   const LABS = [lab("Млечный Путь · вы здесь", [0, -.7, 0]), lab("Андромеда", [1.25, 1.3, .2]),
                 lab("Скопление Девы", [LD.VIRGO[0], LD.VIRGO[1] + .95, LD.VIRGO[2]]),
@@ -1147,6 +1398,8 @@ g => {
 },
 // VII · Человек — по силуэту
 g => {
+  // фигура — своя подгруппа: в ветке «Сон и сознание» она ложится и становится спящим (dream.js)
+  const root = g; g = new THREE.Group(); root.add(g);
   const blue = C(0x8fa6ff), violet = C(0xb49cff);
   const vtx = renderer.capabilities.maxVertexTextures > 0;
   const uvOf = `vec2 fuv(vec2 w){ return vec2((w.x/${HM.K.toFixed(5)} + ${HM.cx.toFixed(3)})/${MS.toFixed(1)}, (${HM.cy.toFixed(3)} - w.y/${HM.K.toFixed(5)})/${MS.toFixed(1)}); }
@@ -1309,6 +1562,8 @@ g => {
   const chs = CC.map((c, k) => { const s = glow(c, 1.0, .62); s.position.set(0, HM.chakraY[k], .3); g.add(s); return s; });
   let fc = -1, LD = 4, LH = 0, LV = 1;
   const setOp = (pl, a) => { pl.visible = a > .004; pl.material.opacity = a; };
+  const figObjs = []; g.traverse(o => { if (o.material && !o.userData.self) figObjs.push(o); });
+  const DREAM = makeDream(root, g, figObjs);
   const upd = (t, H) => {
     const D = LD, h = LH, mixh = (a, b) => a + (b - a)*h;
     const sharp = mixh(1, smooth(-.3, 4, D));
@@ -1335,6 +1590,9 @@ g => {
     showRef(2, h*smooth(7.3, 8, D)*LV);
     let near = -1; if (H && H.h > .2 && fc < 0){ let bd = 9; HM.chakraY.forEach((y, k) => { const d = Math.abs(y - H.y); if (d < bd){ bd = d; near = k; } }); }
     chs.forEach((s,k) => { const f = fc < 0 ? (k === near ? 1 + .9*H.h : 1) : (fc === k ? 1.55 : .6); const v = (1.05 + .3*Math.sin(t*1.6 - k*.7))*f*chak; s.scale.set(v,v,1); s.visible = chak > .01; });
+    if (H){ const le = DREAM.update(t, !!H.dr, H.drd || 0, H.v === undefined ? 1 : H.v);
+            // спящий — приглушённый силуэт: иначе тысячи сложенных точек сливаются в белое пятно
+            if (H.dr){ kosha.material.uniforms.uProg.value *= .25; kund.material.uniforms.uProg.value *= .55; body.material.uniforms.uSolid.value = .8*le; aura.material.uniforms.uSolid.value = .8*le; } }
   };
   upd.api = { focus(kind, idx){ fc = kind === "c" ? idx : -1; }, y: HM.chakraY, look(d, he, v){ LD = d; LH = he; LV = v; }, refTick:(dt, rc, act, probe, dive) => refsTick(refs, dt, rc, act, probe, dive), refs,
     spinePt(out){ const Rb = refs[2], w = Rb.pl.geometry.parameters.width; out.set((SPINE_UV[0] - .5)*w, (.5 - SPINE_UV[1])*w, 0); return Rb.pl.localToWorld(out); } };
@@ -1426,24 +1684,162 @@ g => {
   g.add(glow(0xffc08a, 1.8, .9));
   return t => { g.rotation.y = t*.12; g.rotation.x = .35 + Math.sin(t*.2)*.1; };
 },
-// X · Частицы и кванты
+// X · Частицы и кванты. Два слоя: 0 — волны от двух источников (как было), 1 — опыт с двумя щелями
 g => {
   const side = Math.round(120*Math.sqrt(Q));
   const plane = new THREE.Group(); g.add(plane);
-  plane.add(pts(side*side, (i,o) => { const a = i % side, b = Math.floor(i/side); o.p = [(a/(side-1)-.5)*10, 0, (b/(side-1)-.5)*10]; o.s = 1.15; },
+  const wavePts = pts(side*side, (i,o) => { const a = i % side, b = Math.floor(i/side); o.p = [(a/(side-1)-.5)*10, 0, (b/(side-1)-.5)*10]; o.s = 1.15; },
     `vec2 q = position.xz;
      float d1 = distance(q, vec2(-1.3, -5.0)); float d2 = distance(q, vec2(1.3, -5.0));
      float h = sin(d1*4.2 - uTime*2.2) + sin(d2*4.2 - uTime*2.2) + uHov*1.4*sin(distance(q, uCur.xz)*4.2 - uTime*2.8);
      p.y = h*0.22;
      float I = min(1.0, h*h*0.25);
      col = mix(vec3(0.45,0.3,0.9), vec3(0.5,0.96,1.0), I);
-     a = (0.22 + 0.78*I) * smoothstep(5.3, 3.0, length(q));`));
+     a = (0.22 + 0.78*I) * smoothstep(5.3, 3.0, length(q)) * uSharp;`);
+  plane.add(wavePts);
   plane.rotation.x = .6; plane.position.y = -.9;
   const pa = glow(0xff7fc8, 1.2, 1), pb = glow(0x6fe8ff, 1.2, 1);
   pa.position.set(-4.3, 2.6, 0); pb.position.set(4.3, 2.6, 0); g.add(pa, pb);
+  pa.userData.self = pb.userData.self = true;
   const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([pa.position, pb.position]), new THREE.LineDashedMaterial({color:0xD6AC5E, dashSize:.18, gapSize:.22, transparent:true, opacity:.35}));
-  ln.computeLineDistances(); g.add(ln);
-  return (t, H) => { const v = 1 + (.5 + H.h*.4)*Math.pow(Math.max(0, Math.sin(t*1.2)), 6); pa.scale.set(v,v,1); pb.scale.set(v,v,1); };
+  ln.computeLineDistances(); ln.userData.self = true; g.add(ln);
+
+  // ---- слой 1: опыт с двумя щелями ----
+  // Геометрия (единицы сцены): источник слева, перегородка с двумя щелями, экран справа. Длина волны
+  // подобрана так, чтобы на экране помещалось 5–6 светлых полос, а сетка волнового поля их разрешала.
+  // Главное правило слоя: точки на экране и волны над ним считаются по ОДНОЙ формуле (разность хода
+  // от двух щелей), поэтому полосы стоят ровно там, где волны гасят друг друга, — это не две картинки
+  const SX = -4.6, BX = -1.6, EX = 4.2, SY = .7, SW = .5, YM = 3.0;   // источник, перегородка, экран, ±щель, ширина щели, полуэкран
+  const LAM = .265, K = TAU/LAM;
+  const slit = new THREE.Group(); slit.visible = false; slit.scale.setScalar(1.12); g.add(slit);
+  // перегородка (с двумя прорезями) и экран — тонкие латунные линии
+  const wall = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(BX, -YM - .2, 0), new THREE.Vector3(BX, -SY - SW/2, 0),
+      new THREE.Vector3(BX, -SY + SW/2, 0), new THREE.Vector3(BX, SY - SW/2, 0),
+      new THREE.Vector3(BX, SY + SW/2, 0), new THREE.Vector3(BX, YM + .2, 0)]), lineMat(0xD6AC5E, .8));
+  const scr = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(EX, -YM - .2, 0), new THREE.Vector3(EX, YM + .2, 0)]), lineMat(0xA9A7BD, .35));
+  wall.userData.self = scr.userData.self = true;
+  const src = glow(0xfff1d0, .9, .9); src.position.set(SX, 0, 0); src.userData.self = true;
+  // датчики у щелей: тусклые, когда выключены, золотые — когда включены, вспыхивают на срабатывании
+  const detA = glow(0xffc35a, .55, 0), detB = glow(0xffc35a, .55, 0);
+  detA.position.set(BX + .28, SY, 0); detB.position.set(BX + .28, -SY, 0); detA.userData.self = detB.userData.self = true;
+  // волновое поле: |ψ|² от источника до перегородки и от двух щелей за ней. uProg — «знание пути»:
+  // 0 — амплитуды складываются (интерференция), 1 — складываются вероятности (перекрёстного члена нет)
+  const gx = Math.round(150*Math.sqrt(Q)), gy = Math.round(100*Math.sqrt(Q));
+  const field = pts(gx*gy, (i,o) => { const a = i % gx, b = Math.floor(i/gx);
+      o.p = [SX + (EX - SX)*a/(gx - 1), -YM + 2*YM*b/(gy - 1), 0]; o.s = .9; },
+    `vec2 q = position.xy;
+     float ph = uTime*5.0;
+     float I;
+     if (q.x < ${BX.toFixed(2)}){
+       float r0 = distance(q, vec2(${SX.toFixed(2)}, 0.0));
+       float c0 = cos(r0*${K.toFixed(3)} - ph);
+       I = 0.55*c0*c0*smoothstep(${(SX + .15).toFixed(2)}, ${(SX + .9).toFixed(2)}, q.x);
+     } else {
+       float r1 = distance(q, vec2(${BX.toFixed(2)}, ${SY.toFixed(2)})), r2 = distance(q, vec2(${BX.toFixed(2)}, ${(-SY).toFixed(2)}));
+       float c1 = cos(r1*${K.toFixed(3)} - ph), c2 = cos(r2*${K.toFixed(3)} - ph);
+       float coh = 0.25*(c1 + c2)*(c1 + c2), inc = 0.5*(c1*c1 + c2*c2);
+       I = mix(coh, inc, uProg)*smoothstep(${BX.toFixed(2)}, ${(BX + .35).toFixed(2)}, q.x);
+     }
+     col = mix(vec3(0.42,0.30,0.92), vec3(0.55,0.95,1.0), I);
+     a = (0.03 + 0.42*I)*uSharp;`);
+  // попадания: кольцевой буфер точек. aRnd.x — видима ли, aRnd.y — момент попадания (вспышка новых)
+  const NH = Math.round(3200*Q);
+  const hits = pts(NH, (i,o) => { o.p = [EX, 0, 0]; o.c = C(0xffd27a); o.s = .8; o.rnd = [0, -99, 0]; },
+    `float age = uTime - aRnd.y;
+     a = aRnd.x*uSharp*(0.3 + 2.0*exp(-age*3.5));
+     s *= 1.0 + 2.2*exp(-age*5.0);
+     col = mix(col, vec3(1.0), exp(-age*4.0));`);
+  hits.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage); hits.geometry.attributes.aRnd.setUsage(THREE.DynamicDrawUsage);
+  // профиль: число попаданий по полосам экрана — как гистограмма справа от него
+  const NB = 64, binsC = new Float32Array(NB);
+  const prof = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({length:NB}, (_, k) => new THREE.Vector3(EX + .35, -YM + 2*YM*(k + .5)/NB, 0))), lineMat(0xFFD88A, .7));
+  prof.userData.self = true;
+  // летящая частица — видна, только пока поток редкий
+  const fly = glow(0xffffff, .42, 0); fly.userData.self = true;
+  const LBL = [["Источник", SX, -.75], ["Две щели", BX, YM + .55], ["Экран", EX, YM + .55]].map(([s, x, y]) => {
+    const l = haloLabel(s, .62); l.position.set(x, y, 0); return l; });
+  const lblDet = haloLabel("Детектор", .5); lblDet.position.set(BX + .95, 0, 0);
+  slit.add(field, wall, scr, src, detA, detB, hits, prof, fly, ...LBL, lblDet);
+
+  // распределения на экране — по той же разности хода, что и волновое поле
+  const env = (y, sy) => { const dx = EX - BX, r = Math.hypot(dx, y - sy), sn = (y - sy)/r, u = Math.PI*SW*sn/LAM;
+    return u === 0 ? 1 : Math.pow(Math.sin(u)/u, 2); };
+  const pCoh = y => { const r1 = Math.hypot(EX - BX, y - SY), r2 = Math.hypot(EX - BX, y + SY), c = Math.cos(K*(r1 - r2)/2);
+    return c*c*.5*(env(y, SY) + env(y, -SY)); };
+  const sample = f => { for (let k = 0; k < 400; k++){ const y = (Math.random()*2 - 1)*YM; if (Math.random() < f(y)) return y; } return 0; };
+  const S = { det:false, detK:0, n:0, head:0, acc:0, slow:8, cur:null, onCount:null, maxB:1 };
+  const pos = hits.geometry.attributes.position, rnd = hits.geometry.attributes.aRnd;
+  S.reset = () => { binsC.fill(0); S.maxB = 1; S.n = 0; S.head = 0; S.slow = 8; S.cur = null;
+    for (let i = 0; i < NH; i++) rnd.array[i*3] = 0; rnd.needsUpdate = true; if (S.onCount) S.onCount(0); };
+  S.setDet = on => { if (S.det === on) return; S.det = on; S.reset(); };
+  const land = (y, t) => {
+    const i = S.head; S.head = (S.head + 1) % NH;
+    pos.array[i*3] = EX + (Math.random() - .5)*.4; pos.array[i*3 + 1] = y; pos.array[i*3 + 2] = (Math.random() - .5)*.05;
+    rnd.array[i*3] = 1; rnd.array[i*3 + 1] = t;
+    pos.needsUpdate = rnd.needsUpdate = true;
+    const b = Math.min(NB - 1, Math.max(0, Math.floor((y + YM)/(2*YM)*NB)));
+    binsC[b]++; S.maxB = Math.max(S.maxB, binsC[b]);
+    S.n++; if (S.slow > 0) S.slow--; if (S.onCount) S.onCount(S.n);
+  };
+  // одна частица: выбрать путь и точку попадания. Детектор выключен — пути нет, есть только распределение
+  // с интерференцией; включён — сначала щель (50/50), затем огибающая одной этой щели
+  const spawn = t => {
+    if (S.det){ const sl = Math.random() < .5 ? 1 : -1; return { t0:t, sl, y:sample(y => env(y, sl*SY)) }; }
+    return { t0:t, sl:0, y:sample(pCoh) };
+  };
+  let flashA = 0, flashB = 0, lt = 0;
+  const profArr = prof.geometry.attributes.position;
+  const upd10 = (t, H) => {
+    const dt = Math.min(.05, Math.max(0, t - lt)); lt = t;
+    const s = H.slit || 0, v = H.v === undefined ? 1 : H.v;
+    // слой 0 ↔ слой 1: старая сцена уступает место установке
+    const o0 = 1 - smooth(.05, .55, s), o1 = smooth(.35, .9, s);
+    plane.visible = o0 > .004; wavePts.material.uniforms.uSharp.value = o0;
+    pa.material.opacity = pb.material.opacity = o0*v; ln.material.opacity = .35*o0*v;
+    const pv = 1 + (.5 + H.h*.4)*Math.pow(Math.max(0, Math.sin(t*1.2)), 6); pa.scale.set(pv,pv,1); pb.scale.set(pv,pv,1);
+    slit.visible = o1 > .004;
+    if (!slit.visible) return;
+    S.detK += ((S.det ? 1 : 0) - S.detK)*Math.min(1, dt*3);
+    field.material.uniforms.uSharp.value = o1; field.material.uniforms.uProg.value = S.detK;
+    hits.material.uniforms.uSharp.value = o1;
+    for (const p of [field, hits]) p.material.uniforms.uPush.value = 0;     // курсор установку не мнёт
+    wall.material.opacity = .8*o1*v; scr.material.opacity = .35*o1*v; prof.material.opacity = .7*o1*v;
+    src.material.opacity = (.55 + .35*Math.sin(t*3))*o1*v;
+    for (const l of LBL) l.material.opacity = .9*o1*v;
+    lblDet.material.opacity = .9*o1*v*S.detK;
+    // поток: первые несколько частиц — по одной, с видимым полётом; дальше — всё быстрее
+    if (s > .97){
+      const rate = S.slow > 0 ? 1.3 : Math.min(45, 4 + S.n*.08);
+      if (S.slow > 0){
+        if (!S.cur) S.cur = spawn(t);
+        const c = S.cur, u = (t - c.t0)/1.1;                  // 0..0,4 — к перегородке, 0,4..1 — к экрану
+        let fx, fy, fo;
+        if (u < .4){ const k = u/.4; fx = SX + (BX - SX)*k; fy = 0; fo = 1; }
+        else { const k = (u - .4)/.6;
+          if (c.sl){ fx = BX + (EX - BX)*k; fy = c.sl*SY + (c.y - c.sl*SY)*k; fo = 1; }
+          else { fx = BX + (EX - BX)*k; fy = c.y*k; fo = .25; }       // без детектора пути нет: частица «размыта»
+        }
+        if (u >= .4 && c.sl && !c.fl){ c.fl = 1; if (c.sl > 0) flashA = 1; else flashB = 1; }
+        fly.position.set(fx, fy, 0); fly.material.opacity = fo*o1*v;
+        fly.scale.setScalar(c.sl || u < .4 ? .42 : .42 + 1.2*(u - .4));
+        if (u >= 1){ land(c.y, t); S.cur = null; }
+      } else {
+        fly.material.opacity = 0;
+        S.acc += dt*rate;
+        while (S.acc >= 1){ S.acc -= 1; const c = spawn(t); if (c.sl){ if (c.sl > 0) flashA = Math.max(flashA, .6); else flashB = Math.max(flashB, .6); } land(c.y, t); }
+      }
+    } else fly.material.opacity = 0;
+    flashA *= Math.exp(-dt*6); flashB *= Math.exp(-dt*6);
+    detA.material.opacity = (S.detK*.45 + flashA*S.detK)*o1*v; detB.material.opacity = (S.detK*.45 + flashB*S.detK)*o1*v;
+    detA.scale.setScalar(.55 + .5*flashA); detB.scale.setScalar(.55 + .5*flashB);
+    for (let k = 0; k < NB; k++) profArr.setX(k, EX + .35 + 1.0*binsC[k]/S.maxB);
+    profArr.needsUpdate = true;
+  };
+  S.burst = n => { for (let k = 0; k < n; k++){ const c = spawn(lt); land(c.y, lt - 1); } S.slow = 0; };   // для проверки
+  upd10.api = S;
+  SLIT = S;
+  return upd10;
 },
 // XI · Квантовый вакуум
 g => {
@@ -1813,6 +2209,7 @@ const Music = (() => {
     station(i){ if (!ac){ root = NOTES[i]; return; } setRoot(NOTES[i]); if (on && !omOn) bowl(NOTES[i], ac.currentTime + .05, .9); },
     portal(rise){ if (ac && on && !omOn) whoosh(ac.currentTime + .05, rise); },
     chime(){ if (ac && on && !omOn) bell(root*4, ac.currentTime + .02, .35); },
+    tick(k){ if (ac && on && !omOn && ac.currentTime - (this._tk || -9) > .22){ this._tk = ac.currentTime; bell(root*2*Math.pow(2, PENTA[clamp(k, 0, 4) + 2]/12), ac.currentTime + .02, .14); } },
     hover(){ if (ac && on && !omOn && ac.currentTime - (this._h || -9) > 3){ this._h = ac.currentTime; bell(root*3, ac.currentTime + .02, .18); } },
     dive(){ if (ac && on && !omOn){ whoosh(ac.currentTime + .02, true); bowl(root*2, ac.currentTime + 1.1, .8); } },
     surface(){ if (ac && on && !omOn) whoosh(ac.currentTime + .02, false); },
@@ -2149,23 +2546,57 @@ const GAL_LV = [
     prac:"Полный адрес: медленно назвать свой адрес до конца — улица, город, страна, Земля, Солнечная система, Рукав Ориона, Млечный Путь, Местная группа, Ланиакея — и на каждом шаге почувствовать, как расширяется «дом»." },
   { short:ST[3].short, kind:"g", st:3, name:ST[3].name, sub:ST[3].sub }
 ];
+// Станция II двухслойная: узел первоимпульса, затем звук, ставший формой, — фигуры Хладни
+const CYM_LV = { short:"Хладни", kind:"cym", st:1, name:"Звук и форма", sub:"Фигуры Хладни · вибрация, ставшая узором",
+  scale:"пластина ≈ 0,3 м", hint:"Двигайте частоту — песок перестроится. Без касаний частота сама переходит к следующему резонансу",
+  lead:"На металлическую пластину насыпан песок. Пластину заставляют звучать — и песок, подпрыгивая там, где металл колеблется, сползает туда, где он неподвижен. На каждой резонансной частоте возникает свой узор из линий покоя. Между резонансами пластина почти молчит, и песок узора не находит.",
+  sci:[["s","Эрнст Хладни описал эти фигуры в 1787 году: он вёл смычком по краю посыпанной песком пластины. Опыт показывали Наполеону, и по его заказу Парижская академия объявила премию за теорию колебаний пластин — её в 1816 году получила Софи Жермен"],
+       ["s","Линии, на которые собирается песок, — узловые: там пластина не движется. Чем выше частота, тем больше узловых линий и тем сложнее узор"],
+       ["s","Скрипичные мастера по сей день смотрят на фигуры Хладни деки и спинки инструмента, подстраивая толщину дерева до нужных резонансов"],
+       ["s","Слово «киматика» предложил Ханс Йенни в 1967 году; он снимал узоры в песке, порошках и жидкостях на разных частотах"],
+       ["t","На экране — модель: моды квадратной пластины взяты в классическом приближении cos·cos ± cos·cos, частоты условно пропорциональны n² + m². У настоящей свободной пластины частоты и формы немного другие, но принцип тот же"],
+       ["h","Популярные утверждения о «целебных частотах» (528 Гц и подобные) и о том, что звук «перестраивает» воду или ДНК, опытами не подтверждены. Узор Хладни — следствие резонанса пластины, а не особой силы звука"]],
+  trad:["Нада-брахман — «мир есть звук»: в Упанишадах и нада-йоге творение начинается с вибрации, и первозвук ОМ содержит в себе все формы",
+        "Евангелие от Иоанна — «В начале было Слово»; в Книге Бытия мир создаётся речью: «И сказал Бог…»",
+        "Пифагорейцы — «музыка сфер»: числовые отношения струн и порядок космоса — одно и то же отношение",
+        "Хазрат Инайят Хан, «Мистика звука» — всё проявленное есть вибрация разной плотности",
+        "Честное пересечение: из всех этих образов лаборатория подтверждает один — что колебание при определённых частотах само выстраивает вещество в правильный узор"],
+  prac:"Звучащий ОМ: на выдохе тянуть «О-О-М» на одной ноте, положив ладонь на грудь, затем на макушку. Заметить, где вибрация сильнее, а где тело «молчит», — как узловые линии на пластине." };
+// Станция X двухслойная: волны и частицы (как было), затем опыт с двумя щелями — интерактивный
+const SLIT_LV = { short:"Две щели", kind:"slit", st:9, name:"Опыт с двумя щелями", sub:"Волна или частица · что значит «наблюдать»",
+  scale:"щели ≈ 10⁻⁷ м", hint:"Включите детектор — и смотрите, что станет с полосами",
+  lead:"Электроны выпускают по одному. Каждый оставляет на экране одну точку — как частица. Но точки складываются в полосы, будто каждый электрон прошёл сразу через обе щели и встретился сам с собой, как волна. Поставьте у щелей детектор, который отмечает, через какую щель прошёл электрон, — и полосы исчезнут.",
+  sci:[["s","Опыт с одиночными электронами впервые поставили и сняли на плёнку Мерли, Миссироли и Поцци в Болонье в 1974 году (вместо щелей у них стояла электронная бипризма — эффект тот же). В 1989 году Тономура показал, как картина набирается из отдельных точек. Читатели журнала Physics World в 2002 году назвали этот опыт самым красивым в истории физики"],
+       ["s","Интерферируют не только электроны: нейтроны, атомы, молекулы фуллерена C60 (Арндт и Цайлингер, 1999) и даже молекулы почти из 2000 атомов (2019)"],
+       ["s","Полосы пропадают не потому, что кто-то смотрит, а потому, что путь электрона оставил след в приборе. Как только сведения о щели в принципе где-то записаны, волны от двух щелей перестают складываться — это называют декогеренцией. Сознание экспериментатора в этом не участвует"],
+       ["h","Что происходит с электроном между источником и экраном, физика не решила: копенгагенская, многомировая интерпретации, теория Бома одинаково предсказывают результат опыта и расходятся только в толковании"],
+       ["t","Модель на экране — расчёт волн от двух щелей: полосы стоят там, где волны гасят друг друга, и точки выпадают по той же формуле. Размеры условные: в настоящем опыте щели меньше микрометра, а полосы видны только под увеличением"]],
+  trad:["Нильс Бор, автор принципа дополнительности (волна и частица — две взаимоисключающие и одинаково нужные стороны одного), в 1947 году поместил на свой герб знак инь-ян с девизом «Contraria sunt complementa» — противоположности дополняют друг друга",
+        "Буддизм — взаимозависимое возникновение: у вещи нет свойств самих по себе, вне отношений. Созвучный образ: в квантовой физике свойство определяется во взаимодействии",
+        "Упанишады — свидетель (сакши), который наблюдает, не вмешиваясь. Физика добавляет трезвое уточнение: прибор не может узнать путь частицы, не оставив в ней следа"],
+  prac:"Два взгляда на дыхание: минуту просто следить за ним, ничего не меняя, затем минуту стараться «поймать» каждый вдох. Заметить, где кончается наблюдение и начинается вмешательство." };
 const JOURNEYS = {
   abs:{ st:0, kind:"a", levels:() => ALV, next:() => "g1" },
-  g1:{ st:1, kind:"g", levels:() => GEN(1), next:() => "g2" },
+  g1:{ st:1, kind:"g", levels:() => [GEN(1)[0], CYM_LV], next:() => "g2" },
   g2:{ st:2, kind:"g", levels:() => GEN(2), next:() => "g3" },
   g3:{ st:3, kind:"g", levels:() => GAL_LV, start:1, next:() => galBranch === "bh" ? "bh" : "g4" },
   // ответвление станции IV: к центру Галактики, к чёрной дыре. Дальше пути по кольцу нет — только за горизонт
   bh:{ st:3, kind:"g", levels:() => BH_LV, next:() => "iz" },
   g4:{ st:4, kind:"g", levels:() => SUNLV, next:() => "earth" },
+  // ответвления станции V: из Солнечной системы — к Луне и к Юпитеру с Европой; дальше путь ведёт на Землю
+  moon:{ st:4, kind:"g", title:"Луна", levels:() => MOON_LV, next:() => "earth" },
+  jup:{ st:4, kind:"g", title:"Юпитер и Европа", levels:() => JUP_LV, next:() => "earth" },
   earth:{ st:5, kind:"e", levels:() => earthBranch === "bio" ? [...ELV.slice(0, 7), BIO_LV] : ELV, next:() => earthBranch === "bio" ? "human" : "g8", fork:6 },
   human:{ st:6, kind:"h", levels:() => HLV, next:() => "g7" },
+  // ответвление станции VII: сон и изменённые состояния сознания (вход — с тонких тел и центров)
+  dream:{ st:6, kind:"g", title:"Сон и сознание", levels:() => DREAM_LV, next:() => "g7" },
   g7:{ st:7, kind:"g", levels:() => DNA_LV, next:() => "g8" },
   g8:{ st:8, kind:"g", levels:() => GEN(8), next:() => "g9" },
-  g9:{ st:9, kind:"g", levels:() => GEN(9), next:() => "g10" },
+  g9:{ st:9, kind:"g", levels:() => [GEN(9)[0], SLIT_LV], next:() => "g10" },
   g10:{ st:10, kind:"g", levels:() => GEN(10), next:() => "g11" },
   g11:{ st:11, kind:"g", levels:() => GEN(11), next:() => "abs" }
 };
-const JPREV = { abs:"g11", g1:"abs", g2:"g1", g3:"g2", g4:"g3", bh:"g3", earth:"g4", human:"earth", g7:"human", g8:"g7", g9:"g8", g10:"g9", g11:"g10" };
+const JPREV = { abs:"g11", g1:"abs", g2:"g1", g3:"g2", g4:"g3", bh:"g3", moon:"g4", jup:"g4", dream:"human", earth:"g4", human:"earth", g7:"human", g8:"g7", g9:"g8", g10:"g9", g11:"g10" };
 const jidOf = i => i === 0 ? "abs" : i === 5 ? "earth" : i === 6 ? "human" : "g" + i;
 const jNextSt = () => JOURNEYS[JOURNEYS[jId].next()].st;
 // имя следующей остановки: у ветки чёрной дыры «следующая» — не станция, а Изнанка
@@ -2218,10 +2649,11 @@ function renderChakraDetail(){
 function renderLevel(L){
   shownLevel = L;
   const v = JL[L]; if (!v) return;
-  const stTag = `${ST[jSt].n} · ${ST[jSt].short}`;
+  // у веток станции свой заголовок: «Станция V · Юпитер и Европа», а не «… · Солнце»
+  const stTag = `${ST[jSt].n} · ${JOURNEYS[jId].title || ST[jSt].short}`;
   $("hdEye").textContent = jKind === "g" ? `Станция ${stTag} · ${DATA.ring[jSt].scale}` : jKind === "e" || jKind === "a" ? `${stTag} · слой ${L + 1} из ${JL.length} · ${v.cat}${v.scale ? " · " + v.scale : ""}` : `${stTag} · слой ${L + 1} из ${JL.length} · ${L < 4 ? "тонкие тела" : L === 4 ? "энергетическая ось" : L < 9 ? "плотное тело" : "микромир · " + v.scale}`;
   let name, sub, h = "";
-  if (jKind === "g" && jSt === 4){
+  if (jKind === "g" && jId === "g4"){
     const sp = solarPanel(L); name = sp.name; sub = sp.sub; hSel = -1; h = sp.html;
     $("hdEye").textContent = sp.eye;
     $("hdHint").textContent = SOLAR && SOLAR.sel >= 0 ? "Курсор оживляет поверхность" : L === 0 ? "Наведите на планету, нажмите — подлетим" : JHINT.g;
@@ -2232,13 +2664,40 @@ function renderLevel(L){
     h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>` + (v.hint ? `<p class="mono hd-try">${esc(coarse ? v.hint.replace("Наведите на", "Коснитесь").replace("и нажмите", "") : v.hint)}</p>` : "")
       + listHTML("Наука", v.sci) + listHTML("Традиции и философия", v.trad) + `<section><h3>Параллель с человеком</h3><p class="hd-par">${esc(v.par)}</p></section>` + listHTML("Практики", v.prac, "d t")
       + `<p class="note">${mk("t")}<span>Чёрная дыра здесь не нарисована, а рассчитана: каждый пиксель — луч света, прослеженный по уравнениям Эйнштейна. Яркость диска завышена для глаза; традиции говорят о том же рубеже — о пустоте в центре — языком опыта.</span></p>`;
-  } else if (jKind === "g" && (v.kind === "mol" || v.kind === "lan")){
+  } else if (jKind === "g" && v.kind === "cym"){
     name = v.name; sub = v.sub; hSel = -1;
     $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${v.scale}`;
     $("hdHint").textContent = v.hint;
-    h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>`
+    const lf = f => (Math.log(f/CY_FMIN)/Math.log(CY_FMAX/CY_FMIN)*1000).toFixed(0);
+    h = `<p class="hd-lead">${esc(v.lead)}</p>
+      <section class="slit-ctl"><h3>Опыт</h3>
+        <label class="cy-row"><span class="mono">Частота</span><input type="range" id="cyF" min="0" max="1000" step="1" value="${CYM ? lf(CYM.fT) : 500}" aria-label="Частота колебаний пластины"><b id="cyHz" class="mono">—</b></label>
+        <p class="mono slit-n" id="cyMode">—</p>
+        <div class="slit-row"><button class="btn" id="cyPrev" data-hover>← Резонанс</button><button class="btn" id="cyNext" data-hover>Резонанс →</button><button class="btn" id="cyShake" data-hover>Рассыпать песок</button><button class="btn" id="cyTone" aria-pressed="false" data-hover>Слышать тон</button></div>
+      </section>`
       + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad)
-      + (v.prac ? `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>` : "");
+      + `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>`;
+  } else if (jKind === "g" && v.kind === "slit"){
+    name = v.name; sub = v.sub; hSel = -1;
+    $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${v.scale}`;
+    $("hdHint").textContent = v.hint;
+    const on = SLIT && SLIT.det;
+    h = `<p class="hd-lead">${esc(v.lead)}</p>
+      <section class="slit-ctl"><h3>Опыт</h3>
+        <div class="slit-row"><button class="btn" id="slitDet" aria-pressed="${on}" data-hover>${on ? "Детектор включён — выключить" : "Включить детектор у щелей"}</button>
+        <button class="btn" id="slitReset" data-hover>Очистить экран</button></div>
+        <p class="mono slit-n">Электронов на экране: <b id="slitN">${SLIT ? SLIT.n : 0}</b></p></section>`
+      + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad)
+      + `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>`;
+  } else if (jKind === "g" && (v.kind === "mol" || v.kind === "lan" || v.kind === "body" || v.kind === "dream")){
+    name = v.name; sub = v.sub; hSel = -1;
+    $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${v.scale}`;
+    $("hdHint").textContent = v.hint;
+    const pl = v.planet ? PLN.find(x => x.k === v.planet) : null;
+    h = `<p class="hd-lead">${esc(v.lead)}</p>` + (pl ? planetFacts(pl) : `<p class="mono hd-scale">${v.kind === "dream" ? "" : "Масштаб "}${esc(v.scale)}</p>`)
+      + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad)
+      + (v.prac ? `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>` : "")
+      + (pl ? `<p class="note">${mk("s")}<span>Голос планеты: ${esc(PLN_SND_TXT[pl.k])}. Это синтез по характеру сонификаций NASA, а не сама запись.</span></p>` : "");
   } else if (jKind === "g"){
     const r = DATA.ring[jSt]; name = r.name; sub = r.sub; hSel = -1;
     $("hdHint").textContent = JHINT.g;            // подсказка соседнего слоя (Ланиакея, Молекула) не должна залипать
@@ -2263,6 +2722,8 @@ function renderLevel(L){
     name = v.name; sub = v.sub; hSel = -1;
     h = `<p class="hd-lead">${esc(v.lead)}</p>` + (v.kind === "micro" ? `<p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>` : "") + (v.hint ? `<p class="mono hd-try">${esc(coarse ? (v.hintT || v.hint) : v.hint)}</p>` : "") + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad) + listHTML("Практики", v.prac, "d t") + listHTML("Упражнения", v.ex, "d t") + `<p class="note">${mk("h")}<span>${PHYS_NOTE}</span></p>`;
   }
+  // ответвление «Сон и сознание» — с тонких тел и центров
+  if (jKind === "h" && L <= 4) h += `<section><h3>Ответвление</h3><div class="hd-fork"><button data-go="dream" data-hover><b>Сон и изменённые состояния</b><span>Засыпание · сновидения · осознанный сон · глубокий сон и турия</span></button></div></section>`;
   chars($("hdName"), name, 0); $("hdSub").textContent = sub;
   hdBody.innerHTML = h; hdBody.scrollTop = 0;
   hdBody.classList.remove("swap"); void hdBody.offsetWidth; hdBody.classList.add("swap");
@@ -2275,12 +2736,36 @@ function renderLevel(L){
     if (galBranch === "bh" && !tr && !zm) startTransit(1);           // к центру летим сразу
   });
   const ho = $("hdOpen"); if (ho) ho.onclick = () => openInterior(jSt);
+  const cyF = $("cyF");
+  if (cyF && CYM){
+    const toF = v => CY_FMIN*Math.pow(CY_FMAX/CY_FMIN, v/1000), toV = f => Math.log(f/CY_FMIN)/Math.log(CY_FMAX/CY_FMIN)*1000;
+    cyF.oninput = () => CYM.set(toF(+cyF.value));
+    CYM.onState = s => { const hz = $("cyHz"), md = $("cyMode"); if (!hz) return;
+      hz.textContent = s.f + " Гц";
+      md.textContent = s.on ? `Резонанс: мода (${s.n}, ${s.m}) — песок собирается на линиях покоя` : "Между резонансами — пластина почти не колеблется, узора нет";
+      if (document.activeElement !== cyF) cyF.value = toV(CYM.fT).toFixed(0); };
+    $("cyPrev").onclick = () => CYM.next(-1); $("cyNext").onclick = () => CYM.next(1); $("cyShake").onclick = () => CYM.scatter();
+    const tb = $("cyTone"); tb.setAttribute("aria-pressed", String(!!CYM.tone));
+    tb.onclick = () => {
+      if (CYM.tone){ CYM.tone.osc.stop(); CYM.tone.ctx.close(); CYM.tone = null; tb.setAttribute("aria-pressed", "false"); return; }
+      const A = window.AudioContext || window.webkitAudioContext; if (!A) return;
+      const ctx = new A(), osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = "sine"; osc.frequency.value = CYM.f; gain.gain.value = 0; osc.connect(gain).connect(ctx.destination); osc.start();
+      CYM.tone = { ctx, osc, gain }; tb.setAttribute("aria-pressed", "true"); };
+  }
+  const sd = $("slitDet");
+  if (sd && SLIT){
+    SLIT.onCount = n => { const e = $("slitN"); if (e) e.textContent = n; };
+    sd.onclick = () => { SLIT.setDet(!SLIT.det); sd.setAttribute("aria-pressed", String(SLIT.det)); sd.textContent = SLIT.det ? "Детектор включён — выключить" : "Включить детектор у щелей"; };
+    $("slitReset").onclick = () => SLIT.reset();
+  }
   const sb = $("solBack"); if (sb) sb.onclick = () => solarSelect(-1);
   hdBody.querySelectorAll("#solList button").forEach(bt => bt.onclick = () => solarSelect(+bt.dataset.p));
+  hdBody.querySelectorAll("button[data-go]").forEach(bt => bt.onclick = () => jGo(bt.dataset.go));
   const up = $("hdUp"), dn = $("hdDown");
   up.disabled = false; dn.disabled = false;
-  up.textContent = SOLAR && SOLAR.sel >= 0 && jSt === 4 ? "↑ Вся система"
-                 : L > 0 ? `↑ ${lvlName(L - 1)}` : `↑ ${ST[JOURNEYS[jPrevId()].st].short}`;
+  up.textContent = SOLAR && SOLAR.sel >= 0 && jId === "g4" ? "↑ Вся система"
+                 : L > 0 ? `↑ ${lvlName(L - 1)}` : `↑ ${jPrevId() === "g4" && JOURNEYS[jId].title ? "Солнечная система" : ST[JOURNEYS[jPrevId()].st].short}`;
   dn.textContent = L < JL.length - 1 ? `${lvlName(L + 1)} ↓` : jId === "bh" ? "За горизонт ↓" : `Вглубь: ${jNextName()} ↓`;
 }
 // выбор тела на станции V: карточка + подлёт. Тот же вызов и на клик по планете, и на кнопки панели
@@ -2291,13 +2776,13 @@ function solarSelect(i){
   if (i >= 0) Music.hover();
   renderLevel(Math.max(0, Math.round(depth)));
 }
-const solarOn = () => !!SOLAR && humanOpen && jKind === "g" && jSt === 4;
+const solarOn = () => !!SOLAR && humanOpen && jKind === "g" && jId === "g4";
 $("hdUp").onclick = () => { if (solarOn() && SOLAR.sel >= 0){ solarSelect(-1); return; } depthT = clamp(Math.round(depthT) - 1, -1, DMAX); lastDepthInput = performance.now(); };
 $("hdDown").onclick = () => { if (solarOn() && SOLAR.sel >= 0) solarSelect(-1); depthT = clamp(Math.round(depthT) + 1, -1, DMAX); lastDepthInput = performance.now(); };
 function setBranch(b, L){ earthBranch = b; if (jKind === "e"){ JL = JOURNEYS.earth.levels(); DMAX = JL.length; drawDepth(); renderLevel(L ?? Math.max(0, Math.round(depth))); depthMark(); } }
 const JHINT = { h:"Листайте над фигурой — глубже", e:"Листайте над планетой — глубже", a:"Листайте или коснитесь света — глубже", g:"Листайте — вглубь, к следующей станции" };
 function setJourney(id){
-  if (SOLAR){ SOLAR.sel = -1; Music.planet(null); }
+  if (SOLAR){ SOLAR.sel = -1; Music.planet(id === "jup" ? PLN_SND.jup : null); }   // в ветке Юпитера звучит его голос
   jId = id; const jj = JOURNEYS[id]; jKind = jj.kind; jSt = jj.st; JL = jj.levels(); DMAX = JL.length;
   chHuman.setAttribute("aria-label", "Погружение · " + ST[jSt].name);
   $("hdHint").textContent = id === "bh" ? "Листайте — ближе к горизонту" : JHINT[jKind];
@@ -2307,7 +2792,7 @@ function openJourney(id){
   if (humanOpen && jId === id) return;
   if (tr || zm) return;
   if (humanOpen){ toggleMenu(false); flashTo(id, 0); return; }
-  closePath(); surface();
+  closePath(); closeTime(); closeTree(); surface();
   jHist = [];
   setJourney(id); goTo(jSt);
   // прямой вход в главу — с её «лицевого» слоя: у Галактики это сам диск, а не Ланиакея над ним
@@ -2321,6 +2806,15 @@ function openJourney(id){
 const openEarth = () => openJourney("earth"), openHuman = () => openJourney("human");
 function closeHuman(){ if (!humanOpen) return; if (SOLAR){ SOLAR.sel = -1; Music.planet(null); } humanOpen = false; jHist = []; zoomEnd(); if (tr){ tr = null; $("loopFx").style.opacity = "0"; } chHuman.classList.remove("open"); chHuman.setAttribute("aria-hidden","true"); syncBtns(); stations[6].api.focus("c", -1); Music.om(false); Music.surface(); }
 // переход вглубь следующей станции (dir = 1) или назад по пройденному пути (dir = −1)
+// переход вглубь в ответвление (Луна, Юпитер) — как обычный шаг вперёд по пути, со вспышкой
+// куда вернуться из ветки: глубина, на которой из неё ушли (иначе назад из Луны — сразу к ядру Земли)
+const JRET = {};
+function jGo(id){
+  if (tr || zm || !JOURNEYS[id] || jId === id) return;
+  JRET[jId] = Math.max(0, Math.round(depth));
+  // выбор планеты не сбрасываем здесь: крупный план держится под вспышкой, сброс — при подмене (setJourney)
+  flashTo(id, 1);
+}
 function startTransit(dir){
   const to = dir > 0 ? JOURNEYS[jId].next() : jPrevId();
   if (!to) return;
@@ -2358,7 +2852,7 @@ function stDissolve(i){
 }
 function flashTo(to, dir){
   const soft = softPair(jId, to);
-  tr = { t:0, dir, to, jumped:false, morph: morphPair(jId, to), soft,
+  tr = { t:0, dir, to, from:jId, jumped:false, morph: morphPair(jId, to), soft,
          // глубина, на которой сцену Земли держат во время растворения. Назад мы приходим со стороны
          // «Атома», и depth там уже ушёл в минус — брать его нельзя, иначе Земля проступит глобусом
          eD: dir < 0 ? 15.2 : Math.min(Math.max(0, depth), 15.9), fe: dir > 0 ? 1 : 0, fg: dir > 0 ? 0 : 1, dip: 1 };
@@ -2388,7 +2882,8 @@ function transitTick(dt, now){
     setJourney(tr.to);
     // dir 0 — это прямой вход в главу (из меню или подлётом к Земле): начинать надо с первого слоя,
     // а не с последнего; назад (dir < 0) — наоборот, с последнего
-    depth = depthT = tr.dir < 0 ? DMAX - 1 : tr.dir > 0 ? 0 : (JOURNEYS[tr.to].start || 0);
+    // назад из ветки (Луна, Юпитер) — на слой «Солнечная система», а не в ядро Солнца
+    depth = depthT = tr.dir < 0 ? (tr.from === "moon" || tr.from === "jup" || tr.from === "dream" ? Math.min(DMAX - 1, JRET[tr.to] || 0) : DMAX - 1) : tr.dir > 0 ? 0 : (JOURNEYS[tr.to].start || 0);
     shownLevel = -1; hSel = -1; lastDepthInput = now;
     stations[6].api.focus("c", -1);
     jumpRing(jSt, tr.dir || 1);
@@ -2535,6 +3030,7 @@ $("hBack").onclick = closeHuman;
 $("btnHuman").onclick = () => humanOpen && jKind === "h" ? closeHuman() : openHuman();
 $("btnEarth").onclick = () => humanOpen && jKind === "e" ? closeHuman() : openEarth();
 $("toEarth").onclick = openEarth;
+$("moonBtn").onclick = () => jGo("moon");
 // ветка «Чёрная дыра»: с кольца — сначала страница Галактики, затем сразу полёт к ядру
 function openBH(){
   galBranch = "bh";
@@ -2596,11 +3092,12 @@ $("stages").innerHTML = DATA.stages.map((s, k) => `
     <dl><dt>Узнать</dt><dd>${esc(s.know)}</dd><dt>Почувствовать</dt><dd>${esc(s.prac)}</dd><dt>Прожить</dt><dd>${esc(s.life)}</dd><dt>Осмыслить</dt><dd class="qq">${esc(s.q)}</dd></dl>
   </article>`).join("");
 $("stages").querySelectorAll(".go").forEach(b => b.onclick = () => { const k = +b.dataset.k; closePath(); if (k === 4) openHuman(); else pendingDive = {i:STAGE_ST[k], moved:false}; });
-function openPath(){ closeHuman(); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
+function openPath(){ closeHuman(); closeTime(); closeTree(); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
 $("pathClose").onclick = closePath;
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
-function closeChapters(){ closeHuman(); closePath(); closeRef(); }
+function closeChapters(){ closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); }
+__CHRONO__
 
 /* ---------- Справочник ---------- */
 const REF_GUIDE = `
@@ -2642,7 +3139,7 @@ function renderRefTab(tab){
   refBody.innerHTML = REF[tab];
   document.querySelectorAll(".reftab").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
 }
-function openRef(tab){ closeHuman(); closePath(); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
+function openRef(tab){ closeHuman(); closePath(); closeTime(); closeTree(); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
 function closeRef(){ if (!refOpen) return; refOpen = false; chRef.classList.remove("open"); chRef.setAttribute("aria-hidden","true"); }
 $("mRef").onclick = () => { toggleMenu(false); openRef("guide"); };
 $("refClose").onclick = closeRef;
@@ -2679,6 +3176,7 @@ glc.addEventListener("pointerup", e => { const d = glc._down; if (!d || Math.hyp
   if (solarOn() && !tr && !zm && !menuOpen){
     const pi = SOLAR.selE < .55 && SOLAR.sunE < .35 ? SOLAR.pick(camera, ndc.x, ndc.y, innerWidth/innerHeight) : -1;
     if (pi === 9){ solarSelect(-1); depthT = 1; lastDepthInput = performance.now(); return; }   // к Солнцу — на слой «Солнце»
+    if (pi === 10){ jGo("moon"); return; }                                                     // Луна — сразу в её ветку
     if (pi >= 0){ solarSelect(SOLAR.sel === pi ? -1 : pi); return; }
     if (SOLAR.sel >= 0){ solarSelect(-1); return; }
   }
@@ -2697,7 +3195,8 @@ function ringS(u){ const cyc = Math.floor(u/14), m = u - cyc*14; let s;
 const bell = (x, c) => smooth(c - .85, c - .25, x)*(1 - smooth(c + .25, c + .85, x));
 
 let target = -1, pos = -1, vel = 0, lastInput = 0, travel = false;
-const locked = () => menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
+let timeOn = false, treeOn = false;                                   // открыт «Космический календарь» (chrono.js)
+const locked = () => timeOn || treeOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
 function goTo(i){
   const u = uOfStation(i);
   if (pos < -.5) target = u;
@@ -2869,7 +3368,7 @@ function loop(now){
     if (jKind === "g"){ tmpV.set(nIn.z, 0, -nIn.x); HP.pos.addScaledVector(tmpV, gSway*1.2*hEa); }
     // подлёт к планете: камера остаётся на месте и лишь доворачивается на выбранное тело — оно
     // становится точкой схода, и вся система разлетается мимо него радиально
-    if (SOLAR && jKind === "g" && jSt === 4) HP.tgt.addScaledVector(SOLAR.aim, hEa);
+    if (SOLAR && jKind === "g" && jId === "g4") HP.tgt.addScaledVector(SOLAR.aim, hEa);
     P.pos.lerp(HP.pos, hEa); P.tgt.lerp(HP.tgt, hEa);
   }
   if (hH > .001){
@@ -2951,19 +3450,20 @@ function loop(now){
   }
   // станция V: наведение на планеты и точка курсора на шаре выбранной планеты
   if (SOLAR){
-    const on = humanOpen && jKind === "g" && jSt === 4 && hE > .5 && !menuOpen && !tr && !zm
+    const on = humanOpen && jKind === "g" && jId === "g4" && hE > .5 && !menuOpen && !tr && !zm
                && SOLAR.selE < .55 && SOLAR.sunE < .35;
     const pI = on && pointerIn ? SOLAR.pick(camera, ndc.x, ndc.y, W/H) : -1;
     SOLAR.hovI = pI;
     const B = SOLAR.bodies;
     for (let k = 0; k < B.length; k++){
       // у выбранной планеты курсор «работает» по всему кадру — мы к ней подлетели, она и есть кадр
-      const want = SOLAR.sel === k ? (pointerIn && humanOpen && jSt === 4 ? 1 : 0) : (pI === k ? 1 : 0);
+      const want = SOLAR.sel === k ? (pointerIn && humanOpen && jId === "g4" ? 1 : 0) : (pI === k ? 1 : 0);
       B[k].hov += (want - B[k].hov)*Math.min(1, dt*4.5);
       if (B[k].hov < .003) B[k].hov = 0;
     }
     // подлёт к Земле доигран — уходим в главу «Погружение в Землю»
     if (SOLAR.goEarth){ SOLAR.goEarth = false; SOLAR.sel = -1; SOLAR.selE = 0; openJourney("earth"); }
+    if (SOLAR.goJup){ SOLAR.goJup = false; jGo("jup"); }
     const hk = SOLAR.sel >= 0 && SOLAR.sel < 8 ? SOLAR.sel : (pI >= 0 && pI < 8 ? pI : -1);
     if (hk >= 0 && pointerIn){
       // пересечение луча с единичной сферой в собственных координатах планеты
@@ -3072,8 +3572,11 @@ function loop(now){
       }
       if (st.hov === 0) st.H.h = 0;
       st.H.v = v;
-      if (i === 4){ st.H.sun = humanOpen && jKind === "g" && jSt === 4 ? clamp(depth, 0, 1) : 0;
-                    st.H.depth = humanOpen && jKind === "g" && jSt === 4 ? Math.max(0, depth) : 0; }
+      if (i === 4){ st.H.sun = humanOpen && jKind === "g" && jId === "g4" ? clamp(depth, 0, 1) : 0;
+                    st.H.depth = humanOpen && jKind === "g" && jId === "g4" ? Math.max(0, depth) : 0;
+                    // ветки станции V: Луна, Юпитер и Европа — свои сцены в той же группе станции
+                    st.H.body = humanOpen && (jId === "moon" || jId === "jup") ? jId : null;
+                    st.H.bd = st.H.body ? Math.max(0, depth) : 0; }
       // станция VIII двухслойная: 0 — спираль, 1 — одна молекула из неё
       // на пролёте «Молекула → Атом» станцию держим в состоянии молекулы: после подмены путешествия
       // jSt уже 8, и без этого спираль вернулась бы прямо посреди полёта
@@ -3081,6 +3584,10 @@ function loop(now){
       // «Вселенной» приходим на слой Ланиакеи, на пролётах к Солнцу и к чёрной дыре — на диск
       if (i === 3) st.H.gl = zm && (zm.aSt === 3 || zm.bSt === 3) ? (zm.aSt === 2 ? 0 : 1)
                            : (humanOpen && jKind === "g" && jId === "g3" ? smooth(0, 1, depth) : 1);
+      if (i === 1) st.H.cym = humanOpen && jKind === "g" && jId === "g1" ? smooth(0, 1, depth) : (tr && tr.morph && (tr.to === "g1" || jId === "g1") ? 1 : 0);
+      // ветка станции VII «Сон и сознание»: фигура ложится, над ней — сцена сна (dream.js)
+      if (i === 6){ st.H.dr = humanOpen && jId === "dream"; st.H.drd = st.H.dr ? clamp(depth, 0, 3) : 0; }
+      if (i === 9) st.H.slit = humanOpen && jKind === "g" && jSt === 9 ? smooth(0, 1, depth) : 0;
       if (i === 7) st.H.dna = zm && (zm.aSt === 7 || zm.bSt === 7) ? 1
                             : (humanOpen && jKind === "g" && jSt === 7 ? clamp(depth, 0, 1) : 0);
       // степень растворения в общую сферу (только у станций морф-пары; вне перехода всегда 0, поэтому
@@ -3231,6 +3738,8 @@ function loop(now){
   bhHotWas = bRes.disk;
   mscene.visible = Mh > .003 || Me > .003 || Ma > .003 || (hH > .001) || bV > .003;
   const Mv = Math.max(Mh, Me, Ma, bC);
+  { const mb = $("moonBtn"), on = humanOpen && jKind === "e" && dPos < 6.3 && !tr && !zm && !menuOpen && hE > .5;
+    if (on !== mb.classList.contains("on")){ mb.classList.toggle("on", on); mb.tabIndex = on ? 0 : -1; } }
   { const eb = EARTH.boundary(dPos, earthBranch === "bio"), el = $("eBound"); if (eb.o > .01 && el.dataset.t !== eb.text){ el.dataset.t = eb.text; el.textContent = eb.text; } el.style.opacity = String(jKind === "e" && humanOpen ? eb.o : 0); }
   scene.visible = Mv < .995;
   if (composer) composer.render(dt);

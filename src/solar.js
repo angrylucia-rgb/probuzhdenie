@@ -80,7 +80,7 @@ const PLN_TXT = {
     lead:"Газовый шар, в который поместились бы все остальные планеты, и вихрь, который крутится дольше, чем существует телескопная астрономия.",
     sci:[["s","Масса Юпитера в два с половиной раза больше массы всех прочих планет вместе"],
          ["s","Большое Красное Пятно — шторм, который наблюдают с XIX века; последние десятилетия он сжимается"],
-         ["s","Подтверждено 95 спутников; под льдом Европы — солёный океан, воды в нём больше, чем во всех земных"],
+         ["s","Известно 115 спутников (апрель 2026); под льдом Европы — солёный океан, воды в нём больше, чем во всех земных"],
          ["s","Центр масс пары Солнце—Юпитер лежит вне Солнца: строго говоря, Солнце обращается вокруг общей точки вместе с ним"]],
     trad:["Зевс и Юпитер — закон, порядок, щедрость",
           "Веды — Брихаспати, Гуру: учитель богов, расширение и смысл",
@@ -334,6 +334,7 @@ const SOLAR_BUILD = g => {
   g.add(tilt);
   const sys = new THREE.Group(); tilt.add(sys);
   const DIVE = makeSunDive(g);            // слои 2…11: от гелиосферы до ядра
+  const BODY = makeBodyDive(g);           // ветки: Луна, Юпитер и Европа (bodies.js)
 
   /* --- Солнце: своя геометрия натурального размера в группе, сжатой в 1/K раз,
          чтобы на подходе плотность частиц оказалась ровно естественной --- */
@@ -413,6 +414,12 @@ const SOLAR_BUILD = g => {
                   cur:new THREE.Vector3(9, 9, 9) });
   });
 
+  /* --- Луна: точка рядом с Землёй; клик по ней — в ветку «Луна» (своего подлёта у неё нет) --- */
+  const earthB = bodies[2], MOON_R = .24;
+  const moonSp = glow(0xf2efe6, .11, .95); earthB.orbG.add(moonSp);
+  const moonLb = haloLabel("Луна", .09); earthB.orbG.add(moonLb);
+  let moonA = 0, moonHov = 0;
+
   /* --- состояние подхода --- */
   const st = { sel:-1, selE:0, sunE:0, aim:new THREE.Vector3(), hovI:-1,
                beltP:new THREE.Vector3(), beltA:0, probe:null, pointer:false, vis:1 };
@@ -421,6 +428,7 @@ const SOLAR_BUILD = g => {
   // На слое «Солнце» габарит звезды линеен по общему масштабу: измерено по кадру, 1,11 и 1,01
   // на единицу произведения sys.scale × tilt.scale.
   st.ext = () => {
+    if (st.body) return BODY.ext();
     if (st.dv > 1.35){ const r = DIVE.ext(st.dv); return [r, r]; }
     if (st.sunE < .02 || st.sel >= 0) return null;
     const k = st.wScale*st.fit; return [0.82*k, 0.75*k]; };
@@ -433,6 +441,10 @@ const SOLAR_BUILD = g => {
   // всё считаем в «единицах высоты кадра»: x домножаем на соотношение сторон, тогда
   // порог попадания — честный круг, а не эллипс
   function pick(cam, ndx, ndy, aspect){
+    if (moonSp.visible && moonSp.material.opacity > .05){
+      moonSp.getWorldPosition(tmpA); const c = ndcOf(tmpA, cam);
+      if (c.z <= 1 && Math.hypot((ndx - c.x)*aspect, ndy - c.y) < .042) return 10;
+    }
     let best = -1, bestD = 1e9;
     for (let i = 0; i < bodies.length; i++){
       const bd = bodies[i];
@@ -493,6 +505,9 @@ const SOLAR_BUILD = g => {
     st.sunE += (solid - st.sunE)*Math.min(1, dt*3.2);
     // глубина внутри станции: 0 — вся система, 1 — звезда целиком, дальше слои погружения
     st.dv = Math.max(0, (H && H.depth) || 0);
+    // ветка (Луна / Юпитер): система орбит не показывается, выбор планеты сброшен
+    st.body = (H && H.body) || null;
+    if (st.body){ st.sel = -1; st.selE = 0; }
     // Система орбит и сама звезда (планеты-спрайты + кольца их орбит, группа tilt) держатся
     // только пока мы ещё в гелиосфере (её масштаб — десятки–сотни а.е., тот же порядок, что и
     // у самих орбит, так что видеть их вместе осмысленно). Дальше, в «Тяжести» (масштаб уже
@@ -505,6 +520,8 @@ const SOLAR_BUILD = g => {
     const sysOut = smooth(2.2, 2.9, st.dv);
     // подлёт к Земле — это вход в главу «Погружение в Землю»: у планеты уже есть своя станция
     if (st.sel === 2 && st.selE > .96) st.goEarth = true;
+    // подлёт к Юпитеру — вход в ветку «Юпитер и Европа»: её первый слой и есть карточка планеты
+    if (st.sel === 4 && st.selE > .96) st.goJup = true;
     const selOn = st.sel >= 0 ? 1 : 0;
     st.selE += (selOn - st.selE)*Math.min(1, dt*(selOn ? 2.2 : 2.8));
     if (st.selE < .002) st.selE = 0;
@@ -535,7 +552,8 @@ const SOLAR_BUILD = g => {
     st.aim.copy(tmpA).sub(tmpB).multiplyScalar(smooth(0, .85, st.selE));
 
     if (!(H && H.zs !== undefined) && st.selE < .02 && st.sunE < .02){ const f = fitCalc(); fitK += (f - fitK)*Math.min(1, dt*2.0); }
-    tilt.visible = sysOut < .99;
+    tilt.visible = sysOut < .99 && !st.body;
+    BODY.update(st.body, (H && H.bd) || 0, H && H.v !== undefined ? H.v : 1, t, dt);
     if (tilt.visible) st.vis *= 1 - sysOut;
     DIVE.update(st.dv, st.vis0 = (H && H.v !== undefined ? H.v : 1), t, dt);
     tilt.scale.setScalar(fitK); st.fit = fitK;
@@ -600,8 +618,18 @@ const SOLAR_BUILD = g => {
       bd.pg.scale.setScalar(bd.pl.d*(1 + hv*.34));   // сама планета тоже подрастает под курсором
       bd.om.opacity = .16*orbF*(1 + hv*1.6);
     }
+    // Луна обходит Землю (условно), гаснет вместе с прочими телами
+    // под курсором Луна замирает — иначе в маленькую движущуюся точку трудно попасть
+    moonA += dt*TAU/9*(1 - moonHov);
+    moonSp.position.copy(earthB.pg.position).add(tmpA.set(Math.cos(moonA)*MOON_R, 0, Math.sin(moonA)*MOON_R));
+    moonHov += ((st.hovI === 10 ? 1 : 0) - moonHov)*Math.min(1, dt*5);
+    const mf = (st.sel === 2 ? 1 : 1 - away)*born*spO*st.vis;
+    moonSp.material.opacity = .95*mf; moonSp.scale.setScalar(.11*(1 + .8*moonHov)*spK);
+    moonLb.position.copy(moonSp.position).add(tmpA.set(0, .085, 0)); moonLb.material.opacity = .95*mf*moonHov;
+    moonSp.visible = moonLb.visible = mf > .01 && !st.body;
   };
 
+  st.moonSp = moonSp;
   upd.api = st;
   st.pick = pick;
   st.bodies = bodies;
@@ -622,23 +650,28 @@ const S_AU = a => S_NUM(a.toFixed(3)).replace(/0+$/, "").replace(/,$/, "");
 const S_LIGHT = a => { const m = a*499/60;
   return m < 60 ? S_NUM(m.toFixed(m < 10 ? 1 : 0)) + " мин" : Math.floor(m/60) + " ч " + Math.round(m % 60) + " мин"; };
 
+// орбита, год, радиус, свет — для карточки на обзоре и для слоя «Юпитер» ветки
+function planetFacts(pl){
+  return `<dl class="facts">
+        <dt>Орбита</dt><dd>${S_AU(pl.a)} а.е. — ${Math.round(pl.a*149.6)} млн км от Солнца</dd>
+        <dt>Год</dt><dd>${S_YRS(pl.a)}</dd>
+        <dt>Радиус</dt><dd>${pl.rk.toLocaleString("ru-RU")} км — ${S_NUM((pl.rk/6371).toFixed(2))} земного</dd>
+        <dt>Свет от Солнца</dt><dd>${S_LIGHT(pl.a)}</dd></dl>`;
+}
 // что показать в левой панели: карточку выбранного тела либо слой станции
 function solarPanel(L){
   const sel = SOLAR ? SOLAR.sel : -1, tag = "Станция " + ST[4].n;
   if (sel >= 0){
     const pl = sel === 8 ? null : PLN[sel], key = pl ? pl.k : "bel";
     const nm = pl ? pl.nm : "Пояс астероидов", tx = PLN_TXT[key];
-    const facts = pl ? `<dl class="facts">
-        <dt>Орбита</dt><dd>${S_AU(pl.a)} а.е. — ${Math.round(pl.a*149.6)} млн км от Солнца</dd>
-        <dt>Год</dt><dd>${S_YRS(pl.a)}</dd>
-        <dt>Радиус</dt><dd>${pl.rk.toLocaleString("ru-RU")} км — ${S_NUM((pl.rk/6371).toFixed(2))} земного</dd>
-        <dt>Свет от Солнца</dt><dd>${S_LIGHT(pl.a)}</dd></dl>` : "";
+    const facts = pl ? planetFacts(pl) : "";
     return { eye:`${tag} · Солнечная система · ${nm}`, name:nm, sub:tx.sub,
       html:`<p class="hd-lead">${esc(tx.lead)}</p>${facts}`
         + listHTML("Наука", tx.sci) + listHTML("Традиции и эзотерика", tx.trad)
         + `<section><h3>Интересно</h3><p class="hd-par">${esc(tx.fun)}</p></section>`
         + `<p class="mono hd-try">Ведите курсором по планете — она откликнётся</p>`
         + `<p class="note">${mk("s")}<span>Голос планеты: ${esc(PLN_SND_TXT[key])}. Это синтез по характеру сонификаций NASA, а не сама запись.</span></p>`
+        + (key === "ear" ? `<button class="hd-open" data-go="moon" data-hover>Луна — спутник Земли ↓</button>` : "")
         + `<button class="hd-open" id="solBack" data-hover>← Вернуться ко всей системе</button>` };
   }
   const v = SUNLV[L] || SUNLV[0];
@@ -674,5 +707,8 @@ function solarList(){
     + PLN.map((pl, i) => row(i, esc(pl.nm), "#" + pl.hal.toString(16).padStart(6, "0"),
         S_AU(pl.a) + " а.е. · " + S_YRS(pl.a))).join("")
     + row(8, "Пояс астероидов", "#8a7a62", "2,1–3,3 а.е. · Малдек")
-    + `</ol></section>`;
+    + `</ol></section>`
+    + `<section><h3>Спутник Земли</h3><div class="hd-fork">`
+    + `<button data-go="moon" data-hover><b>Луна</b><span>Рождение из удара · приливы · фазы и календари</span></button>`
+    + `</div></section>`;
 }
