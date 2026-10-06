@@ -36,24 +36,31 @@ const BIO = (() => {
     const LM = new Float32Array(W*H), TM = new Float32Array(W*H), RR = 4;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){ let m = 0; for (let k = -RR; k <= RR; k++){ const xx = x + k; if (xx >= 0 && xx < W && D[y*W + xx] > m) m = D[y*W + xx]; } TM[y*W + x] = m; }
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){ let m = 0; for (let k = -RR; k <= RR; k++){ const yy = y + k; if (yy >= 0 && yy < H && TM[yy*W + x] > m) m = TM[yy*W + x]; } LM[y*W + x] = m; }
-    const r = (S.rot || 0)*Math.PI/180, cr = Math.cos(r), sr = Math.sin(r);
+    const r = (ARTD[k] ? 0 : S.rot || 0)*Math.PI/180, cr = Math.cos(r), sr = Math.sin(r);
+    const nx = new Float32Array(POOL), ny = new Float32Array(POOL);
     const th = new Float32Array(POOL), u = new Float32Array(POOL), v = new Float32Array(POOL), d = new Float32Array(POOL), e = new Uint8Array(POOL), sg = new Float32Array(POOL);
     let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
     for (let j = 0; j < POOL; j++){
       const isE = edg.length && (Math.random() < .16 || !ins.length), L = isE ? edg : ins, idx = L[(Math.random()*L.length) | 0];
-      const px = idx % W + Math.random() - W/2, py = -((idx/W | 0) + Math.random() - H/2);
+      const fx = idx % W + Math.random(), fy = (idx/W | 0) + Math.random(), px = fx - W/2, py = -(fy - H/2); nx[j] = fx/W; ny[j] = fy/H;
       const rx = px*cr - py*sr, ry = px*sr + py*cr;
       u[j] = rx; v[j] = ry; d[j] = Math.pow(D[idx]/dm, .6); e[j] = isE ? 1 : 0; sg[j] = Math.random() < .5 ? -1 : 1; th[j] = 1 - smooth(2.2, 5.5, LM[idx]);
       x0 = Math.min(x0, rx); x1 = Math.max(x1, rx); y0 = Math.min(y0, ry); y1 = Math.max(y1, ry);
     }
     const cx = (x0 + x1)/2, cy = (y0 + y1)/2, sc = 1/Math.max(x1 - x0, y1 - y0, 1);
     for (let j = 0; j < POOL; j++){ u[j] = (u[j] - cx)*sc; v[j] = (v[j] - cy)*sc; }
-    return SPC[k] = { u, v, d, e, sg, th, ar: (x1 - x0)/Math.max(1, y1 - y0), fill: (ins.length + edg.length)/(W*H) };
+    return SPC[k] = { u, v, d, e, sg, th, nx, ny, ar: (x1 - x0)/Math.max(1, y1 - y0), fill: (ins.length + edg.length)/(W*H) };
   }
   // миниатюра силуэта для карточек (золото на прозрачном)
   const THUMB = {};
+  // рисунки Люсии (BIO_ART): декодируются сразу при загрузке; дают цвет частиц, портрет и миниатюры
+  const ARTD = typeof BIO_ART !== "undefined" ? BIO_ART : {}, ART = {};
+  for (const k in ARTD){ const im = new Image(); im.onload = () => { const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext("2d"); x.drawImage(im, 0, 0);
+    ART[k] = { im, w: c.width, h: c.height, d: x.getImageData(0, 0, c.width, c.height).data }; Object.keys(THUMB).forEach(t => { if (new RegExp("^" + k + "\\d").test(t)) delete THUMB[t]; }); }; im.src = ARTD[k].img; }
   function thumb(k, w, h){
     const key = k + w + "x" + h; if (THUMB[key]) return THUMB[key];
+    if (ART[k]){ const A = ART[k], c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"), sc = Math.min(w/A.w, h/A.h)*.94;
+      x.drawImage(A.im, (w - A.w*sc)/2, (h - A.h*sc)/2, A.w*sc, A.h*sc); return THUMB[key] = c.toDataURL("image/webp", .9); }
     if (!BIO_MASK[k]){ const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
       x.strokeStyle = "rgba(214,172,94,.45)"; x.setLineDash([4, 4]); x.strokeRect(w*.3, h*.12, w*.4, h*.76); x.fillStyle = "rgba(214,172,94,.6)"; x.font = `${Math.round(h*.4)}px Forum, serif`; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("?", w/2, h/2);
       return THUMB[key] = c.toDataURL(); }
@@ -68,8 +75,8 @@ const BIO = (() => {
   }
 
   // ---- шейдеры: вся анимация на видеокарте; процессор каждый кадр передаёт лишь несколько чисел на существо ----
-  const CV = `attribute float aE; attribute float aDel; attribute float aSg; attribute float aR; attribute float aTh;
-uniform float uT, uPR, uS, uF, uTilt, uLife, uAnim, uAl, uPlant, uAct, uPh, uFa, uHov;
+  const CV = `attribute float aE; attribute float aDel; attribute float aSg; attribute float aR; attribute float aTh; attribute vec3 aC;
+uniform float uT, uPR, uS, uF, uTilt, uLife, uAnim, uAl, uPlant, uAct, uPh, uFa, uHov, uArt;
 uniform vec3 uC, uFos, uCol, uStone;
 varying vec3 vColor; varying float vAlpha;
 void main(){
@@ -89,7 +96,7 @@ void main(){
     if (uAnim > 4.5 && uAnim < 5.5) q += (vec2(aR, fract(aR*7.13)) - 0.5)*0.022*uS*aTh;
     vec3 lp = vec3(uC.x + q.x, uC.y + q.y, uC.z + aSg*d*0.16*uS*(uPlant > 0.5 ? 0.5 : 1.0));
     p = mix(fp, lp, k); p.z += sin(3.14159*k)*0.9*(aSg*0.3 + 0.7);
-    vec3 lc = uCol*(0.5 + 0.5*d + aE*0.25);
+    vec3 lc = uArt > 0.5 ? aC*(1.2 + 0.4*d) + vec3(0.04) : uCol*(0.5 + 0.5*d + aE*0.25);
     col = mix(uStone, lc, k);
     a = (aE > 0.5 ? 0.75 : 0.55 + 0.35*d)*(uPlant > 0.5 ? 0.85 : 1.0)*(0.55 + 0.45*k) + (k < 1.0 ? sin(3.14159*k)*0.4 : 0.0);
     if (uAnim > 2.5 && uAnim < 4.5) a *= 1.0 + aTh*0.7*max(0.0, sin(uT*4.0 - u*26.0 + uPh))*(0.35 + 0.65*uAct);
@@ -150,7 +157,7 @@ void main(){
   vColor = c; vAlpha = a*smoothstep(0.3, 2.5, dd);
 }`;
   const shMat = (vs, uni) => new THREE.ShaderMaterial({ uniforms: uni, vertexShader: vs, fragmentShader: FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-  function geo(n, attrs){ const g = new THREE.BufferGeometry(); for (const k in attrs) g.setAttribute(k, new THREE.BufferAttribute(attrs[k], k === "position" ? 3 : 1)); return g; }
+  function geo(n, attrs){ const g = new THREE.BufferGeometry(); for (const k in attrs) g.setAttribute(k, new THREE.BufferAttribute(attrs[k], k === "position" || k === "aC" ? 3 : 1)); return g; }
   const RCAP = 9000;
   let pR, pEnv = null, glowS, RU, EU;
   const v3 = c => new THREE.Vector3(c[0], c[1], c[2]);
@@ -240,20 +247,21 @@ void main(){
     }
     for (let li = L.length - 1; li >= 0; li--) if (!BIO_MASK[L[li].k]) L.splice(li, 1);
     for (const I of L){
-      const S = BIO_SP[I.k] || {}, sp = species(I.k), plant = !!S.plant, anim = S.anim || "still";
+      const S = BIO_SP[I.k] || {}, AD = ARTD[I.k] || {}, sp = species(I.k), plant = !!S.plant, anim = AD.a || S.anim || "still";
       if (((E && E.ready) || world) && !I.fossilOnly && (LANE[anim] === "floor" || anim === "sway" || anim === "still")) I.y = (BIO_FLOOR[E ? E.world : world] ?? -3.7) + I.h*.5*(sp.ar >= 1 ? 1/sp.ar : 1) - .06;
       const n = Math.min(POOL, Math.round(clamp((plant ? 500 : 800) + (plant ? 300 : 900)*I.h, 500, 4200)*(I.fossilOnly ? .6 : 1)));
-      Object.assign(I, { sp, n, plant, anim, X: I.x, Y: I.y, Z: I.z, ph: Math.random()*TAU, fa: (Math.random() - .5)*.7, face: S.face || 1,
+      Object.assign(I, { sp, n, plant, anim, X: I.x, Y: I.y, Z: I.z, ph: Math.random()*TAU, fa: (Math.random() - .5)*.7, face: AD.f || S.face || 1,
         lane: LANE[anim], spd: Math.max(.12, Math.abs(I.v)*.85), vx: 0, vy: 0, act: 0, tl: 0, st: "rest", tm: Math.random()*2.5, tx: I.x, ty: I.y });
       I.mv = !I.fossilOnly && !plant && !!I.lane && !!I.v;
       I.F = I.v ? Math.sign(I.v)*I.face : 1;
-      const P = new Float32Array(n*3), aE = new Float32Array(n), aDel = new Float32Array(n), aSg = new Float32Array(n), aR = new Float32Array(n), aTh = new Float32Array(n);
-      for (let j = 0; j < n; j++){ P[j*3] = sp.u[j]; P[j*3 + 1] = sp.v[j]; P[j*3 + 2] = sp.d[j]; aE[j] = sp.e[j]; aDel[j] = Math.random()*.45 + (sp.v[j] + .5)*.15; aSg[j] = sp.sg[j]; aR[j] = Math.random(); aTh[j] = sp.th[j]; }
+      const P = new Float32Array(n*3), aE = new Float32Array(n), aDel = new Float32Array(n), aSg = new Float32Array(n), aR = new Float32Array(n), aTh = new Float32Array(n), aC = new Float32Array(n*3), A = ART[I.k];
+      for (let j = 0; j < n; j++){ P[j*3] = sp.u[j]; P[j*3 + 1] = sp.v[j]; P[j*3 + 2] = sp.d[j]; aE[j] = sp.e[j]; aDel[j] = Math.random()*.45 + (sp.v[j] + .5)*.15; aSg[j] = sp.sg[j]; aR[j] = Math.random(); aTh[j] = sp.th[j];
+        if (A){ const q = (Math.min(A.h - 1, sp.ny[j]*A.h | 0)*A.w + Math.min(A.w - 1, sp.nx[j]*A.w | 0))*4; aC[j*3] = A.d[q]/255; aC[j*3 + 1] = A.d[q + 1]/255; aC[j*3 + 2] = A.d[q + 2]/255; } }
       const stone = mixc(e >= 0 ? rockCol(e, I.y, .9) : rockCol(eraAtY(I.y), I.y, .9), [1, .95, .85], .45);
       I.U = { uPR: U.pr, uT:{ value:0 }, uS:{ value:I.h }, uF:{ value:I.F }, uTilt:{ value:0 }, uLife:{ value:0 }, uAnim:{ value:ANIM[anim] || 0 }, uAl:{ value:1 },
-        uPlant:{ value:plant ? 1 : 0 }, uAct:{ value:0 }, uPh:{ value:I.ph }, uFa:{ value:I.fa }, uHov:{ value:0 },
+        uPlant:{ value:plant ? 1 : 0 }, uArt:{ value:A ? 1 : 0 }, uAct:{ value:0 }, uPh:{ value:I.ph }, uFa:{ value:I.fa }, uHov:{ value:0 },
         uC:{ value:new THREE.Vector3(I.x, I.y, I.z) }, uFos:{ value:new THREE.Vector3(I.x, I.y, -.32) }, uCol:{ value:v3(spCol(I.k)) }, uStone:{ value:v3(stone) } };
-      I.o = new THREE.Points(geo(n, { position:P, aE, aDel, aSg, aR, aTh }), shMat(CV, I.U)); I.o.frustumCulled = false; scn.add(I.o);
+      I.o = new THREE.Points(geo(n, { position:P, aE, aDel, aSg, aR, aTh, aC }), shMat(CV, I.U)); I.o.frustumCulled = false; scn.add(I.o);
     }
     return L;
   }
@@ -768,7 +776,7 @@ void main(){
         <h4>${S.bio ? "Что ему грозит" : "Что досталось нам"}</h4><p class="tm-pr bio-p">${esc(S.legacy)}</p>
         <h4>Наука</h4><ul class="list">${S.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}<li>${mk("h")}<span>${S.bio ? "Цвета на сцене условные: силуэт показывает форму, а не окраску" : "Цвета на сцене — реконструкция: окраска этого существа неизвестна"}</span></li></ul>
         <div class="tm-gos">${gal.on ? (SE ? `<button class="btn tm-go" id="bioToEra" data-hover>В пласт «${esc(SE.nm)}» →</button>` : "") : bmOn ? "" : `<button class="btn tm-go" id="bioCmp" data-hover>Рядом с человеком →</button>`}${S.tree ? `<button class="btn tm-go" id="bioTree" data-hover>В Древе жизни →</button>` : ""}</div>
-        <p class="bio-cr">Силуэт: ${credit(k)}</p>`;
+        <p class="bio-cr">${ARTD[k] ? "Рисунок «Пробуждения»" : "Силуэт: " + credit(k)}</p>`;
     } else if (!E){
       h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">Биосфера · учебник жизни</span><span class="tm-nav"><button id="bioDown" aria-label="Вниз, в прошлое" data-hover>↓</button></span></div>
         <h3>Пласты камня</h3><p class="tm-ago2">20 пластов · 4,5 миллиарда лет</p>

@@ -1,0 +1,8 @@
+{
+ "megat": { "face": 1 },
+ "sahel": { "face": -1 },
+ "argen": { "face": -1 },
+ "micro": { "face": 1, "anim": "still" },
+ "mosa":  { "face": -1 },
+ "quetz": { "face": 1, "anim": "walk" }
+}
