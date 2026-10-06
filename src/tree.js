@@ -218,23 +218,58 @@ const CHT = (() => {
     // чем глубже узел (ближе к краю) и мельче его ветвь — тем ближе камера
     const span = (n.a1 - n.a0);
     distT = n === root ? 16 : clamp(2.2 + span*6 + (1 - n.r)*3, 2, 13);
-    card(n);
+    card(n); jrMark("tr", n.id, n.nm.replace(" — общий предок", ""));
   }
+  // переходы: в календарь — на дату появления; клеточные группы — на станцию «Клетка», люди — на «Человек»
+  const TREE_ST = {};
+  ["luca","bac","arc","cyano","firm","proteo","actino","meth","halo","asg","euk","amoe","sar","cil","foram","diat","choano"].forEach(id => TREE_ST[id] = ["g7", "Клетка"]);
+  ["hominin","austr","homo","erect","neand","deni","sap"].forEach(id => TREE_ST[id] = ["human", "Человек"]);
+  // дата в «Космическом календаре» для события t млн лет назад (13,8 млрд лет = год)
+  const MONG = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"], MD = [31,28,31,30,31,30,31,31,30,31,30,31];
+  function calDate(tMy){ const sec = 365*86400*(1 - tMy*1e6/13.8e9); let day = Math.floor(sec/86400), m = 0; while (m < 11 && day >= MD[m]){ day -= MD[m]; m++; }
+    const r = sec - Math.floor(sec/86400)*86400, hh = Math.floor(r/3600), mm = Math.floor(r % 3600/60);
+    return `${day + 1} ${MONG[m]}` + (m === 11 && day === 30 ? `, ${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}` : ""); }
   // ---- карточка (8а: родословная, даты, ветви) ----
   const ago = t => t >= 1000 ? `${String((t/1000).toFixed(t >= 10000 ? 0 : 1)).replace(".", ",")} млрд лет назад` : t >= 1 ? `${String(Math.round(t))} млн лет назад` : t > 0 ? `${Math.round(t*1000)} тыс. лет назад` : "сейчас";
   function card(n){
-    const g = TREE_GRP[n.g], chain = []; for (let q = n; q; q = q.p ? BY[q.p] : null) chain.unshift(q);
+    const g = TREE_GRP[n.g], I = TREE_INFO[n.id] || {}, chain = []; for (let q = n; q; q = q.p ? BY[q.p] : null) chain.unshift(q);
+    const si = TREE_STEPS.indexOf(n.id);
     const box = $("trCard");
-    box.innerHTML = `<span class="mono tm-cat" style="color:rgb(${g[1]})">${esc(g[0])}${PATH.has(n.id) ? " · наша линия" : ""}</span>
+    box.innerHTML = `<div class="tm-bar"><span class="mono tm-cat" style="color:rgb(${g[1]})">${esc(g[0])}${PATH.has(n.id) ? " · наша линия" : ""}</span>`
+      + (si >= 0 ? `<span class="tm-nav"><button data-st="${si - 1}" ${si <= 0 ? "disabled" : ""} aria-label="Предыдущий шаг пути" data-hover>←</button><span class="mono" style="color:var(--faint);align-self:center;padding:0 4px">шаг ${si + 1}/${TREE_STEPS.length}</span><button data-st="${si + 1}" ${si >= TREE_STEPS.length - 1 ? "disabled" : ""} aria-label="Следующий шаг пути" data-hover>→</button></span>` : "") + `</div>
       <h3>${esc(n.nm)}${n.t1 > 0 ? " †" : ""}</h3>
-      <p class="tm-ago2">${n === root ? "≈ 4,2 млрд лет назад (оценка по геномам)" : "Появились ≈ " + ago(n.t0) + (n.t1 > 0 ? " · вымерли ≈ " + ago(n.t1) : "")}</p>
-      <nav class="tr-chain" aria-label="Родословная">${chain.map(q => `<button data-n="${q.id}" ${q === n ? 'aria-current="true"' : ""} data-hover>${esc(q.nm.replace(" — общий предок", ""))}</button>`).join("<i>›</i>")}</nav>`
+      <p class="tm-ago2">${n === root ? "≈ 4,2 млрд лет назад (оценка по геномам)" : "Появились ≈ " + ago(n.t0) + (n.t1 > 0 ? " · вымерли ≈ " + ago(n.t1) : "")}</p>`
+      + (I.lead ? `<p class="tm-lead">${esc(I.lead)}</p>` : "")
+      + (I.inh ? `<div class="tr-inh"><h4>Что досталось нам</h4><p>${esc(I.inh)}</p></div>` : "")
+      + (I.art ? `<div class="tm-art">${I.art.split("\n\n").map(x => `<p>${esc(x)}</p>`).join("")}</div>` : "")
+      + (I.sci && I.sci.length ? `<h4>Наука</h4><ul class="list">${I.sci.map(x => `<li>${mk(x[0])}<span>${esc(x[1])}</span></li>`).join("")}</ul>` : "")
+      + (I.tr ? `<h4>Традиции</h4><ul class="list">${I.tr.map(x => `<li>${mk("t")}<span>${esc(x)}</span></li>`).join("")}</ul>` : "")
+      + (I.pr ? `<h4>Практика</h4><p class="tm-pr">${esc(I.pr)}</p>` : "")
+      + `<div class="tm-gos"><button class="btn tm-go" data-cal="${n.t0}" data-hover>В календаре: ${esc(calDate(n.t0))} →</button>`
+      + (TREE_ST[n.id] ? `<button class="btn tm-go" data-js="${TREE_ST[n.id][0]}" data-hover>Станция «${TREE_ST[n.id][1]}» →</button>` : "")
+      + (() => { const b = typeof bioOfTree === "function" ? bioOfTree(n.id) : null; return b ? `<button class="btn tm-go" data-bio="${b[0]}" data-hover>В Биосфере: ${esc(b[1])} →</button>` : ""; })() + `</div>`
+      + `<h4>Родословная</h4><nav class="tr-chain" aria-label="Родословная">${chain.map(q => `<button data-n="${q.id}" ${q === n ? 'aria-current="true"' : ""} data-hover>${esc(q.nm.replace(" — общий предок", ""))}</button>`).join("<i>›</i>")}</nav>`
       + (n.ch.length ? `<h4>Ветви</h4><ul class="tr-kids">${n.ch.map(c => `<li><button data-n="${c.id}" data-hover><span class="dotc" style="background:rgb(${TREE_GRP[c.g][1]})"></span>${esc(c.nm)}${c.t1 > 0 ? " †" : ""}<span class="mono">${esc(ago(c.t0))}</span></button></li>`).join("")}</ul>` : "")
       + `<p class="note">${mk("t")}<span>Даты расхождений — оценки по окаменелостям и молекулярным часам. Подробность ветвей на древе — не мера важности: основное разнообразие жизни — у бактерий и архей.</span></p>`;
     box.classList.remove("swap"); void box.offsetWidth; box.classList.add("swap");
-    box.querySelectorAll("[data-n]").forEach(b => b.onclick = () => select(BY[b.dataset.n]));
+    box.querySelectorAll("[data-n]").forEach(b => b.onclick = () => { stopWalk(); select(BY[b.dataset.n]); });
+    box.querySelectorAll("[data-st]").forEach(b => b.onclick = () => { stopWalk(); step(+b.dataset.st); });
+    box.querySelectorAll("[data-cal]").forEach(b => b.onclick = () => { const y = +b.dataset.cal*1e6; close(); openTime(); CHR.goAgo(y); });
+    box.querySelectorAll("[data-bio]").forEach(b => b.onclick = () => { const id = b.dataset.bio; close(); openBio(id); });
+    box.querySelectorAll("[data-js]").forEach(b => b.onclick = () => { const id = b.dataset.js; close(); openJourney(id); });
     $("trScroll").scrollTop = 0;
+    const sb = $("trStep"); if (sb) sb.textContent = si >= 0 ? `${si + 1}/${TREE_STEPS.length}` : "—";
   }
+  // ---- путь к нам: 11 шагов по золотой линии; «Пройти путь» листает сам, по шагу в 8 с ----
+  let walk = 0, walkT = 0;
+  function step(i){ i = clamp(i, 0, TREE_STEPS.length - 1); select(BY[TREE_STEPS[i]]); }
+  const curStep = () => { const i = TREE_STEPS.indexOf(sel.id); if (i >= 0) return i;
+    for (let q = sel; q; q = q.p ? BY[q.p] : null){ const k = TREE_STEPS.indexOf(q.id); if (k >= 0) return k; } return 0; };
+  function stopWalk(){ if (!walk) return; walk = 0; const b = $("trWalk"); b.textContent = "▶ Пройти путь"; b.setAttribute("aria-pressed", "false"); }
+  $("trWalk").onclick = () => { if (walk){ stopWalk(); return; } walk = 1; walkT = 0; const b = $("trWalk"); b.textContent = "❚❚ Пауза"; b.setAttribute("aria-pressed", "true");
+    if (TREE_STEPS.indexOf(sel.id) === TREE_STEPS.length - 1 || TREE_STEPS.indexOf(sel.id) < 0) step(0); };
+  $("trPrev").onclick = () => { stopWalk(); const i = TREE_STEPS.indexOf(sel.id); step(i >= 0 ? i - 1 : curStep()); };
+  $("trNext").onclick = () => { stopWalk(); const i = TREE_STEPS.indexOf(sel.id); step(i >= 0 ? i + 1 : curStep() + 1); };
   // ---- ввод ----
   let drag = null, moved = 0;
   cvs.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY]; moved = 0; cvs.setPointerCapture(e.pointerId); });
@@ -244,10 +279,12 @@ const CHT = (() => {
       rotY -= dx*.005; tilt = clamp(tilt + dy*.004, .12, 1.45); drag = [e.clientX, e.clientY]; auto = false; }
     hov = pick(x, y); cvs.style.cursor = hov ? "pointer" : drag ? "grabbing" : "grab";
   });
-  cvs.addEventListener("pointerup", e => { const r = cvs.getBoundingClientRect(); if (moved < 6){ const n = pick(e.clientX - r.left, e.clientY - r.top); if (n) select(n); } drag = null; });
+  cvs.addEventListener("pointerup", e => { const r = cvs.getBoundingClientRect(); if (moved < 6){ const n = pick(e.clientX - r.left, e.clientY - r.top); if (n){ stopWalk(); select(n); } } drag = null; });
   cvs.addEventListener("wheel", e => { e.preventDefault(); const k = e.deltaMode === 1 ? .06 : .0016; distT = clamp(distT*Math.exp(e.deltaY*k), 2.2, 22); }, {passive:false});
   addEventListener("keydown", e => { if (!open) return; if (e.key === "Escape") close();
-    if (e.key === "Backspace" && sel.p){ e.preventDefault(); select(BY[sel.p]); } });
+    if (e.key === "Backspace" && sel.p){ e.preventDefault(); stopWalk(); select(BY[sel.p]); }
+    if (["ArrowRight","ArrowDown","PageDown"].includes(e.key)){ e.preventDefault(); $("trNext").onclick(); }
+    if (["ArrowLeft","ArrowUp","PageUp"].includes(e.key)){ e.preventDefault(); $("trPrev").onclick(); } });
   let scr = [];                                               // экранные координаты узлов этого кадра
   function pick(x, y){ let best = null, bd = W3 < 760 ? 22 : 14; for (const [sx, sy, n] of scr){ const d = Math.hypot(sx - x, sy - y); if (d < bd){ bd = d; best = n; } } return best; }
   function size(){ DPR3 = Math.min(2, devicePixelRatio || 1); W3 = cvs.clientWidth; H3 = cvs.clientHeight;
@@ -259,6 +296,7 @@ const CHT = (() => {
     raf = open ? requestAnimationFrame(frame) : 0;
     const dt = Math.min(.1, (now - last)/1000 || 0); last = now;
     if (auto) rotY += dt*.03;
+    if (walk){ walkT += dt; if (walkT > 8){ walkT = 0; const i = TREE_STEPS.indexOf(sel.id); if (i >= TREE_STEPS.length - 1) stopWalk(); else step(i + 1); } }
     dist += (distT - dist)*Math.min(1, dt*3); tgt.lerp(tgtT, Math.min(1, dt*3));
     const port = W3 < 760, mxOn = chTree.classList.contains("tm-max");
     // центр кадра правее панели (на телефоне — выше неё): сдвигаем окно камеры
@@ -324,11 +362,11 @@ const CHT = (() => {
   addEventListener("resize", () => { if (open) size(); });
   const mxb = $("trMax");
   mxb.onclick = () => { const on = !chTree.classList.contains("tm-max"); chTree.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Древо" : "⤢ Читать"; };
-  $("trHome").onclick = () => { select(root); distT = 16; tilt = .95; auto = true; };
+  $("trHome").onclick = () => { stopWalk(); select(root); distT = 16; tilt = .95; auto = true; };
   return { open: openT, close, get on(){ return open; }, select: id => BY[id] && select(BY[id]), nodes: NODES, dbg: { sel: () => sel.id, n: NODES.length } };
 })();
 const chTree = $("chTree");
-function openTree(id){ closeHuman(); closePath(); closeRef(); closeTime(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
+function openTree(id){ closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
 function closeTree(){ CHT.close(); }
 $("btnTree").onclick = () => CHT.on ? closeTree() : openTree();
 $("treeClose").onclick = closeTree;

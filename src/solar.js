@@ -236,8 +236,8 @@ ven:`float dd = length(position - uCur), w = uHov*exp(-dd*dd*5.0);
   p = q;`,
 
 // Земля: детальную станцию заменять не нужно — здесь короткий узнаваемый вид
-ear:`float land = fbm(nrm*1.9)*1.7 + fbm(nrm*5.0)*0.4 - 0.62;
-  float L = smoothstep(0.00, 0.06, land), ice = smoothstep(0.83, 0.90, abs(lat));
+ear:`float land = landT(nrm) - 0.18 + (fbm(nrm*6.0) - 0.5)*0.12;     // настоящие материки (поле суши uLand)
+  float L = smoothstep(0.00, 0.06, land), ice = iceT(nrm, land + 0.18);
   col = mix(vec3(0.06,0.18,0.48), vec3(0.18,0.44,0.24), L);
   col = mix(col, vec3(0.16,0.36,0.18), L*smoothstep(0.3, 0.7, fbm(nrm*7.0)));
   col = mix(col, vec3(0.80,0.86,0.94), ice);

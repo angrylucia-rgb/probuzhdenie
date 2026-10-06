@@ -13,13 +13,15 @@ const EARTH = (() => {
   const warp = D => D - .8*Math.sin(TAU*D)/TAU;
   const GL = `
 const vec3 SUN = vec3(-0.9186, 0.2297, 0.3215);
-float landF(vec3 q){ return sin(q.x*2.2 + 1.3)*sin(q.y*2.6 + 0.4)*cos(q.z*1.8 - 0.7) + 0.35*sin(q.x*4.7 + q.z*3.9) + 0.25*sin(q.y*6.1 - q.x*2.3); }
+float landF(vec3 q){ return landT(q); }
+float dryT(vec3 q);   // настоящие материки: поле суши из текстуры uLand (общая шапка шейдеров)
 float landD(vec3 q){ float l = landF(q); float am = 0.16; vec3 r = q; for (int i = 0; i < 5; i++){ r = vec3(r.y*2.1 + 1.7, r.z*2.1 - 0.9, r.x*2.1 + 2.3); l += am*sin(r.x)*sin(r.y + 0.5*sin(r.z)); am *= 0.55; } return l; }
 float h31(vec3 q){ return fract(sin(dot(q, vec3(12.9898, 78.233, 37.719)))*43758.5453); }
 float vn(vec3 x){ vec3 i = floor(x); vec3 f = fract(x); f = f*f*(3.0 - 2.0*f);
   return mix(mix(mix(h31(i), h31(i + vec3(1.0,0.0,0.0)), f.x), mix(h31(i + vec3(0.0,1.0,0.0)), h31(i + vec3(1.0,1.0,0.0)), f.x), f.y),
              mix(mix(h31(i + vec3(0.0,0.0,1.0)), h31(i + vec3(1.0,0.0,1.0)), f.x), mix(h31(i + vec3(0.0,1.0,1.0)), h31(i + vec3(1.0,1.0,1.0)), f.x), f.y), f.z); }
 float fbm(vec3 x){ float v = 0.0; float am = 0.5; for (int i = 0; i < 5; i++){ v += am*vn(x); x = x*2.03 + vec3(1.7, 9.2, 3.1); am *= 0.5; } return v; }
+float dryT(vec3 q){ vec3 n = normalize(q); float la = abs(asin(clamp(n.y, -1.0, 1.0)))*57.29578; return smoothstep(9.0, 17.0, la)*(1.0 - smoothstep(31.0, 40.0, la))*(0.45 + 0.55*fbm(n*5.0)); }   // пустыни субтропиков
 float shadeK(vec3 nObj){ vec3 nw = normalize((modelMatrix*vec4(nObj, 0.0)).xyz); return smoothstep(-0.35, 0.3, dot(nw, SUN)); }
 float fogK(vec3 q, float n0, float f0){ vec4 fv = modelViewMatrix*vec4(q, 1.0); float fz = -fv.z; return smoothstep(n0, n0 + 3.0, fz)*(1.0 - smoothstep(f0*0.55, f0, fz)); }
 float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smoothstep(3.0, 40.0, -fv.z); }
@@ -40,7 +42,7 @@ float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smooth
   // отрезки в набор точек: extra(t, dist) → доп. данные
   function seg(out, a, b, step, jit, tag){ const L = Math.hypot(b[0]-a[0], b[1]-a[1], b[2]-a[2]); const n = Math.max(1, Math.round(L/step));
     for (let j = 0; j < n; j++){ const t = j/n; out.push([a[0] + (b[0]-a[0])*t + rn()*jit, a[1] + (b[1]-a[1])*t + rn()*jit, a[2] + (b[2]-a[2])*t + rn()*jit, t, tag]); } }
-  const landJS = d => { const x = d[0]*2.3, y = d[1]*2.3, z = d[2]*2.3; return Math.sin(x*2.2 + 1.3)*Math.sin(y*2.6 + .4)*Math.cos(z*1.8 - .7) + .35*Math.sin(x*4.7 + z*3.9) + .25*Math.sin(y*6.1 - x*2.3); };
+  const landJS = d => landAt(d);
   const hsh = (x, y) => { const s = Math.sin(x*127.1 + y*311.7)*43758.5453; return s - Math.floor(s); };
   const vn2 = (x, y) => { const i = Math.floor(x), j = Math.floor(y), f = x - i, g = y - j, u = f*f*(3 - 2*f), v = g*g*(3 - 2*g);
     return (hsh(i, j)*(1 - u) + hsh(i + 1, j)*u)*(1 - v) + (hsh(i, j + 1)*(1 - u) + hsh(i + 1, j + 1)*u)*v; };
@@ -50,12 +52,14 @@ float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smooth
   /* ===== МАКРО: планета и её поля ===== */
   // 0 · планета (тот же рисунок материков, что на кольце)
   add(globe, P(26000*Q, (i, o, n) => { const d = fib(i, n); o.p = sc3(d, RG); o.rnd = d; o.s = .8 + Math.random()*.3; },
-    `vec3 q = aRnd*2.3; float land = landF(q); float Lm = step(0.18, land); float ice = step(2.02, abs(q.y));
+    `vec3 q = aRnd*2.3; float land = landF(q); float Lm = step(0.18, land); float ice = iceT(q, land);
      vec3 ocean = mix(vec3(0.16,0.42,0.95), vec3(0.07,0.25,0.66), uK*smoothstep(0.18, -0.6, land));
-     float dry = smoothstep(0.35, 0.95, 0.5 + 0.5*sin(q.x*3.1 + q.z*2.3) - abs(q.y)*0.2);
+     float dry = dryT(q);
      vec3 grn = mix(vec3(0.4,0.88,0.56), mix(vec3(0.3,0.7,0.36), vec3(0.88,0.72,0.42), dry), uK);
      col = mix(ocean, grn, Lm); col = mix(col, vec3(0.92,0.96,1.0), ice);
-     a = mix(0.32, 1.0, max(Lm, ice))*(1.0 - 0.55*smoothstep(0.5, 1.0, uK));
+     a = mix(0.24, 1.0, max(Lm, ice))*(1.0 - 0.55*smoothstep(0.5, 1.0, uK));
+     a *= mix(0.12, 1.0, smoothstep(-0.2, 0.3, normalize((modelViewMatrix*vec4(aRnd, 0.0)).xyz).z));   // обратная сторона не просвечивает
+     s *= mix(0.9, 1.25, Lm);
      a *= mix(1.0, 0.16 + 0.84*shadeK(aRnd), uShade);`),
     D => 1 - smooth(6.12, 6.32, D), { macro:true, k:D => smooth(3.5, 5.6, D) });
   // лимб атмосферы
@@ -65,8 +69,8 @@ float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smooth
   // детализированная шапка, обращённая к камере: фрактальный берег
   add(macro, P(36000*Q, (i, o) => { let d; do { d = dir(); } while (d[2] < .5); o.p = sc3(d, RG*1.002); o.rnd = d; o.s = .7 + Math.random()*.4; },
     `vec3 ug = aRnd; ug.xz = rot(-uRot)*ug.xz; vec3 q = ug*2.3; float land = landD(q);
-     float Lm = smoothstep(0.16, 0.2, land); float ice = step(2.02, abs(q.y));
-     float dry = smoothstep(0.35, 0.95, 0.5 + 0.5*sin(q.x*3.1 + q.z*2.3) - abs(q.y)*0.2);
+     float Lm = smoothstep(0.16, 0.2, land); float ice = iceT(q, land);
+     float dry = dryT(q);
      float relief = fbm(q*6.0);
      vec3 ocean = mix(vec3(0.12,0.4,0.9), vec3(0.05,0.2,0.6), smoothstep(0.16, -0.5, land));
      ocean = mix(ocean, vec3(0.35,0.85,0.95), smoothstep(0.05, 0.17, land)*(1.0 - Lm));

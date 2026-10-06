@@ -1,21 +1,42 @@
 // ===== Ветка станции VII «Сон и сознание» (итерация 6) =====
 // Четыре слоя по Мандукья-упанишаде: засыпание (А) → сновидения (У) → осознанный сон → глубокий сон и
-// турия (М и тишина). Сцена живёт в той же группе станции, что и фигура человека: фигура ложится и
+// турия (М и тишина). Сцена живёт в той же группе станции, что и фигура человека: фигура рассыпается и собирается лёжа,
 // становится спящим, над ним — облако сна, под ним — «монитор» с записью: ЭЭГ засыпания, гипнограмма
 // ночи, сигнал глазами из осознанного сна, медленные дельта-волны. Всё перетекает по глубине плавно:
 // вес каждого слоя — треугольная функция от глубины, облако и запись смешиваются по весам.
+// узоры Клювера для фосфенов порога сна: k — номер узора, u — свой номер точки, r — случайный вектор
+const KLV_GLSL = `vec3 klv(float k, float u, vec3 r){
+  if (k < 0.5){                                   // туннель: кольца медленно расходятся
+    float ring = floor(u*7.0), rad = 0.12 + mod(ring*0.27 + uTime*0.06, 1.9), an = r.x*3.14159 + u*50.0;
+    return vec3(cos(an)*rad*1.1, sin(an)*rad*0.72, r.z*0.05);
+  } else if (k < 1.5){                            // спираль: четыре мягких рукава
+    float arm = floor(u*4.0), rr = fract(u*13.0 + uTime*0.03), rad = 0.1 + rr*1.85;
+    float th = arm*1.5708 + log(rad + 0.05)*1.9 - uTime*0.12;
+    return vec3(cos(th)*rad*1.1 + r.y*0.05, sin(th)*rad*0.72 + r.x*0.05, r.z*0.05);
+  } else if (k < 2.5){                            // решётка: соты, чуть колышутся
+    float id = floor(u*480.0), gx = mod(id, 24.0) - 11.5, gy = floor(id/24.0) - 9.5;
+    vec2 q = vec2(gx*0.17 + mod(gy, 2.0)*0.085, gy*0.15);
+    q += vec2(sin(q.y*3.0 + uTime*0.4), cos(q.x*3.0 + uTime*0.35))*0.04;
+    return vec3(q, r.z*0.05);
+  }
+  float an, rad;                                   // паутина: лучи и кольца
+  if (fract(u*3.0) < 0.5){ an = floor(u*12.0)*0.5236 + uTime*0.02; rad = fract(u*37.0)*1.9; }
+  else { rad = (floor(fract(u*5.3)*6.0) + 1.0)*0.31; an = r.x*3.14159; }
+  return vec3(cos(an)*rad*1.1, sin(an)*rad*0.72, r.z*0.05);
+}
+`;
 function makeDream(root, fig, figObjs){
   const CY = 1.35, TY = -2.9, TW = 3.0;            // центр облака, ось монитора, полуширина монитора
   const grp = new THREE.Group(); grp.visible = false; root.add(grp);
   // облако сна: одни и те же точки собираются в четыре разных рисунка
   const cloud = pts(4200*Q, (i, o) => { o.p = [0, 0, 0]; o.s = .55 + Math.random()*.75; },
     `vec3 r = aRnd; float u = aSeed;
-     // 0 · гипнагогия: туннель-спираль — одна из «форм-констант» Клювера
-     float arm = floor(u*6.0), rr = fract(u*17.0 + uTime*0.05);
-     float rad0 = 0.1 + pow(rr, 1.5)*2.05, th0 = arm*1.0472 + log(rad0 + 0.06)*2.3 - uTime*0.22;
-     vec3 p0 = vec3(cos(th0)*rad0*1.2, sin(th0)*rad0*0.82, r.z*0.08);
-     float a0 = (0.3 + 0.7*abs(sin(uTime*1.6 + u*40.0)))*smoothstep(0.0, 0.12, rr)*(1.0 - smoothstep(0.7, 1.0, rr));
-     vec3 c0 = hsv(fract(u*0.27 + uTime*0.025 + rr*0.35))*0.8 + 0.2;
+     // 0 · фосфены порога сна: четыре узора Клювера (туннель, спираль, решётка, паутина) тускло перетекают друг в друга
+     float kph = uTime*0.105, kA = mod(floor(kph), 4.0), kf = smoothstep(0.62, 1.0, fract(kph));
+     vec3 p0 = mix(klv(kA, u, r), klv(mod(kA + 1.0, 4.0), u, r), kf);
+     vec2 ke = p0.xy/vec2(2.0, 1.35);
+     float a0 = (0.16 + 0.24*abs(sin(uTime*1.3 + u*60.0)))*(1.0 - smoothstep(0.75, 1.05, length(ke)));
+     vec3 c0 = mix(vec3(0.98, 0.74, 0.46), vec3(0.64, 0.56, 1.0), fract(u*3.3 + kA*0.25))*0.8;
      // 1 · сновидения: несколько «образов» бродят облаком, в REM — живее и ярче
      float k = floor(fract(u*7.31)*6.0);
      vec2 cc = vec2(sin(uTime*(0.10 + k*0.03) + k*2.1)*1.45, cos(uTime*(0.085 + k*0.025) + k*1.3)*0.75);
@@ -24,12 +45,11 @@ function makeDream(root, fig, figObjs){
      p1.xy += vec2(sin(uTime*0.9 + u*30.0), cos(uTime*0.8 + u*20.0))*0.07*(0.3 + uRem);
      float a1 = (0.22 + 0.78*uRem)*(0.6 + 0.4*sin(uTime*0.9 + k*1.7));
      vec3 c1 = mix(hsv(fract(k*0.17 + 0.55)), vec3(0.92, 0.88, 1.0), 0.35);
-     // 2 · осознанность: ясная сфера — сон, увиденный как сон
-     vec3 sd = normalize(r + vec3(0.0001)); float ca = cos(uTime*0.16), sa = sin(uTime*0.16);
-     sd.xz = mat2(ca, -sa, sa, ca)*sd.xz;
-     vec3 p2 = sd*1.4;
-     float a2 = 0.22 + 0.4*smoothstep(-0.3, 0.7, sd.z);
-     vec3 c2 = mix(vec3(1.0, 0.86, 0.56), vec3(0.78, 0.9, 1.0), step(0.6, fract(u*3.7)));
+     // 2 · осознанность: золотой край ясного окна в пелене — сон, увиденный как сон
+     float wa = u*6.2832 + uTime*0.05, wr = 1.0 + r.y*0.035;
+     vec3 p2 = vec3(cos(wa)*1.55*wr, sin(wa)*1.05*wr, r.z*0.06);
+     float a2 = (0.3 + 0.35*step(0.4, fract(wa*4.0)))*(0.8 + 0.2*sin(uTime*1.1 + u*30.0));
+     vec3 c2 = mix(vec3(1.0, 0.86, 0.56), vec3(0.95, 0.94, 1.0), step(0.7, fract(u*3.7)));
      // 3 · дельта-волны: медленные кольца расходятся от неподвижного центра
      float ring = floor(u*4.0), ph = fract(ring*0.25 + uTime*0.03);
      float an = r.x*3.14159 + u*0.7;
@@ -39,10 +59,88 @@ function makeDream(root, fig, figObjs){
      p = uW.x*p0 + uW.y*p1 + uW.z*p2 + uW.w*p3;
      a = (uW.x*a0 + uW.y*a1 + uW.z*a2 + uW.w*a3)*uSharp;
      col = uW.x*c0 + uW.y*c1 + uW.z*c2 + uW.w*c3;
-     s *= 0.8 + 0.15*uW.z;`, 1, "uniform vec4 uW; uniform float uRem;\n");
+     s *= 0.8 + 0.15*uW.z;`, 1, "uniform vec4 uW; uniform float uRem;\n" + KLV_GLSL);
   cloud.material.uniforms.uW = { value: new THREE.Vector4(1, 0, 0, 0) };
   cloud.material.uniforms.uRem = { value: 0 };
   cloud.position.y = CY; cloud.userData.self = true; grp.add(cloud);
+  // ---- «Лежачий Будда»: спящий на правом боку, частицы выстроены по силуэту из PNG (sleeper_data.js) ----
+  // Сидящая фигура в лотосе при входе в ветку растворяется, на её месте проявляется лежащая.
+  const SLL = 5.8, SK = SLL/SLEEPER.W, SCY = -1.2;
+  const slW = (px, py) => [(px - SLEEPER.W/2)*SK, SCY - (py - SLEEPER.H/2)*SK];
+  const sraw = atob(SLEEPER.d), u16 = k => sraw.charCodeAt(k) | (sraw.charCodeAt(k + 1) << 8);
+  const SP = []; for (let i = 0; i < SLEEPER.n; i++){ const b = i*6; SP.push([u16(b)/65535*SLEEPER.W, u16(b + 2)/65535*SLEEPER.H, sraw.charCodeAt(b + 4)/255, sraw.charCodeAt(b + 5)]); }
+  const sBody = pts(Math.min(SLEEPER.n, SLEEPER.n*Math.max(.55, Q)), (i, o) => {
+      const [x, y, l, dd] = SP[i], [wx, wy] = slW(x, y), th = Math.min(dd, 40)*SK*.9;   // объём: чем дальше от края, тем толще
+      o.p = [wx, wy, rn()*th]; o.c = mixc(C(0x9fb8ff), C(0xfff1dc), .2 + .65*l);
+      o.s = .55 + .55*Math.random() + (dd <= 2 ? .15 : 0); o.rnd = [.35 + .65*l, dd <= 2 ? 1 : 0, rn()]; },
+    `float br = sin(uTime*1.25);                    // дыхание спящего — около 12 вдохов в минуту
+     p.y += (p.y - (${SCY.toFixed(2)}))*0.018*br;
+     p.xy += vec2(sin(uTime*0.6 + aSeed*30.0), cos(uTime*0.5 + aSeed*20.0))*0.006;
+     float tw = 0.6 + 0.4*sin(uTime*1.7 + aSeed*40.0);
+     a = aRnd.x*(0.8 + 0.2*aRnd.y)*tw*0.95*uSharp;`);
+  sBody.userData.self = true; grp.add(sBody);
+  // дымка сна: частицы с верхнего края силуэта медленно поднимаются к облаку
+  const topY = {}; SP.forEach(q => { if (q[3] > 2) return; const b = Math.floor(q[0]/10); topY[b] = Math.min(topY[b] ?? 1e9, q[1]); });
+  const upE = SP.filter(q => q[3] <= 2 && q[1] < topY[Math.floor(q[0]/10)] + 5);
+  const sAura = pts(1100*Q, (i, o) => { const q = upE[Math.floor(Math.random()*upE.length)], [wx, wy] = slW(q[0], q[1]);
+      o.p = [wx, wy, rn()*.1]; o.c = mixc(C(0xb9a6ff), C(0xfff1dc), Math.random()*.6); o.s = .5 + Math.random()*.8; },
+    `float life = fract(aSeed*5.3 + uTime*(0.04 + aSeed*0.035));
+     p = position + vec3(sin(life*5.0 + aSeed*30.0)*0.08, life*0.75, 0.0);
+     a = sin(life*3.14159)*(1.0 - life)*0.32*uSharp;`);
+  sAura.userData.self = true; grp.add(sAura);
+  // энергетические центры на лежащем теле: Муладхара (промежность) → Сахасрара (макушка)
+  const DCC = [0xD9453B, 0xE8833A, 0xE9C548, 0x4FA66A, 0x3F8FD1, 0x6464D2, 0xA06BD0];
+  const sCh = SLEEPER.ch.map(([x, y], k) => { const g = glow(DCC[k], .9, 0), [wx, wy] = slW(x, y); g.position.set(wx, wy, .3); g.userData.self = true; grp.add(g); return g; });
+  // канал между центрами — радужный поток от корня к макушке, как у сидящей фигуры
+  const sCurve = new THREE.CatmullRomCurve3(SLEEPER.ch.map(([x, y]) => { const [wx, wy] = slW(x, y); return new THREE.Vector3(wx, wy, .25); }));
+  const sKund = pts(440*Q, (i, o) => { const t = Math.random(), v = sCurve.getPoint(t), tg = sCurve.getTangent(t);
+      o.p = [v.x, v.y, v.z]; o.rnd = [t, -tg.y, tg.x]; o.s = .8 + Math.random()*.8; },
+    `float t = aRnd.x, wv = fract(t - uTime*0.12);
+     p.xy += aRnd.yz*sin(t*40.0 + uTime*2.0 + aSeed*6.28)*0.03;
+     col = hsv(t*0.78); a = (0.22 + 0.78*pow(sin(wv*3.14159), 6.0))*0.75*uSharp;`);
+  sKund.userData.self = true; grp.add(sKund);
+  // ---- пелена другого мира: мерцающая завеса медленно опускается сверху и меняется по слоям ----
+  // засыпание — край пелены над спящим, в ней фосфены; сновидения — пелена накрыла спящего;
+  // осознанный сон — в пелене открывается ясное окно; глубокий сон — пелена темнеет и затихает
+  const VTOP = CY + 3.0, VL = [VTOP - (CY - .95), VTOP - (SCY - 1.05)];
+  const veil = pts(6200*Q, (i, o) => { o.p = [rn(), Math.pow(Math.random(), .75), 0]; o.s = .7 + Math.random()*1.0; },
+    `float ux = position.x, uy = position.y;
+     float edge = uL + 0.22*sin(ux*4.0 + uTime*0.35) + 0.12*sin(ux*9.0 - uTime*0.5);
+     float calm = 1.0 - 0.8*uDark;
+     p = vec3(ux*3.9 + sin(uy*3.0 + uTime*0.4 + ux*5.0)*0.07*calm, ${VTOP.toFixed(2)} - uy*edge,
+              0.12 + sin(ux*7.0 + uTime*0.25)*0.28 + aRnd.z*0.05);
+     float streak = 0.5 + 0.5*pow(sin(ux*23.0 + uTime*0.12 + sin(ux*3.0 + uTime*0.2)*2.0), 2.0);
+     float low = pow(uy, 5.0);
+     float sh = 0.75 + 0.25*sin(uTime*(0.4 + 0.8*calm) + aSeed*40.0);
+     a = (0.13 + 0.62*low)*streak*sh*uA*(1.0 - 0.72*uDark)*smoothstep(0.0, 0.1, uy)*smoothstep(1.0, 0.82, abs(ux));
+     vec2 dw = (p.xy - vec2(0.0, ${CY.toFixed(2)}))/vec2(1.55, 1.05);
+     a *= mix(1.0, smoothstep(0.82, 1.04, length(dw)), uWin);
+     col = mix(vec3(0.42, 0.4, 0.95), vec3(0.98, 0.64, 0.86), low)*(1.0 - 0.35*uDark);`, 1, "uniform float uL; uniform float uWin; uniform float uDark; uniform float uA;\n");
+  for (const k of ["uL", "uWin", "uDark", "uA"]) veil.material.uniforms[k] = { value: 0 };
+  veil.userData.self = true; grp.add(veil);
+  let vL = 0, vWin = 0, vDark = 0;
+  // ---- переход «сидящий → лежащий»: фигура распадается на облако светящихся частиц, облако собирается в лежащую позу ----
+  // position — точка сидящей фигуры (маска HM), aRnd — точка лежащей; середина пути — общее облако, медленно кружащее
+  const mStart = HM.inside, MN = Math.round(5200*Math.max(.6, Q));
+  const morph = pts(MN, (i, o) => {
+      const id = mStart[Math.floor(Math.random()*mStart.length)], [x, y] = HM.toW(id % MS + Math.random(), Math.floor(id/MS) + Math.random());
+      const q = SP[Math.floor(Math.random()*SP.length)], [ex, ey] = slW(q[0], q[1]);
+      o.p = [x, y, rn()*.12]; o.rnd = [ex, ey, rn()*Math.min(q[3], 40)*SK*.9];
+      o.c = mixc(C(0xbfd0ff), C(0xfff1dc), Math.random()*.5); o.s = .6 + Math.random()*.8; },
+    `float m = clamp((uM - aSeed*0.22)/0.78, 0.0, 1.0);
+     float e1 = smoothstep(0.0, 0.55, m), e2 = smoothstep(0.45, 1.0, m);
+     vec3 S = position, E = aRnd, Cc = mix(S, E, 0.5) + vec3(0.0, 0.3, 0.0);
+     vec3 h = fract(sin(vec3(aSeed*91.7, aSeed*37.3, aSeed*13.1))*vec3(4375.5, 2375.1, 7357.9)) - 0.5;
+     vec3 off = h*vec3(6.2, 4.0, 2.4)*(0.75 + 0.25*sin(uTime*0.8 + aSeed*20.0));
+     float an = m*2.6 + uTime*0.15;
+     off.xy = mat2(cos(an), sin(an), -sin(an), cos(an))*off.xy;
+     p = mix(mix(S, Cc + off, e1), E, e2);
+     float mid = sin(m*3.14159);
+     col = mix(col, mix(vec3(1.0, 0.86, 0.62), vec3(0.74, 0.66, 1.0), h.x + 0.5), mid*0.7);
+     a = uA*(0.42 + 0.12*mid)*(0.7 + 0.3*sin(uTime*3.0 + aSeed*50.0));
+     s *= 1.0 + 0.15*mid;`, 1, "uniform float uM; uniform float uA;\n");
+  morph.material.uniforms.uM = { value: 0 }; morph.material.uniforms.uA = { value: 0 };
+  morph.userData.self = true; grp.add(morph);
   // неподвижный свет в центре — «свидетель» (слой турии)
   const wit = glow(0xfff1d6, 1.1, 0); wit.position.set(0, CY, .1); wit.userData.self = true; grp.add(wit);
   // монитор: точки вдоль линии, высоту и цвет пишем из JS
@@ -79,7 +177,7 @@ function makeDream(root, fig, figObjs){
                lab("У · сон узнан", 0, CY + 2.2, .34), lab("М · глубокий сон → турия", 0, CY + 2.2, .34)];
   const lrlr = lab("Л  П  Л  П", 0, TY + .62, .22, "#FFE7B0");
   const fb = []; for (const o of figObjs) if (o.material) fb.push([o, o.material.uniforms && o.material.uniforms.uOpacity ? -1 : o.material.opacity]);
-  let lie = 0, lastT = 0, rem = 0, dimWas = 1;
+  let lie = 0, lastT = 0, rem = 0, dimWas = 1, figSaved = null;
   const W4 = [0, 0, 0, 0];
   // ЭЭГ засыпания: окно 4 с бежит влево; альфа волнами уступает место тете
   const eeg0 = (tt) => { const m = .5 + .5*Math.sin(tt*.45);
@@ -91,19 +189,32 @@ function makeDream(root, fig, figObjs){
   return {
     update(t, on, d, v){
       const dt = Math.min(.1, Math.max(0, t - lastT)); lastT = t;
-      // фигура ложится и становится спящим; при выходе из ветки — сразу встаёт (переход закрыт вспышкой)
-      lie = on ? Math.min(1, lie + dt/2.6) : 0;
-      const le = lie*lie*(3 - 2*lie);
-      fig.rotation.z = le*Math.PI/2; fig.scale.setScalar(1 - .5*le); fig.position.y = -1.2*le;
-      const dim = 1 - .45*le;
+      // переход без вспышки: сидящая фигура рассыпается облаком, облако собирается в лежащую (и обратно при выходе)
+      lie = on ? Math.min(1, lie + dt/3.6) : Math.max(0, lie - dt/2.8);
+      const le = smooth(.8, 1, lie);                 // проявление лежащей
+      const dim = 1 - smooth(.02, .22, lie);         // растворение сидящей
+      // пока сидящая растворена, прячем её совсем: общий фейд станции может вернуть ей прозрачность
+      const hide = lie > .26;
+      if (hide){ if (!figSaved) figSaved = fb.map(([o]) => o.visible); for (const [o] of fb) o.visible = false; }
+      else if (figSaved){ fb.forEach(([o], k) => o.visible = figSaved[k]); figSaved = null; }
       if (dim !== 1 || dimWas !== 1){
         for (const [o, b] of fb){ if (b < 0) o.material.uniforms.uOpacity.value = v*dim; else o.material.opacity = b*v*dim; }
         dimWas = dim;
       }
-      grp.visible = on;
-      if (!on) return 0;
-      const pres = smooth(.25, 1, lie);
-      for (let k = 0; k < 4; k++) W4[k] = Math.max(0, 1 - Math.abs(clamp(d, 0, 3) - k));
+      grp.visible = lie > 0;
+      if (lie <= 0) return 0;
+      morph.visible = lie < .999;
+      morph.material.uniforms.uM.value = lie; morph.material.uniforms.uA.value = v*smooth(0, .05, lie)*(1 - smooth(.86, 1, lie));
+      const pres = smooth(.6, 1, lie);
+      if (on) for (let k = 0; k < 4; k++) W4[k] = Math.max(0, 1 - Math.abs(clamp(d, 0, 3) - k));
+      // пелена опускается медленно: и при входе, и от слоя к слою
+      const tL = on && lie > .55 ? W4[0]*VL[0] + (1 - W4[0])*VL[1] : 0;
+      vL += (tL - vL)*Math.min(1, dt*(tL > vL ? .45 : 1.2));
+      vWin += (W4[2] - vWin)*Math.min(1, dt*1.2); vDark += (W4[3] - vDark)*Math.min(1, dt*1.0);
+      const vu = veil.material.uniforms; vu.uL.value = vL; vu.uWin.value = vWin; vu.uDark.value = vDark; vu.uA.value = pres*v;
+      sBody.material.uniforms.uSharp.value = le*v; sAura.material.uniforms.uSharp.value = le*v; sKund.material.uniforms.uSharp.value = le*v;
+      sCh.forEach((g, k) => { const up = k >= 5 ? 1 + .7*W4[3] : 1 - .35*W4[3];
+        g.material.opacity = Math.min(1, le*v*.95*up*(.8 + .2*Math.sin(t*1.4 - k*.7))); const sc = .9*(1.02 + .12*Math.sin(t*1.4 - k*.7)); g.scale.set(sc, sc, 1); });
       // курсор ночи: 8 часов за 32 секунды
       const cur = (t/32) % 1, stg = stageAt(cur);
       rem += ((stg === "R" ? 1 : 0) - rem)*Math.min(1, dt*2);
@@ -132,7 +243,7 @@ function makeDream(root, fig, figObjs){
       syl.forEach((s, k) => s.material.opacity = (W < 760 ? 0 : 1)*pres*v*.85*smooth(.45, .9, W4[k]));   // в портрете слог уходит под шапку
       { const q = (((5*.5 + t) % 7) + 7) % 7;        // сигнал пересекает середину окна → подпись над ним
         lrlr.material.opacity = pres*v*W4[2]*smooth(.6, 1.2, q)*(1 - smooth(3.4, 4.2, q)); }
-      return le;
+      return 1 - dim;
     }
   };
 }
@@ -144,7 +255,8 @@ const DREAM_LV = [
          ["s","Lacaux и соавт., 2021 (Science Advances): 103 человека решали задачу со скрытым правилом. Кто провёл в стадии N1 хотя бы 15 секунд, находил правило в 83% случаев, оставшиеся бодрыми — в 31%, а провалившиеся глубже, в N2, — лишь в 14%"],
          ["s","Метод опыта — тот, что приписывают Эдисону и Дали: задремать с лёгким предметом в руке. Он выпадает, будит — и мысль с порога сна можно успеть записать"],
          ["s","Вздрагивание при засыпании — гипнические подёргивания — бывает у большинства людей и обычно безвредно"],
-         ["t","Узоры на экране — геометрия, которую люди часто видят на пороге сна: спирали, туннели, решётки («формы-константы», описанные Генрихом Клювером). Это образ, а не запись чьих-то видений"]],
+         ["h","Почему именно такие узоры: в 2001 году Бресслофф, Коуэн и соавт. показали на модели, что полосы спонтанной активности в первичной зрительной коре (V1) из-за её «логарифмической» карты сетчатки видятся как туннели и спирали. Модель многое объясняет, но остаётся моделью"],
+         ["t","Сверху опускается пелена — образ перехода в другой мир сна. В ней тускло мерцают узоры, которые люди часто видят на пороге сна: туннели, спирали, решётки, паутина («формы-константы» Генриха Клювера). Это образ, а не запись чьих-то видений"]],
     trad:["Мандукья-упанишада: сознание проходит четыре состояния. Первое — бодрствование, Вайшванара, «обращённое вовне»; ему соответствует звук А в слоге АУМ",
           "Тибетская йога сна начинается на этом пороге: засыпать, удерживая внимание — на образе света в горловом центре, — чтобы не потерять нить сознания",
           "Йога-нидра, «сон йогина»: лёжа, в полном расслаблении, оставаться в сознании на самой грани сна"],
@@ -157,7 +269,7 @@ const DREAM_LV = [
          ["s","Разбуженные в REM чаще всего рассказывают о сновидениях, но сны бывают и в медленном сне — обычно короче и ближе к обрывкам мыслей"],
          ["s","Сон нужен памяти: в медленном сне гиппокамп «проигрывает» события дня, и они закрепляются в коре"],
          ["h","Очищает ли сон мозг? В 2013 году у мышей нашли, что во сне межклеточное пространство мозга расширяется примерно на 60% и отходы выводятся быстрее (глимфатическая система). В 2024 году группа Miao и Франкса получила у мышей обратное — во сне выведение медленнее. Спор не закрыт"],
-         ["t","На экране — типичная гипнограмма здорового взрослого. У каждого ночь своя"]],
+         ["t","На экране — типичная гипнограмма здорового взрослого. У каждого ночь своя. Пелена накрыла спящего: внешний мир отрезан, сознание живёт среди собственных образов"]],
     trad:["Мандукья: второе состояние — сон со сновидениями, Тайджаса, «сияющее». Сознание обращено внутрь и само творит образы; ему соответствует У",
           "Аборигены Австралии — Время сновидений: мир сотворён во сне предков и продолжает им сниться",
           "Античность и Библия: сон как послание — лестница Иакова; в святилищах Асклепия больные спали ради исцеляющего сна (инкубация)",
@@ -170,7 +282,7 @@ const DREAM_LV = [
          ["s","Konkoly и соавт., 2021 (Current Biology): лаборатории в США, Франции, Германии и Нидерландах задавали спящим вопросы — например, простые примеры на сложение — и получали ответы движениями глаз прямо из сна"],
          ["s","Хотя бы раз осознанный сон видели около 55% людей, почти четверть — раз в месяц и чаще (мета-анализ Saunders и соавт., 2016)"],
          ["s","В осознанном сне сильнее работают лобные отделы коры — те, что днём отвечают за самонаблюдение и контроль; в обычном REM они приглушены"],
-         ["t","Сфера на экране — образ ясности, а не изображение сна"]],
+         ["t","Ясное окно в пелене — образ осознанности: сон продолжается, но виден как сон. Это образ, а не изображение сна"]],
     trad:["Тибетский буддизм — йога сна (милам), одна из Шести йог Наропы: узнать сон как сон, научиться менять его и наконец увидеть, что и дневной мир той же природы",
           "Чжуан-цзы: ему приснилось, что он бабочка, и, проснувшись, он не мог решить — Чжуан Чжоу ли снилась бабочка, или бабочке снится Чжуан Чжоу",
           "Аристотель, «О сновидениях»: иногда во сне что-то в нас говорит, что являющееся — лишь сон"],
@@ -183,7 +295,7 @@ const DREAM_LV = [
          ["h","Сохранение осознанности в глубоком сне описывают опытные практики («ясный свет», турия). Лабораторные работы об этом есть, но пока на малых группах"],
          ["h","На пороге смерти: van Lommel и соавт., 2001 (Lancet) — 18% из 344 пациентов после остановки сердца рассказали о переживаниях, близких к смерти. AWARE II (Parnia и соавт., 2023): у части реанимируемых ЭЭГ возвращалась к почти нормальной — местами спустя час реанимации, — а часть выживших помнила осознанные переживания"],
          ["h","Borjigin и соавт.: в 2013 году у крыс в первые 30 секунд после остановки сердца — всплеск согласованных гамма-волн; в 2023 году похожий всплеск увидели у двух из четырёх умирающих пациентов после отключения ИВЛ. Это говорит об остаточной работе мозга, но не решает, что такое сознание"],
-         ["t","Расходящиеся кольца — образ медленных волн; неподвижный свет в центре — символ «свидетеля», о котором говорят традиции"]],
+         ["t","Пелена темнеет и затихает; расходящиеся кольца — образ медленных волн; неподвижный свет в центре — символ «свидетеля», о котором говорят традиции"]],
     trad:["Мандукья: третье состояние — глубокий сон, Праджня, «сплошное сознание», без желаний и без образов; ему соответствует М. Четвёртое, турия, — тишина после АУМ: не обращённое ни внутрь, ни вовне, мирное, недвойственное — это Атман",
           "Тибетский буддизм — йога ясного света: узнать свет сознания в глубоком сне. По учению, то же узнавание нужно и в момент смерти, в бардо",
           "Рамана Махарши: то «Я», что было и в бодрствовании, и во сне, и в глубоком сне, и есть истинное; путь к нему — вопрос «Кто я?»"],

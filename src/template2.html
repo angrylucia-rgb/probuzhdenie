@@ -155,13 +155,11 @@ sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 /* Луна в углу кадра на «космических» слоях Земли: клик — в ветку «Луна» */
 .moonbtn{position:fixed;right:calc(var(--pad) + 120px);top:calc(env(safe-area-inset-top,0px) + 120px);z-index:6;display:grid;justify-items:center;gap:8px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .8s,visibility .8s}
 .moonbtn.on{opacity:1;visibility:visible;pointer-events:auto}
-.moonbtn i{position:relative;width:46px;height:46px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 62% 38%,#fbf8ef 0,#d9d4c7 32%,#a9a497 62%,#6b675f 100%);box-shadow:0 0 24px rgba(230,226,214,.35),0 0 2px rgba(255,255,255,.6);transition:transform .5s,box-shadow .5s}
-.moonbtn i::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 64%,rgba(70,70,80,.45) 0 9%,transparent 10%),radial-gradient(circle at 46% 30%,rgba(70,70,80,.35) 0 12%,transparent 13%),radial-gradient(circle at 70% 70%,rgba(70,70,80,.3) 0 7%,transparent 8%)}
-.moonbtn i::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 18% 50%,rgba(5,6,12,.88) 0 46%,transparent 64%)}
+.moonbtn canvas{width:60px;height:60px;display:block;transition:transform .5s,filter .5s}
 .moonbtn span{color:var(--muted);font-size:10px;transition:color .5s}
-.moonbtn:hover i,.moonbtn:focus-visible i{transform:scale(1.14);box-shadow:0 0 34px rgba(240,236,224,.6),0 0 2px #fff}
+.moonbtn:hover canvas,.moonbtn:focus-visible canvas{transform:scale(1.14);filter:brightness(1.25)}
 .moonbtn:hover span,.moonbtn:focus-visible span{color:var(--brass)}
-@media (max-width:760px){.moonbtn{right:14px;top:calc(env(safe-area-inset-top,0px) + 70px)}.moonbtn i{width:34px;height:34px}}
+@media (max-width:760px){.moonbtn{right:14px;top:calc(env(safe-area-inset-top,0px) + 70px)}.moonbtn canvas{width:44px;height:44px}}
 .hd-fork{display:grid;gap:8px}
 .hd-fork button{display:grid;gap:3px;text-align:left;padding:11px 14px;border:1px solid var(--line);border-radius:4px;transition:border-color .3s,background .3s}
 .hd-fork button b{font:400 22px/1.1 var(--display)}
@@ -180,7 +178,7 @@ sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 body.j-white .ch-human{background:transparent!important;border-color:transparent!important;pointer-events:none}
 body.j-white .ch-human .back{pointer-events:auto;color:#5a4e38}
 body.j-white .hd-grid{opacity:0;visibility:hidden}
-body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white .brand{opacity:0;pointer-events:none}
+body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white #btnSearch,body.j-white .brand{opacity:0;pointer-events:none}
 body.j-white .act{color:#5a4e38}
 body.j-white .vign,body.j-white .grain,body.j-white .shade,body.j-white .foot,body.j-white .gauge{opacity:0!important;pointer-events:none}
 body.j-white .st,body.j-white .portal,body.j-white .intro{opacity:0!important;visibility:hidden!important}
@@ -337,6 +335,7 @@ body.j-white .dot{background:#b09a6a}
 .tm-card ul.list li{font-size:13.5px}
 .tm-pr{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
 .tm-go{justify-self:start;margin-top:4px;font-size:13px}
+.tm-gos{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}.tm-gos .tm-go{margin-top:0}
 .tm-cyc{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
 .tm-cyc[hidden]{display:none}
 .tm-cyc ul.list{gap:8px;margin:0}.tm-cyc ul.list li{font-size:13px}.tm-cyc b{font-weight:500;color:var(--ink)}
@@ -346,7 +345,16 @@ body.j-white .dot{background:#b09a6a}
 .tm-max-btn{color:var(--muted);font-size:12.5px;transition:color .3s}.tm-max-btn:hover{color:var(--brass)}
 #treeCv,#treeLab{position:absolute;inset:0;width:100%;height:100%;display:block}
 #treeCv{pointer-events:auto;touch-action:none;cursor:grab}#treeLab{pointer-events:none}
-.ch-tree .time-in{grid-template-rows:auto auto minmax(0,1fr)}
+.ch-tree .time-in{grid-template-rows:auto auto auto minmax(0,1fr)}
+.ch-tree.tm-max .tr-hint{display:none}
+.tr-path{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+.tr-path .mono{color:var(--brass)}
+.tr-path button{color:var(--muted);font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;transition:color .3s,border-color .3s}
+.tr-path button:hover{color:var(--brass);border-color:var(--brass)}
+#trStep{color:var(--faint)!important;min-width:34px;text-align:center}
+.tr-inh{border:1px solid rgba(255,214,140,.32);border-radius:4px;padding:10px 12px;background:rgba(255,214,140,.05)}
+.tr-inh h4{margin:0 0 4px!important;color:#ffd88a!important}
+.tr-inh p{margin:0;font:16px/1.45 var(--display);color:var(--ink)}
 .ch-tree.tm-max .time-in{grid-template-rows:auto minmax(0,1fr)}
 .tr-hint{color:var(--faint);font-size:9.5px;letter-spacing:.14em}
 .tr-chain{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;font-size:12.5px;color:var(--muted)}
@@ -361,11 +369,348 @@ body.j-white .dot{background:#b09a6a}
 @media (max-width:760px){
   .time-in{left:var(--pad);right:var(--pad);top:47%;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:auto;gap:7px}
   .tm-head .eyebrow{font-size:9.5px;letter-spacing:.14em}.tm-hide-m{display:none}
+  .tr-hint{display:none}
   .tm-unit{display:none}
   .tm-now{padding-top:7px}.tm-date{font-size:21px}.tm-ago{font-size:16px}
   .tm-card h3{font-size:25px}.tm-lead{font-size:17px}.tm-art p{font-size:14.5px}
   .ch-time.tm-max .time-in{width:auto;top:calc(env(safe-area-inset-top,0px) + 56px);background:rgba(5,6,12,.96);margin:0 calc(-1*var(--pad));padding:0 var(--pad)}
 }
+/* «Нить мысли» */
+#thSvg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:auto;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#thSvg.grab{cursor:grabbing}
+.ch-thought .time-in{grid-template-rows:auto auto minmax(0,1fr)}
+.ch-thought.tm-max .time-in{grid-template-rows:auto minmax(0,1fr)}.ch-thought.tm-max .th-hint{display:none}
+.th-hbtn{display:flex;gap:14px;align-items:baseline}.th-fold-btn{display:none}
+.th-bed{stroke:rgba(150,180,255,.16);stroke-width:1}
+.th-flow{fill:none;stroke:rgba(160,190,255,.22);stroke-width:1;stroke-dasharray:3 9;animation:thflow 9s linear infinite}
+.th-flow.f1{stroke:rgba(255,220,170,.16);animation-duration:13s;stroke-dasharray:2 14}.th-flow.f2{animation-duration:11s;stroke-dasharray:5 12}
+@keyframes thflow{to{stroke-dashoffset:-120}}
+.th-era-l{fill:none;stroke:rgba(214,172,94,.28);stroke-width:1}
+.th-era-t{font:500 9px var(--mono);letter-spacing:.18em;text-transform:uppercase;fill:rgba(214,172,94,.55)}
+.th-ticks line{stroke:rgba(200,210,255,.3);stroke-width:1}
+.th-ticks text{font:9px var(--mono);fill:rgba(205,215,255,.42);letter-spacing:.06em}
+.th-th{fill:none;stroke-width:1;transition:stroke .3s,opacity .3s;opacity:.22}
+.th-th.o{stroke:#ffd9a0}.th-th.m{stroke:#9fd8ff}
+.th-ld{stroke-width:.8;opacity:.28}.th-ld.o{stroke:#ffd9a0}.th-ld.m{stroke:#9fd8ff}
+.th-hit{fill:transparent}
+.th-fig{cursor:pointer}
+.th-fig .th-dot{transition:r .3s}
+.th-fig.o .th-dot{fill:#ffd9a0;filter:drop-shadow(0 0 4px rgba(255,210,140,.7))}
+.th-fig.m .th-dot{fill:#9fd8ff;filter:drop-shadow(0 0 4px rgba(140,210,255,.7))}
+.th-nm{font:15.5px var(--display);fill:#e9e2d0}
+.th-fig.big .th-nm{fill:#fff4dc}
+.th-yr{font:8.5px var(--mono);letter-spacing:.06em;fill:rgba(200,195,180,.5)}
+.th-fig.nolab text{display:none}
+.th-fig:hover .th-nm,.th-fig.me .th-nm{fill:#ffd88a}
+.th-fig.m:hover .th-nm,.th-fig.m.me .th-nm{fill:#bfe8ff}
+.th-fig.sel .th-dot{stroke:#fff;stroke-width:1.4}
+#thSvg.hl .th-fig:not(.on){opacity:.28}
+#thSvg.hl .th-fig.on.nolab text{display:inline}
+#thSvg.hl .th-th:not(.on){opacity:.06}
+#thSvg.hl .th-th.on{opacity:.95;stroke-width:1.4}
+#thSvg.hl .th-ld:not(.on){opacity:.08}
+#thSvg.hl .th-ld.on{opacity:.6}
+.th-o{color:#ffd9a0;font-weight:500}.th-m{color:#9fd8ff;font-weight:500}
+.eyebrow.th-o{color:#ffd9a0}.eyebrow.th-m{color:#9fd8ff}
+.th-dot-o{background:#ffd9a0;box-shadow:0 0 6px rgba(255,210,140,.7)}.th-dot-m{background:#9fd8ff;box-shadow:0 0 6px rgba(140,210,255,.7)}
+.th-thl li{font-size:13.5px;color:var(--muted)}
+.th-lnk{color:var(--ink);font:16px var(--display);transition:color .3s}.th-lnk:hover{color:var(--brass)}
+.th-br{cursor:pointer}
+.th-br-hit{fill:none;stroke:transparent;stroke-width:8}
+#thSvg.hl .th-br:not(.on){pointer-events:none}
+.th-br-m .th-br-c{opacity:.7}.th-br-m.on .th-br-c{opacity:1}
+.th-ic{width:.95em;height:.95em;vertical-align:-.12em}
+.th-br-l{fill:none;stroke:#f1e4c6;stroke-width:1.1;opacity:.42;transition:opacity .3s,stroke-width .3s}
+.th-br.half .th-br-l{stroke-dasharray:4 4}
+.th-br-c{fill:#0b0c18;stroke:#f1e4c6;stroke-width:1;opacity:.85}
+.th-br-f{fill:#f1e4c6}
+.th-br-m:hover .th-br-c{stroke:#ffd88a}
+.th-br:hover .th-br-l,.th-br.on .th-br-l{opacity:.95;stroke-width:1.7}
+.th-br.sel .th-br-c{stroke:#ffd88a;stroke-width:1.6}.th-br.sel .th-br-f{fill:#ffd88a}
+#thSvg.hl .th-br:not(.on){opacity:.12}
+.th-mk{font-family:var(--display);color:#f1e4c6}.th-mk.half{color:#e6d6b4}
+.th-arr{color:var(--faint);margin:0 4px}
+.th-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.th-pair p{margin:4px 0 0;font-size:14.5px;line-height:1.58;color:#ddd6c6}
+.th-cl{font-size:14.5px;color:#cfc8b8}
+.th-why p{font-size:15px}
+@media (max-width:760px){.th-pair{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .ch-thought .time-in{top:auto;height:46vh;background:linear-gradient(rgba(5,6,12,.0),rgba(5,6,12,.94) 22px);padding-top:16px}
+  .ch-thought.th-fold .time-in{height:auto}.ch-thought.th-fold .tm-scroll{display:none}
+  .th-fold-btn{display:inline}#thHome{font-size:12px}
+  .th-nm{font-size:13.5px}
+  .ch-thought.tm-max .time-in{height:auto;top:calc(env(safe-area-inset-top,0px) + 56px)}
+}
+.st-snd{margin:8px 0 0;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}.st-snd .mono{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.hd-snd b{font-weight:500;color:var(--ink)}.hd-snd-off{color:var(--faint);font-size:13px}
+.snd-list{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:10px}
+.snd-it{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start}
+.snd-it .mono{display:block;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.snd-it b{font:400 19px var(--display);color:var(--ink)}.snd-it p{margin:3px 0 0;font-size:14px;line-height:1.55;color:#cfc8b8}
+.snd-play{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);color:var(--brass);font-size:12px;transition:border-color .3s,background .3s}
+.snd-play:hover,.snd-play.on{border-color:var(--brass);background:rgba(214,172,94,.12)}
+.snd-myth{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:10px}.snd-myth li{font-size:14.5px;line-height:1.6;color:#ddd6c6}.snd-myth b{font-weight:500;color:var(--ink)}
+.hd-thl{display:flex;flex-wrap:wrap;gap:6px}
+.hd-thl button{font:15px var(--display);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:4px 12px;transition:border-color .3s,color .3s}
+.hd-thl button.o{border-color:rgba(255,217,160,.32)}.hd-thl button.m{border-color:rgba(159,216,255,.32)}
+.hd-thl button:hover{color:var(--brass);border-color:var(--brass)}
+/* «Лестница измерений» */
+#dimCv,#dimLab{position:absolute;inset:0;width:100%;height:100%;display:block}
+#dimCv{pointer-events:auto;touch-action:none;cursor:grab}#dimLab{pointer-events:none}
+.ch-dims .time-in{grid-template-rows:auto auto auto auto minmax(0,1fr)}
+.ch-dims.tm-max .time-in{grid-template-rows:auto minmax(0,1fr)}
+.ch-dims.tm-max .dm-ladder,.ch-dims.tm-max #dmHint{display:none}
+.dm-ladder{display:flex;gap:4px;flex-wrap:wrap}
+.dm-ladder button{display:grid;justify-items:center;gap:1px;min-width:48px;padding:5px 7px 4px;border:1px solid var(--line);border-radius:4px;color:var(--muted);transition:color .3s,border-color .3s,background .3s}
+.dm-ladder button b{font:400 17px var(--display);color:var(--ink)}
+.dm-ladder button span{font:9px var(--mono);letter-spacing:.06em;text-transform:uppercase;max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-ladder button:hover{border-color:var(--brass);color:var(--brass)}
+.dm-ladder button.on{border-color:var(--brass);background:rgba(214,172,94,.12);color:var(--brass)}
+.dm-ladder button:disabled{opacity:.32;pointer-events:none;border-style:dashed}
+#dmHint{color:var(--faint);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
+.dm-tm{color:var(--brass);align-self:center}
+.dm-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;width:100%}
+.dm-sep{width:1px;height:18px;background:var(--line);margin:0 4px}
+.dm-modes .tm-tog{padding:5px 10px}
+.dm-chip{font:11px var(--mono);letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:4px 7px;transition:color .3s,border-color .3s,background .3s}
+.dm-chip:hover{color:var(--brass);border-color:var(--brass)}
+.dm-chip[aria-pressed="true"]{color:var(--ink);border-color:var(--brass);background:rgba(214,172,94,.14)}
+.dm-chip.w[aria-pressed="true"]{border-color:#ff9f8a;background:rgba(255,159,138,.14)}
+.dm-sl{gap:10px;color:var(--muted)}.dm-sl input,#dmFr{flex:1;min-width:120px;accent-color:#d6ac5e}.dm-sl b{min-width:42px;color:var(--brass);font-weight:400}
+.dm-note{margin:2px 0 0;font-size:13px;line-height:1.5;color:#cfc8b8;width:100%}
+.dm-lens{gap:6px 8px}.dm-lens .mono{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.dm-views b{font-weight:500;color:var(--ink)}.dm-lens-box{border:1px solid rgba(214,172,94,.22);border-radius:4px;padding:10px 12px;background:rgba(214,172,94,.035)}.dm-lens-box b{font-weight:500;color:var(--ink)}.dm-lens-note{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--faint)}.dm-ask{font-style:italic;color:#e6dcc4}
+.dm-note-m{display:none;border-left:2px solid rgba(214,172,94,.5);padding-left:10px}
+.dm-tetr{display:grid;justify-items:center;gap:5px;padding:10px 0 4px;border:1px solid rgba(214,172,94,.25);border-radius:4px;background:rgba(214,172,94,.04)}
+.dm-tetr div{display:flex;gap:9px}.dm-tetr i{width:7px;height:7px;border-radius:50%;background:#ffd88a;box-shadow:0 0 6px rgba(255,216,138,.8)}
+.dm-tetr span{font-size:9.5px;letter-spacing:.12em;color:var(--faint);margin-top:4px;text-align:center}
+@media (max-width:760px){
+  #dmTools .dm-note{display:none}.dm-note-m{display:block}.dm-sep{display:none}
+  .dm-modes .tm-tog{padding:4px 9px;font-size:12px}.dm-chip{padding:3px 6px}
+  .ch-dims .time-in{top:auto;height:54vh;background:linear-gradient(rgba(5,6,12,.0),rgba(5,6,12,.94) 22px);padding-top:16px}
+  .dm-ladder button{min-width:0;flex:1;padding:4px 2px}.dm-ladder button span{display:none}
+  #dmHint{display:block;font-size:9px}
+  .ch-dims.tm-max .time-in{height:auto;top:calc(env(safe-area-inset-top,0px) + 56px)}
+}
+/* «Биосфера» */
+#bioCv,#bioLab,.bio-sky,.bio-rock{position:absolute;inset:0;width:100%;height:100%;display:block}
+#bioCv{pointer-events:auto;touch-action:pan-x}#bioLab,.bio-sky,.bio-rock{pointer-events:none}
+.bio-rock{-webkit-mask-image:linear-gradient(90deg,transparent 26%,#000 46%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent 26%,#000 46%,#000 97%,transparent)}
+.bio-sky{opacity:0}
+.bio-sky[data-w=sea]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(60,140,170,.30),transparent 70%),linear-gradient(rgba(14,46,62,.55),rgba(6,16,26,.2) 62%,rgba(40,32,18,.35))}
+.bio-sky[data-w=reef],.bio-sky[data-w=coast]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(60,160,160,.28),transparent 70%),linear-gradient(rgba(12,50,58,.55),rgba(6,18,24,.2) 62%,rgba(40,32,18,.35))}
+.bio-sky[data-w=shallow]{background:radial-gradient(ellipse 80% 60% at 60% 0%,rgba(120,180,140,.3),transparent 70%),linear-gradient(rgba(20,58,52,.55),rgba(8,22,20,.2) 62%,rgba(40,34,18,.35))}
+.bio-sky[data-w=mat]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(80,140,150,.22),transparent 70%),linear-gradient(rgba(16,40,48,.55),rgba(6,14,20,.2) 62%,rgba(30,34,18,.4))}
+.bio-sky[data-w=archean]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(190,120,60,.28),transparent 70%),linear-gradient(rgba(48,32,22,.6),rgba(14,12,14,.25) 62%,rgba(36,24,18,.4))}
+.bio-sky[data-w=goe]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(200,110,70,.26),transparent 70%),linear-gradient(rgba(54,26,20,.55),rgba(16,10,12,.25) 62%,rgba(52,22,14,.45))}
+.bio-sky[data-w=cells]{background:radial-gradient(ellipse 70% 70% at 60% 30%,rgba(70,150,140,.22),transparent 72%),linear-gradient(rgba(10,40,40,.5),rgba(6,16,18,.35))}
+.bio-sky[data-w=ice]{background:radial-gradient(ellipse 90% 50% at 60% 8%,rgba(200,220,240,.22),transparent 72%),linear-gradient(rgba(40,52,70,.6),rgba(26,34,48,.35) 55%,rgba(80,96,116,.35))}
+.bio-sky[data-w=hadean]{background:radial-gradient(ellipse 80% 45% at 60% 100%,rgba(220,80,30,.32),transparent 70%),linear-gradient(rgba(30,14,16,.55),rgba(20,8,10,.3) 55%,rgba(70,22,10,.45))}
+.bio-sky[data-w=desert]{background:radial-gradient(ellipse 90% 50% at 62% 6%,rgba(240,170,110,.24),transparent 70%),linear-gradient(rgba(60,34,24,.5),rgba(26,14,12,.25) 55%,rgba(70,34,20,.45))}
+.bio-g.na .bio-gt{background:repeating-linear-gradient(90deg,rgba(214,172,94,.16) 0 4px,transparent 4px 8px)}
+.bio-sky[data-w=triassic]{background:radial-gradient(ellipse 90% 50% at 62% 6%,rgba(240,180,110,.24),transparent 70%),linear-gradient(rgba(58,38,26,.5),rgba(24,14,12,.25) 55%,rgba(64,38,20,.45))}
+.bio-sky[data-w=forest]{background:radial-gradient(ellipse 80% 50% at 60% 8%,rgba(170,200,150,.2),transparent 70%),linear-gradient(rgba(24,40,30,.55),rgba(10,18,14,.25) 60%,rgba(24,30,20,.5))}
+.bio-sky[data-w=meadow]{background:radial-gradient(ellipse 90% 50% at 62% 6%,rgba(200,220,170,.24),transparent 70%),linear-gradient(rgba(34,48,40,.5),rgba(12,18,16,.25) 60%,rgba(30,36,20,.45))}
+.bio-sky[data-w=jungle]{background:radial-gradient(ellipse 80% 50% at 60% 8%,rgba(150,210,150,.2),transparent 70%),linear-gradient(rgba(18,42,30,.6),rgba(8,20,14,.3) 60%,rgba(16,30,18,.55))}
+.bio-sky[data-w=savanna]{background:radial-gradient(ellipse 90% 50% at 62% 6%,rgba(250,200,120,.26),transparent 70%),linear-gradient(rgba(60,46,28,.5),rgba(24,18,12,.25) 55%,rgba(64,50,24,.45))}
+.bio-sky[data-w=steppe]{background:radial-gradient(ellipse 90% 50% at 60% 8%,rgba(210,225,240,.22),transparent 72%),linear-gradient(rgba(44,52,64,.55),rgba(24,28,36,.3) 55%,rgba(60,64,64,.4))}
+.bio-sky[data-w=field]{background:radial-gradient(ellipse 90% 50% at 62% 6%,rgba(250,220,150,.24),transparent 70%),linear-gradient(rgba(50,48,40,.5),rgba(20,18,14,.25) 55%,rgba(60,50,26,.45))}
+.bio-sky[data-w=today]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(70,170,200,.3),transparent 70%),linear-gradient(rgba(14,52,70,.55),rgba(6,18,26,.2) 62%,rgba(40,34,20,.35))}
+.bio-sky[data-w=taiga]{background:radial-gradient(ellipse 90% 50% at 60% 8%,rgba(200,215,230,.2),transparent 72%),linear-gradient(rgba(30,40,48,.6),rgba(12,18,20,.3) 58%,rgba(46,54,60,.45))}
+.bio-sky[data-w=tundra]{background:radial-gradient(ellipse 100% 45% at 64% 4%,rgba(230,200,220,.2),transparent 72%),linear-gradient(rgba(44,48,66,.6),rgba(24,26,38,.3) 55%,rgba(58,62,56,.45))}
+.bio-sky[data-w=ocean]{background:radial-gradient(ellipse 80% 55% at 60% 0%,rgba(90,170,230,.32),transparent 72%),linear-gradient(rgba(12,46,84,.6),rgba(6,22,44,.35) 60%,rgba(4,12,26,.5))}
+.bio-sky[data-w=deep]{background:radial-gradient(ellipse 60% 40% at 30% 100%,rgba(40,90,120,.14),transparent 70%),linear-gradient(rgba(2,6,14,.75),rgba(2,4,10,.6))}
+.bio-sky[data-w=swamp]{background:radial-gradient(ellipse 80% 50% at 60% 8%,rgba(150,170,110,.16),transparent 70%),linear-gradient(rgba(22,38,26,.5),rgba(10,18,12,.25) 60%,rgba(18,30,24,.5))}
+.ch-bio .time-in{grid-template-rows:auto auto auto minmax(0,1fr)}
+.ch-bio.tm-max .time-in{grid-template-rows:auto minmax(0,1fr)}
+.ch-bio.tm-max #bioHint,.ch-bio.tm-max .bio-col{display:none}
+#bioHint{color:var(--faint);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
+.bio-col{position:absolute;right:calc(var(--pad) - 6px);top:calc(env(safe-area-inset-top,0px) + 84px);bottom:calc(env(safe-area-inset-bottom,0px) + 26px);width:30px;display:flex;flex-direction:column;gap:2px;pointer-events:auto;z-index:2}
+.bio-col button{position:relative;min-height:6px;border-radius:2px;background:color-mix(in srgb,var(--c) 52%,#2a2620);opacity:.5;transition:opacity .3s,transform .3s,box-shadow .3s}
+.bio-col button.rd{opacity:.85}
+.bio-col button:hover{opacity:1;transform:scaleX(1.25)}
+.bio-col button.on{opacity:1;transform:scaleX(1.45);box-shadow:0 0 0 1px rgba(255,236,200,.9),0 0 14px color-mix(in srgb,var(--c) 70%,transparent)}
+.bio-col button span{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;font:13px var(--display);color:var(--muted);opacity:0;pointer-events:none;transition:opacity .3s;text-shadow:0 0 6px #05060c,0 0 3px #05060c}
+.bio-col button:hover span,.bio-col button.on span{opacity:1}
+.bio-col button.on span{color:var(--ink);font-size:15px}
+.bio-chips{display:flex;flex-wrap:wrap;gap:6px}
+.bio-sp{display:grid;justify-items:center;gap:2px;width:92px;padding:6px 4px 5px;border:1px solid var(--line);border-radius:4px;transition:border-color .3s,background .3s}
+.bio-sp img{width:84px;height:44px;object-fit:contain;opacity:.85}
+.bio-sp span{font:13px var(--display);color:var(--ink);text-align:center;line-height:1.15}
+.bio-sp:hover{border-color:var(--brass);background:rgba(214,172,94,.08)}
+.bio-p{color:#ddd6c6;font-size:14.5px}
+.bio-port{width:100%;max-height:200px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,214,150,.25));margin:4px 0}
+.bio-grp{margin:-4px 0 0;color:var(--faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.bio-size{display:grid;gap:8px;border:1px solid rgba(214,172,94,.22);border-radius:4px;padding:10px 12px;background:rgba(214,172,94,.035)}
+.bio-size div{display:grid;gap:4px}.bio-size span{font-size:12.5px;color:var(--muted)}
+.bio-size i{display:block;height:5px;border-radius:3px;background:rgba(230,218,192,.55)}.bio-size i.s{background:var(--brass);box-shadow:0 0 8px rgba(214,172,94,.6)}
+.bio-gs{display:grid;gap:7px;border:1px solid rgba(214,172,94,.22);border-radius:4px;padding:10px 12px;background:rgba(214,172,94,.035)}
+.bio-g{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px}
+.bio-g>.mono{font-size:11px;color:var(--brass)}
+.bio-gt{position:relative;height:5px;border-radius:3px;background:rgba(214,172,94,.14)}
+.bio-gt i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,rgba(214,172,94,.5),#ffd88a)}
+.bio-gt b{position:absolute;top:-4px;width:2px;height:13px;margin-left:-1px;background:#f6ebcf;box-shadow:0 0 6px rgba(246,235,207,.8)}
+.bio-gv{font-size:12.5px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:5px}
+.bio-gn{margin:2px 0 0;font-size:9.5px;letter-spacing:.08em;color:var(--faint)}
+.bio-cr{margin:4px 0 0;font-size:11.5px;color:var(--faint);line-height:1.5}
+.bio-globe{display:grid;justify-items:center;gap:6px}.bio-globe canvas{width:220px;height:220px;cursor:grab;touch-action:pan-y}
+.bio-flt{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.bio-flt label{display:grid;gap:3px}.bio-flt label .mono{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.bio-flt select,.bio-flt input{background:rgba(5,6,12,.7);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:5px 7px;font:13px var(--body,inherit);outline:none;min-width:0}
+.bio-flt select:focus,.bio-flt input:focus{border-color:var(--brass)}
+.bio-flt .bio-q{grid-column:1/-1}.bio-sort{grid-column:1/-1;display:flex;gap:6px}
+.bio-grid .bio-sp{position:relative}.bio-grid .bio-sp i{font:8.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-style:normal;display:flex;align-items:center;gap:4px}
+.bio-grid .bio-sp i::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+.bio-sp.on{border-color:var(--brass);background:rgba(214,172,94,.12)}
+#bioSim{position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none}
+.ch-bio.bio-mech #bioSim{display:block}
+.ch-bio.bio-mech #bioCv,.ch-bio.bio-mech #bioLab,.ch-bio.bio-mech .bio-rock,.ch-bio.bio-mech .bio-sky,.ch-bio.bio-mech .bio-col{display:none}
+.bio-mlist{display:grid;gap:6px}
+.bio-mlist button{display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:4px;padding:8px 10px;transition:border-color .3s,background .3s}
+.bio-mlist button:hover{border-color:var(--brass);background:rgba(214,172,94,.08)}
+.bio-mlist b{font:400 22px var(--display);color:var(--brass);min-width:20px;text-align:center}
+.bio-mlist span{display:grid;gap:2px}.bio-mlist i{font:400 17px var(--display);font-style:normal;color:var(--ink)}.bio-mlist small{font-size:12.5px;color:var(--muted)}
+.bio-mctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid rgba(214,172,94,.22);border-radius:4px;padding:10px;background:rgba(214,172,94,.035)}
+.bio-seg{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.bio-rng{display:grid;grid-template-columns:auto 1fr 40px;gap:8px;align-items:center;width:100%}.bio-rng .mono{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.bio-rng input{accent-color:#d6ac5e}.bio-rng b{font-weight:400;color:var(--brass);font-size:12px}
+.bio-mctl .tm-go{margin-top:0}
+.bio-soon{border-left:2px solid rgba(214,172,94,.5);padding-left:10px}
+@media (max-width:760px){
+  .ch-bio .time-in{top:auto;height:54vh;background:linear-gradient(rgba(5,6,12,.0),rgba(5,6,12,.94) 22px);padding-top:16px}
+  .ch-bio.tm-max .time-in{height:auto;top:calc(env(safe-area-inset-top,0px) + 56px)}
+  .bio-col{top:calc(env(safe-area-inset-top,0px) + 70px);bottom:calc(54vh + 14px);width:18px;right:10px}
+  .bio-col button span{font-size:11px}.bio-col button.on span{font-size:13px}
+  #bioHint{display:block;font-size:9px}
+  .bio-sp{width:78px}.bio-sp img{width:70px;height:36px}
+  .bio-rock{-webkit-mask-image:linear-gradient(#000 38%,transparent 52%);mask-image:linear-gradient(#000 38%,transparent 52%)}
+}
+/* «Компас пути» */
+.ch-compass{inset:0;background:radial-gradient(circle at 50% 40%,rgba(16,16,34,.97),rgba(5,6,12,.985) 75%);backdrop-filter:blur(14px);overflow:auto;transform:scale(1.02)}
+.ch-compass.open{transform:none}
+.cp-in{min-height:100%;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 50px)}
+.cp-body{width:min(720px,100%);display:grid;gap:16px}
+.cp-body.swap{animation:fadein .6s both}
+.cp-body h2{font:400 clamp(30px,4.4vw,48px)/1.08 var(--display);margin:0;color:var(--ink)}
+.cp-body .lede{margin:0;font:19px/1.5 var(--display);color:#ddd6c6}
+.cp-honest{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted);border-left:2px solid rgba(214,172,94,.4);padding-left:12px}
+.cp-dots{display:flex;gap:8px}.cp-dots i{width:22px;height:3px;border-radius:2px;background:rgba(214,172,94,.18)}.cp-dots i.done{background:rgba(214,172,94,.6)}.cp-dots i.on{background:var(--brass);box-shadow:0 0 8px rgba(214,172,94,.7)}
+.cp-ans{display:grid;gap:10px;margin-top:6px}
+.cp-ans button{text-align:left;padding:15px 20px;border:1px solid var(--line);border-radius:6px;font:20px/1.25 var(--display);color:var(--ink);transition:border-color .3s,background .3s,color .3s}
+.cp-ans button:hover,.cp-ans button:focus-visible{border-color:var(--brass);background:rgba(214,172,94,.07)}
+.cp-ans button.on{border-color:var(--brass);background:rgba(214,172,94,.14);color:#ffe2a8}
+.cp-nav{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin-top:6px}.cp-go{margin-left:auto}
+.cp-why{color:var(--brass);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;margin:-4px 0 0}
+.cp-steps{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:cps}
+.cp-steps li{display:grid;grid-template-columns:28px 120px 1fr;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(214,172,94,.12);counter-increment:cps}
+.cp-steps li::before{content:counter(cps);font:15px var(--display);color:var(--brass)}
+.cp-steps .mono{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.cp-steps b{font:400 18px/1.25 var(--display);color:var(--ink)}
+.cp-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cp-card{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.cp-card h3{margin:0;font:400 22px var(--display);color:#ffe2a8}.cp-card p{margin:0;font-size:14px;line-height:1.5;color:#ddd6c6}.cp-card .cp-sm{color:var(--muted);font-size:13px}
+.cp-card .tm-link{justify-self:start}
+.chap-cp b{color:#ffe2a8}
+.rt-compass{display:grid;gap:4px;text-align:left;margin:4px 0 18px;padding:16px 20px;border:1px dashed rgba(214,172,94,.5);border-radius:6px;transition:background .3s,border-color .3s}
+.rt-compass:hover{background:rgba(214,172,94,.07);border-color:var(--brass)}.rt-compass b{font:400 22px var(--display);color:#ffe2a8}.rt-compass span:last-child{color:var(--muted);font-size:13.5px}
+.cp-invite{position:fixed;left:var(--pad);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:39;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 2*var(--pad));background:rgba(8,9,18,.93);border:1px solid rgba(214,172,94,.4);border-radius:8px;padding:10px 12px 10px 16px;font-size:14px;color:#ddd6c6;box-shadow:0 10px 30px rgba(0,0,0,.5);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .6s,visibility .6s,transform .6s}
+.cp-invite.open{opacity:1;visibility:visible;transform:none}.cp-invite b{color:#ffe2a8;font-weight:500}.cp-invite .btn{padding:5px 12px;font-size:13px;flex:none}
+@media (max-width:760px){
+  .cp-steps li{grid-template-columns:24px 1fr}.cp-steps .mono{grid-column:2}.cp-steps b{grid-column:2}
+  .cp-cards{grid-template-columns:1fr}.cp-ans button{font-size:18px;padding:13px 16px}
+  .cp-invite{font-size:13px;gap:8px}
+}
+/* «Моя астролябия» */
+.ch-mine{inset:0;background:rgba(5,6,12,.96);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
+.ch-mine.open{transform:none}
+.mn-in{width:min(1000px,100%);margin:0 auto;display:grid;gap:14px}
+.mn-in h2{font:400 clamp(32px,4.4vw,50px)/1.05 var(--display);margin:0;color:var(--ink)}
+.mn-priv{margin:0;font-size:13.5px;color:var(--muted);border-left:2px solid rgba(214,172,94,.4);padding-left:12px;max-width:640px}
+.mn-top{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:28px;align-items:start;margin-top:6px}
+.mn-ring{width:100%;height:auto;display:block}
+.mn-orb{fill:none;stroke:rgba(214,172,94,.35);stroke-width:1}.mn-orb2{fill:none;stroke:rgba(214,172,94,.12);stroke-dasharray:2 5}.mn-orb3{fill:none;stroke:rgba(214,172,94,.08)}
+.mn-day{fill:none;stroke:rgba(214,172,94,.16);stroke-width:5;stroke-linecap:round}.mn-day.on{stroke:#ffd88a;filter:drop-shadow(0 0 4px rgba(255,216,138,.8))}
+.mn-lv{fill:rgba(214,172,94,.16)}.mn-lv.on{filter:drop-shadow(0 0 2px currentColor)}
+.mn-st{cursor:pointer}.mn-st:focus-visible{outline:none}.mn-st:focus-visible .mn-dot,.mn-st:hover .mn-dot{stroke:#ffd88a;stroke-width:2}
+.mn-dot{fill:#0b0c18;stroke:rgba(214,172,94,.45);stroke-width:1}
+.mn-st.on .mn-dot{filter:drop-shadow(0 0 6px currentColor)}
+.mn-num{font:12px var(--display);fill:rgba(233,226,208,.55)}.mn-st.on .mn-num{fill:#f1e4c6}
+.mn-c1{font:400 38px var(--display);fill:#ffe2a8}.mn-c2{font:9.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;fill:rgba(233,226,208,.5)}
+.mn-leg{display:flex;gap:14px;align-items:center;justify-content:center;color:var(--faint);font-size:9.5px;letter-spacing:.12em;margin:4px 0 0}
+.mn-leg i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:-8px}.mn-leg .l1{background:#7fd0ff}.mn-leg .l2{background:#ffd88a}
+.mn-side{display:grid;gap:12px}
+.mn-side h4,.mn-day-b h4{font:500 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:8px 0 0}
+.mn-stats{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mn-stats li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:baseline;font-size:14px;color:#ddd6c6}
+.mn-stats b{font:400 22px var(--display);color:var(--ink)}.mn-stats small{font:13px var(--display);color:var(--faint)}
+.mn-stats i{grid-column:1/-1;height:2px;background:rgba(214,172,94,.14);position:relative}
+.mn-stats i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--brass);box-shadow:0 0 6px rgba(214,172,94,.6)}
+.mn-stats .mn-pr b{color:#ffd88a}
+.mn-next{display:grid;gap:8px}
+.mn-next button{display:grid;gap:2px;text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:6px;transition:border-color .3s,background .3s}
+.mn-next button:hover{border-color:var(--brass);background:rgba(214,172,94,.06)}
+.mn-next .mono{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}.mn-next b{font:400 18px var(--display);color:var(--ink)}
+.mn-sm,.mn-empty{color:var(--muted);font-size:14px;margin:0}
+.mn-h3{font:400 28px var(--display);color:var(--ink);margin:18px 0 0;border-top:1px solid var(--line);padding-top:16px}
+.mn-feed{display:grid;gap:10px}
+.mn-day-b ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.mn-day-b li{font-size:14.5px;line-height:1.5;color:#ddd6c6}
+.mn-day-b q{font:16px/1.45 var(--display);color:var(--ink);quotes:"«" "»"}
+.mn-ic{display:inline-block;width:18px;color:var(--brass)}
+.mn-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-top:14px;border-top:1px solid var(--line);padding-top:16px}
+.mn-msg{color:var(--faint);font-size:10px;letter-spacing:.12em}
+.mn-clr{margin-left:auto;color:var(--muted);font-size:13.5px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}.mn-yes{color:#ff9f8a!important}
+.chap-mn b{color:#bfe8ff}
+@media (max-width:760px){.mn-top{grid-template-columns:1fr}.mn-ringw{max-width:380px;margin:0 auto}}
+.ch-routes{inset:0;background:rgba(5,6,12,.95);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
+.ch-routes.open{transform:none}
+.rt-in{width:min(980px,100%);margin:0 auto}
+.rt-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.rt-card{display:grid;gap:8px;text-align:left;padding:18px 20px;border:1px solid var(--line);border-radius:6px;background:rgba(214,172,94,.03);transition:border-color .3s,background .3s}
+.rt-card:hover{border-color:var(--brass);background:rgba(214,172,94,.08)}
+.rt-card b{font:400 28px/1.1 var(--display);color:var(--ink)}
+.rt-card span{color:var(--muted);font-size:14px}
+.rt-card i{font-style:normal;color:var(--brass)}
+.chap-rt b{color:#ffd88a}
+.routebar{position:fixed;right:var(--pad);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:40;width:min(430px,calc(100vw - 2*var(--pad)));background:rgba(8,9,18,.93);border:1px solid rgba(214,172,94,.45);border-radius:8px;padding:12px 14px 12px;box-shadow:0 10px 40px rgba(0,0,0,.6),0 0 24px rgba(214,172,94,.12);backdrop-filter:blur(10px);display:grid;grid-template-columns:minmax(0,1fr);gap:8px;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .5s,visibility .5s,transform .5s}
+.routebar.open{opacity:1;visibility:visible;transform:none}
+.rb-top{display:flex;align-items:center;gap:10px}
+.rb-name{color:var(--brass);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rb-step{color:var(--faint);font-size:9.5px}
+.rb-x{color:var(--muted);font-size:12px;transition:color .3s}.rb-x:hover{color:var(--brass)}
+.rb-body h3{margin:0;font:400 24px/1.15 var(--display);color:var(--ink)}
+.rb-body p{margin:4px 0 0;font-size:14px;line-height:1.55;color:#ddd6c6}
+.routebar.fold .rb-body p{display:none}
+.rb-nav{display:flex;align-items:center;gap:8px}
+.rb-btn{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--muted);transition:color .3s,border-color .3s}
+.rb-btn:hover{color:var(--brass);border-color:var(--brass)}
+.rb-btn:disabled{opacity:.3;pointer-events:none}
+.rb-next{margin-left:auto;color:var(--ink);border-color:var(--brass);background:rgba(214,172,94,.12)}
+.rb-again{color:var(--faint);font-size:12px}.rb-again:hover{color:var(--brass)}
+@media (max-width:760px){
+  .routebar{right:auto;left:var(--pad);top:calc(env(safe-area-inset-top,0px) + 46px);bottom:auto;padding:9px 11px;gap:5px}
+  .rb-body h3{font-size:19px}.rb-body p{font-size:13px;max-height:30vh;overflow:auto}
+  .rb-again{display:none}
+}
+.srch{position:fixed;inset:0;z-index:45;background:rgba(3,4,10,.62);backdrop-filter:blur(6px);display:flex;justify-content:center;align-items:flex-start;padding:calc(env(safe-area-inset-top,0px) + 9vh) var(--pad) 20px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.srch.open{opacity:1;visibility:visible}
+.sr-box{width:min(680px,100%);max-height:78vh;display:grid;grid-template-rows:auto minmax(0,1fr);background:rgba(9,10,20,.97);border:1px solid rgba(214,172,94,.45);border-radius:10px;box-shadow:0 20px 70px rgba(0,0,0,.7);overflow:hidden}
+.sr-top{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);color:var(--brass)}
+.sr-top input{flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--ink);font:400 22px var(--display)}
+.sr-top input::placeholder{color:var(--faint)}
+.sr-k{color:var(--faint);font-size:9.5px;border:1px solid var(--line);border-radius:4px;padding:2px 6px}
+.sr-res{overflow:auto;padding:8px;display:grid;gap:2px;align-content:start;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent}
+.sr-it{display:grid;grid-template-columns:96px 1fr;gap:2px 12px;text-align:left;padding:9px 10px;border-radius:5px;transition:background .2s}
+.sr-it.on,.sr-it:hover{background:rgba(214,172,94,.1)}
+.sr-ty{grid-row:span 3;color:var(--brass);font-size:9px;letter-spacing:.14em;padding-top:5px}
+.sr-it b{font:400 19px/1.2 var(--display);color:var(--ink)}
+.sr-ctx{font-size:12px;color:var(--faint)}
+.sr-sn{font-size:13px;color:var(--muted);line-height:1.45}
+.sr-sn mark{background:rgba(255,216,138,.22);color:#ffe7b8;border-radius:2px;padding:0 1px}
+.sr-hint{color:var(--faint);font-size:9.5px;padding:6px 10px 4px;margin:0}
+.sr-none{color:var(--muted);padding:14px 10px;margin:0}
+@media (max-width:760px){ .srch{padding-top:calc(env(safe-area-inset-top,0px) + 12px)} .sr-box{max-height:86vh} .sr-it{grid-template-columns:1fr} .sr-ty{grid-row:auto;padding-top:0} .sr-top input{font-size:19px} }
 .ch-path{inset:0;background:rgba(5,6,12,.94);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
 .ch-path.open{transform:none}
 .ch-ref{inset:0;background:rgba(5,6,12,.94);backdrop-filter:blur(14px);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 60px);transform:translateY(20px)}
@@ -472,6 +817,7 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
 @keyframes izb{50%{opacity:.15}}
 .izexit{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:calc(14px + env(safe-area-inset-left,0px));width:40px;height:40px;display:none;align-items:center;justify-content:center;z-index:82;opacity:.32;background:transparent;border:0;padding:0;border-radius:50%;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .25s}
 .izexit:hover,.izexit:focus-visible{opacity:.8}
+.izdims{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));left:calc(62px + env(safe-area-inset-left,0px));display:none;z-index:82;opacity:.32;background:transparent;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:5px 12px;color:#fff;font:12px var(--mono, monospace);letter-spacing:.08em;cursor:pointer;transition:opacity .25s}.izdims:hover,.izdims:focus-visible{opacity:.85}
 .izexit:active{opacity:.95}
 /* погружение за горизонт: панель, интерфейс и курсор уходят вместе со светом */
 body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opacity:0!important;pointer-events:none!important;transition:opacity 1.6s!important}
@@ -511,6 +857,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <button class="act mono" id="btnPath" aria-pressed="false" data-hover><span class="lbl">Путь</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M7 1v6l4 2"/></svg></button>
       <button class="act mono" id="btnTime" aria-pressed="false" data-hover><span class="lbl">Время</span><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 1h9M1.5 13h9M2.5 1c0 3.5 3.5 4 3.5 6s-3.5 2.5-3.5 6M9.5 1c0 3.5-3.5 4-3.5 6s3.5 2.5 3.5 6"/></svg></button>
       <button class="act mono" id="btnTree" aria-pressed="false" data-hover><span class="lbl">Древо</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.4" fill="currentColor"/><path d="M7 7L3 3M7 7l4-4M7 7v6M3 3L1.5 4.5M3 3l.5-2M11 3l1.5 1.5M11 3l-.5-2M7 13l-2 .5M7 13l2 .5"/></svg></button>
+      <button class="act mono" id="btnSearch" aria-label="Поиск по сайту (Ctrl+K)" data-hover><span class="lbl">Поиск</span><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.3"/><path d="M8.7 8.7L12 12"/></svg></button>
       <button class="act mono" id="sound" aria-pressed="false" data-hover><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="lbl">Музыка</span></button>
       <button class="act mono" id="menuBtn" data-hover><span class="lbl">Станции</span><span class="burger" aria-hidden="true"><i></i><i></i></span></button>
     </div>
@@ -532,8 +879,10 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <button class="enter alt" id="toHuman" hidden data-hover><span>Карта человека</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
       <button class="enter alt" id="toEarth" hidden data-hover><span>Погружение в Землю</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
       <button class="enter alt" id="toBH" hidden data-hover><span>К центру — чёрная дыра</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
+      <button class="enter alt" id="toDims" hidden data-hover><span>Лестница измерений</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
       <span class="scale-now" id="stScale"></span>
     </div>
+    <p class="st-snd" id="stSnd"></p>
     <span class="st-hint" id="stHint">Наведите на объект и нажмите — чтобы погрузиться</span>
   </section>
 
@@ -550,12 +899,18 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <button class="close mono" id="menuClose" data-hover>Закрыть ✕</button>
   <div class="menu-in">
     <div class="chaps">
+      <button class="chap chap-rt" id="mRoutes" data-hover><span class="mono eyebrow">Экскурсии</span><b>Маршруты</b><span>«Откуда я?», «Из чего я сделан?», «Свет»… — сквозь кольцо, календарь и Древо</span></button>
+      <button class="chap chap-cp" id="mCompass" data-hover><span class="mono eyebrow">Минута вопросов</span><b>Компас пути</b><span>С чего начать сегодня — маршрут под ваш интерес, время и состояние</span></button>
+      <button class="chap chap-mn" id="mMine" data-hover><span class="mono eyebrow">Личная карта</span><b>Моя астролябия</b><span>Что вы уже прошли: станции, слои, практики, дневник — только в этом браузере</span></button>
       <button class="chap" id="mHuman" data-hover><span class="mono eyebrow">Глава</span><b>Погружение в человека</b><span>От тонких тел — через центры — к мышцам, органам и скелету</span></button>
       <button class="chap" id="mAbs" data-hover><span class="mono eyebrow">Глава</span><b>Сквозной путь</b><span>От Абсолюта вглубь всех станций по кругу — с развилками</span></button>
       <button class="chap" id="mEarth" data-hover><span class="mono eyebrow">Глава</span><b>Погружение в Землю</b><span>Сквозь поля, воздух, воду и камень — к железному сердцу планеты</span></button>
       <button class="chap" id="mBH" data-hover><span class="mono eyebrow">Ответвление</span><b>К центру Галактики</b><span>Чёрная дыра Стрелец A* и проход за горизонт — в Изнанку</span></button>
       <button class="chap" id="mTime" data-hover><span class="mono eyebrow">Ось времени</span><b>Космический календарь</b><span>13,8 млрд лет в одном году: от Большого взрыва до последней секунды</span></button>
       <button class="chap" id="mTree" data-hover><span class="mono eyebrow">Родство всего живого</span><b>Древо жизни</b><span>От LUCA — через бактерии, растения, грибы и животных — к человеку</span></button>
+      <button class="chap" id="mThought" data-hover><span class="mono eyebrow">История идей</span><b>Нить мысли</b><span>Два берега одной реки: опыт традиций и измерение науки — от Ригведы до LIGO</span></button>
+      <button class="chap" id="mBio" data-hover><span class="mono eyebrow">Учебник жизни</span><b>Биосфера</b><span>Пласты камня: 4,5 млрд лет жизни, больше 140 существ, механизмы эволюции, основы биологии и биомы Земли</span></button>
+      <button class="chap" id="mDims" data-hover><span class="mono eyebrow">Модели пространства</span><b>Лестница измерений</b><span>Точка, линия, плоскость, наш мир — и как заглянуть в четвёртое, пятое, шестое</span></button>
       <button class="chap" id="mPath" data-hover><span class="mono eyebrow">Глава</span><b>Путь из восьми этапов</b><span>Узнать, почувствовать, прожить, осмыслить</span></button>
       <button class="chap" id="mRef" data-hover><span class="mono eyebrow">Справочник</span><b>Как пользоваться · сравнение традиций</b><span>Инструкция, Розеттский камень, десять принципов, источники</span></button>
     </div>
@@ -567,7 +922,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 <div class="reveal" id="reveal" aria-hidden="true"></div>
 <div class="loopfx" id="loopFx" aria-hidden="true"></div>
 <div class="ebound mono" id="eBound" aria-hidden="true"></div>
-<button class="moonbtn" id="moonBtn" aria-label="Луна — погрузиться" tabindex="-1" data-hover><i aria-hidden="true"></i><span class="mono">Луна</span></button>
+<button class="moonbtn" id="moonBtn" aria-label="Луна — погрузиться" tabindex="-1" data-hover><canvas id="moonCv" width="120" height="120" aria-hidden="true"></canvas><span class="mono">Луна</span></button>
 <div class="ptip" id="ptip" aria-live="polite"><span class="mono pk"></span><b></b><p class="pd"></p><p class="pn"></p></div>
 
 <section class="interior" id="interior" aria-hidden="true" aria-label="Станция изнутри">
@@ -648,10 +1003,86 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <button class="close mono" id="treeClose" data-hover>Вернуться на кольцо ✕</button>
   <div class="time-in">
     <div class="tm-head"><span class="mono eyebrow">Древо жизни<span class="tm-hide-m"> · 4 млрд лет родства</span></span><button class="tm-max-btn" id="trMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
-    <div class="tm-ctl"><button class="tm-link" id="trHome" data-hover>⟲ Всё древо</button><span class="mono tm-hint tr-hint">Клик по узлу — ветвь · тяните — поворот · колесо — ближе</span></div>
+    <div class="tm-ctl"><span class="tr-path"><span class="mono">Путь к нам</span><button id="trPrev" aria-label="Предыдущий шаг" data-hover>←</button><span class="mono" id="trStep">1/11</span><button id="trNext" aria-label="Следующий шаг" data-hover>→</button></span><button class="btn" id="trWalk" aria-pressed="false" data-hover>▶ Пройти путь</button><button class="tm-link" id="trHome" data-hover>⟲ Всё древо</button></div>
+    <span class="mono tm-hint tr-hint">Клик по узлу — ветвь · тяните — поворот · колесо — ближе · ← → — шаги пути</span>
     <div class="tm-scroll" id="trScroll"><article class="tm-card" id="trCard" aria-live="polite"></article></div>
   </div>
 </section>
+
+<section class="chapter ch-time ch-thought" id="chThought" aria-hidden="true" aria-label="Нить мысли">
+  <svg id="thSvg" aria-label="Река идей: верхний берег — опыт, нижний — измерение"></svg>
+  <button class="close mono" id="thClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Нить мысли<span class="tm-hide-m"> · опыт и измерение</span></span><span class="th-hbtn"><button class="tm-link" id="thHome" data-hover>⟲ Вся река</button><button class="tm-max-btn" id="thMax" aria-pressed="false" data-hover>⤢ Читать</button><button class="tm-max-btn th-fold-btn" id="thFold" data-hover>▾ Свернуть</button></span></div>
+    <span class="mono tm-hint tr-hint th-hint">Клик — карточка · колесо — ближе · тяните — сдвиг · ← → — по времени</span>
+    <div class="tm-scroll" id="thScroll"><article class="tm-card" id="thCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-dims" id="chDims" aria-hidden="true" aria-label="Лестница измерений">
+  <canvas id="dimCv" aria-label="Объект ступени из золотых частиц: точка, отрезок, квадрат, куб"></canvas>
+  <canvas id="dimLab" aria-hidden="true"></canvas>
+  <button class="close mono" id="dmClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Лестница измерений<span class="tm-hide-m"> · 0D → 6D</span></span><button class="tm-max-btn" id="dmMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <nav class="dm-ladder" id="dmLadder" aria-label="Ступени"></nav>
+    <div class="tm-ctl" id="dmTools"></div>
+    <span class="mono tm-hint tr-hint" id="dmHint"></span>
+    <div class="tm-scroll" id="dmScroll"><article class="tm-card" id="dmCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-bio" id="chBio" aria-hidden="true" aria-label="Биосфера">
+  <canvas class="bio-rock" id="bioRock" aria-hidden="true"></canvas>
+  <div class="bio-sky" id="bioSky" aria-hidden="true"></div>
+  <canvas id="bioCv" aria-label="Пласт породы: окаменелости, которые оживают и собираются в существ из частиц"></canvas>
+  <canvas id="bioLab" aria-hidden="true"></canvas>
+  <canvas id="bioSim" aria-label="Живая модель опыта"></canvas>
+  <nav class="bio-col" id="bioCol" aria-label="Колонна пластов: сверху — сегодня, внизу — древнейшие"></nav>
+  <button class="close mono" id="bioClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Биосфера<span class="tm-hide-m"> · пласты камня</span></span><button class="tm-max-btn" id="bioMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <div class="tm-ctl" id="bioTools"><button class="tm-tog" id="bioGalB" aria-pressed="false" data-hover>Галерея существ</button><button class="tm-tog" id="bioMechB" aria-pressed="false" data-hover>Механизмы эволюции</button><button class="tm-tog" id="bioBasB" aria-pressed="false" data-hover>Основы биологии</button><button class="tm-tog" id="bioBmB" aria-pressed="false" data-hover>Биомы Земли</button><button class="tm-tog" id="bioLife" aria-pressed="false" hidden data-hover>Оживить окаменелости</button></div>
+    <span class="mono tm-hint tr-hint" id="bioHint"></span>
+    <div class="tm-scroll" id="bioScroll"><article class="tm-card" id="bioCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-compass" id="chCompass" aria-hidden="true" aria-label="Компас пути">
+  <button class="close mono" id="cpClose" data-hover>Закрыть ✕</button>
+  <div class="cp-in"><div class="cp-body" id="cpBody"></div></div>
+</section>
+
+<aside class="cp-invite" id="cpInvite" aria-hidden="true"><span>Не знаете, с чего начать? <b>Компас пути</b> — одна минута.</span><button class="btn" id="cpInvGo" data-hover>Открыть</button><button class="rb-x" id="cpInvX" aria-label="Закрыть приглашение" data-hover>✕</button></aside>
+
+<section class="chapter ch-mine" id="chMine" aria-hidden="true" aria-label="Моя астролябия">
+  <button class="close mono" id="mnClose" data-hover>Закрыть ✕</button>
+  <div class="mn-in" id="mnBody"></div>
+</section>
+
+<section class="chapter ch-routes" id="chRoutes" aria-hidden="true" aria-label="Маршруты">
+  <button class="close mono" id="routesClose" data-hover>Закрыть ✕</button>
+  <div class="rt-in">
+    <span class="mono eyebrow">Экскурсии сквозь весь сайт</span>
+    <h2>Маршруты</h2>
+    <p class="lede">Каждый маршрут — ответ на один вопрос. Шаг за шагом он ведёт через кольцо станций, погружения, Космический календарь и Древо жизни. Полоса маршрута остаётся с вами, куда бы вы ни перешли.</p>
+    <button class="rt-compass" id="rtCompass" data-hover><span class="mono eyebrow">Компас пути</span><b>Собрать свой маршрут</b><span>Шесть вопросов — около минуты</span></button>
+    <div class="rt-list" id="routeList"></div>
+  </div>
+</section>
+
+<div class="srch" id="srch" aria-hidden="true" role="dialog" aria-label="Поиск по сайту">
+  <div class="sr-box">
+    <div class="sr-top"><svg width="16" height="16" viewBox="0 0 13 13" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.3"/><path d="M8.7 8.7L12 12"/></svg><input id="srchIn" type="text" placeholder="Станции, слои, события, группы Древа…" autocomplete="off" spellcheck="false"><span class="mono sr-k">Esc</span></div>
+    <div class="sr-res" id="srchRes"></div>
+  </div>
+</div>
+
+<aside class="routebar" id="routeBar" aria-hidden="true" aria-label="Маршрут">
+  <div class="rb-top"><span class="mono rb-name" id="rbName"></span><span class="mono rb-step" id="rbStep"></span><button class="rb-x" id="rbFold" data-hover>Свернуть ▴</button><button class="rb-x" id="rbClose" aria-label="Выйти из маршрута" data-hover>✕</button></div>
+  <div class="rb-body"><h3 id="rbH"></h3><p id="rbTx"></p></div>
+  <div class="rb-nav"><button class="rb-btn" id="rbPrev" data-hover>← Назад</button><button class="rb-again" id="rbAgain" data-hover>↺ к месту шага</button><button class="rb-btn rb-next" id="rbNext" data-hover>Дальше →</button></div>
+</aside>
 
 <section class="chapter ch-ref" id="chRef" aria-hidden="true" aria-label="Справочник">
   <button class="close mono" id="refClose" data-hover>Вернуться на кольцо ✕</button>
@@ -660,6 +1091,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <button class="reftab on" data-tab="guide" data-hover>Как пользоваться</button>
       <button class="reftab" data-tab="rosetta" data-hover>Розеттский камень</button>
       <button class="reftab" data-tab="principles" data-hover>Десять принципов</button>
+      <button class="reftab" data-tab="sounds" data-hover>Звуки кольца</button>
       <button class="reftab" data-tab="sources" data-hover>Источники</button>
     </nav>
     <div class="ref-body" id="refBody"></div>
@@ -707,7 +1139,43 @@ const PORTALS = [
 ];
 const TINT = ["#3a2c12","#2a1b3e","#0f1a3c","#17153d","#3c1a0a","#0a2635","#12291f","#321028","#0a2b31","#201138","#0a1328","#0a0910"];
 const EXP = [30,28,26.9,21,9.1,7.1,0.2,-5,-10,-18,-34.8,-38];
-const NOTES = [130.81,146.83,164.81,196.00,220.00,246.94,196.00,174.61,164.81,146.83,123.47,110.00];
+// тоники станций — по кругу квинт: C G D A E B F♯ C♯ G♯ D♯ A♯ F; кольцо замыкается на «Абсолюте» (выбор музыкальный, ○)
+const NOTES = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5].map(s => 130.81*Math.pow(2, (s >= 7 ? s - 12 : s)/12));
+// что звучит на станции: метка достоверности и короткое объяснение (панель станции, панель погружения, «Звуки кольца»)
+const VOICE_INFO = [
+  { m:"t", h:"Тишина и Ом", tx:"Тишина и слог Ом. Это символ, а не звук «из данных»: у Абсолюта нет частоты." },
+  { m:"s", h:"Тон пластины Хладни", tx:"Тон резонирующей пластины и медленные биения соседней моды — та самая вибрация, что рисует узоры из песка." },
+  { m:"s", h:"«Звук Большого взрыва»", tx:"Шум и нисходящий аккорд с отношениями частот 1 : 2,45 : 3,68 — как у пиков реликтового излучения (ℓ ≈ 220, 540, 810), поднятых примерно на 50 октав. По мотивам сонификации Марка Уиттла." },
+  { m:"h", h:"Искры центра Галактики", tx:"Искры сканируют небо слева направо: яркость → громкость, высота → тон. Синтез по мотивам сонификации центра Галактики (NASA Chandra, 2020), а не сама запись." },
+  { m:"s", h:"Гул колеблющегося Солнца", tx:"Девять близких тонов с биениями — пятиминутные колебания Солнца (≈ 3 мГц, шаг мод ≈ 135 мкГц), ускоренные примерно в 40 000 раз. Так звучит гелиосейсмология (SOHO)." },
+  { m:"s", h:"Радио Земли и пульс Шумана", tx:"Свисты-вистлеры и «утренний хор» — естественное радиоизлучение Земли, которое лежит прямо в звуковом диапазоне. Тон пульсирует с частотой шумановского резонанса 7,83 Гц." },
+  { m:"s", h:"Сердце и дыхание", tx:"Удары сердца около 60 в минуту и волна дыхания 6 раз в минуту (0,1 Гц) — ритм практики «дыхание сердца», при котором растёт вариабельность сердечного ритма." },
+  { m:"h", h:"Гул клетки и мотив кодонов", tx:"Тонкий гул около 1,6 кГц — так колебалась стенка дрожжевой клетки в опыте Гимжевски (2004; одно исследование, спорное). Мелодия при прибытии — кодоны ДНК, переведённые в ноты; правило перевода произвольное (○)." },
+  { m:"s", h:"Аккорд водорода", tx:"Четыре линии серии Бальмера — 656,3; 486,1; 434,0 и 410,2 нм. Отношения их частот 1 : 1,350 : 1,512 : 1,600 перенесены в слышимый аккорд." },
+  { m:"s", h:"Щелчки детектора", tx:"Щелчки в случайные моменты, как у счётчика частиц: по закону Пуассона, в среднем около двух в секунду. Предсказать следующий нельзя — можно только вероятность." },
+  { m:"t", h:"Шум вакуума", tx:"Шум с плывущим фильтром — символ квантовых флуктуаций. Настоящие флуктуации вакуума не слышны." },
+  { m:"t", h:"Почти тишина", tx:"Один далёкий удар колокола. Пустота — не звук, а пространство, в котором звук возможен." }
+];
+// голоса ключевых слоёв: jId:L → метка, заголовок и пояснение (для чёрной дыры — вся ветка, ключ "bh")
+const LV_VOICE = {
+  "g4:11": { m:"h", h:"Гул ядра Солнца", tx:"Очень низкий пульсирующий гул — образ g-мод, колебаний самой глубины Солнца с периодами в часы. Их ищут десятилетиями, и надёжно они не обнаружены." },
+  "earth:2": { m:"s", h:"Хор магнитосферы", tx:"Восходящие чириканья — «хоровые» волны в радиационных поясах Земли. Зонды Van Allen записали их, и они лежат прямо в звуковом диапазоне: здесь — синтез по их характеру." },
+  "earth:4": { m:"s", h:"Аккорд Шумана", tx:"Пять шумановских резонансов — 7,83 · 14,3 · 20,8 · 27,3 · 33,8 Гц — подняты на 4 октавы и звучат аккордом с настоящими отношениями; основной резонанс остаётся пульсом." },
+  "bh": { m:"s", h:"Си-бемоль чёрной дыры", tx:"Волны давления, которые чёрная дыра в скоплении галактик Персея гонит через горячий газ, — это си-бемоль на 57 октав ниже до первой октавы (Chandra, 2003). Здесь он поднят обратно. Честно: это голос другой чёрной дыры, не Стрельца A*." },
+  "moon:2": { m:"s", h:"Дыхание приливов", tx:"Два прилива в сутки: период 12 часов 25 минут сжат до 12,4 секунды — шум волны нарастает и отступает." },
+  "jup:0": { m:"h", h:"Радиоголос Юпитера", tx:"Свисты и шорохи — по характеру декаметрового радиоизлучения Юпитера, которое записывали «Вояджеры» и «Юнона». Синтез по мотивам, не сама запись." },
+  "human:7": { m:"s", h:"Сердце крупным планом", tx:"Около 60 ударов в минуту: «тук» — закрываются клапаны между предсердиями и желудочками, «тук» — клапаны аорты и лёгочной артерии." },
+  "human:10": { m:"s", h:"Щелчки нейронов", tx:"Потенциалы действия, пропущенные через динамик, звучат щелчками и очередями — так нейрофизиологи со времён Хьюбела и Визела слушают отдельные клетки." },
+  "g7:1": { m:"s", h:"Колебания воды", tx:"Три собственных колебания молекулы воды — 1595, 3657 и 3756 см⁻¹ (около 10¹⁴ Гц) — опущены примерно на 40 октав и звучат аккордом с настоящими отношениями." },
+  "g9:1": { m:"s", h:"Частицы падают на экран", tx:"Каждый щелчок — одна частица; высота тона — место попадания, выпавшее случайно, но по картине интерференции. Со временем слышно, что одни высоты повторяются чаще — это полосы." },
+  "dream:0": { m:"s", h:"Альфа уступает тете", tx:"Тон пульсирует то с частотой альфа-ритма (10 Гц), то тета-ритма (6 Гц) — так меняется ЭЭГ при засыпании." },
+  "dream:1": { m:"t", h:"Всплески образов", tx:"Неровные тихие звоны — образ быстрого сна, когда мозг активен почти как днём, а тело неподвижно." },
+  "dream:2": { m:"t", h:"Всплески образов", tx:"Неровные тихие звоны — образ быстрого сна, в котором вспыхнула ясность." },
+  "dream:3": { m:"s", h:"Дельта-волны", tx:"Медленная пульсация около 1 раза в секунду — дельта-ритм глубокого сна." }
+};
+const lvVoiceKey = (jid, L) => jid === "bh" ? "bh" : LV_VOICE[jid + ":" + L] ? jid + ":" + L : null;
+// серия Бальмера водорода: Hα 656,3, Hβ 486,1, Hγ 434,0, Hδ 410,2 нм → отношения частот
+const BALMER = [656.3, 486.1, 434.0, 410.2].map(l => 656.3/l);
 const STAGE_ST = [6,0,1,3,6,7,10,0];
 // сила и радиус отклика частиц на курсор: + отталкивание, − притяжение (атом «схлопывается» при наблюдении)
 const PUSH = [.6,.5,.45,.45,.7,.35,-.3,.55,-1.2,.15,.8,-.6];
@@ -789,7 +1257,14 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 0.1, 3000);
 const tscene = new THREE.Scene();
 const tcam = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.1, 400);
-const U = { time:{value:0}, pr:{value:PR} };
+__EARTHLAND__
+// поле суши настоящей Земли (1°): GPU — текстура uLand, CPU — landAt(); 0,5 — берег
+const EARTH_LAND = (() => { const s = atob(EARTH_LAND_B64), a = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a; })();
+const LAND_TEX = (() => { const t = new THREE.DataTexture(EARTH_LAND, 360, 180, THREE.LuminanceFormat, THREE.UnsignedByteType); t.magFilter = t.minFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.generateMipmaps = false; t.needsUpdate = true; return t; })();
+// то же правило, что в шейдере: направление → долгота/широта → значение поля (−0,82…1,18; берег — 0,18)
+function landAt(d){ const l = Math.hypot(d[0], d[1], d[2]) || 1, lon = Math.atan2(d[0]/l, d[2]/l), lat = Math.asin(clamp(d[1]/l, -1, 1));
+  const x = clamp(Math.floor((lon/TAU + .5)*360), 0, 359), y = clamp(Math.floor((lat/Math.PI + .5)*180), 0, 179); return (EARTH_LAND[y*360 + x]/255 - .5)*2 + .18; }
+const U = { time:{value:0}, pr:{value:PR}, land:{value:LAND_TEX} };
 
 /* ---------- частицы ---------- */
 const HEAD = `
@@ -797,6 +1272,11 @@ uniform float uTime; uniform float uPR; uniform float uOpacity; uniform float uS
 attribute float aSeed; attribute vec3 aRnd; attribute vec3 aColor; attribute float aSize;
 varying vec3 vColor; varying float vAlpha;
 uniform vec3 uCur; uniform float uHov; uniform float uPush; uniform float uRad; uniform float uDive; uniform float uSharp; uniform float uSolid;
+uniform sampler2D uLand;
+float landT(vec3 q){ vec3 n = normalize(q); vec2 uv = vec2(atan(n.x, n.z)/6.2831853 + 0.5, asin(clamp(n.y, -1.0, 1.0))/3.1415927 + 0.5); return (texture2D(uLand, uv).r - 0.5)*2.0 + 0.18; }
+float iceT(vec3 q, float land){ vec3 n = normalize(q); float la = asin(clamp(n.y, -1.0, 1.0))*57.29578, lo = atan(n.x, n.z)*57.29578;
+  float grl = step(0.18, land)*step(59.5, la)*step(-74.0, lo)*step(lo, -11.0);
+  return max(max(smoothstep(74.0, 78.0, la), smoothstep(-61.0, -65.0, la)), grl); }
 mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 vec3 hsv(float h){ return clamp(abs(mod(h*6.0 + vec3(0.0,4.0,2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); }
 `;
@@ -804,7 +1284,7 @@ const FRAG = `varying vec3 vColor; varying float vAlpha;
 void main(){ float r = length(gl_PointCoord - 0.5); float g = smoothstep(0.5, 0.0, r); g *= g; float al = g * vAlpha; if (al < 0.002) discard; gl_FragColor = vec4(vColor, al); }`;
 function pmat(chunk, size, decl){
   return new THREE.ShaderMaterial({
-    uniforms: { uTime:U.time, uPR:U.pr, uOpacity:{value:1}, uSize:{value:size||1}, uFocus:{value:-1}, uSpeed:{value:1}, uProg:{value:0}, uCur:{value:new THREE.Vector3(999,999,999)}, uHov:{value:0}, uPush:{value:.5}, uRad:{value:2}, uDive:{value:0}, uSharp:{value:1}, uSolid:{value:0} },
+    uniforms: { uTime:U.time, uPR:U.pr, uLand:U.land, uOpacity:{value:1}, uSize:{value:size||1}, uFocus:{value:-1}, uSpeed:{value:1}, uProg:{value:0}, uCur:{value:new THREE.Vector3(999,999,999)}, uHov:{value:0}, uPush:{value:.5}, uRad:{value:2}, uDive:{value:0}, uSharp:{value:1}, uSolid:{value:0} },
     vertexShader: HEAD + (decl || "") + `void main(){
       vec3 p = position; vec3 col = aColor; float a = 1.0; float s = aSize;
       ${chunk}
@@ -1381,18 +1861,21 @@ g => {
 SOLAR_BUILD,
 // VI · Земля и жизнь
 g => {
-  g.add(pts(9000*Q, (i,o,n) => { o.p = fib(i,n).map(v => v*2.3); o.s = .75; },
+  g.add(pts(20000*Q, (i,o,n) => { o.p = fib(i,n).map(v => v*2.3); o.s = .6; },
     `vec3 q = position;
      p.xz = rot(uTime*0.12) * p.xz;
-     float land = sin(q.x*2.2 + 1.3)*sin(q.y*2.6 + 0.4)*cos(q.z*1.8 - 0.7) + 0.35*sin(q.x*4.7 + q.z*3.9) + 0.25*sin(q.y*6.1 - q.x*2.3);
+     float land = landT(q);
      float L = step(0.18, land);
-     float ice = step(2.02, abs(q.y));
-     col = mix(vec3(0.16,0.42,0.95), vec3(0.4,0.88,0.56), L);
+     float ice = iceT(q, land);
+     float dry = smoothstep(9.0, 17.0, abs(asin(clamp(normalize(q).y, -1.0, 1.0)))*57.3)*(1.0 - smoothstep(31.0, 40.0, abs(asin(clamp(normalize(q).y, -1.0, 1.0)))*57.3));
+     col = mix(vec3(0.13,0.36,0.9), mix(vec3(0.38,0.9,0.55), vec3(0.95,0.82,0.5), dry*0.7), L);
      col = mix(col, vec3(0.92,0.96,1.0), ice);
-     a = mix(0.32, 1.0, max(L, ice));`));
+     // дальнюю половину шара почти гасим — иначе материки обратной стороны просвечивают и путают рисунок
+     float fr = smoothstep(-0.2, 0.3, normalize((modelViewMatrix*vec4(normalize(p), 0.0)).xyz).z);
+     a = mix(0.22, 1.0, max(L, ice))*mix(0.1, 1.0, fr); s *= mix(0.85, 1.3, L);`));
   g.add(pts(1400*Q, (i,o,n) => { o.p = fib(i,n).map(v => v*2.55); o.c = C(0x6fe0c0); o.s = .6; },
     `p.xz = rot(uTime*0.07) * p.xz; a = 0.2 + 0.2*sin(uTime*3.0 + aSeed*50.0);`));
-  g.add(glow(0x4aa3ff, 7.4, .38));
+  g.add(glow(0x4aa3ff, 7.4, .2));
   const moon = glow(0xe6ebff, 1.1, .95); g.add(moon);
   let ma = 0, lt = 0; return (t, H) => { const dt = Math.min(.05, Math.max(0, t - lt)); lt = t; ma += dt*(.1 + H.h*.05); moon.position.set(Math.cos(ma)*4.3, Math.sin(ma)*.9, Math.sin(ma)*4.3); g.rotation.y += (H.x*.25*H.h - g.rotation.y)*.012; g.rotation.x += (-H.y*.15*H.h - g.rotation.x)*.012; };
 },
@@ -1592,7 +2075,7 @@ g => {
     chs.forEach((s,k) => { const f = fc < 0 ? (k === near ? 1 + .9*H.h : 1) : (fc === k ? 1.55 : .6); const v = (1.05 + .3*Math.sin(t*1.6 - k*.7))*f*chak; s.scale.set(v,v,1); s.visible = chak > .01; });
     if (H){ const le = DREAM.update(t, !!H.dr, H.drd || 0, H.v === undefined ? 1 : H.v);
             // спящий — приглушённый силуэт: иначе тысячи сложенных точек сливаются в белое пятно
-            if (H.dr){ kosha.material.uniforms.uProg.value *= .25; kund.material.uniforms.uProg.value *= .55; body.material.uniforms.uSolid.value = .8*le; aura.material.uniforms.uSolid.value = .8*le; } }
+            if (H.dr){ kosha.material.uniforms.uProg.value *= 1 - le; kund.material.uniforms.uProg.value *= 1 - le; body.material.uniforms.uSolid.value = .8*le; aura.material.uniforms.uSolid.value = .8*le; } }
   };
   upd.api = { focus(kind, idx){ fc = kind === "c" ? idx : -1; }, y: HM.chakraY, look(d, he, v){ LD = d; LH = he; LV = v; }, refTick:(dt, rc, act, probe, dive) => refsTick(refs, dt, rc, act, probe, dive), refs,
     spinePt(out){ const Rb = refs[2], w = Rb.pl.geometry.parameters.width; out.set((SPINE_UV[0] - .5)*w, (.5 - SPINE_UV[1])*w, 0); return Rb.pl.localToWorld(out); } };
@@ -2199,14 +2682,187 @@ const Music = (() => {
       pvTimer = setTimeout(fire, c.every*1000*(.6 + Math.random()*.9)); };
     pvTimer = setTimeout(fire, 900); }
 
+  /* ---- голоса станций (новый блок, этап 4, подэтап 11а) ------------------------------------------
+     У каждой станции — тихий фон из настоящих чисел (● / ◐) или честный символ (○) и короткая фраза
+     при прибытии. Фоны перетекают друг в друга; играют поверх пэда и колокольчиков. Тоники — по кругу
+     квинт (NOTES). Всё — синтез: несколько генераторов на станцию, без звуковых файлов. */
+  let vcur = null, vkey = "", vPend = 0, clickBuf = null;
+  const VVOL = .9;
+  function vOsc(f, type, g, dest, det){ const o = ac.createOscillator(); o.type = type || "sine"; o.frequency.value = f; if (det) o.detune.value = det;
+    const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(dest); o.start(); return { o, g: gg }; }
+  function vNoise(dest, g, type, freq, q){ const s = ac.createBufferSource(); s.buffer = noiseBuf(); s.loop = true;
+    const f = ac.createBiquadFilter(); f.type = type || "lowpass"; f.frequency.value = freq || 800; f.Q.value = q || .7;
+    const gg = ac.createGain(); gg.gain.value = g; s.connect(f); f.connect(gg); gg.connect(dest); s.start(); return { s, f, g: gg }; }
+  function vLfo(param, rate, depth){ const l = ac.createOscillator(), lg = ac.createGain(); l.frequency.value = rate; lg.gain.value = depth; l.connect(lg); lg.connect(param); l.start(); return l; }
+  function vGlide(t, f0, f1, dur, vol, type, dest, expo){
+    const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine";
+    o.frequency.setValueAtTime(f0, t); if (expo) o.frequency.exponentialRampToValueAtTime(f1, t + dur); else o.frequency.linearRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(.08, dur*.2)); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(dest || bus); o.start(t); o.stop(t + dur + .05); }
+  function vClick(t, vol, dest, pan){
+    if (!clickBuf){ const n = Math.floor(ac.sampleRate*.012); clickBuf = ac.createBuffer(1, n, ac.sampleRate); const d = clickBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/n, 6); }
+    const s = ac.createBufferSource(); s.buffer = clickBuf; const f = ac.createBiquadFilter(); f.type = "highpass"; f.frequency.value = 1800;
+    const g = ac.createGain(); g.gain.value = vol; const p = ac.createStereoPanner ? ac.createStereoPanner() : null;
+    s.connect(f); f.connect(g); if (p){ p.pan.value = pan || 0; g.connect(p); p.connect(dest || bus); } else g.connect(dest || bus); s.start(t); }
+  function vThump(t, f, vol, dest){ const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(f*1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + .06);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + .22);
+    o.connect(g); g.connect(dest || bus); o.start(t); o.stop(t + .25); }
+  // фоны: (k — тоника станции, out — выход фона) → { stop() }
+  const BED = {
+    // II · пластина Хладни: тон резонанса и медленные биения соседней моды
+    1: (k, out) => { const a = [vOsc(k*4, "sine", .045, out), vOsc(k*4*1.0035, "sine", .035, out), vOsc(k*4*2.3, "sine", .01, out)]; return { stop: () => a.forEach(x => x.o.stop()) }; },
+    // III · «звук Большого взрыва»: пики реликтового излучения ℓ ≈ 220 : 540 : 810 → 1 : 2,45 : 3,68, медленно сползают вниз, как в сонификации Уиттла
+    2: (k, out) => { const n = vNoise(out, .09, "lowpass", 240), r = [1, 2.45, 3.68], a = r.map((x, j) => vOsc(k/2*x, "sine", [.05, .028, .018][j], out, (Math.random() - .5)*8));
+      let up = true; const iv = setInterval(() => { const t = ac.currentTime; a.forEach((x, j) => x.o.frequency.setTargetAtTime(k/2*r[j]*(up ? .94 : 1), t, 9)); up = !up; }, 20000);
+      return { stop: () => { clearInterval(iv); n.s.stop(); a.forEach(x => x.o.stop()); } }; },
+    // IV · Галактика: искры сканируют небо слева направо — по мотивам сонификации центра Галактики (Chandra)
+    3: (k, out) => { const d = vOsc(k, "sine", .015, out); const p = ac.createStereoPanner ? ac.createStereoPanner() : null; if (p) p.connect(out);
+      const t0 = ac.currentTime; const iv = setInterval(() => { if (Math.random() < .55){ const t = ac.currentTime + .02, ph = ((t - t0)/12) % 1;
+        if (p) p.pan.setValueAtTime(ph*2 - 1, t); vGlide(t, k*4*Math.pow(2, PENTA[Math.floor(Math.random()*PENTA.length)]/12), k*4*Math.pow(2, PENTA[Math.floor(Math.random()*PENTA.length)]/12)*1.002, .9, .03 + Math.random()*.03, "sine", p || out); } }, 320);
+      return { stop: () => { clearInterval(iv); d.o.stop(); } }; },
+    // V · Солнце: пятиминутные колебания (≈ 3 мГц, шаг мод ≈ 135 мкГц), ускоренные так, что центр лёг на тонику: гул с биениями
+    4: (k, out) => { const sp = k/.0033, a = []; for (let j = -4; j <= 4; j++) a.push(vOsc((.0033 + j*.000135)*sp, "sine", .006 + Math.random()*.012, out));
+      const n = vNoise(out, .025, "lowpass", 180); return { stop: () => { a.forEach(x => x.o.stop()); n.s.stop(); } }; },
+    // VI · Земля: шумановский резонанс 7,83 Гц как пульс тона; вистлеры и «утренний хор» — естественное радио Земли в звуковом диапазоне
+    5: (k, out) => { const am = ac.createGain(); am.gain.value = .5; am.connect(out); const o = vOsc(k, "sine", .05, am); const l = vLfo(am.gain, 7.83, .45);
+      const iv = setInterval(() => { const t = ac.currentTime + .05, r = Math.random();
+        if (r < .35) vGlide(t, 5200, 1300, 1.1 + Math.random()*.5, .018, "sine", out, true);
+        else if (r < .55) for (let j = 0; j < 4; j++) vGlide(t + j*.17, 1700 + Math.random()*300, 3000 + Math.random()*600, .22, .008, "sine", out, true); }, 3200);
+      return { stop: () => { clearInterval(iv); o.o.stop(); l.stop(); } }; },
+    // VII · Человек: сердце ≈ 60 ударов в минуту и дыхание 6 раз в минуту (0,1 Гц) — ритм практики «дыхание сердца»
+    6: (k, out) => { const br = ac.createGain(); br.gain.value = .5; br.connect(out); const n = vNoise(br, .05, "bandpass", 700, .9); const l = vLfo(br.gain, .1, .5);
+      const iv = setInterval(() => { const t = ac.currentTime + .05; vThump(t, 52, .13, out); vThump(t + .28, 45, .08, out); }, 1000);
+      return { stop: () => { clearInterval(iv); n.s.stop(); l.stop(); } }; },
+    // VIII · Клетка: тонкий гул ≈ 1,6 кГц — колебания стенки дрожжевой клетки (Gimzewski, 2004, спорно) и стеклянный тон
+    7: (k, out) => { const tr = ac.createGain(); tr.gain.value = .6; tr.connect(out); const o = vOsc(k*2, "triangle", .03, tr); const l = vLfo(tr.gain, 4, .25);
+      const y = vOsc(1600, "sine", .0035, out); const l2 = vLfo(y.g.gain, .3, .002);
+      return { stop: () => { o.o.stop(); l.stop(); y.o.stop(); l2.stop(); } }; },
+    // IX · Атом: серия Бальмера водорода — 656,3 / 486,1 / 434,0 / 410,2 нм → частоты 1 : 1,350 : 1,512 : 1,600
+    8: (k, out) => { const a = BALMER.map((x, j) => vOsc(k*2*x, "sine", [.035, .022, .016, .012][j], out, (Math.random() - .5)*4)); return { stop: () => a.forEach(x => x.o.stop()) }; },
+    // X · Кванты: щелчки детектора в случайные моменты (процесс Пуассона, в среднем ~1,7 в секунду)
+    9: (k, out) => { const d = vOsc(k*2, "sine", .008, out); let tm = 0, live = true;
+      const next = () => { if (!live) return; vClick(ac.currentTime + .02, .07 + Math.random()*.05, out, Math.random()*1.6 - .8); tm = setTimeout(next, -Math.log(1 - Math.random())*600); }; next();
+      return { stop: () => { live = false; clearTimeout(tm); d.o.stop(); } }; },
+    // XI · Вакуум: шум с плывущим фильтром — символ флуктуаций (○)
+    10: (k, out) => { const n = vNoise(out, .04, "bandpass", 900, .6); const l = vLfo(n.f.frequency, .03, 700); return { stop: () => { n.s.stop(); l.stop(); } }; }
+  };
+  // ---- голоса ключевых слоёв (11б): ключ "jId:L" (для чёрной дыры — вся ветка) ----
+  const LBED = {
+    // ядро Солнца: g-моды — колебания самой глубины с периодами в часы; надёжно не обнаружены (◐)
+    "g4:11": (k, out) => { const am = ac.createGain(); am.gain.value = .5; am.connect(out); const a = [vOsc(k/4, "sine", .09, am), vOsc(k/4*1.5, "sine", .03, am)]; const l = vLfo(am.gain, .25, .4);
+      const n = vNoise(out, .05, "lowpass", 90); return { stop: () => { a.forEach(x => x.o.stop()); l.stop(); n.s.stop(); } }; },
+    // магнитосфера: «хор» — волны в радиационных поясах (Van Allen Probes) звучат прямо в звуковом диапазоне
+    "earth:2": (k, out) => { const iv = setInterval(() => { const t = ac.currentTime + .03; for (let j = 0; j < 3 + Math.floor(Math.random()*4); j++) vGlide(t + j*(.12 + Math.random()*.1), 1500 + Math.random()*500, 2800 + Math.random()*900, .2 + Math.random()*.1, .012, "sine", out, true); }, 900);
+      const n = vNoise(out, .02, "bandpass", 2200, 1.2); return { stop: () => { clearInterval(iv); n.s.stop(); } }; },
+    // ионосфера: шумановские резонансы 7,83 · 14,3 · 20,8 · 27,3 · 33,8 Гц, поднятые на 4 октавы (×16) — аккорд с настоящими отношениями
+    "earth:4": (k, out) => { const a = [7.83, 14.3, 20.8, 27.3, 33.8].map((f, j) => vOsc(f*16, "sine", [.04, .028, .02, .014, .01][j], out, (Math.random() - .5)*6));
+      const l = vLfo(out.gain, 7.83, .12); return { stop: () => { a.forEach(x => x.o.stop()); l.stop(); } }; },
+    // чёрная дыра: волны давления в скоплении Персея — си-бемоль на 57 октав ниже до первой октавы; подняты обратно (B♭3 ≈ 233 Гц)
+    "bh": (k, out) => { const f = 233.08, am = ac.createGain(); am.gain.value = .5; am.connect(out); const a = [vOsc(f/2, "sine", .07, am), vOsc(f, "sine", .04, am, 4), vOsc(f*1.5, "sine", .015, am, -5)];
+      const l = vLfo(am.gain, .18, .45); const n = vNoise(out, .04, "lowpass", 140); return { stop: () => { a.forEach(x => x.o.stop()); l.stop(); n.s.stop(); } }; },
+    // Луна · приливы: два прилива в сутки — период 12 ч 25 мин, сжатый до 12,4 секунды
+    "moon:2": (k, out) => { const sw = ac.createGain(); sw.gain.value = .5; sw.connect(out); const n = vNoise(sw, .08, "lowpass", 420); const l = vLfo(sw.gain, 1/12.4, .5);
+      return { stop: () => { n.s.stop(); l.stop(); } }; },
+    // Юпитер: декаметровое радиоизлучение — свисты и шорохи, которые слышали «Вояджеры» и «Юнона»
+    "jup:0": (k, out) => { const n = vNoise(out, .03, "bandpass", 1200, 1.5); const iv = setInterval(() => { const t = ac.currentTime + .03; if (Math.random() < .6) vGlide(t, 900 + Math.random()*1800, 400 + Math.random()*600, .5 + Math.random()*.8, .016, "sine", out, true); }, 700);
+      return { stop: () => { clearInterval(iv); n.s.stop(); } }; },
+    // Человек · органы: сердце крупным планом — 60 ударов в минуту, «тук-тук» клапанов
+    "human:7": (k, out) => { const iv = setInterval(() => { const t = ac.currentTime + .05; vThump(t, 48, .2, out); vThump(t + .3, 40, .13, out); }, 1000); return { stop: () => clearInterval(iv) }; },
+    // нейроны: потенциалы действия как щелчки — так нейрофизиологи слушают клетки через динамик (Хьюбел и Визел)
+    "human:10": (k, out) => { let live = true, tm = 0; const burst = () => { if (!live) return; const t = ac.currentTime + .02, n = Math.random() < .3 ? 4 + Math.floor(Math.random()*8) : 1;
+        for (let j = 0; j < n; j++) vClick(t + j*(.012 + Math.random()*.02), .05 + Math.random()*.04, out, Math.random()*1.2 - .6); tm = setTimeout(burst, -Math.log(1 - Math.random())*260); }; burst();
+      return { stop: () => { live = false; clearTimeout(tm); } }; },
+    // молекула: колебания воды — валентные 3657 и 3756 см⁻¹, деформационное 1595 см⁻¹ (≈ 10¹⁴ Гц), опущенные на ~40 октав
+    "g7:1": (k, out) => { const a = [1595, 3657, 3756].map((w, j) => vOsc(k*2*w/1595, "sine", [.04, .022, .016][j], out)); return { stop: () => a.forEach(x => x.o.stop()) }; },
+    // опыт с двумя щелями: каждый щелчок — частица на экране; высота — место попадания, выпавшее по картине интерференции
+    "g9:1": (k, out) => { let live = true, tm = 0; const P = x => Math.pow(Math.cos(x*9.4), 2)*Math.pow(Math.sin(x*3.1 + 1e-6)/(x*3.1 + 1e-6), 2);
+      const drop = () => { if (!live) return; let x; do { x = Math.random()*2 - 1; } while (Math.random() > P(x)); const t = ac.currentTime + .02;
+        vGlide(t, k*4*Math.pow(2, x*1.2), k*4*Math.pow(2, x*1.2), .18, .03, "sine", out); vClick(t, .04, out, x*.9); tm = setTimeout(drop, -Math.log(1 - Math.random())*380); }; drop();
+      return { stop: () => { live = false; clearTimeout(tm); } }; },
+    // сон · засыпание: альфа 10 Гц медленно сменяется тетой 6 Гц — ритм пульсации тона
+    "dream:0": (k, out) => { const am = ac.createGain(); am.gain.value = .5; am.connect(out); const o = vOsc(k, "sine", .045, am); const l = ac.createOscillator(), lg = ac.createGain(); l.frequency.value = 10; lg.gain.value = .4; l.connect(lg); lg.connect(am.gain); l.start();
+      let a = true; const iv = setInterval(() => { l.frequency.setTargetAtTime(a ? 6 : 10, ac.currentTime, 3); a = !a; }, 9000); return { stop: () => { clearInterval(iv); o.o.stop(); l.stop(); } }; },
+    // сон · быстрый сон: неровные всплески образов, глаза движутся под веками
+    "dream:1": (k, out) => { const d = vOsc(k, "sine", .02, out); const iv = setInterval(() => { if (Math.random() < .5){ const t = ac.currentTime + .03; bell(k*2*Math.pow(2, PENTA[Math.floor(Math.random()*PENTA.length)]/12), t, .1); } }, 650);
+      return { stop: () => { clearInterval(iv); d.o.stop(); } }; },
+    // сон · глубокий: дельта-волны ≈ 1 Гц — медленное дыхание тишины
+    "dream:3": (k, out) => { const am = ac.createGain(); am.gain.value = .5; am.connect(out); const a = [vOsc(k/2, "sine", .07, am), vOsc(k, "sine", .02, am)]; const l = vLfo(am.gain, 1, .45);
+      return { stop: () => { a.forEach(x => x.o.stop()); l.stop(); } }; }
+  };
+  LBED["dream:2"] = LBED["dream:1"];
+  // ---- «Биосфера»: тихие фоны эпох (ключ "bio:<среда>"), всё — синтез ----
+  function vSwell(out, g, f, rate){ const sw = ac.createGain(); sw.gain.value = .5; sw.connect(out); const n = vNoise(sw, g, "lowpass", f); const l = vLfo(sw.gain, rate || .09, .45); return { stop: () => { n.s.stop(); l.stop(); } }; }
+  function vEvery(ms, fn){ let live = true, tm = 0; const go = () => { if (!live) return; if (on && !omOn) fn(ac.currentTime + .03); tm = setTimeout(go, ms*(.5 + Math.random())); }; tm = setTimeout(go, ms*.5); return () => { live = false; clearTimeout(tm); }; }
+  const BIOBED = {
+    rock: (k, out) => { const n = vNoise(out, .05, "lowpass", 110), d = vOsc(k/4, "sine", .03, out); return { stop: () => { n.s.stop(); d.o.stop(); } }; },
+    hadean: (k, out) => { const n = vNoise(out, .09, "lowpass", 90), d = vOsc(k/4, "sawtooth", .006, out), c = vEvery(700, t => { for (let j = 0; j < 2 + Math.floor(Math.random()*4); j++) vClick(t + j*.05*Math.random(), .03 + Math.random()*.03, out, Math.random()*1.6 - .8); });
+      const m = vEvery(9000, t => vGlide(t, 1400, 300, 1.4, .02, "sine", out, true)); return { stop: () => { n.s.stop(); d.o.stop(); c(); m(); } }; },
+    archean: (k, out) => { const s = vSwell(out, .07, 320), d = vOsc(k/2, "sine", .02, out), b = vEvery(2600, t => { for (let j = 0; j < 3; j++) vGlide(t + j*.15, 90 + Math.random()*40, 60, .4, .03, "sine", out); }); return { stop: () => { s.stop(); d.o.stop(); b(); } }; },
+    goe: (k, out) => { const s = vSwell(out, .06, 360), d = vOsc(k/2, "sine", .018, out), b = vEvery(450, t => vGlide(t, 500 + Math.random()*500, 1100 + Math.random()*900, .12, .012, "sine", out, true)); return { stop: () => { s.stop(); d.o.stop(); b(); } }; },
+    cells: (k, out) => { const a = [vOsc(k*2, "sine", .016, out, -4), vOsc(k*3, "sine", .01, out, 5)], s = vSwell(out, .03, 500, .05), b = vEvery(3800, t => bell(k*4*Math.pow(2, PENTA[Math.floor(Math.random()*5)]/12), t, .05)); return { stop: () => { a.forEach(x => x.o.stop()); s.stop(); b(); } }; },
+    ice: (k, out) => { const w = vNoise(out, .07, "bandpass", 700, 1.4), l = vLfo(w.f.frequency, .06, 450), c = vEvery(7000, t => { vGlide(t, 140, 70, 1.2, .03, "triangle", out, true); vClick(t, .03, out, 0); }); return { stop: () => { w.s.stop(); l.stop(); c(); } }; },
+    mat: (k, out) => { const s = vSwell(out, .05, 280, .06), d = vOsc(k/2, "sine", .02, out), b = vEvery(5200, t => bell(k*2, t, .05)); return { stop: () => { s.stop(); d.o.stop(); b(); } }; },
+    sea: (k, out) => { const s = vSwell(out, .07, 420), b = vEvery(1600, t => { if (Math.random() < .5) vClick(t, .02, out, Math.random()*1.4 - .7); else vGlide(t, 300, 700, .18, .01, "sine", out, true); }); return { stop: () => { s.stop(); b(); } }; },
+    swamp: (k, out) => { const w = vNoise(out, .04, "bandpass", 1600, .8), z = vEvery(5000, t => { const o = ac.createOscillator(), g = ac.createGain(), am = ac.createOscillator(), ag = ac.createGain(); o.type = "sawtooth"; o.frequency.value = 160 + Math.random()*60; am.frequency.value = 24; ag.gain.value = .5; am.connect(ag); ag.connect(g.gain);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.008, t + .5); g.gain.exponentialRampToValueAtTime(.0001, t + 2.2); const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 900; o.connect(f); f.connect(g); g.connect(out); o.start(t); am.start(t); o.stop(t + 2.3); am.stop(t + 2.3); });
+      const d = vEvery(2200, t => vGlide(t, 1800, 900, .08, .012, "sine", out, true)); return { stop: () => { w.s.stop(); z(); d(); } }; },
+    desert: (k, out) => { const w = vNoise(out, .06, "bandpass", 900, .7), l = vLfo(w.f.frequency, .07, 600), l2 = vLfo(w.g.gain, .11, .03); return { stop: () => { w.s.stop(); l.stop(); l2.stop(); } }; }
+  };
+  ["reef", "coast", "shallow", "today"].forEach(w => BIOBED[w] = BIOBED.sea);
+  ["triassic", "savanna", "steppe", "field"].forEach(w => BIOBED[w] = BIOBED.desert);
+  BIOBED.forest = BIOBED.jungle = (k, out) => { const w = vNoise(out, .035, "bandpass", 1400, .7), l = vLfo(w.f.frequency, .05, 500), c = vEvery(1800, t => { for (let j = 0; j < 3; j++) vGlide(t + j*.09, 3200 + Math.random()*800, 2600 + Math.random()*600, .06, .006, "sine", out); }); return { stop: () => { w.s.stop(); l.stop(); c(); } }; };
+  BIOBED.taiga = BIOBED.forest; BIOBED.tundra = BIOBED.ice; BIOBED.ocean = BIOBED.sea;
+  BIOBED.deep = (k, out) => { const n = vNoise(out, .05, "lowpass", 70), d = vOsc(k/4, "sine", .022, out), p = vEvery(4200, t => { if (Math.random() < .6) bell(k*4*Math.pow(2, PENTA[Math.floor(Math.random()*PENTA.length)]/12), t, .05); else vGlide(t, 900, 400, 1.6, .008, "sine", out, true); });
+    return { stop: () => { n.s.stop(); d.o.stop(); p(); } }; };
+  BIOBED.meadow = (k, out) => { const w = vNoise(out, .03, "bandpass", 900, .7), b = vEvery(2600, t => { const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(); o.type = "sawtooth"; o.frequency.value = 220 + Math.random()*40; f.type = "bandpass"; f.frequency.value = 1100;
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.006, t + .4); g.gain.exponentialRampToValueAtTime(.0001, t + 1.8); o.connect(f); f.connect(g); g.connect(out); o.start(t); o.stop(t + 1.9); }); return { stop: () => { w.s.stop(); b(); } }; };
+
+  // фразы при прибытии
+  const PHR = {
+    1: (k, t) => vGlide(t, k*2, k*4, 1.6, .05, "triangle"),
+    2: (k, t) => { vGlide(t, k*16, k, 5, .025, "sawtooth"); vGlide(t + .2, k*12, k*.75, 5.2, .02, "triangle"); },
+    3: (k, t) => { for (let j = 0; j < 10; j++) bell(k*4*Math.pow(2, PENTA[j % PENTA.length]/12), t + j*.11, .22); },
+    4: (k, t) => bowl(k/2, t, 1.1),
+    5: (k, t) => vGlide(t, 5600, 1200, 1.6, .045, "sine", bus, true),
+    6: (k, t) => { for (let j = 0; j < 3; j++){ vThump(t + j*1, 52, .22); vThump(t + j*1 + .28, 45, .14); } },
+    7: (k, t) => { const C = "ATGGCCATTGTAATGGGCCGCTGAAAGGGT"; for (let j = 0; j < C.length; j++){ const d = "ACGT".indexOf(C[j]) + (j % 3 === 2 ? 2 : 0); bell(k*2*Math.pow(2, PENTA[d]/12), t + j*.16, .16); } },
+    8: (k, t) => { BALMER.forEach((x, j) => bell(k*2*x, t + j*.35, .32)); BALMER.forEach(x => bell(k*2*x, t + 1.8, .2)); },
+    9: (k, t) => { for (let j = 0; j < 9; j++) vClick(t + Math.random()*1.4, .12, bus, Math.random()*1.6 - .8); },
+    10: (k, t) => { const n = vNoise(bus, .0001, "bandpass", 600, .6); n.g.gain.exponentialRampToValueAtTime(.06, t + 1.2); n.g.gain.exponentialRampToValueAtTime(.0001, t + 3.5); n.f.frequency.exponentialRampToValueAtTime(2400, t + 3.5); setTimeout(() => n.s.stop(), 4000); },
+    11: (k, t) => bell(k*2, t, .25)
+  };
+  function vStart(key){
+    const parts = key.split(":"), kind = parts[0];
+    const out = ac.createGain(); out.gain.value = .0001; out.connect(bus);
+    let b = null;
+    if (kind === "bio"){ b = BIOBED[parts[1]] ? BIOBED[parts[1]](root, out) : null; }
+    else if (kind === "lv"){ const lk = parts[1] === "bh" ? "bh" : parts[1] + ":" + parts[2], J = JOURNEYS[parts[1]], k = NOTES[J ? J.st : 0]; b = LBED[lk] ? LBED[lk](k, out) : null; }
+    else { const i = +parts[1], k = NOTES[i] || root; b = BED[i] ? BED[i](k, out) : null; }
+    out.gain.setTargetAtTime(VVOL, ac.currentTime + .1, 1.2);
+    return { key, out, b };
+  }
+  function vStop(v){ if (!v) return; const t = ac.currentTime; v.out.gain.cancelScheduledValues(t); v.out.gain.setTargetAtTime(.0001, t, .9); setTimeout(() => { try { v.b && v.b.stop(); } catch(e){} v.out.disconnect(); }, 4500); }
+  function voiceSet(key, phrase){
+    if (!ac || !on || omOn){ if (vcur){ vStop(vcur); vcur = null; } vkey = key; return; }
+    if (key === (vcur && vcur.key)) return;
+    vStop(vcur); vcur = key ? vStart(key) : null; vkey = key;
+    const ps = String(key).split(":"), i = +ps[1];
+    if (phrase && ps[0] === "st" && PHR[i]) PHR[i](NOTES[i], ac.currentTime + 1.1);
+  }
   return {
     planet(c){ if (!ac) return; if (!c || !on || omOn){ planetStop(); return; } planetStart(c); },
     planetOn(){ return !!pvc; },
     toggle(v){ if (!ac) init(); on = v; clearTimeout(timer); if (!v) planetStop();
-      if (v){ ac.resume(); master.gain.setTargetAtTime(.85, ac.currentTime, 1.4); if (omOn) omSet(true); else bowl(root, ac.currentTime + .15); timer = setTimeout(tick, 1800); }
-      else { master.gain.setTargetAtTime(0, ac.currentTime, .5); clearTimeout(omTimer); } },
-    om(v){ if (v !== omOn) omSet(v); },
+      if (v){ ac.resume(); master.gain.setTargetAtTime(.85, ac.currentTime, 1.4); if (omOn) omSet(true); else bowl(root, ac.currentTime + .15); timer = setTimeout(tick, 1800); const k = vkey; vcur = null; if (k) voiceSet(k, false); }
+      else { master.gain.setTargetAtTime(0, ac.currentTime, .5); clearTimeout(omTimer); if (vcur){ vStop(vcur); vcur = null; } } },
+    om(v){ if (v !== omOn){ omSet(v); if (ac){ const k = vkey; if (v){ if (vcur){ vStop(vcur); vcur = null; } } else if (k) voiceSet(k, false); } } },
     station(i){ if (!ac){ root = NOTES[i]; return; } setRoot(NOTES[i]); if (on && !omOn) bowl(NOTES[i], ac.currentTime + .05, .9); },
+    // голос места: key — "st:i"; смена с паузой 0,3 с, чтобы быстрый пролёт по кольцу не дёргал звук
+    voice(key, phrase){ clearTimeout(vPend); vkey = key; vPend = setTimeout(() => voiceSet(key, phrase), 300); },
+    voiceKey(){ return vcur ? vcur.key : ""; },
+    vtest(i){ clearTimeout(vPend); voiceSet("st:" + i, true); },
+    // «Послушать» из Справочника: включает музыку и сразу ставит нужный голос (с фразой станции)
+    preview(key){ const sb = $("sound"); if (sb.getAttribute("aria-pressed") !== "true") sb.click(); clearTimeout(vPend); if (vcur && vcur.key === key){ vStop(vcur); vcur = null; } voiceSet(key, true); },
     portal(rise){ if (ac && on && !omOn) whoosh(ac.currentTime + .05, rise); },
     chime(){ if (ac && on && !omOn) bell(root*4, ac.currentTime + .02, .35); },
     tick(k){ if (ac && on && !omOn && ac.currentTime - (this._tk || -9) > .22){ this._tk = ac.currentTime; bell(root*2*Math.pow(2, PENTA[clamp(k, 0, 4) + 2]/12), ac.currentTime + .02, .14); } },
@@ -2214,6 +2870,12 @@ const Music = (() => {
     dive(){ if (ac && on && !omOn){ whoosh(ac.currentTime + .02, true); bowl(root*2, ac.currentTime + 1.1, .8); } },
     surface(){ if (ac && on && !omOn) whoosh(ac.currentTime + .02, false); },
     end(){ if (ac && on && !omOn) bowl(root, ac.currentTime + .02, 1.2); },
+    // «аккорд измерений»: каждая ступень добавляет голос — 1 · квинта · терция · септима · нона · ундецима (○ музыкальный образ)
+    dim(n){ if (!ac || !on || omOn) return; const t = ac.currentTime + .03;
+      if (!n){ bell(root*4, t, .3); return; }
+      [1, 1.5, 1.25, 1.875, 2.25, 2.667, 3].slice(0, n + 1).forEach((r, k) => bowl(root*r, t + k*.13, .75 - k*.06)); },
+    // вращение в новой плоскости слегка сдвигает тон: XY XZ YZ — ступени трезвучия, XW YW ZW — выше, «новое направление»
+    plane(k){ if (!ac || !on || omOn) return; bell(root*2*[1, 1.25, 1.5, 1.875, 2.25, 2.5][k], ac.currentTime + .02, .28); },
     // катарсис: диссонанс двойственности разрешается в чистое мажорное трезвучие (хрусталь/чаша)
     triad(){ if (!ac || !on) return; const t = ac.currentTime + .03; const f = root*2;
       bowl(f, t, 1.1); bowl(f*1.25, t + .09, .85); bowl(f*1.5, t + .18, .95); bell(f*2, t + .3, .5); }
@@ -2231,6 +2893,41 @@ function chars(el, text, base){
   });
 }
 function refade(el, text){ el.textContent = text; el.classList.remove("fade"); void el.offsetWidth; el.classList.add("fade"); }
+// ---------- журнал пройденного (новый блок, этап 3, подэтап 10б) ----------
+// Тихо и только в этом браузере: что открыто (станции, слои, события календаря, группы Древа, фигуры и мосты,
+// маршруты) — с числом посещений и датами; практики, доведённые до конца, — по дням. Читает «Моя астролябия».
+// Функции объявлены через function: их зовут из любых модулей, в том числе во время загрузки.
+var JR_DB = null, JR_T = 0;
+function jrLoad(){
+  if (JR_DB) return JR_DB;
+  try { JR_DB = JSON.parse(localStorage.getItem("astro-log") || "null"); } catch(e){}
+  if (!JR_DB || JR_DB.v !== 1) JR_DB = { v:1, seen:{}, prac:[], days:{} };
+  try { JSON.parse(localStorage.getItem("astro-visited") || "[]").forEach(i => { const k = "st:" + i; if (!JR_DB.seen[k] && ST[i]) JR_DB.seen[k] = { n: ST[i].short, c:1, f:0, l:0 }; }); } catch(e){}
+  return JR_DB;
+}
+function jrDay(t){ const d = new Date(t); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function jrSave(){ clearTimeout(JR_T); JR_T = setTimeout(() => { try { localStorage.setItem("astro-log", JSON.stringify(JR_DB)); } catch(e){} }, 400); }
+function jrMark(kind, id, name){
+  const db = jrLoad(), k = kind + ":" + id, now = Date.now(), e = db.seen[k];
+  if (e){ if (now - e.l < 60000) return; e.c++; e.l = now; if (name) e.n = name; if (!e.f) e.f = now; }
+  else db.seen[k] = { n: name || String(id), c:1, f: now, l: now };
+  const d = jrDay(now); db.days[d] = (db.days[d] || 0) + 1;
+  jrSave();
+}
+function jrPrac(id, name){
+  const db = jrLoad(), now = Date.now();
+  db.prac.push({ t: now, id, n: name }); if (db.prac.length > 400) db.prac.splice(0, db.prac.length - 400);
+  const d = jrDay(now); db.days[d] = (db.days[d] || 0) + 1;
+  jrSave();
+}
+function jrClear(){
+  JR_DB = { v:1, seen:{}, prac:[], days:{} };
+  try {
+    const rm = []; for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && k.startsWith("astro-") && k !== "astro-compass-invite") rm.push(k); }
+    rm.forEach(k => localStorage.removeItem(k));
+  } catch(e){}
+  visited.clear();
+}
 const visited = new Set();
 try { JSON.parse(localStorage.getItem("astro-visited") || "[]").forEach(v => visited.add(v)); } catch(e){}
 let shown = -2, tintTarget = new THREE.Color(TINT[0]);
@@ -2240,12 +2937,14 @@ function showStation(i){
   const s = ST[i];
   stEl.hidden = false; count.hidden = false;
   $("stNum").textContent = s.n;
+  { const vi = VOICE_INFO[i]; $("stSnd").innerHTML = `<span class="mono">♪ Голос станции</span> ${mk(vi.m)} ${esc(vi.h)}`; }
   chars($("stName"), s.name, 0);
   refade($("stSub"), s.sub); refade($("stLede"), LEDE[i]); refade($("stScale"), s.scale);
-  $("toHuman").hidden = i !== 6; $("toEarth").hidden = i !== 5; $("toBH").hidden = i !== 3;
+  $("toHuman").hidden = i !== 6; $("toEarth").hidden = i !== 5; $("toBH").hidden = i !== 3; $("toDims").hidden = i !== 0;
   count.innerHTML = String(i+1).padStart(2,"0") + "<small>из 12</small>";
-    Music.station(i);
+    Music.station(i); if (!humanOpen) Music.voice("st:" + i, true);
   visited.add(i); try { localStorage.setItem("astro-visited", JSON.stringify([...visited])); } catch(e){}
+  jrMark("st", i, s.short);
   miniMarks();
 }
 let shownPortal = -1;
@@ -2386,7 +3085,7 @@ function fillInterior(i){
       <span class="saved item" id="saved" aria-live="polite"></span></section>`, 0);
   inBody.scrollTop = 0;
   const jr = $("journal"); let jt;
-  jr.addEventListener("input", () => { clearTimeout(jt); jt = setTimeout(() => { try { localStorage.setItem("astro-journal-" + i, jr.value); $("saved").textContent = "Сохранено"; } catch(e){ $("saved").textContent = "Браузер не даёт сохранить"; } }, 500); });
+  jr.addEventListener("input", () => { clearTimeout(jt); jt = setTimeout(() => { try { localStorage.setItem("astro-journal-" + i, jr.value); localStorage.setItem("astro-journal-t-" + i, String(Date.now())); $("saved").textContent = "Сохранено"; } catch(e){ $("saved").textContent = "Браузер не даёт сохранить"; } }, 500); });
   clearInterval(timerId); timerId = null;
   $("tBtn").onclick = () => {
     if (timerId){ clearInterval(timerId); timerId = null; $("tBtn").textContent = "Продолжить"; return; }
@@ -2394,7 +3093,7 @@ function fillInterior(i){
     timerId = setInterval(() => { left--; $("tTime").dataset.left = left;
       $("tTime").textContent = String(Math.floor(left/60)).padStart(2,"0") + ":" + String(left % 60).padStart(2,"0");
       $("tRing").setAttribute("stroke-dashoffset", String(238.8*(1 - left/300)));
-      if (left <= 0){ clearInterval(timerId); timerId = null; $("tBtn").textContent = "Готово"; $("tTime").dataset.left = 300; Music.end(); } }, 1000);
+      if (left <= 0){ clearInterval(timerId); timerId = null; $("tBtn").textContent = "Готово"; $("tTime").dataset.left = 300; Music.end(); jrPrac("in:" + i, "Практика станции «" + ST[i].short + "»"); } }, 1000);
   };
   const pi = (i + 11) % 12, ni = (i + 1) % 12;
   $("inPrev").textContent = `← ${ST[pi].n} · ${ST[pi].short}`; $("inNext").textContent = `${ST[ni].n} · ${ST[ni].short} →`;
@@ -2649,6 +3348,7 @@ function renderChakraDetail(){
 function renderLevel(L){
   shownLevel = L;
   const v = JL[L]; if (!v) return;
+  jrMark("lv", jId + ":" + L, (JOURNEYS[jId].title || ST[jSt].short) + " · " + (v.kind === "kosha" ? DATA.koshas[v.k].name : (v.name || v.short || "")));
   // у веток станции свой заголовок: «Станция V · Юпитер и Европа», а не «… · Солнце»
   const stTag = `${ST[jSt].n} · ${JOURNEYS[jId].title || ST[jSt].short}`;
   $("hdEye").textContent = jKind === "g" ? `Станция ${stTag} · ${DATA.ring[jSt].scale}` : jKind === "e" || jKind === "a" ? `${stTag} · слой ${L + 1} из ${JL.length} · ${v.cat}${v.scale ? " · " + v.scale : ""}` : `${stTag} · слой ${L + 1} из ${JL.length} · ${L < 4 ? "тонкие тела" : L === 4 ? "энергетическая ось" : L < 9 ? "плотное тело" : "микромир · " + v.scale}`;
@@ -2707,7 +3407,7 @@ function renderLevel(L){
     name = v.name; sub = v.sub; hSel = -1; h = "";
   } else if (jKind === "e" || jKind === "a"){
     name = v.name; sub = v.sub; hSel = -1;
-    h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>` + (v.hint ? `<p class="mono hd-try">${esc(v.hint)}</p>` : "") + (jKind === "e" && JOURNEYS.earth.fork === L ? `<section class="hd-fork"><h3>Развилка пути</h3><button data-br="litho" aria-pressed="${earthBranch === "litho"}" data-hover><b>Литосфера</b><span>Океан, кора, мантия, ядро, железо → станция «Атом»</span></button><button data-br="bio" aria-pressed="${earthBranch === "bio"}" data-hover><b>Биосфера</b><span>Древо жизни → «Человек» → «Клетка» → «Атом»</span></button></section>` : "") + listHTML("Наука", v.sci) + listHTML("Традиции и философия", v.trad) + `<section><h3>Параллель с человеком</h3><p class="hd-par">${esc(v.par)}</p></section>` + listHTML("Практики", v.prac, "d t")  + `<p class="note">${mk("t")}<span>${jKind === "a" ? "Суперсимметрия и великое объединение — теоретические модели; рождение пар и заряды — наблюдаемые факты. Традиции говорят о том же рубеже языком опыта." : "Традиционные и эзотерические «поля» — язык опыта и символа; физические поля измеряются приборами. На карте они показаны рядом, но различаются метками."}</span></p>`;
+    h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p>` + (v.hint ? `<p class="mono hd-try">${esc(v.hint)}</p>` : "") + (jKind === "e" && JOURNEYS.earth.fork === L ? `<section class="hd-fork"><h3>Развилка пути</h3><button data-br="litho" aria-pressed="${earthBranch === "litho"}" data-hover><b>Литосфера</b><span>Океан, кора, мантия, ядро, железо → станция «Атом»</span></button><button data-br="bio" aria-pressed="${earthBranch === "bio"}" data-hover><b>Биосфера</b><span>Древо жизни → «Человек» → «Клетка» → «Атом»</span></button></section>` : "") + (jKind === "e" && v === BIO_LV ? `<section class="hd-fork"><h3>Ответвление</h3><button data-tree="1" data-hover><b>Древо жизни</b><span>4 млрд лет родства: от LUCA через растения, грибы и животных — к человеку</span></button><button data-biob="1" data-hover><b>Биосфера — учебник жизни</b><span>Пласты камня: 20 эпох и больше 140 существ, механизмы эволюции, основы биологии и биомы Земли</span></button></section>` : "") + listHTML("Наука", v.sci) + listHTML("Традиции и философия", v.trad) + `<section><h3>Параллель с человеком</h3><p class="hd-par">${esc(v.par)}</p></section>` + listHTML("Практики", v.prac, "d t")  + `<p class="note">${mk("t")}<span>${jKind === "a" ? "Суперсимметрия и великое объединение — теоретические модели; рождение пар и заряды — наблюдаемые факты. Традиции говорят о том же рубеже языком опыта." : "Традиционные и эзотерические «поля» — язык опыта и символа; физические поля измеряются приборами. На карте они показаны рядом, но различаются метками."}</span></p>`;
   } else if (v.kind === "kosha"){
     const k = DATA.koshas[v.k]; name = k.name; sub = k.ru;
     h = `<p class="hd-lead">${esc(k.what)}</p>
@@ -2724,8 +3424,20 @@ function renderLevel(L){
   }
   // ответвление «Сон и сознание» — с тонких тел и центров
   if (jKind === "h" && L <= 4) h += `<section><h3>Ответвление</h3><div class="hd-fork"><button data-go="dream" data-hover><b>Сон и изменённые состояния</b><span>Засыпание · сновидения · осознанный сон · глубокий сон и турия</span></button></div></section>`;
+  // «Лестница измерений» — с первого слоя «Абсолюта»: из точки-бинду
+  if (jId === "abs" && L === 0) h += `<section><h3>Ответвление</h3><div class="hd-fork"><button data-dims="0" data-hover><b>Лестница измерений</b><span>Из точки — в линию, плоскость, пространство и дальше: 0D → 6D</span></button></div></section>`;
+  // голос станции
+  { const lk = lvVoiceKey(jId, L), vi = lk ? LV_VOICE[lk] : VOICE_INFO[jSt]; if (vi) h += `<section class="hd-snd"><h3>Что вы слышите${lk ? " · голос слоя" : ""}</h3><p class="hd-par">${mk(vi.m)} <b>${esc(vi.h)}.</b> ${esc(vi.tx)}${$("sound").getAttribute("aria-pressed") === "true" ? "" : " <span class=\"hd-snd-off\">Включите «Музыку», чтобы услышать.</span>"}</p></section>`; }
+  { const lk = lvVoiceKey(jId, L); Music.voice(lk ? "lv:" + (lk === "bh" ? "bh:0" : lk) : "st:" + jSt, false); }
+  // «Нить мысли»: чьи идеи живут в этом месте кольца
+  try {
+    const ths = TH_FIG.filter(f => f.go.t === "j" && f.go.id === jId && (f.go.d || 0) === L).sort((a, b) => a.y - b.y);
+    if (ths.length) h += `<section class="hd-th"><h3>Нить мысли · идеи этого места</h3><div class="hd-thl">${ths.map(f => `<button data-th="${f.id}" class="${f.b}" data-hover>${esc(f.nm)}</button>`).join("")}</div></section>`;
+  } catch(e){}
   chars($("hdName"), name, 0); $("hdSub").textContent = sub;
-  hdBody.innerHTML = h; hdBody.scrollTop = 0;
+  hdBody.innerHTML = h;
+  hdBody.querySelectorAll("button[data-th]").forEach(b => b.onclick = () => openThought(b.dataset.th)); hdBody.scrollTop = 0;
+  hdBody.querySelectorAll("button[data-dims]").forEach(b => b.onclick = () => openDims(+b.dataset.dims));
   hdBody.classList.remove("swap"); void hdBody.offsetWidth; hdBody.classList.add("swap");
   hdBody.querySelectorAll(".hlist button").forEach(b => b.onclick = () => { hSel = hSel === +b.dataset.i ? -1 : +b.dataset.i; stations[6].api.focus("c", hSel); renderChakraDetail(); });
   renderChakraDetail();
@@ -2762,6 +3474,8 @@ function renderLevel(L){
   const sb = $("solBack"); if (sb) sb.onclick = () => solarSelect(-1);
   hdBody.querySelectorAll("#solList button").forEach(bt => bt.onclick = () => solarSelect(+bt.dataset.p));
   hdBody.querySelectorAll("button[data-go]").forEach(bt => bt.onclick = () => jGo(bt.dataset.go));
+  hdBody.querySelectorAll("button[data-tree]").forEach(bt => bt.onclick = () => openTree());
+  hdBody.querySelectorAll("button[data-biob]").forEach(bt => bt.onclick = () => { closeHuman(); openBio(); });
   const up = $("hdUp"), dn = $("hdDown");
   up.disabled = false; dn.disabled = false;
   up.textContent = SOLAR && SOLAR.sel >= 0 && jId === "g4" ? "↑ Вся система"
@@ -2792,7 +3506,7 @@ function openJourney(id){
   if (humanOpen && jId === id) return;
   if (tr || zm) return;
   if (humanOpen){ toggleMenu(false); flashTo(id, 0); return; }
-  closePath(); closeTime(); closeTree(); surface();
+  closePath(); closeTime(); closeTree(); closeThought(); surface();
   jHist = [];
   setJourney(id); goTo(jSt);
   // прямой вход в главу — с её «лицевого» слоя: у Галактики это сам диск, а не Ланиакея над ним
@@ -2804,7 +3518,7 @@ function openJourney(id){
   Music.dive();
 }
 const openEarth = () => openJourney("earth"), openHuman = () => openJourney("human");
-function closeHuman(){ if (!humanOpen) return; if (SOLAR){ SOLAR.sel = -1; Music.planet(null); } humanOpen = false; jHist = []; zoomEnd(); if (tr){ tr = null; $("loopFx").style.opacity = "0"; } chHuman.classList.remove("open"); chHuman.setAttribute("aria-hidden","true"); syncBtns(); stations[6].api.focus("c", -1); Music.om(false); Music.surface(); }
+function closeHuman(){ if (!humanOpen) return; if (SOLAR){ SOLAR.sel = -1; Music.planet(null); } humanOpen = false; jHist = []; zoomEnd(); if (tr){ tr = null; $("loopFx").style.opacity = "0"; } chHuman.classList.remove("open"); chHuman.setAttribute("aria-hidden","true"); syncBtns(); stations[6].api.focus("c", -1); Music.om(false); Music.surface(); if (shown >= 0) Music.voice("st:" + shown, false); }
 // переход вглубь следующей станции (dir = 1) или назад по пройденному пути (dir = −1)
 // переход вглубь в ответвление (Луна, Юпитер) — как обычный шаг вперёд по пути, со вспышкой
 // куда вернуться из ветки: глубина, на которой из неё ушли (иначе назад из Луны — сразу к ядру Земли)
@@ -2852,11 +3566,13 @@ function stDissolve(i){
 }
 function flashTo(to, dir){
   const soft = softPair(jId, to);
-  tr = { t:0, dir, to, from:jId, jumped:false, morph: morphPair(jId, to), soft,
+  // человек ↔ сон: одна станция, без вспышки — фигура сама рассыпается и собирается (dream.js)
+  const dreamTr = (jId === "human" && to === "dream") || (jId === "dream" && to === "human");
+  tr = { t:0, dir, to, from:jId, jumped:false, morph: morphPair(jId, to), soft, dreamTr,
          // глубина, на которой сцену Земли держат во время растворения. Назад мы приходим со стороны
          // «Атома», и depth там уже ушёл в минус — брать его нельзя, иначе Земля проступит глобусом
          eD: dir < 0 ? 15.2 : Math.min(Math.max(0, depth), 15.9), fe: dir > 0 ? 1 : 0, fg: dir > 0 ? 0 : 1, dip: 1 };
-  if (!soft){
+  if (!soft && !dreamTr){
     const c = FXC[JOURNEYS[to].st], fx = $("loopFx"), at = W < 760 ? "50% 28%" : "62% 50%";
     fx.style.background = to === "abs" ? "#fffdf8" : `radial-gradient(circle at ${at},rgba(255,250,240,.97),${c} 32%,rgba(20,18,40,.55) 70%,rgba(5,6,12,.35) 100%)`;
   }
@@ -2870,7 +3586,7 @@ function jumpRing(st, dir){
 function transitTick(dt, now){
   if (!tr) return;
   tr.t += dt;
-  const TJ = tr.soft ? .45 : .6;
+  const TJ = tr.dreamTr ? .05 : tr.soft ? .45 : .6;
   if (!tr.jumped && tr.t > TJ){
     tr.jumped = true;
     if (tr.dir > 0) jHist.push(jId); else if (tr.dir < 0) jHist.pop(); else jHist = [];
@@ -2897,9 +3613,9 @@ function transitTick(dt, now){
     tr.fg = tr.dir > 0 ? (tr.jumped ? inn : 0) : (tr.jumped ? out : 1);
     tr.dip = 1 - .94*smooth(0, .28, tr.t)*(1 - smooth(1.6, 2.3, tr.t));
   }
-  const lo = tr.soft ? 0 : (tr.t < .6 ? smooth(0, .6, tr.t) : 1 - smooth(.75, 2.2, tr.t));
+  const lo = tr.soft || tr.dreamTr ? 0 : (tr.t < .6 ? smooth(0, .6, tr.t) : 1 - smooth(.75, 2.2, tr.t));
   $("loopFx").style.opacity = String(lo);
-  if (tr.t > (tr.soft ? 2.4 : 2.2)){ if (tr.soft) softEnd(); tr = null; $("loopFx").style.opacity = "0"; }
+  if (tr.t > (tr.dreamTr ? .4 : tr.soft ? 2.4 : 2.2)){ if (tr.soft) softEnd(); tr = null; $("loopFx").style.opacity = "0"; }
 }
 /* ---------- переход-зум: натуральное приближение, без вспышки и подмены кадра ----------
    Для этих пар переход сделан как настоящий пролёт камеры внутрь: мы подлетаем к одной из точек
@@ -3031,6 +3747,33 @@ $("btnHuman").onclick = () => humanOpen && jKind === "h" ? closeHuman() : openHu
 $("btnEarth").onclick = () => humanOpen && jKind === "e" ? closeHuman() : openEarth();
 $("toEarth").onclick = openEarth;
 $("moonBtn").onclick = () => jGo("moon");
+// значок Луны — из частиц, как все объекты сайта: точки сферы, моря темнее, фаза — серп, свет справа
+(() => {
+  const cv = $("moonCv"), c = cv.getContext("2d"), mb = $("moonBtn"), N = 2200, P = [];
+  const MARIA = [[.35, .55, .42], [.2, -.1, .3], [-.25, .35, .28], [.05, .95, .22], [-.45, -.2, .2], [.6, -.35, .18]];   // [широта, долгота, радиус] морей
+  for (let i = 0; i < N; i++){ const y = Math.random()*2 - 1, r = Math.sqrt(1 - y*y), t = Math.random()*6.2832, x = Math.cos(t)*r, z = Math.sin(t)*r;
+    const lat = Math.asin(y), lon = Math.atan2(x, z); let alb = .9;
+    for (const [la, lo, rr] of MARIA){ const d = Math.acos(clamp(Math.sin(lat)*Math.sin(la) + Math.cos(lat)*Math.cos(la)*Math.cos(lon - lo), -1, 1)); if (d < rr) alb = Math.min(alb, .45 + .45*(d/rr)**2); }
+    P.push({ x, y, z, alb: alb*(.8 + .4*Math.random()), s: Math.random()*6.28, k: .6 + Math.random()*.8 }); }
+  const HALO = Array.from({ length: 90 }, () => { const a = Math.random()*6.2832, r = 1.08 + Math.random()*.32; return [Math.cos(a)*r, Math.sin(a)*r, Math.random()*6.28]; });
+  let hov = 0; mb.addEventListener("pointerenter", () => hov = 1); mb.addEventListener("pointerleave", () => hov = 0);
+  let h = 0, last = 0;
+  (function draw(t){ requestAnimationFrame(draw);
+    if (!mb.classList.contains("on")) return;
+    const dt = Math.min(.1, (t - last)/1000 || 0); last = t; h += (hov - h)*Math.min(1, dt*4);
+    const W = cv.width, R = W*.4, cx = W/2, cy = W/2, a = t/1000*.08, ca = Math.cos(a), sa = Math.sin(a);
+    c.clearRect(0, 0, W, W);
+    const g = c.createRadialGradient(cx, cy, R*.85, cx, cy, W*.49); g.addColorStop(0, `rgba(235,226,200,${.08 + .07*h})`); g.addColorStop(1, "rgba(235,226,200,0)"); c.fillStyle = g; c.beginPath(); c.arc(cx, cy, W*.49, 0, 6.2832); c.fill();
+    for (const [hx, hy, hs] of HALO){ const al = .12 + .1*Math.sin(t/1000*.9 + hs) + .1*h; if (al <= 0) continue; c.fillStyle = `rgba(240,228,196,${al})`; c.beginPath(); c.arc(cx + hx*R, cy + hy*R, W/150, 0, 6.2832); c.fill(); }
+    const L = [.86, .18, .47];                                   // направление на Солнце — серп справа
+    for (const p of P){ const x = p.x*ca + p.z*sa, z = -p.x*sa + p.z*ca, y = p.y; if (z < 0) continue;
+      const lam = Math.max(0, x*L[0] + y*L[1] + z*L[2]), earth = .05, b = (lam*lam*.9 + earth)*p.alb*(.85 + .15*Math.sin(t/1000*1.3 + p.s))*(1 + .35*h);
+      if (b < .03) continue;
+      const lum = Math.min(1, b*1.25), rr = (.55 + .8*Math.min(1, b))*p.k*W/120;
+      c.fillStyle = `rgba(${245*lum + 10|0},${238*lum + 8|0},${220*lum + 6|0},${Math.min(1, .25 + b)})`;
+      c.beginPath(); c.arc(cx + x*R, cy - y*R, rr, 0, 6.2832); c.fill(); }
+  })(0);
+})();
 // ветка «Чёрная дыра»: с кольца — сначала страница Галактики, затем сразу полёт к ядру
 function openBH(){
   galBranch = "bh";
@@ -3055,6 +3798,7 @@ $("toBH").onclick = openBH;
 $("mBH").onclick = () => { toggleMenu(false); openBH(); };
 $("btnIz").onclick = () => izEnter(false);
 $("toHuman").onclick = openHuman;
+$("toDims").onclick = () => openDims(0);
 addEventListener("resize", () => { if (humanOpen){ drawDepth(); depthMark(); } });
 addEventListener("wheel", e => {
   if (!humanOpen || menuOpen) return;
@@ -3092,11 +3836,11 @@ $("stages").innerHTML = DATA.stages.map((s, k) => `
     <dl><dt>Узнать</dt><dd>${esc(s.know)}</dd><dt>Почувствовать</dt><dd>${esc(s.prac)}</dd><dt>Прожить</dt><dd>${esc(s.life)}</dd><dt>Осмыслить</dt><dd class="qq">${esc(s.q)}</dd></dl>
   </article>`).join("");
 $("stages").querySelectorAll(".go").forEach(b => b.onclick = () => { const k = +b.dataset.k; closePath(); if (k === 4) openHuman(); else pendingDive = {i:STAGE_ST[k], moved:false}; });
-function openPath(){ closeHuman(); closeTime(); closeTree(); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
+function openPath(){ closeHuman(); closeTime(); closeTree(); closeThought(); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
 $("pathClose").onclick = closePath;
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
-function closeChapters(){ closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); }
+function closeChapters(){ closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeRouteList(); }
 __CHRONO__
 
 /* ---------- Справочник ---------- */
@@ -3132,14 +3876,46 @@ function renderSourcesHTML(){
 }
 const REF = { guide: REF_GUIDE, rosetta: null, principles: null, sources: null };
 const chRef = $("chRef"), refBody = $("refBody"); let refOpen = false;
+function renderSoundsHTML(){
+  const row = (key, vi, tag) => `<li class="snd-it"><button class="snd-play" data-snd="${key}" aria-label="Послушать: ${esc(vi.h)}" data-hover>▶</button><div><span class="mono">${tag}</span><b>${esc(vi.h)}</b> ${mk(vi.m)}<p>${esc(vi.tx)}</p></div></li>`;
+  const ly = Object.entries(LV_VOICE).filter(([k]) => k !== "dream:2").map(([k, vi]) => { const [j, L] = k === "bh" ? ["bh", 0] : k.split(":"), J = JOURNEYS[j];
+    const nm = (J.title || ST[J.st].short) + (k === "bh" ? " · ветка" : " · слой " + (+L + 1)); return row("lv:" + (k === "bh" ? "bh:0" : k), vi, nm); }).join("");
+  return `<section class="ref-sec"><h2>Звуки кольца</h2>
+    <p class="lede">У каждой станции — свой тихий голос. Где можно, он собран из настоящих чисел: спектров, частот, ритмов, перенесённых в слышимый диапазон (${mk("s")}). Где это синтез по мотивам чужих сонификаций — ${mk("h")}. Где числа нет — честный символ (${mk("t")}). Голоса звучат поверх фоновой музыки, когда включена кнопка «Музыка», и перетекают друг в друга, пока вы идёте по кольцу.</p>
+    <h3>Станции</h3><ul class="snd-list">${ST.map((st, i) => row("st:" + i, VOICE_INFO[i], st.n + " · " + st.short)).join("")}</ul>
+    <h3>Голоса слоёв</h3><ul class="snd-list">${ly}</ul>
+    <h3>Аккорд измерений</h3>
+    <p>В «Лестнице измерений» каждая ступень добавляет к аккорду голос: точка — тихий колокольчик, линия — основной тон и квинта, плоскость — терция, пространство — септима, дальше — нона и ундецима. Это музыкальный образ ${mk("t")}, а не физика: так слышно, как мир «наполняется» направлениями.</p>
+    <ul class="snd-list">${["Точка", "Линия", "Плоскость", "Пространство", "Тессеракт", "Свёрнутое измерение", "Калаби — Яу"].map((nm, n) => `<li class="snd-it"><button class="snd-play" data-dim="${n}" aria-label="Послушать аккорд ступени ${n}D" data-hover>▶</button><div><span class="mono">${n}D</span><b>${esc(nm)}</b><p>${n ? (n + 1) + " голос" + (n + 1 < 5 ? "а" : "ов") + " аккорда" : "одинокий колокольчик"}</p></div></li>`).join("")}</ul>
+    <h3>Почему тональности идут по кругу квинт</h3>
+    <p>Каждой станции дана своя тоника: C, G, D, A, E, B, F♯, C♯, G♯, D♯, A♯, F — каждая следующая на квинту выше. Соседние станции созвучны, и путь по кольцу звучит как модуляция, которая на «Абсолюте» возвращается к началу. ${mk("t")} Это музыкальный выбор, а не физика.</p>
+    <p>Честная деталь: двенадцать «чистых» квинт (3 : 2) не замыкают круг. (3/2)¹² ≈ 129,75, а семь октав — ровно 128; лишние ≈ 23 цента называют пифагоровой коммой. ${mk("s")} Чтобы круг сомкнулся, современный строй делит октаву на 12 равных шагов — так звучит и это кольцо.</p>
+    <h3>Мифы о частотах — бережно</h3>
+    <ul class="snd-myth">
+      <li><b>«432 Гц — природный строй, 440 Гц вреден».</b> ${mk("t")} Высота «ля» веками гуляла примерно от 400 до 460 Гц; Верди в 1880-х выступал за строй около 432 Гц, а 440 Гц договорились считать стандартом в XX веке (ISO 16, 1975). Разница — около трети полутона. Надёжных данных, что 432 Гц особым образом влияет на тело или «резонирует со Вселенной», нет: есть лишь маленькие пилотные работы. Строй — договорённость, а не закон природы.</li>
+      <li><b>«У каждой чакры своя частота в герцах».</b> ${mk("t")} В классических тантрических текстах центрам сопоставлены звуки — биджа-слоги ЛАМ, ВАМ, РАМ, ЯМ, ХАМ, ОМ, — а не частоты: сама мера «герц» появилась в XIX–XX веках. Списки «частот чакр» — современные авторские схемы, у разных авторов разные.</li>
+      <li><b>«Сольфеджио 528 Гц чинит ДНК».</b> ${mk("t")} Набор «частот сольфеджио» придуман в 1990-х (Дж. Пулео, Л. Горовиц). Средневековые слоги ут-ре-ми (Гвидо д’Ареццо, XI век) означали ступени, а не герцы — абсолютной высоты тогда не измеряли. Рецензированных данных о «ремонте ДНК» звуком нет.</li>
+      <li><b>«Резонанс Шумана растёт, и мы вместе с ним».</b> ${mk("t")} Основная частота держится около 7,8 Гц и чуть колеблется вместе с ионосферой. То, что она близка к альфа-ритму мозга (8–12 Гц), — красивое совпадение ${mk("h")}, а не доказанная связь.</li>
+    </ul>
+    <h3>Что в звуке действительно работает</h3>
+    <ul class="snd-myth">
+      <li>${mk("s")} Медленное дыхание около 6 раз в минуту повышает вариабельность сердечного ритма — на этом построена практика «дыхание сердца».</li>
+      <li>${mk("s")} Гудение с закрытым ртом («ммм», как в конце ОМ) примерно в 15 раз повышает оксид азота в носовых пазухах (Вайцберг и Лундберг, 2002).</li>
+      <li>${mk("s")} Музыка снижает тревогу, например перед операцией: эффект умеренный, но повторяется в мета-анализах.</li>
+      <li>${mk("s")} Тишина тоже звук: двухминутные паузы между музыкой успокаивали дыхание и пульс сильнее самой расслабляющей музыки (Бернарди и соавт., 2006).</li>
+    </ul></section>`;
+}
 function renderRefTab(tab){
   if (tab === "rosetta" && !REF.rosetta) REF.rosetta = renderRosettaHTML();
   if (tab === "principles" && !REF.principles) REF.principles = renderPrinciplesHTML();
   if (tab === "sources" && !REF.sources) REF.sources = renderSourcesHTML();
+  if (tab === "sounds") REF.sounds = renderSoundsHTML();
   refBody.innerHTML = REF[tab];
+  if (tab === "sounds") refBody.querySelectorAll("[data-dim]").forEach(b => b.onclick = () => { const sb = $("sound"); if (sb.getAttribute("aria-pressed") !== "true") sb.click(); setTimeout(() => Music.dim(+b.dataset.dim), 350); });
+  if (tab === "sounds") refBody.querySelectorAll("[data-snd]").forEach(b => b.onclick = () => { refBody.querySelectorAll("[data-snd]").forEach(x => x.classList.toggle("on", x === b)); Music.preview(b.dataset.snd); });
   document.querySelectorAll(".reftab").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
 }
-function openRef(tab){ closeHuman(); closePath(); closeTime(); closeTree(); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
+function openRef(tab){ closeHuman(); closePath(); closeTime(); closeTree(); closeThought(); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
 function closeRef(){ if (!refOpen) return; refOpen = false; chRef.classList.remove("open"); chRef.setAttribute("aria-hidden","true"); }
 $("mRef").onclick = () => { toggleMenu(false); openRef("guide"); };
 $("refClose").onclick = closeRef;
@@ -3151,7 +3927,7 @@ document.querySelectorAll(".reftab").forEach(b => b.onclick = () => renderRefTab
   let timer = null, n = 0, inhale = false;
   function tick(){
     inhale = !inhale;
-    if (inhale){ n++; if (n > 30){ stop(); ph.textContent = "Готово"; return; } Music.chime(); }
+    if (inhale){ n++; if (n > 30){ stop(); ph.textContent = "Готово"; jrPrac("breath", "Дыхание сердца"); return; } Music.chime(); }
     orb.classList.toggle("in", inhale); ph.textContent = inhale ? "Вдох" : "Выдох"; cnt.textContent = `${n} из 30 дыханий`;
   }
   function stop(){ clearInterval(timer); timer = null; orb.classList.remove("in"); btn.textContent = "Начать 5 минут"; inhale = false; }
@@ -3195,8 +3971,8 @@ function ringS(u){ const cyc = Math.floor(u/14), m = u - cyc*14; let s;
 const bell = (x, c) => smooth(c - .85, c - .25, x)*(1 - smooth(c + .25, c + .85, x));
 
 let target = -1, pos = -1, vel = 0, lastInput = 0, travel = false;
-let timeOn = false, treeOn = false;                                   // открыт «Космический календарь» (chrono.js)
-const locked = () => timeOn || treeOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
+let timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false;                                   // открыт «Космический календарь» (chrono.js)
+const locked = () => timeOn || treeOn || thoughtOn || compassOn || mineOn || dimsOn || bioOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
 function goTo(i){
   const u = uOfStation(i);
   if (pos < -.5) target = u;
@@ -3307,7 +4083,7 @@ function loop(now){
   if (IZ.opaque){ last = now; requestAnimationFrame(loop); return; }
   const dt = Math.min(.05, (now - last)/1000); last = now; T += dt; U.time.value = T;
   if (now - lastInput > 420){
-    if (target > -.5) target += (Math.round(target) - target)*Math.min(1, dt*3);
+    if (target > -.5){ target += (Math.round(target) - target)*Math.min(1, dt*3); if (Math.abs(target - Math.round(target)) < 1e-3) target = Math.round(target) + 0; }
     else target += ((target < -.75 ? -1 : 0) - target)*Math.min(1, dt*3);
   }
   transitTick(dt, now);
@@ -3415,7 +4191,7 @@ function loop(now){
   const stNow = pos < -.5 ? -1 : stopOf(mod(Math.round(pos), 14)).st;
   if (stNow !== lastHoverI){ lastHoverI = stNow === undefined ? -1 : stNow; atStationSince = T; }
   hoverI = -1;
-  const canRing = !menuOpen && !humanOpen && !pathOpen && diveT === 0 && pos >= 0 && k < .05 && Math.abs(target - pos) < .05 && frac0 < .08 && stNow !== undefined;
+  const canRing = !menuOpen && !humanOpen && !pathOpen && diveT === 0 && pos > -.5 && k < .05 && Math.abs(target - pos) < .05 && frac0 < .08 && stNow !== undefined;
   const canInside = insideOpen && diveT > .95;
   const testI = canInside ? diveSt : (canRing ? stNow : -1);
   const probe = pointerIn || tapPending || (armed >= 0 && now < armedUntil);

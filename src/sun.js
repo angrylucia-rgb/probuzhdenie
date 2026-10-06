@@ -413,6 +413,8 @@ function makeSunDive(parent){
 
   /* 11 · ядро: протон-протонный цикл, разыгранный по шагам */
   const CORE = makeFusion(put, UP);
+  // курсор не должен мять реакцию: точки ядра — тоже в HOV (толчок обнуляется, остаётся лишь лёгкая подсветка)
+  LM[11].forEach(m => { if (m.uniforms && m.uniforms.uPush) HOV.push(m); });
 
   const api = {
     // d — глубина внутри станции V (1 — звезда целиком, 11 — ядро)
@@ -470,7 +472,7 @@ function makeFusion(put, UP){
   geo.setAttribute("aSize", new THREE.BufferAttribute(siz, 1));
   geo.setAttribute("aSeed", new THREE.BufferAttribute(sed, 1));
   geo.setAttribute("aRnd", new THREE.BufferAttribute(rnd, 3));
-  const mat = pmat(`a = aSize > 0.01 ? 0.98*uSharp : 0.0; s *= 1.9;`);
+  const mat = pmat(`a = aSize > 0.01 ? 0.98*uSharp : 0.0; s *= 1.9; { vec3 dvq = p - uCur; float ddq = length(dvq); float infq = uHov*exp(-ddq*ddq/(uRad*uRad)); a /= 1.0 + infq*1.4; s /= 1.0 + infq*0.6; }`);
   const P4 = new THREE.Points(geo, mat); P4.frustumCulled = false;
 
   // фон: горячая плотная плазма ядра
@@ -478,7 +480,7 @@ function makeFusion(put, UP){
       o.p = [v[0]*r*1.05, v[1]*r*1.05, v[2]*r*1.05];
       o.c = mixc(C(0xfff2d0), C(0xff9a3a), Math.random()); o.s = .5 + Math.random()*.7; },
     `p = position*(1.0 + 0.01*sin(uTime*4.0 + aSeed*80.0));
-     a = (0.07 + 0.16*fract(aSeed*29.0))*uSharp;`);
+     a = (0.07 + 0.16*fract(aSeed*29.0))*uSharp; { vec3 dvq = p - uCur; float ddq = length(dvq); float infq = uHov*exp(-ddq*ddq/(uRad*uRad)); a /= 1.0 + infq*1.4; s /= 1.0 + infq*0.6; }`);
   put(11, bg); put(11, P4);
 
   // подписи: без них цепочка читается как танец точек, а с ними — как реакция

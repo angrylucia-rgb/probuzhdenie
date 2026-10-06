@@ -118,7 +118,7 @@ const makeBodyDive = g => {
   // 2 · Приливы: горбы океана тянутся к Луне и чуть опережают её; Луна повёрнута к Земле одной стороной
   const m2 = layer();
   const sys2 = new THREE.Group(); sys2.rotation.x = .62; m2.add(sys2);
-  const earth2 = P(bSphere(5000, 1.3, S_CHUNK.ear)); sys2.add(earth2);
+  const earth2 = P(bSphere(12000, 1.3, S_CHUNK.ear)); sys2.add(earth2);
   const W_M = .32;                                      // угловая скорость Луны на слое (рад/с)
   const bulge = P(pts(4200*Q, (i, o, n) => { o.p = fib(i, n); o.c = C(0x4fa0ff); o.s = .55; },
     `vec3 n = normalize(position);
@@ -132,8 +132,8 @@ const makeBodyDive = g => {
   const moon2 = new THREE.Group(); sys2.add(moon2);
   const moon2s = P(bSphere(2200, .5, B_MOON)); moon2.add(moon2s);
   const face = Sp(glow(0xffd88a, .32, .9)); moon2.add(face);
-  m2.add(L("Земля и её приливные горбы", 0, -2.45, 0, .5));
-  const lblRec = L("Луна удаляется на 3,8 см в год", 0, 2.75, 0, .5); m2.add(lblRec);
+  // тихая подсказка снизу; цифра «3,8 см в год» уже есть в описании слоя — на сцене её не дублируем
+  { const l = haloLabel("Земля и её приливные горбы", .27, "#E6DAC0"); l.position.set(0, -2.3, 0); l.userData.b = .5; SP.push(l); m2.add(l); }
 
   // 3 · Фазы: восемь видов Луны по кругу, как их видно с Земли; подсвечена текущая
   const m3 = layer();

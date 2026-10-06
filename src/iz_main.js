@@ -1,7 +1,7 @@
 // «Изнанка» внутри Астролябии. Своё полотно WebGL2 поверх всей страницы и свой цикл кадров;
 // создаётся при первом входе, между входами спит. Логика кадра — та же, что в самостоятельной v3 (main.js):
 // ввод → разрыв реальности → сердце мира → звук и свет. Выход — двойное касание или Esc.
-let canvas = null, hint = null, exitBtn = null, vis = null, input = null, unbind = null, running = false, raf = 0, onExit = null;
+let canvas = null, hint = null, exitBtn = null, dimsBtn = null, vis = null, input = null, unbind = null, running = false, raf = 0, onExit = null;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let storage = null; try { storage = localStorage; } catch (e) { /* нет хранилища */ }
 const ws = createWorldState();
@@ -41,7 +41,11 @@ function mount() {
   exitBtn.type = 'button'; exitBtn.className = 'izexit'; exitBtn.setAttribute('aria-label', 'Выйти из Изнанки');
   exitBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
   exitBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
-  document.body.append(canvas, hint, exitBtn);
+  // ступени выше нашего мира — отсюда, из «Изнанки», вход в «Лестницу измерений» (4D–6D)
+  dimsBtn = document.createElement('button');
+  dimsBtn.type = 'button'; dimsBtn.className = 'izdims'; dimsBtn.textContent = '4D · 5D · 6D →'; dimsBtn.setAttribute('aria-label', 'Высшие измерения: Лестница измерений');
+  dimsBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); setTimeout(() => { try { openDims(4); } catch (er) {} }, 1300); });
+  document.body.append(canvas, hint, exitBtn, dimsBtn);
   try { vis = createVisualEngine(canvas); } catch (e) { vis = null; }
   input = createInputTracker({ stillnessSec: 240 });
   canvas.addEventListener('pointerdown', enter);
@@ -65,7 +69,7 @@ function open(opts = {}) {
   // из-за горизонта приходим в полную темноту — полотно сразу непрозрачно, плазма проявляется из черноты;
   // из меню полотно само наплывает поверх Астролябии
   canvas.style.transition = opts.fromBlack ? 'none' : 'opacity 1.2s ease';
-  canvas.style.display = 'block'; hint.style.display = 'block'; exitBtn.style.display = 'flex';
+  canvas.style.display = 'block'; hint.style.display = 'block'; exitBtn.style.display = 'flex'; dimsBtn.style.display = 'block';
   if (opts.fromBlack) canvas.style.opacity = '1'; else requestAnimationFrame(() => { canvas.style.opacity = '1'; });
   unbind = bindInput(canvas, input, close);
   entered = false; intro = 1; hint.classList.remove('gone');
@@ -86,7 +90,7 @@ function close() {
     // Астролябия возвращается под полотном, пока оно гаснет: так выход читается как всплытие, а не как смена страницы
     if (onExit) onExit();
     canvas.style.transition = 'opacity 1.1s ease'; canvas.style.opacity = '0';
-    setTimeout(() => { running = false; cancelAnimationFrame(raf); canvas.style.display = 'none'; hint.style.display = 'none'; exitBtn.style.display = 'none'; audio.suspend(); if (unbind) unbind(); unbind = null; }, 1150);
+    setTimeout(() => { running = false; cancelAnimationFrame(raf); canvas.style.display = 'none'; hint.style.display = 'none'; exitBtn.style.display = 'none'; dimsBtn.style.display = 'none'; audio.suspend(); if (unbind) unbind(); unbind = null; }, 1150);
   }, 1500);
 }
 document.addEventListener('visibilitychange', () => { if (!running) return; document.hidden ? audio.suspend() : audio.resume(); });

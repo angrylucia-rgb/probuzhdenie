@@ -62,6 +62,15 @@ const CHR = (() => {
   const CAT = { cos:["Космос","159,180,255"], ear:["Земля и жизнь","143,224,176"], hum:["Становление человека","255,182,120"], civ:["История","255,216,138"], spi:["Мысль, дух и наука","255,159,207"] };
   const CATK = ["cos","ear","hum","civ","spi"];
   const EV = CHR_EV.slice().sort((a, b) => b.ago - a.ago);   // события — в chrono_events.js
+  // события жизни → узел Древа жизни (кнопка «В Древе жизни»)
+  // событие → фигура «Нити мысли»
+  const EV2TH = { veda:"rig", upan:"upa", pyth:"pyt", confu:"lao", buddha:"bud", socr:"pla", plotin:"plo", rumi:"rum", coper:"cop", galileo:"gal",
+    newton:"new", darwin:"dar", mendel:"men", quant:"ein", hubble:"lem", dna:"dna", ligo:"lig" };
+  const EV2TREE = { life:"luca", photo:"cyano", goe:"cyano", euk:"euk", boring:"euk", multi:"red", ediac:"edia", camb:"bil", burgess:"arth", land:"land",
+    ordo:"trilo", jaws:"gnath", insect:"insect", forest:"vasc", tetra:"tetra", devon:"placo", carbon:"lyco", amniote:"amn", perm:"trilo", dino:"dino",
+    mamm:"mam", trj:"archo", archae:"birds", flower:"angio", kpg:"dino", primate:"prim", whale:"whale", apes:"hom", homin:"hominin", ardi:"hominin",
+    laetoli:"austr", tools:"austr", lucy:"austr", homo:"homo", erectus:"erect", fire:"homo", neand:"neand", sap:"sap", neandx:"neand", dog:"carn", agri:"grass" };
+  const TREE_NAME = id => { const r = TREE_ROWS.find(x => x[0] === id); return r ? r[2].replace(" — общий предок", "") : id; };
   const STN = { g1:"Первоимпульс", g2:"Вселенная", g3:"Галактика", bh:"Чёрная дыра", g4:"Солнечная система", earth:"Земля", moon:"Луна", human:"Человек", g7:"Клетка", g8:"Атом", g9:"Кванты", g10:"Вакуум", abs:"Абсолют" };
   EV.forEach(e => { e.t = YS*(1 - e.ago/AGE); e.k = ringOfT(e.t); });
   function ringOfT(t){ for (let k = 0; k < NR - 1; k++) if (t < RINGS[k + 1].A) return k; return NR - 1; }
@@ -297,6 +306,7 @@ const CHR = (() => {
     if (e && cardEv && EV.indexOf(e) > EV.indexOf(cardEv) && typeof Music !== "undefined" && Music.tick) Music.tick(CATK.indexOf(e.c));
     cardEv = e; const box = $("tmCard");
     if (!e){ box.innerHTML = ""; return; }
+    jrMark("ev", e.id, e.nm);
     const d = dateStr(e.t, e.k), [cn, rgb] = CAT[e.c], idx = EV.indexOf(e);
     box.innerHTML = `<div class="tm-bar"><span class="mono tm-cat" style="color:rgb(${rgb})">${cn} · ${esc(d.day)}${e.k >= 2 ? " " + d.tm : ""}</span>
         <span class="tm-nav"><button data-nv="-1" ${idx <= 0 ? "disabled" : ""} aria-label="Предыдущее событие" data-hover>←</button><span class="mono" style="color:var(--faint);align-self:center;padding:0 4px">${idx + 1}/${EV.length}</span><button data-nv="1" ${idx >= EV.length - 1 ? "disabled" : ""} aria-label="Следующее событие" data-hover>→</button></span></div>
@@ -305,10 +315,16 @@ const CHR = (() => {
       + (e.sci && e.sci.length ? `<h4>Наука</h4><ul class="list">${e.sci.map(x => `<li>${mk(x[0])}<span>${esc(x[1])}</span></li>`).join("")}</ul>` : "")
       + (e.tr ? `<h4>Традиции</h4><ul class="list">${e.tr.map(x => `<li>${mk("t")}<span>${esc(x)}</span></li>`).join("")}</ul>` : "")
       + (e.pr ? `<h4>Практика</h4><p class="tm-pr">${esc(e.pr)}</p>` : "")
-      + (e.st ? `<button class="btn tm-go" data-st="${e.st}" data-hover>Станция «${STN[e.st] || e.st}» →</button>` : "");
+      + `<div class="tm-gos">` + (e.st ? `<button class="btn tm-go" data-st="${e.st}" data-hover>Станция «${STN[e.st] || e.st}» →</button>` : "")
+      + (EV2TH[e.id] ? `<button class="btn tm-go tm-th" data-th="${EV2TH[e.id]}" data-hover>В Нити мысли: ${esc(TH_FIG.find(f => f.id === EV2TH[e.id]).nm)} →</button>` : "")
+      + (EV2TREE[e.id] ? `<button class="btn tm-go tm-tree" data-tr="${EV2TREE[e.id]}" data-hover>В Древе жизни: ${esc(TREE_NAME(EV2TREE[e.id]))} →</button>` : "")
+      + (() => { const b = (e.c === "ear" || e.c === "hum") && typeof bioOfEvent === "function" ? bioOfEvent(e) : null; return b ? `<button class="btn tm-go tm-bio" data-bio="${b.id}" data-hover>В Биосфере: пласт «${esc(b.nm)}» →</button>` : ""; })() + `</div>`;
     box.classList.remove("swap"); void box.offsetWidth; box.classList.add("swap");
     if (!cycOn) $("tmScroll").scrollTop = 0;
-    const go = box.querySelector(".tm-go"); if (go) go.onclick = () => { const id = go.dataset.st; close(); openJourney(id); };
+    const go = box.querySelector(".tm-go[data-st]"); if (go) go.onclick = () => { const id = go.dataset.st; close(); openJourney(id); };
+    const gth = box.querySelector(".tm-th"); if (gth) gth.onclick = () => { const id = gth.dataset.th; close(); openThought(id); };
+    const gb = box.querySelector(".tm-bio"); if (gb) gb.onclick = () => { const id = gb.dataset.bio; close(); openBio(id); };
+    const gt = box.querySelector(".tm-tree"); if (gt) gt.onclick = () => { const id = gt.dataset.tr; close(); openTree(id); };
     box.querySelectorAll("[data-nv]").forEach(b => b.onclick = () => goEv(idx + +b.dataset.nv));
   }
   // перейти к событию по номеру: стрелка встаёт на него (как учебник — листать событие за событием)
@@ -347,11 +363,11 @@ const CHR = (() => {
   }
   function close(){ if (!open) return; open = timeOn = false; play = false; chTime.classList.remove("open"); chTime.setAttribute("aria-hidden", "true"); $("btnTime").setAttribute("aria-pressed", "false"); }
   addEventListener("resize", () => { if (open) size(); });
-  return { open: openT, close, get on(){ return open; }, dbg: { set: v => { s = sT = v; }, time: () => timeOf(s), ago: () => agoStr(timeOf(s)) } };
+  return { open: openT, close, get on(){ return open; }, goAgo: y => { play = false; syncPlay(); s = sT = sOf(YS*(1 - clamp(y, 0, AGE)/AGE)) + 1e-7; }, dbg: { set: v => { s = sT = v; }, time: () => timeOf(s), ago: () => agoStr(timeOf(s)) } };
 })();
 const chTime = $("chTime");
 function closeTime(){ CHR.close(); }
-function openTime(){ closeHuman(); closePath(); closeRef(); closeTree(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
+function openTime(){ closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
 $("btnTime").onclick = () => CHR.on ? closeTime() : openTime();
 $("timeClose").onclick = closeTime;
 $("mTime").onclick = openTime;
