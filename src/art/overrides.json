@@ -4,5 +4,17 @@
  "argen": { "face": -1 },
  "micro": { "face": 1, "anim": "still" },
  "mosa":  { "face": -1 },
- "quetz": { "face": 1, "anim": "walk" }
+ "quetz": { "face": 1, "anim": "walk" },
+ "trex":  { "face": -1 },
+ "brach": { "face": -1 },
+ "diplo": { "face": -1 },
+ "stego": { "face": -1 },
+ "allo":  { "face": -1 },
+ "archx": { "face": -1, "anim": "fly" },
+ "ichsa": { "face": -1 },
+ "plesi": { "face": 1 },
+ "liopl": { "face": -1 },
+ "anchi": { "face": -1, "anim": "still" },
+ "jurama": { "face": -1, "anim": "still" },
+ "rhamp": { "face": 1, "anim": "fly" }
 }

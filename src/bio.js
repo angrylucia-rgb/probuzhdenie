@@ -248,12 +248,12 @@ void main(){
     for (let li = L.length - 1; li >= 0; li--) if (!BIO_MASK[L[li].k]) L.splice(li, 1);
     for (const I of L){
       const S = BIO_SP[I.k] || {}, AD = ARTD[I.k] || {}, sp = species(I.k), plant = !!S.plant, anim = AD.a || S.anim || "still";
-      if (((E && E.ready) || world) && !I.fossilOnly && (LANE[anim] === "floor" || anim === "sway" || anim === "still")) I.y = (BIO_FLOOR[E ? E.world : world] ?? -3.7) + I.h*.5*(sp.ar >= 1 ? 1/sp.ar : 1) - .06;
+      if (((E && E.ready) || world) && !I.fossilOnly && (LANE[anim] === "floor" || anim === "sway" || anim === "still")) I.y = (typeof world === "number" ? world : BIO_FLOOR[E ? E.world : world] ?? -3.7) + I.h*.5*(sp.ar >= 1 ? 1/sp.ar : 1) - .06;
       const n = Math.min(POOL, Math.round(clamp((plant ? 500 : 800) + (plant ? 300 : 900)*I.h, 500, 4200)*(I.fossilOnly ? .6 : 1)));
       Object.assign(I, { sp, n, plant, anim, X: I.x, Y: I.y, Z: I.z, ph: Math.random()*TAU, fa: (Math.random() - .5)*.7, face: AD.f || S.face || 1,
         lane: LANE[anim], spd: Math.max(.12, Math.abs(I.v)*.85), vx: 0, vy: 0, act: 0, tl: 0, st: "rest", tm: Math.random()*2.5, tx: I.x, ty: I.y });
       I.mv = !I.fossilOnly && !plant && !!I.lane && !!I.v;
-      I.F = I.v ? Math.sign(I.v)*I.face : 1;
+      I.F = I.dir ? I.dir*I.face : I.v ? Math.sign(I.v)*I.face : 1;
       const P = new Float32Array(n*3), aE = new Float32Array(n), aDel = new Float32Array(n), aSg = new Float32Array(n), aR = new Float32Array(n), aTh = new Float32Array(n), aC = new Float32Array(n*3), A = ART[I.k];
       for (let j = 0; j < n; j++){ P[j*3] = sp.u[j]; P[j*3 + 1] = sp.v[j]; P[j*3 + 2] = sp.d[j]; aE[j] = sp.e[j]; aDel[j] = Math.random()*.45 + (sp.v[j] + .5)*.15; aSg[j] = sp.sg[j]; aR[j] = Math.random(); aTh[j] = sp.th[j];
         if (A){ const q = (Math.min(A.h - 1, sp.ny[j]*A.h | 0)*A.w + Math.min(A.w - 1, sp.nx[j]*A.w | 0))*4; aC[j*3] = A.d[q]/255; aC[j*3 + 1] = A.d[q + 1]/255; aC[j*3 + 2] = A.d[q + 2]/255; } }
@@ -456,6 +456,11 @@ void main(){
     cam.setViewOffset(W3, H3, port ? 0 : -W3*(mx ? .25 : .17), port ? H3*.24 : 0, W3, H3);
     const D = port ? 21 : 14;
     const intro = cur < 0 && !cmp && !bmOn; cam.position.set(ptr.nx*.35, -ptr.ny*.2 + (intro ? 0 : .2), D); cam.lookAt(0, intro ? 0 : .1, -2);
+    // панорама эпохи: камера опускается и отъезжает, параллакс сильнее; переход — вместе с оживанием
+    if (PAN && PAN.img){ cam.position.set(0, .2, D); cam.lookAt(0, .1, -2); cam.updateMatrixWorld(); }
+    const pk = PAN && !PAN.img && !cmp && !bmOn ? smooth(.05, .85, life)*(trn ? Math.max(0, 1 - trT*3) : 1) : 0;
+    if (pk > 0){ const K = PAN.S.camK, Dp = port ? K.Dp : K.D;
+      cam.position.set(ptr.nx*(.35 + .9*pk), -ptr.ny*(.2 + .15*pk) + .2 + (K.y - .2)*pk, D + (Dp - D)*pk); cam.lookAt(ptr.nx*.25*pk, .1 + (K.look - .1)*pk, -2); }
     // порода: зёрна (шейдер) и 2D-холст
     RU.uOff.value = rockOff; RU.uTr.value = trn ? 1 : 0; RU.uBy.value = trn ? -7.6 + trT*15.2 : 99;
     setEra(RU.uCA, RU.uIA, trn ? trn.from : cur); setEra(RU.uCB, RU.uIB, trn ? trn.to : cur);
@@ -464,6 +469,11 @@ void main(){
     // среда
     const envA = cmp ? 0 : bmOn ? 1 : smooth(.25, 1, life)*(trn ? Math.max(0, 1 - trT*3) : 1);
     EU.uT.value = T; EU.uA.value = envA; EU.uPort.value = port ? 1 : 0; if (pEnv) pEnv.visible = envA > .01;
+    if (PAN){ PAN.update(T, cmp || bmOn ? 0 : envA, port ? 0 : ptr.nx*.9, -ptr.ny*.5);
+      if (PAN.img){ PAN.layout(cam, port, ZP, -ptr.nx, foldK); panoLayoutImg(); } }
+    const pon = !!PAN && envA > .35 && !cmp && !bmOn; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
+    const hid = fold && pon; if (hid !== box.classList.contains("bio-hide")){ box.classList.toggle("bio-hide", hid); foldBtn(); }
+    foldK += ((hid ? 1 : 0) - foldK)*Math.min(1, dt*3.2);
     // существа: режиссура на процессоре (несколько чисел), точки — в шейдере
     const instA = trn ? Math.max(0, 1 - trT*3.2) : 1, living = (cur >= 0 || bmOn) && !trn && !cmp;
     if (living && life > .6) direct(dt, T);
@@ -471,10 +481,12 @@ void main(){
     for (let q = 0; q < INST.length; q++){
       const I = INST[q], u = I.U, lifeI = I.fossilOnly ? 0 : life;
       let Yb = I.Y;
-      if (I.anim === "fly") Yb += Math.sin(T*1.1 + I.ph)*(I.st === "go" ? .08 : .2)*lifeI;
+      if (PAN){}
+      else if (I.anim === "fly") Yb += Math.sin(T*1.1 + I.ph)*(I.st === "go" ? .08 : .2)*lifeI;
       else if (I.anim === "swim" || I.anim === "eel") Yb += Math.sin(T*.7 + I.ph)*.1*lifeI;
       else if (I.anim === "walk") Yb += .02*I.h*Math.abs(Math.sin(T*3.4 + I.ph))*I.act;
-      u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
+      u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = PAN ? instA*(1 - smooth(.8, .97, life)) : instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
+      if (I.spr){ const su = I.spr.material.uniforms; su.uT.value = T; su.uA.value = instA*smooth(.74, .97, life)*(cmp || bmOn ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*.55; I.shd.visible = I.spr.visible; } }
       u.uC.value.set(I.X, Yb, I.Z); u.uF.value = I.F; u.uTilt.value = I.tl; u.uAct.value = I.act;
       I.o.visible = instA > .005;
       I.sx = I.X; I.sy = Yb;
@@ -663,7 +675,7 @@ void main(){
     if (cmpInfo.tiny){ c.font = "11px 'JetBrains Mono', monospace"; c.fillStyle = "rgba(160,200,255,.8)"; c.textBaseline = "top"; const p = scr2(INST[0].X, CMP_FLOOR, 0);
       c.fillText(`увеличено ≈ в ${Math.round(cmpInfo.mag).toLocaleString("ru-RU")} раз`, p[0], p[1] + 34); }
   }
-  function galOn(k){ if (bmOn) bmLeave(); if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); } gal.on = true; view = null; compare(k || cmpK || "anom"); card(); }
+  function galOn(k){ panoClear(); if (bmOn) bmLeave(); if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); } gal.on = true; view = null; compare(k || cmpK || "anom"); card(); }
   function galOff(){ gal.on = false; cmp = false; cmpK = null; view = null; labClear(); arrive(cur); life = lifeT = cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; lifeAt = 0; column(); card(); }
 
   // ======== 13д · механизмы эволюции: опыты на 2D-холсте #bioSim ========
@@ -721,7 +733,7 @@ void main(){
   function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); arrive(cur); life = lifeT = cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; lifeAt = 0; column(); card(); }
   // ======== 13е · биомы Земли: та же WebGL-сцена, без породы ========
   let bmOn = false, bi = 0;
-  function bmShow(i){ bi = clamp(i, 0, BIO_BIOMES.length - 1); const B = BIO_BIOMES[bi]; sel = -1; hov = -1; view = null;
+  function bmShow(i){ panoClear(); bi = clamp(i, 0, BIO_BIOMES.length - 1); const B = BIO_BIOMES[bi]; sel = -1; hov = -1; view = null;
     INST = makeInst(-1, (BIO_BSCENE[B.id] || []).map(([k, x, y, h, z, v]) => ({ k, x, y, z, h, v })), B.world);
     makeEnv(B.world); sky.dataset.w = B.world; life = lifeT = 1; lifeAt = 0;
     jrMark("bio", "biome:" + B.id, B.nm); Music.voice("bio:" + B.world, false); card(); }
@@ -837,6 +849,87 @@ void main(){
     view = k; sel = q != null ? q : INST.findIndex(I => I.k === k && !I.fossilOnly);
     jrMark("bio", "sp:" + k, BIO_SP[k].ru); card();
   }
+  // ======== панорама эпохи: пейзаж (bio_pano.js) + существа-рисунки на своих местах ========
+  let PAN = null, fold = false, foldK = 0;
+  // свернуть текст и смотреть панораму целиком
+  const fb = $("bioFold");
+  function foldBtn(){ const h = box.classList.contains("bio-hide"), m = innerWidth <= 760; fb.textContent = h ? (m ? "⌃" : "›") : (m ? "⌄" : "‹");
+    fb.setAttribute("aria-pressed", String(h)); fb.title = h ? "Показать текст" : "Скрыть текст"; fb.setAttribute("aria-label", h ? "Показать текст" : "Скрыть текст и смотреть панораму"); }
+  fb.onclick = () => { fold = !fold; }; foldBtn(); addEventListener("resize", foldBtn);
+  const SPV = `uniform float uT, uPh, uAn; varying vec2 vUv;
+void main(){ vUv = uv; vec3 p = position; float sd = uv.x - 0.5, e = smoothstep(0.18, 0.5, abs(sd));
+  if (uAn < 0.5){ p.y += uv.y*0.012*sin(uT*1.3 + uPh) + sin(uT*0.7 + uPh)*0.018*e*uv.y; }
+  else if (uAn < 2.5){ p.y += sin(uv.x*6.5 - uT*1.9 + uPh)*0.03*(0.2 + abs(sd)*1.6) + sin(uT*0.6 + uPh)*0.035; p.x += sin(uT*0.41 + uPh)*0.025; }
+  else if (uAn < 4.5){ p.y += uv.y*0.014*sin(uT*1.2 + uPh) + sin(uT*0.85 + uPh)*0.022*e*(0.3 + uv.y); }
+  else if (uAn < 5.5){ p.y += sin(uT*1.5 + uPh)*0.05; p.x += sin(uT*0.47 + uPh)*0.04; }
+  else { p.x += sin(uT*0.5 + uPh)*0.04*uv.y*uv.y; }
+  gl_Position = projectionMatrix*modelViewMatrix*vec4(p, 1.0); }`;
+  const SPF = `uniform sampler2D uTex; uniform float uA, uHov, uWet; uniform vec3 uWc; varying vec2 vUv;
+void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) discard; vec3 col = c.rgb*(1.0 + 0.25*uHov); col = mix(col, col*uWc, uWet*0.6); gl_FragColor = vec4(col, a); }`;
+  const SHF = `uniform float uA; varying vec2 vUv; void main(){ vec2 d = vUv - 0.5; float r = dot(d, d)*4.0; gl_FragColor = vec4(0.0, 0.0, 0.0, smoothstep(1.0, 0.0, r)*uA); }`;
+  // силуэт без рисунка: тёмная фигура с золотым ореолом
+  function silCanvas(k){
+    const { W, H, M } = decode(k), S = BIO_SP[k] || {}, r = (S.rot || 0)*Math.PI/180;
+    const t = document.createElement("canvas"); t.width = W; t.height = H; const tx = t.getContext("2d"), im = tx.createImageData(W, H);
+    for (let i = 0; i < W*H; i++) if (M[i]){ im.data[i*4] = 255; im.data[i*4 + 1] = 214; im.data[i*4 + 2] = 150; im.data[i*4 + 3] = 255; }
+    tx.putImageData(im, 0, 0);
+    const bw = Math.abs(W*Math.cos(r)) + Math.abs(H*Math.sin(r)), bh = Math.abs(W*Math.sin(r)) + Math.abs(H*Math.cos(r)), pad = 16;
+    const c = document.createElement("canvas"); c.width = Math.ceil(bw) + pad*2; c.height = Math.ceil(bh) + pad*2; const x = c.getContext("2d");
+    const draw = g => { g.save(); g.translate(c.width/2, c.height/2); g.rotate(-r); g.drawImage(t, -W/2, -H/2); g.restore(); };
+    x.filter = "blur(10px)"; x.globalAlpha = .8; draw(x); x.filter = "blur(4px)"; x.globalAlpha = 1; draw(x); draw(x); x.filter = "blur(1.5px)"; draw(x); x.filter = "none";
+    const d = document.createElement("canvas"); d.width = c.width; d.height = c.height; const dx = d.getContext("2d"); draw(dx);
+    dx.globalCompositeOperation = "source-in"; const gr = dx.createLinearGradient(0, 0, 0, c.height); gr.addColorStop(0, "#4a3b26"); gr.addColorStop(1, "#1d1710"); dx.fillStyle = gr; dx.fillRect(0, 0, c.width, c.height);
+    x.drawImage(d, 0, 0);
+    return { c, sx: c.width/bw, sy: c.height/bh };
+  }
+  let SHT = null;
+  function panoBuild(E, PS){
+    PAN = PANO.build(E.id); if (!PAN) return; scn.add(PAN.grp);
+    const wc = new THREE.Vector3(.55, .95, .85);
+    for (const I of INST){ if (I.fossilOnly) continue;
+      const A = ART[I.k]; let tex, sx = 1, sy = 1;
+      if (A){ tex = new THREE.Texture(A.im); tex.needsUpdate = true; } else { const s = silCanvas(I.k); tex = new THREE.CanvasTexture(s.c); sx = s.sx; sy = s.sy; }
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      const ar = I.sp.ar, w = (ar >= 1 ? I.h : I.h*ar)*sx, h = (ar >= 1 ? I.h/ar : I.h)*sy, wet = I.Y < PS.floor - .2;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 14, 6), new THREE.ShaderMaterial({ vertexShader: SPV, fragmentShader: SPF, transparent: true, depthWrite: false,
+        uniforms: { uTex:{ value:tex }, uT:{ value:0 }, uA:{ value:0 }, uPh:{ value:I.ph }, uAn:{ value:ANIM[I.anim] || 0 }, uHov:{ value:0 }, uWet:{ value:wet ? 1 : 0 }, uWc:{ value:wc } } }));
+      m.scale.set(w*I.F, h, 1); m.position.set(I.X, I.Y, I.Z); m.renderOrder = wet ? 850 + I.Z : 1000 + I.Z*10; m.visible = false; scn.add(m); I.spr = m;
+      if (!wet && I.anim !== "fly"){ if (!SHT) SHT = new THREE.PlaneGeometry(1, 1);
+        const sh = new THREE.Mesh(SHT, new THREE.ShaderMaterial({ vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }", fragmentShader: SHF, transparent: true, depthWrite: false, uniforms: { uA:{ value:0 } } }));
+        sh.rotation.x = -Math.PI/2; sh.scale.set(w*.95, w*.22, 1); sh.position.set(I.X, PS.floor + .02, I.Z); sh.renderOrder = 999 + I.Z*10; sh.visible = false; scn.add(sh); I.shd = sh; }
+    }
+  }
+  const ZP = -4, PANO_BASE = "pano/";
+  function sprite(I, wet, flatShadow){
+    const A = ART[I.k]; let tex, sx = 1, sy = 1;
+    if (A){ tex = new THREE.Texture(A.im); tex.needsUpdate = true; } else { const s = silCanvas(I.k); tex = new THREE.CanvasTexture(s.c); sx = s.sx; sy = s.sy; }
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 14, 6), new THREE.ShaderMaterial({ vertexShader: SPV, fragmentShader: SPF, transparent: true, depthWrite: false, depthTest: false,
+      uniforms: { uTex:{ value:tex }, uT:{ value:0 }, uA:{ value:0 }, uPh:{ value:I.ph }, uAn:{ value:ANIM[I.anim] || 0 }, uHov:{ value:0 }, uWet:{ value:wet ? 1 : 0 }, uWc:{ value:new THREE.Vector3(.55, .95, .85) } } }));
+    m.userData = { sx, sy }; m.visible = false; scn.add(m); I.spr = m;
+    if (!wet && I.anim !== "fly" && !I.plant){ if (!SHT) SHT = new THREE.PlaneGeometry(1, 1);
+      const sh = new THREE.Mesh(SHT, new THREE.ShaderMaterial({ vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }", fragmentShader: SHF, transparent: true, depthWrite: false, depthTest: false, uniforms: { uA:{ value:0 } } }));
+      if (flatShadow) sh.rotation.x = -Math.PI/2; sh.visible = false; scn.add(sh); I.shd = sh; }
+    return m;
+  }
+  function panoBuildImg(E, PI){
+    PAN = PIMG.build(E.id, PANO_BASE); if (!PAN) return; scn.add(PAN.grp);
+    for (const I of INST){ if (I.fossilOnly || I.pu == null) continue; const m = sprite(I, I.wet, false); m.renderOrder = 100 + I.pv*100; if (I.shd) I.shd.renderOrder = 99 + I.pv*100; }
+  }
+  // раскладка существ по картинке: размер — доля высоты, ступни на земле картинки, сдвиг — тот же параллакс, что у её пикселей
+  function panoLayoutImg(){
+    const r = PAN.st.rect; if (!r) return;
+    INST.forEach((I, q) => { if (I.pu == null) return;
+      const hs = I.ps*r.H, ar = I.sp.ar, sw = ar >= 1 ? hs : hs*ar, sh = ar >= 1 ? hs/ar : hs, [wx, wy] = PAN.toWorld(I.pu, I.pv), [dx, dy] = PAN.shift(I.pu, I.pv);
+      const land = !I.wet && I.anim !== "fly" && I.lane !== "water";
+      I.h = hs; I.U.uS.value = hs; I.X = wx + dx; I.Y = (land ? wy + sh/2 : wy) + dy; I.Z = ZP + .5 + q*.01;
+      if (I.spr){ const u = I.spr.userData; I.spr.scale.set(sw*u.sx*I.F, sh*u.sy, 1); I.spr.position.set(I.X, I.Y, I.Z); }
+      if (I.shd){ I.shd.scale.set(sw*.9, sw*.09, 1); I.shd.position.set(I.X, wy + dy + sw*.01, I.Z - .005); } });
+  }
+  function panoClear(){
+    for (const I of INST){ if (I.spr){ scn.remove(I.spr); I.spr.geometry.dispose(); I.spr.material.uniforms.uTex.value.dispose(); I.spr.material.dispose(); I.spr = null; } if (I.shd){ scn.remove(I.shd); I.shd.material.dispose(); I.shd = null; } }
+    if (PAN){ scn.remove(PAN.grp); PAN.dispose(); PAN = null; }
+  }
   // ---- переходы по пластам ----
   function go(n){
     if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); }
@@ -849,9 +942,13 @@ void main(){
     cur = n; column(); card();
   }
   function arrive(n){
-    INST = makeInst(n); life = 0; lifeT = 0;
-    const E = n >= 0 ? BIO_ERAS[n] : null;
-    makeEnv(E && E.ready ? E.world : null); sky.dataset.w = E && E.ready ? E.world : "";
+    panoClear();
+    const E = n >= 0 ? BIO_ERAS[n] : null, PI = E && E.ready && typeof PIMG !== "undefined" && PIMG.has(E.id) ? BIO_PIMG[E.id] : null;
+    const PS = !PI && E && E.ready && typeof PANO !== "undefined" && PANO.has(E.id) ? BIO_PANO[E.id] : null;
+    INST = PI ? makeInst(n, PI.slots.filter(r => BIO_SP[r[0]]).map(([k, u, v, sz, d]) => ({ k, x: 0, y: 0, z: ZP + .5, h: 1, v: 0, dir: d, pu: u, pv: v, ps: sz, wet: !!PI.wl && v > PI.wl })))
+      : PS ? makeInst(n, PS.slots.map(([k, x, y, z, h, d]) => ({ k, x, y, z, h, v: 0, dir: d })), PS.floor) : makeInst(n); life = 0; lifeT = 0;
+    makeEnv(E && E.ready && !PS && !PI ? E.world : null); sky.dataset.w = E && E.ready ? E.world : "";
+    if (PI) panoBuildImg(E, PI); else if (PS) panoBuild(E, PS);
     if (E && E.ready) lifeAt = performance.now() + 1300;
     if (E) jrMark("bio", E.id, E.nm);
     Music.voice("bio:" + (E && E.ready ? E.world : "rock"), false);
@@ -896,7 +993,7 @@ void main(){
   const mxb = $("bioMax");
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Сцена" : "⤢ Читать"; };
   return { open: openB, close, get on(){ return open; }, go, portrait,
-    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); }, biome: i => { bmOn_(i); }, dbg: { fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn,
+    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); }, biome: i => { bmOn_(i); }, dbg: { fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
       pickAt: (x, y) => pick(x, y), scr: k => { const I = INST.find(I => I.k === k && !I.fossilOnly); return I ? scr2(I.sx, I.sy, I.Z) : null; } } };
 })();
 const chBio = $("chBio");

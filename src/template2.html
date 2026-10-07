@@ -523,6 +523,19 @@ body.j-white .dot{background:#b09a6a}
 .bio-sky[data-w=deep]{background:radial-gradient(ellipse 60% 40% at 30% 100%,rgba(40,90,120,.14),transparent 70%),linear-gradient(rgba(2,6,14,.75),rgba(2,4,10,.6))}
 .bio-sky[data-w=swamp]{background:radial-gradient(ellipse 80% 50% at 60% 8%,rgba(150,170,110,.16),transparent 70%),linear-gradient(rgba(22,38,26,.5),rgba(10,18,12,.25) 60%,rgba(18,30,24,.5))}
 .ch-bio .time-in{grid-template-rows:auto auto auto minmax(0,1fr)}
+.ch-bio .time-in{isolation:isolate}.ch-bio .time-in::before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-90px;bottom:-30px;left:calc(-1*var(--pad));right:-90px;background:linear-gradient(90deg,rgba(5,7,9,.9) 0,rgba(5,7,9,.82) 72%,rgba(5,7,9,0));opacity:0;transition:opacity .8s}
+.ch-bio.bio-pano .time-in::before{opacity:1}
+.ch-bio .time-in{transition:transform .55s cubic-bezier(.4,0,.2,1),opacity .45s}
+.ch-bio.bio-hide .time-in{transform:translateX(calc(-100% - 70px));opacity:0;pointer-events:none}
+.ch-bio.bio-hide #bioHint{opacity:0}
+.bio-fold{display:none;position:absolute;z-index:6;top:50%;left:calc(var(--pad) + min(460px,36vw) + 22px);transform:translateY(-50%);width:34px;height:68px;padding:0;border-radius:18px;border:1px solid rgba(214,172,94,.5);background:rgba(5,7,9,.62);color:#f3dcaa;font:20px/1 Forum,Georgia,serif;text-align:center;cursor:pointer;backdrop-filter:blur(4px);transition:left .55s cubic-bezier(.4,0,.2,1),background .3s}
+.bio-fold:hover{background:rgba(30,24,14,.85)}
+.ch-bio.bio-pano .bio-fold{display:block}
+.ch-bio.bio-hide .bio-fold{left:14px}
+@media (max-width:760px){.bio-fold{top:calc(47% - 46px);left:50%;transform:translateX(-50%);width:72px;height:30px;font-size:18px;transition:top .55s cubic-bezier(.4,0,.2,1)}
+  .ch-bio.bio-hide .bio-fold{left:50%;top:calc(100% - 52px)}
+  .ch-bio.bio-hide .time-in{transform:translateY(calc(100% + 40px))}}
+@media (max-width:760px){.ch-bio .time-in::before{top:-40px;bottom:-20px;right:calc(-1*var(--pad));background:linear-gradient(rgba(5,7,9,0),rgba(5,7,9,.9) 46px)}}
 .ch-bio.tm-max .time-in{grid-template-rows:auto minmax(0,1fr)}
 .ch-bio.tm-max #bioHint,.ch-bio.tm-max .bio-col{display:none}
 #bioHint{color:var(--faint);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
@@ -1036,6 +1049,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <canvas class="bio-rock" id="bioRock" aria-hidden="true"></canvas>
   <div class="bio-sky" id="bioSky" aria-hidden="true"></div>
   <canvas id="bioCv" aria-label="Пласт породы: окаменелости, которые оживают и собираются в существ из частиц"></canvas>
+  <button class="bio-fold" id="bioFold" aria-pressed="false" aria-label="Скрыть текст и смотреть панораму" title="Скрыть текст" data-hover>‹</button>
   <canvas id="bioLab" aria-hidden="true"></canvas>
   <canvas id="bioSim" aria-label="Живая модель опыта"></canvas>
   <nav class="bio-col" id="bioCol" aria-label="Колонна пластов: сверху — сегодня, внизу — древнейшие"></nav>
