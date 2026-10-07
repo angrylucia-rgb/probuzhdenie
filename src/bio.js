@@ -451,6 +451,8 @@ void main(){
     if (lifeAt && now > lifeAt){ lifeAt = 0; lifeT = 1; hint(); }
     const lp = life; life += (lifeT - life)*Math.min(1, dt*(lifeT > life ? .9 : 1.6)); if (Math.abs(lifeT - life) < .003) life = lifeT;
     if (lp < .97 && life >= .97) hint();
+    // наведение: не чаще одного раза за кадр (мыши 500–1000 Гц шлют события чаще кадров)
+    if (ptr.mv){ ptr.mv = false; const q = pick(ptr.x, ptr.y); if (q !== hov){ hov = q; cvs.style.cursor = q >= 0 ? "pointer" : ""; } }
     // камера: лёгкий параллакс за указателем
     ptr.nx += ((ptr.in ? ptr.x/W3*2 - 1 : 0) - ptr.nx)*Math.min(1, dt*2); ptr.ny += ((ptr.in ? ptr.y/H3*2 - 1 : 0) - ptr.ny)*Math.min(1, dt*2);
     cam.setViewOffset(W3, H3, port ? 0 : -W3*(mx ? .25 : .17), port ? H3*.24 : 0, W3, H3);
@@ -464,14 +466,16 @@ void main(){
     // порода: зёрна (шейдер) и 2D-холст
     RU.uOff.value = rockOff; RU.uTr.value = trn ? 1 : 0; RU.uBy.value = trn ? -7.6 + trT*15.2 : 99;
     setEra(RU.uCA, RU.uIA, trn ? trn.from : cur); setEra(RU.uCB, RU.uIB, trn ? trn.to : cur);
-    RU.uLife.value = !trn && cur >= 0 ? life : 0; RU.uPort.value = port ? 1 : 0; pR.visible = !cmp && !bmOn;
+    RU.uLife.value = !trn && cur >= 0 ? life : 0; RU.uPort.value = port ? 1 : 0; pR.visible = !cmp && !bmOn && !(PAN && !trn && life > .9);
     drawRock(trT, cmp || bmOn ? 0 : trn || cur < 0 ? 1 : 1 - smooth(.05, .8, life));
     // среда
     const envA = cmp ? 0 : bmOn ? 1 : smooth(.25, 1, life)*(trn ? Math.max(0, 1 - trT*3) : 1);
     EU.uT.value = T; EU.uA.value = envA; EU.uPort.value = port ? 1 : 0; if (pEnv) pEnv.visible = envA > .01;
-    if (PAN){ PAN.update(T, cmp || bmOn ? 0 : envA, port ? 0 : ptr.nx*.9, -ptr.ny*.5);
-      if (PAN.img){ if (!(fc % 20)){ const r = box.querySelector(".time-in").getBoundingClientRect(); panL = port ? 0 : Math.min(.6, (r.right + 24)/W3); }
-        const k = Math.min(1, dt*1.6); panX += (gpx - panX)*k; panY += (gpy - panY)*k;
+    if (PAN){ const k = 1 - Math.exp(-Math.min(dt, .1)*2.4);
+      if (PAN.img){ panX += (gpx - panX)*k; panY += (gpy - panY)*k; }
+      // один сглаженный сигнал и для сдвига панорамы, и для глубинного параллакса — иначе два слоя движения с разной инерцией дают рывки
+      PAN.update(T, cmp || bmOn ? 0 : envA, port ? 0 : (PAN.img ? panX : ptr.nx)*.9, -(PAN.img ? panY : ptr.ny)*.5);
+      if (PAN.img){ if (!(fc % 30) && !fold){ const r = box.querySelector(".time-in").getBoundingClientRect(); panL = port ? 0 : Math.min(.6, (r.right + 24)/W3); }
         PAN.layout(cam, port, ZP, port ? -ptr.nx : panX, foldK, panL, panY); panoLayoutImg(); } }
     const pon = !!PAN && envA > .35 && !cmp && !bmOn; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
     const hid = fold && pon; if (hid !== box.classList.contains("bio-hide")){ box.classList.toggle("bio-hide", hid); foldBtn(); }
@@ -490,7 +494,7 @@ void main(){
       u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = PAN ? instA*(1 - smooth(.8, .97, life)) : instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
       if (I.spr){ const su = I.spr.material.uniforms; su.uT.value = T; su.uA.value = instA*smooth(.74, .97, life)*(cmp || bmOn ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*.55; I.shd.visible = I.spr.visible; } }
       u.uC.value.set(I.X, Yb, I.Z); u.uF.value = I.F; u.uTilt.value = I.tl; u.uAct.value = I.act;
-      I.o.visible = instA > .005;
+      I.o.visible = instA > .005 && !(PAN && life > .975);
       I.sx = I.X; I.sy = Yb;
     }
     // подсветка выбранного
@@ -515,10 +519,13 @@ void main(){
   }
   // очистка слоя подписей; два вызова — обход редкой ошибки ускоренного 2D-холста (первый clearRect после текста иногда теряется)
   function labClear(){ ctx2.setTransform(1, 0, 0, 1, 0, 0); ctx2.clearRect(0, 0, lab.width, lab.height); ctx2.clearRect(0, 0, lab.width, lab.height); }
+  let labDirty = true;
   function overlay(T){
-    const c = ctx2; labClear(); c.setTransform(DPR3, 0, 0, DPR3, 0, 0);
+    const c = ctx2, q = hov >= 0 ? hov : -1, draw = cmp || (q >= 0 && INST[q] && !trn);
+    if (!draw && !labDirty) return;   // пустой слой подписей не перерисовываем каждый кадр
+    labClear(); labDirty = draw; c.setTransform(DPR3, 0, 0, DPR3, 0, 0);
     if (cmp){ cmpOverlay(c); return; }
-    const q = hov >= 0 ? hov : -1; if (q < 0 || !INST[q] || trn) return;
+    if (!draw) return;
     const I = INST[q], sp = I.sp, hh = (sp.ar >= 1 ? .5/sp.ar : .5)*I.h, p = scr2(I.sx, I.sy - hh - .12, I.Z), S = BIO_SP[I.k];
     c.font = "400 17px Forum, Georgia, serif"; c.textAlign = "center"; c.textBaseline = "top";
     c.lineJoin = "round"; c.lineWidth = 5; c.strokeStyle = "rgba(5,6,12,.85)"; c.strokeText(S.ru, p[0], p[1] + 4);
@@ -959,8 +966,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     hint();
   }
   // ---- ввод ----
-  cvs.addEventListener("pointermove", e => { const r = cvs.getBoundingClientRect(); ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top; ptr.in = true;
-    const q = pick(ptr.x, ptr.y); if (q !== hov){ hov = q; cvs.style.cursor = q >= 0 ? "pointer" : ""; } });
+  cvs.addEventListener("pointermove", e => { const r = cvs.getBoundingClientRect(); ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top; ptr.in = true; ptr.mv = true; });
   cvs.addEventListener("pointerleave", () => { ptr.in = false; hov = -1; cvs.style.cursor = ""; });
   cvs.addEventListener("pointerdown", e => { const r = cvs.getBoundingClientRect(); const q = pick(e.clientX - r.left, e.clientY - r.top); if (q >= 0) portrait(INST[q].k, q); });
   let wheelAt = 0;
@@ -975,7 +981,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     else if (cmp || mechOn || bmOn) return;
     else if (e.key === "ArrowDown" || e.key === "PageDown"){ e.preventDefault(); if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); }
     else if (e.key === "ArrowUp" || e.key === "PageUp"){ e.preventDefault(); if (cur >= 0) go(cur < NE - 1 ? cur + 1 : -1); } }, true);
-  function size(){ DPR3 = Math.min(2, devicePixelRatio || 1); W3 = cvs.clientWidth; H3 = cvs.clientHeight;
+  function size(){ DPR3 = Math.min(1.6, devicePixelRatio || 1); W3 = cvs.clientWidth; H3 = cvs.clientHeight;
     rend.setPixelRatio(DPR3); rend.setSize(W3, H3, false); lab.width = W3*DPR3; lab.height = H3*DPR3; cam.aspect = W3/Math.max(1, H3); cam.updateProjectionMatrix(); }
   function openB(target){
     if (!built) build(); open = bioOn = true; size();

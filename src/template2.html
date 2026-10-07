@@ -526,9 +526,9 @@ body.j-white .dot{background:#b09a6a}
 .ch-bio .time-in{isolation:isolate}.ch-bio .time-in::before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-90px;bottom:-30px;left:calc(-1*var(--pad));right:-90px;background:linear-gradient(90deg,rgba(5,7,9,.9) 0,rgba(5,7,9,.82) 72%,rgba(5,7,9,0));opacity:0;transition:opacity .8s}
 .ch-bio.bio-pano .time-in::before{opacity:1}
 .ch-bio .time-in{transition:transform .55s cubic-bezier(.4,0,.2,1),opacity .45s}
-.ch-bio.bio-hide .time-in{transform:translateX(calc(-100% - 70px));opacity:0;pointer-events:none}
+.ch-bio.bio-hide .time-in{transform:translateX(calc(-100% - 70px));opacity:0;pointer-events:none;visibility:hidden;transition:transform .55s cubic-bezier(.4,0,.2,1),opacity .45s,visibility 0s .55s}
 .ch-bio.bio-hide #bioHint{opacity:0}
-.bio-fold{display:none;position:absolute;z-index:6;top:50%;left:calc(var(--pad) + min(460px,36vw) + 22px);transform:translateY(-50%);width:34px;height:68px;padding:0;border-radius:18px;border:1px solid rgba(214,172,94,.5);background:rgba(5,7,9,.62);color:#f3dcaa;font:20px/1 Forum,Georgia,serif;text-align:center;cursor:pointer;backdrop-filter:blur(4px);transition:left .55s cubic-bezier(.4,0,.2,1),background .3s}
+.bio-fold{display:none;position:absolute;z-index:6;top:50%;left:calc(var(--pad) + min(460px,36vw) + 22px);transform:translateY(-50%);width:34px;height:68px;padding:0;border-radius:18px;border:1px solid rgba(214,172,94,.5);background:rgba(5,7,9,.8);color:#f3dcaa;font:20px/1 Forum,Georgia,serif;text-align:center;cursor:pointer;transition:left .55s cubic-bezier(.4,0,.2,1),background .3s}
 .bio-fold:hover{background:rgba(30,24,14,.85)}
 .ch-bio.bio-pano .bio-fold{display:block}
 .ch-bio.bio-hide .bio-fold{left:14px}
