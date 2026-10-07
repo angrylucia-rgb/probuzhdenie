@@ -15834,8 +15834,8 @@ const PIMG = (() => {
   const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }`;
   const FI = `uniform sampler2D uTex, uDep; uniform vec2 uPar; uniform vec4 uR; uniform float uA, uT, uWl, uK; varying vec2 vUv;
 void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float out_ = max(abs(q.y - qc.y)*uR.w/uR.z*2.357, abs(q.x - qc.x)*2.357);
-  float d = texture2D(uDep, qc).r; vec2 uv = qc - uPar*(d - 0.3)*uK*(1.0 - smoothstep(0.0, 0.02, out_));
-  if (out_ > 0.0){ uv = vec2(qc.x, clamp(qc.y, 0.004, 0.996)); vec3 e = vec3(0.0); for (int i = -4; i <= 4; i++) e += texture2D(uTex, vec2(uv.x + float(i)*0.03, uv.y + (uv.y > 0.5 ? -0.03 : 0.03))).rgb; e /= 9.0;
+  float d = texture2D(uDep, qc).r; vec2 uv = qc - uPar*(d - 0.3)*uK;
+  if (out_ > 0.002){ uv = vec2(qc.x, clamp(qc.y, 0.004, 0.996)); vec3 e = vec3(0.0); for (int i = -4; i <= 4; i++) e += texture2D(uTex, vec2(uv.x + float(i)*0.03, uv.y + (uv.y > 0.5 ? -0.03 : 0.03))).rgb; e /= 9.0;
     gl_FragColor = vec4(mix(e*0.8, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.055, out_)), uA); return; }
   if (uWl > 0.0 && uv.y < 1.0 - uWl){ float w = (1.0 - uWl - uv.y); uv.x += sin(uv.y*140.0 + uT*1.3)*0.00045*smoothstep(0.0, 0.05, w); uv.y += sin(uv.x*90.0 + uT*0.9)*0.0003*smoothstep(0.0, 0.05, w); }
   vec3 c = texture2D(uTex, clamp(uv, 0.001, 0.999)).rgb; c *= 0.97 + 0.03*sin(uT*0.35);
@@ -15886,15 +15886,17 @@ void main(){ float x = vUv.x*7.0 - vUv.y*1.8; float s = pow(max(0.0, sin(x + sin
     // раскладка: плоскость закрывает весь экран; картинка — прямоугольник внутри неё. ПК: ширина ≈ ширина экрана, при открытом тексте
     // правый край прижат к краю экрана (левая часть уходит под текст), при свёрнутом — по центру; сверху и снизу — мягкое продолжение в темноту.
     // Телефон: картинка во всю высоту области сцены, палец водит её вбок. fold: 0 — текст открыт, 1 — свёрнут; left — правый край текста (доля ширины).
-    function layout(cam, port, Z, pan, fold, left){
+    function layout(cam, port, Z, pan, fold, left, tilt){
       const un = (x, y) => new THREE.Vector3(x, y, .5).unproject(cam).sub(cam.position).normalize();
       const at = (x, y) => { const d = un(x, y), t = (Z - cam.position.z)/d.z; return cam.position.clone().addScaledVector(d, t); };
       const a = at(-1, -1), b = at(1, 1), rw = b.x - a.x, rh = b.y - a.y, A = 3168/1344;
       img.scale.set(rw*1.02, rh*1.02, 1); img.position.set((a.x + b.x)/2, (a.y + b.y)/2, Z);
       let W, H, cx, cy;
       if (port){ H = rh*(.48 + .26*fold); W = H*A; cx = (a.x + b.x)/2 + (W - rw)*.5*(pan || 0); cy = (b.y - rh*.235)*(1 - fold) + ((a.y + b.y)/2 + rh*.03)*fold; }
-      else { W = rw*1.04; H = W/A; if (H < rh*.8){ H = rh*.8; W = H*A; } if (H > rh*1.04){ H = rh*1.04; W = H*A; }
-        const xr = b.x + rw*.012 - W/2, xc = (a.x + b.x)/2; cx = xr + (xc - xr)*fold + (pan || 0)*rw*.03; cy = (a.y + b.y)/2 - rh*.02; }
+      else { // ПК: картинка крупно (чуть выше экрана), курсор водит по ней: у левого края виден левый край картины, у правого — правый
+        H = rh*1.12; W = H*A; if (W < rw*1.15){ W = rw*1.15; H = W/A; }
+        const L = a.x + rw*(left || 0)*(1 - fold), xl = L + W/2, xr = b.x - W/2, t = ((pan || 0) + 1)/2;
+        cx = xl + (xr - xl)*t; cy = (a.y + b.y)/2 + (H - rh)*.5*(tilt || 0); }
       const pw = rw*1.02, ph = rh*1.02, px0 = img.position.x - pw/2, py0 = img.position.y - ph/2;
       IU.uR.value.set((cx - W/2 - px0)/pw, (cy - H/2 - py0)/ph, W/pw, H/ph);
       const r = st.rect = { x0: cx - W/2, y1: cy + H/2, W, H, Z };
@@ -16391,7 +16393,9 @@ void main(){
     const envA = cmp ? 0 : bmOn ? 1 : smooth(.25, 1, life)*(trn ? Math.max(0, 1 - trT*3) : 1);
     EU.uT.value = T; EU.uA.value = envA; EU.uPort.value = port ? 1 : 0; if (pEnv) pEnv.visible = envA > .01;
     if (PAN){ PAN.update(T, cmp || bmOn ? 0 : envA, port ? 0 : ptr.nx*.9, -ptr.ny*.5);
-      if (PAN.img){ PAN.layout(cam, port, ZP, -ptr.nx, foldK); panoLayoutImg(); } }
+      if (PAN.img){ if (!(fc % 20)){ const r = box.querySelector(".time-in").getBoundingClientRect(); panL = port ? 0 : Math.min(.6, (r.right + 24)/W3); }
+        const k = Math.min(1, dt*1.6); panX += (gpx - panX)*k; panY += (gpy - panY)*k;
+        PAN.layout(cam, port, ZP, port ? -ptr.nx : panX, foldK, panL, panY); panoLayoutImg(); } }
     const pon = !!PAN && envA > .35 && !cmp && !bmOn; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
     const hid = fold && pon; if (hid !== box.classList.contains("bio-hide")){ box.classList.toggle("bio-hide", hid); foldBtn(); }
     foldK += ((hid ? 1 : 0) - foldK)*Math.min(1, dt*3.2);
@@ -16771,7 +16775,9 @@ void main(){
     jrMark("bio", "sp:" + k, BIO_SP[k].ru); card();
   }
   // ======== панорама эпохи: пейзаж (bio_pano.js) + существа-рисунки на своих местах ========
-  let PAN = null, fold = false, foldK = 0;
+  let PAN = null, fold = false, foldK = 0, panX = 0, panY = 0, panL = .38, gpx = 0, gpy = 0;
+  // по панораме водит курсор в любом месте главы (и над текстом, и над колонной)
+  box.addEventListener("pointermove", e => { if (e.pointerType === "touch") return; gpx = clamp(e.clientX/innerWidth*2 - 1, -1, 1); gpy = clamp(e.clientY/innerHeight*2 - 1, -1, 1); });
   // свернуть текст и смотреть панораму целиком
   const fb = $("bioFold");
   function foldBtn(){ const h = box.classList.contains("bio-hide"), m = innerWidth <= 760; fb.textContent = h ? (m ? "⌃" : "›") : (m ? "⌄" : "‹");

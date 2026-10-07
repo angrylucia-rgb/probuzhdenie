@@ -470,7 +470,9 @@ void main(){
     const envA = cmp ? 0 : bmOn ? 1 : smooth(.25, 1, life)*(trn ? Math.max(0, 1 - trT*3) : 1);
     EU.uT.value = T; EU.uA.value = envA; EU.uPort.value = port ? 1 : 0; if (pEnv) pEnv.visible = envA > .01;
     if (PAN){ PAN.update(T, cmp || bmOn ? 0 : envA, port ? 0 : ptr.nx*.9, -ptr.ny*.5);
-      if (PAN.img){ PAN.layout(cam, port, ZP, -ptr.nx, foldK); panoLayoutImg(); } }
+      if (PAN.img){ if (!(fc % 20)){ const r = box.querySelector(".time-in").getBoundingClientRect(); panL = port ? 0 : Math.min(.6, (r.right + 24)/W3); }
+        const k = Math.min(1, dt*1.6); panX += (gpx - panX)*k; panY += (gpy - panY)*k;
+        PAN.layout(cam, port, ZP, port ? -ptr.nx : panX, foldK, panL, panY); panoLayoutImg(); } }
     const pon = !!PAN && envA > .35 && !cmp && !bmOn; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
     const hid = fold && pon; if (hid !== box.classList.contains("bio-hide")){ box.classList.toggle("bio-hide", hid); foldBtn(); }
     foldK += ((hid ? 1 : 0) - foldK)*Math.min(1, dt*3.2);
@@ -850,7 +852,9 @@ void main(){
     jrMark("bio", "sp:" + k, BIO_SP[k].ru); card();
   }
   // ======== панорама эпохи: пейзаж (bio_pano.js) + существа-рисунки на своих местах ========
-  let PAN = null, fold = false, foldK = 0;
+  let PAN = null, fold = false, foldK = 0, panX = 0, panY = 0, panL = .38, gpx = 0, gpy = 0;
+  // по панораме водит курсор в любом месте главы (и над текстом, и над колонной)
+  box.addEventListener("pointermove", e => { if (e.pointerType === "touch") return; gpx = clamp(e.clientX/innerWidth*2 - 1, -1, 1); gpy = clamp(e.clientY/innerHeight*2 - 1, -1, 1); });
   // свернуть текст и смотреть панораму целиком
   const fb = $("bioFold");
   function foldBtn(){ const h = box.classList.contains("bio-hide"), m = innerWidth <= 760; fb.textContent = h ? (m ? "⌃" : "›") : (m ? "⌄" : "‹");
