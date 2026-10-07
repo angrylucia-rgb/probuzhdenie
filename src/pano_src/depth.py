@@ -18,3 +18,5 @@ for i in ids:
     dm.save(os.path.join(OUT, "%s_d.webp" % i), "WEBP", quality=88)
     im.resize((2560, round(2560*im.size[1]/im.size[0])), Image.LANCZOS).save(os.path.join(OUT, "%s.webp" % i), "WEBP", quality=80, method=6)
     print(i, os.path.getsize(os.path.join(OUT, "%s.webp" % i))//1024, "KB", os.path.getsize(os.path.join(OUT, "%s_d.webp" % i))//1024, "KB")
+# Примечание (v104): для панорам с подводной частью без дна глубину под линией воды выравниваем
+# (почти ровная толща: глубина у линии воды + 0,12 книзу), иначе модель считает воду полом и параллакс «едет» как у земли.
