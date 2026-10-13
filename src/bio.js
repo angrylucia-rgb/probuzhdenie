@@ -792,7 +792,7 @@ void main(){
       const mxL = Math.max(1.7, S.len), wH = 1.7/mxL*100, wS = S.len/mxL*100;
       const SE = BIO_ERAS[SP_ERA[k]];
       h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(gal.on ? "Галерея" : bmOn ? BIO_BIOMES[bi].nm : E ? E.nm : "")} · портрет</span><span class="tm-nav"><button id="bioBack" data-hover>← ${esc(gal.on ? "Галерея" : bmOn ? BIO_BIOMES[bi].nm : E ? E.nm : "Назад")}</button></span></div>
-        <img class="bio-port" src="${thumb(k, 520, 240)}" alt="Силуэт: ${esc(S.ru)}">
+        <img class="bio-port" src="${thumb(k, 520, 240)}" alt="${ARTD[k] ? "Рисунок" : "Силуэт"}: ${esc(S.ru)}">
         <h3>${esc(S.ru)}</h3><p class="tm-ago2"><i>${esc(S.lat)}</i></p><p class="bio-grp mono">${esc(S.grp)}</p>
         <div class="bio-size" aria-label="Сравнение размера с человеком"><div><span>Человек · 1,7 м</span><i style="width:${Math.max(.6, wH).toFixed(2)}%"></i></div><div><span>${esc(S.ru)} · ${esc(S.lenT)}</span><i class="s" style="width:${Math.max(.6, wS).toFixed(2)}%"></i></div></div>
         <h4>${S.bio ? "Как приспособлен" : "Главное изобретение"}</h4><p class="tm-pr bio-p">${esc(S.inv)}</p>
