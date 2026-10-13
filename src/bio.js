@@ -938,7 +938,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     INST.forEach((I, q) => { if (I.pu == null) return;
       const F = fosPos(I);
       if (!r){ I.h = F[3]; I.U.uS.value = F[3]; I.X = F[0]; I.Y = F[1]; I.Z = F[2]; return; }
-      const hs = I.ps*r.H, ar = I.sp.ar, sw = ar >= 1 ? hs : hs*ar, sh = ar >= 1 ? hs/ar : hs, [wx, wy] = PAN.toWorld(I.pu, I.pv), [dx, dy] = PAN.shift(I.pu, I.pv);
+      const hs = I.ps*r.H, ar = I.sp.ar, sw = ar >= 1 ? hs : hs*ar, sh = (ar >= 1 ? hs/ar : hs)*(I.fl || 1), [wx, wy] = PAN.toWorld(I.pu, I.pv), [dx, dy] = PAN.shift(I.pu, I.pv);
       const land = !I.wet && I.anim !== "fly" && I.lane !== "water";
       const PX = wx + dx, PY = (land ? wy + sh/2 : wy) + dy, PZ = ZP + .5 + q*.01, mixF = (a, b) => a + (b - a)*kF;
       I.h = mixF(F[3], hs); I.U.uS.value = I.h; I.X = mixF(F[0], PX); I.Y = mixF(F[1], PY); I.Z = mixF(F[2], PZ);
@@ -975,7 +975,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     panoClear();
     const E = n >= 0 ? BIO_ERAS[n] : null, PI = E && E.ready && typeof PIMG !== "undefined" && PIMG.has(E.id) ? BIO_PIMG[E.id] : null;
     const PS = !PI && E && E.ready && typeof PANO !== "undefined" && PANO.has(E.id) ? BIO_PANO[E.id] : null;
-    INST = PI ? makeInst(n, PI.slots.filter(r => BIO_SP[r[0]]).map(([k, u, v, sz, d]) => ({ k, x: (u - .5)*9, y: 2.4 - (v - .15)*5.5, z: -.35, h: clamp(sz*6, .7, 1.9), v: 0, dir: d, pu: u, pv: v, ps: sz, wet: !!PI.wl && v > PI.wl })))
+    INST = PI ? makeInst(n, PI.slots.filter(r => BIO_SP[r[0]]).map(([k, u, v, sz, d, fl]) => ({ k, fl, x: (u - .5)*9, y: 2.4 - (v - .15)*5.5, z: -.35, h: clamp(sz*6, .7, 1.9), v: 0, dir: d, pu: u, pv: v, ps: sz, wet: !!PI.wl && v > PI.wl })))
       : PS ? makeInst(n, PS.slots.map(([k, x, y, z, h, d]) => ({ k, x, y, z, h, v: 0, dir: d })), PS.floor) : makeInst(n); life = 0; lifeT = 0;
     makeEnv(E && E.ready && !PS && !PI ? E.world : null); sky.dataset.w = E && E.ready ? E.world : "";
     if (PI) panoBuildImg(E, PI); else if (PS) panoBuild(E, PS);
