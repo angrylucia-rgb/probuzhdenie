@@ -965,7 +965,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   function reviveStone(){
     if (!ST){ lifeT = 1; lifeAt = 0; hint(); return; }
     if (cur < 0 || !BIO_ERAS[cur].ready || !ST.revive()) return;
-    life = lifeT = 1; lifeAt = 0; hint();
+    life = lifeT = 1; lifeAt = 0; hint(); Music.voice("bio:" + BIO_ERAS[cur].world, false);
   }
   function toStone(){
     if (!ST){ lifeT = 0; lifeAt = 0; hint(); return; }
@@ -981,7 +981,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     if (PI) panoBuildImg(E, PI); else if (PS) panoBuild(E, PS);
     if (E && E.ready && !ST) lifeAt = performance.now() + 1300;
     if (E) jrMark("bio", E.id, E.nm);
-    Music.voice("bio:" + (E && E.ready ? E.world : "rock"), false);
+    Music.voice("bio:" + (E && E.ready && !ST ? E.world : "rock"), false);   // со стеной пород: пока камень — гул породы, мир эпохи звучит после раскола
     hint();
   }
   // ---- ввод ----
@@ -1005,7 +1005,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   function openB(target){
     if (!built) build(); open = bioOn = true; size();
     if (ST === undefined){ ST = typeof STRATA !== "undefined" ? STRATA.init(box, "strata/") : null;
-      if (ST){ ST.cb.fossil = () => { if (lifeT < .5) reviveStone(); }; ST.cb.opened = () => hint(); ST.cb.closed = () => { life = lifeT = 0; hint(); }; } }
+      if (ST){ ST.cb.fossil = () => { if (lifeT < .5) reviveStone(); }; ST.cb.opened = () => hint(); ST.cb.closed = () => { life = lifeT = 0; hint(); Music.voice("bio:rock", false); }; } }
     if (target != null && target !== -2 && bmOn) bmLeave();
     const n = typeof target === "string" ? BIO_ERAS.findIndex(e => e.id === target) : target;
     if (n != null && n !== -2){ cur = n; trn = null; view = null; arrive(n); column(); card(); if (ST) ST.go(n >= 0 ? NE - 1 - n : -1, true); }
