@@ -1,0 +1,142 @@
+{
+ "now": {
+  "file": "01_now.png",
+  "x0": 1512,
+  "y0": 650,
+  "side": 389,
+  "size_m": 0.25
+ },
+ "holocene": {
+  "file": "02_holocene.png",
+  "x0": 1161,
+  "y0": 223,
+  "side": 1091,
+  "size_m": 0.7
+ },
+ "pleistocene": {
+  "file": "03_pleistocene.png",
+  "x0": 1473,
+  "y0": 688,
+  "side": 467,
+  "size_m": 0.3
+ },
+ "neogene": {
+  "file": "04_neogene.png",
+  "x0": 1516,
+  "y0": 455,
+  "side": 380,
+  "size_m": 0.17
+ },
+ "paleogene": {
+  "file": "05_paleogene.png",
+  "x0": 1239,
+  "y0": 377,
+  "side": 935,
+  "size_m": 0.6
+ },
+ "cretaceous": {
+  "file": "06_cretaceous.png",
+  "x0": 950,
+  "y0": 133,
+  "side": 1403,
+  "size_m": 0.9
+ },
+ "jurassic": {
+  "file": "07_jurassic.png",
+  "x0": 1383,
+  "y0": 510,
+  "side": 701,
+  "size_m": 0.45
+ },
+ "triassic": {
+  "file": "08_triassic.png",
+  "x0": 1512,
+  "y0": 650,
+  "side": 389,
+  "size_m": 0.25
+ },
+ "permian": {
+  "file": "09_permian.png",
+  "x0": 1395,
+  "y0": 303,
+  "side": 623,
+  "size_m": 0.4
+ },
+ "carboniferous": {
+  "file": "10_carboniferous.png",
+  "x0": 1239,
+  "y0": 301,
+  "side": 935,
+  "size_m": 0.6
+ },
+ "devonian": {
+  "file": "11_devonian.png",
+  "x0": 1395,
+  "y0": 533,
+  "side": 623,
+  "size_m": 0.4
+ },
+ "silurian": {
+  "file": "12_silurian.png",
+  "x0": 1356,
+  "y0": 494,
+  "side": 701,
+  "size_m": 0.45
+ },
+ "ordovician": {
+  "file": "13_ordovician.png",
+  "x0": 1317,
+  "y0": 455,
+  "side": 779,
+  "size_m": 0.5
+ },
+ "cambrian": {
+  "file": "14_cambrian.png",
+  "x0": 1395,
+  "y0": 610,
+  "side": 623,
+  "size_m": 0.4
+ },
+ "ediacaran": {
+  "file": "15_ediacaran.png",
+  "x0": 1395,
+  "y0": 533,
+  "side": 623,
+  "size_m": 0.4
+ },
+ "snowball": {
+  "file": "16_snowball.png",
+  "x0": 1434,
+  "y0": 572,
+  "side": 545,
+  "size_m": 0.35
+ },
+ "boring": {
+  "file": "17_boring.png",
+  "x0": 1317,
+  "y0": 563,
+  "side": 779,
+  "size_m": 0.5
+ },
+ "goe": {
+  "file": "18_goe.png",
+  "x0": 1434,
+  "y0": 572,
+  "side": 545,
+  "size_m": 0.35
+ },
+ "archean": {
+  "file": "19_archean.png",
+  "x0": 1512,
+  "y0": 650,
+  "side": 389,
+  "size_m": 0.25
+ },
+ "hadean": {
+  "file": "20_hadean.png",
+  "x0": 1516,
+  "y0": 654,
+  "side": 380,
+  "size_m": 0.15
+ }
+}

@@ -1,0 +1,848 @@
+<title>Пласты камня — прототип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=PT+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Раскладка: стена на весь экран (WebGL), слева — полевой журнал геолога, справа — керн из 20 пластов. Один тёмный мир (подземелье), без светлой темы — сознательно. */
+:root{
+  --ink:#0b0907;          /* темнота породы */
+  --paper:#e9dfcb;        /* текст журнала */
+  --muted:#a89a82;        /* подписи */
+  --lamp:#f2c879;         /* тёплый свет фонаря — единственный акцент */
+  --line:rgba(233,223,203,.16);
+  --veil:rgba(8,6,5,.78);
+  --f-disp:"Forum","Cormorant Garamond",Georgia,serif;
+  --f-body:"PT Serif",Georgia,"Times New Roman",serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow:hidden;touch-action:none}
+#gl,#fx{position:fixed;inset:0;width:100%;height:100%;display:block}
+#fx{pointer-events:none}
+.ui{position:fixed;inset:0;pointer-events:none}
+.ui *{pointer-events:auto}
+/* журнал */
+.log{position:absolute;left:0;top:0;bottom:0;width:min(400px,34vw);padding:calc(env(safe-area-inset-top,0px) + 34px) 30px 28px 32px;
+  background:linear-gradient(90deg,var(--veil) 0,var(--veil) 70%,rgba(8,6,5,0));display:flex;flex-direction:column;gap:14px;pointer-events:none}
+.log>*{pointer-events:auto}
+.eyebrow{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--lamp)}
+.eyebrow span{color:var(--muted)}
+h1{font:400 clamp(38px,4.2vw,58px)/1 var(--f-disp);margin:6px 0 0;letter-spacing:.01em;text-wrap:balance}
+.age{font:400 15px/1.3 var(--f-mono);color:var(--lamp);font-variant-numeric:tabular-nums}
+.rock{font:italic 16px/1.45 var(--f-body);color:var(--muted);margin:0}
+.txt{font:16px/1.55 var(--f-body);margin:0;max-width:62ch}
+.mk{font-style:normal;color:var(--lamp);font-size:.85em}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+button{font:500 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--paper);background:rgba(20,16,12,.7);
+  border:1px solid rgba(242,200,121,.45);border-radius:999px;padding:11px 16px;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+button:hover{background:rgba(242,200,121,.14);border-color:var(--lamp)}
+button:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+button.go{color:#1a1208;background:var(--lamp);border-color:var(--lamp)}
+button.go:hover{background:#ffd994}
+button:disabled,button.go:disabled{opacity:.45;cursor:default;background:rgba(20,16,12,.7);color:var(--muted);border-color:rgba(242,200,121,.3)}
+.nav{display:flex;gap:8px}
+.nav button{width:40px;height:40px;padding:0;font-size:16px;letter-spacing:0}
+.way[hidden]{display:none}
+.way{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font:400 12px/1.3 var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.way .wl{width:100%;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+.way label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.way input{accent-color:var(--lamp);margin:0}
+.tip{margin-top:auto;font:400 12px/1.5 var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.tip b{color:var(--paper);font-weight:500}
+/* керн */
+.core{position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 50px);bottom:28px;width:30px;display:flex;flex-direction:column;gap:3px}
+.seg{flex:1;border-radius:3px;background:#17130f;border:1px solid rgba(233,223,203,.07);position:relative;cursor:default;background-size:cover;background-position:center}
+.seg.ready{cursor:pointer;border-color:rgba(233,223,203,.25)}
+.seg.ready:hover{border-color:var(--lamp)}
+.seg.cur{outline:2px solid var(--lamp);outline-offset:2px}
+.seg .nm{position:absolute;right:42px;top:50%;transform:translateY(-50%);white-space:nowrap;font:400 18px/1 var(--f-disp);color:var(--paper);opacity:0;transition:opacity .3s;pointer-events:none;text-shadow:0 1px 6px #000}
+.seg.cur .nm,.seg:hover .nm{opacity:1}
+.seg:not(.ready) .nm{font:400 11px/1 var(--f-mono);color:var(--muted)}
+.coreCap{position:absolute;right:16px;top:calc(env(safe-area-inset-top,0px) + 22px);font:500 10px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+/* метки на стене */
+.pin{position:absolute;right:70px;font:400 11px/1.3 var(--f-mono);color:var(--paper);letter-spacing:.06em;display:flex;align-items:center;gap:8px;pointer-events:none;opacity:.85;text-shadow:0 1px 4px #000;transition:opacity .3s}
+.pin::after{content:"";width:46px;height:1px;background:var(--lamp)}
+.gap{position:absolute;left:min(430px,37vw);font:400 11px/1.3 var(--f-mono);color:var(--muted);letter-spacing:.06em;pointer-events:none;text-shadow:0 1px 4px #000}
+.hov{position:absolute;font:400 13px/1.35 var(--f-mono);color:var(--paper);background:rgba(8,6,5,.82);border:1px solid rgba(242,200,121,.5);padding:8px 11px;border-radius:6px;pointer-events:none;transform:translate(-50%,-130%);white-space:nowrap;opacity:0;transition:opacity .2s}
+.hov b{color:var(--lamp);font-weight:500}
+.load{position:fixed;inset:0;display:grid;place-items:center;font:400 13px var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:var(--ink);transition:opacity .8s}
+@media (max-width:720px){
+  .log{width:auto;left:0;right:0;top:auto;bottom:0;padding:16px 64px calc(env(safe-area-inset-bottom,0px) + 16px) 16px;gap:8px;
+    background:linear-gradient(0deg,var(--veil) 0,var(--veil) 75%,rgba(8,6,5,0))}
+  h1{font-size:34px}
+  .txt{font-size:14.5px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .rock{font-size:14px}
+  .tip{display:none}
+  .way .wl{display:none}
+  .core{right:12px;width:22px}
+  .coreCap{right:8px}
+  .pin{right:44px}.pin::after{width:20px}
+  .gap{left:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<canvas id="gl" aria-label="Стена породы под фонарём"></canvas>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="ui">
+  <section class="log" id="log">
+    <div class="eyebrow">Биосфера · пласты камня <span>· прототип</span></div>
+    <h1 id="nm">Наше время</h1>
+    <div class="age" id="age"></div>
+    <p class="rock" id="rock"></p>
+    <p class="txt" id="txt"></p>
+    <div class="row">
+      <div class="nav"><button id="up" aria-label="Пласт выше">↑</button><button id="dn" aria-label="Пласт ниже">↓</button></div>
+      <button class="go" id="act" hidden>Оживить окаменелость</button>
+    </div>
+    <div class="way" id="way" role="radiogroup" aria-label="Как открыть камень">
+      <span class="wl">как открыть камень</span>
+      <label><input type="radio" name="way" id="waySlab" value="slab" checked> расколоть по слоям</label>
+      <label><input type="radio" name="way" id="wayErode" value="erode"> стереть временем</label>
+    </div>
+    <div class="tip">Курсор — это <b>фонарь</b>: ведите им по стене.<br>Колесо или ↑ ↓ — спуск по пластам.</div>
+  </section>
+  <div class="coreCap">керн</div>
+  <div class="core" id="core"></div>
+  <div class="hov" id="hov"></div>
+  <div id="pins"></div>
+</div>
+<div class="load" id="load">спускаемся в породу…</div>
+
+<script>
+(() => {
+"use strict";
+const AR = 1429/2560;               // высота картинки стены / ширина
+const PA = 3168/1344;               // пропорции панорамы
+// ---- пласты с картинками (сверху вниз) ----
+const mk = (id, nm, age, rock, txt, o) => Object.assign({ id, nm, age, rock, txt, gloss:.3, grain:[120,110,100], soft:"none", dust:1 }, o || {});
+const L = [
+  mk("now", "Наше время", "с середины XX века", "Насыпной грунт: бетон, кирпич, стекло, асфальт, пластик, кости кур.",
+    "Так выглядит слой, который оставляем мы. Геологи спорят, считать ли его новой эпохой — антропоценом: в 2024 году подкомиссия по стратиграфии четвертичного периода отклонила это предложение <span class=mk>●</span>. Но след уже в камне: кусок «пластигломерата» — расплавленный пластик, сросшийся с песком и галькой.",
+    { gloss:.35, grain:[90,70,50], soft:"all", dust:2 }),
+  mk("holocene", "Голоцен", "11,7 тыс. лет назад – наши дни", "Торф с корнями, серо-голубая озёрная глина, песок.",
+    "Тёплое время после последнего оледенения <span class=mk>●</span>. В болотах растения не успевают сгнить и копятся торфом — примерно по миллиметру в год <span class=mk>◐</span>. Торф хранит пыльцу, по которой восстанавливают климат прошлого <span class=mk>●</span>.",
+    { gloss:.5, grain:[70,52,36], soft:"all", dust:1.2 }),
+  mk("pleistocene", "Плейстоцен", "2,58 млн – 11,7 тыс. лет назад", "Жёлтый лёсс, вечная мерзлота с линзами льда, ледниковая морена.",
+    "Эпоха ледниковых периодов <span class=mk>●</span>. Ледник приносил валуны всех пород и бросал их вперемешку — так получилась морена <span class=mk>●</span>. Ветер с ледников надувал жёлтый лёсс <span class=mk>●</span>, а в мерзлоте до сих пор находят туши мамонтов <span class=mk>●</span>.",
+    { gloss:.35, grain:[190,170,130], soft:"all", dust:2.2 }),
+  mk("neogene", "Неоген", "23 – 2,58 млн лет назад", "Косослоистый песчаник, белый диатомит, прослой гальки.",
+    "Косые слои — следы подводных дюн и течений <span class=mk>●</span>. Белый лёгкий диатомит сложен створками микроскопических водорослей-диатомей <span class=mk>●</span>. В неогене жил мегалодон, самая крупная хищная акула <span class=mk>●</span>.",
+    { gloss:.15, grain:[215,190,140], dust:2 }),
+  mk("paleogene", "Палеоген", "66 – 23 млн лет назад", "Тонкослоистый горючий сланец.",
+    "Ил на дне бескислородного озера ложился тончайшими слоями <span class=mk>●</span>. В таком сланце карьера Мессель (Германия, ≈ 47 млн лет) сохранились ранние лошади и летучие мыши с контуром тела и даже содержимым желудка <span class=mk>●</span>.",
+    { gloss:.5, grain:[80,72,62], soft:"shale", dust:.8 }),
+  mk("cretaceous", "Мел", "145 – 66 млн лет назад", "Белый мел с рядами чёрных кремнёвых желваков.",
+    "Мел — это микроскопические известковые щитки водорослей-кокколитофорид, миллионы лет оседавшие на дно тёплого моря <span class=mk>●</span>. Чёрные желваки — кремень: кремнезём скелетов губок, собравшийся в осадке <span class=mk>●</span>. Тонкая тёмная полоса сверху — граница мела и палеогена: глина с иридием от удара астероида 66 млн лет назад <span class=mk>●</span> (в Дувре её нет — она видна, например, в Стевнс-Клинт в Дании).",
+    { gloss:.12, grain:[217,212,198], dust:2.5, pin:{ v:.125, t:"66,0 млн лет · иридиевая глина" } }),
+  mk("jurassic", "Юра", "201 – 145 млн лет назад", "Голубой лейас: слои известняка и глинистого сланца.",
+    "Ритм светлых известняков и тёмных сланцев отложился на дне тёплого мелкого моря <span class=mk>●</span>. В таких скалах у Лайм-Риджиса Мэри Эннинг в 1811–1812 годах откопала первый целый скелет ихтиозавра <span class=mk>●</span>. Под фонарём проступает его отпечаток — в сланцах Хольцмадена сохраняется даже контур тела <span class=mk>●</span>.",
+    { gloss:.45, grain:[111,118,122], soft:"dark", dust:1, fos:{ u:.63, v:.56, w:.153, ha:.4, nm:"Ихтиозавр", what:"череп с кольцом костных пластин вокруг глаза · ≈ 45 см" } }),
+  mk("triassic", "Триас", "252 – 201 млн лет назад", "Красные песчаники и аргиллиты с зелёными пятнами.",
+    "Красный цвет — окисленное железо: осадки сохли на воздухе жаркой Пангеи <span class=mk>●</span>. Зелёные пятна — места, где железо восстановилось <span class=mk>●</span>. В триасе появились первые динозавры и млекопитающие <span class=mk>●</span>.",
+    { gloss:.2, grain:[170,80,55], soft:"dark", dust:1.6 }),
+  mk("permian", "Пермь", "299 – 252 млн лет назад", "Красный дюнный песчаник, гипс и каменная соль.",
+    "Огромные косые слои — застывшие дюны пустыни <span class=mk>●</span>. Ниже соль и гипс: испарившееся мелкое море, как цехштейн Европы <span class=mk>●</span>. В конце перми случилось величайшее вымирание: исчезло около 80–90 % морских видов <span class=mk>◐</span>.",
+    { gloss:.3, grain:[190,95,60], dust:1.8 }),
+  mk("carboniferous", "Карбон", "359 – 299 млн лет назад", "Угольный пласт между сланцем и песчаником.",
+    "Уголь — спрессованные остатки болотных лесов из гигантских плаунов и папоротников <span class=mk>●</span>. Чтобы получился метровый пласт, нужны были многие метры торфа <span class=mk>◐</span>. Под фонарём уголь блестит и раскалывается на кубики по трещинам кливажа.",
+    { gloss:1.0, grain:[29,27,26], soft:"cube", dust:1.2 }),
+  mk("devonian", "Девон", "419 – 359 млн лет назад", "Древний красный песчаник с галечным конгломератом.",
+    "Галька и косые слои — русла рек на суше <span class=mk>●</span>. В таких породах Шотландии найдены панцирные и кистепёрые рыбы <span class=mk>●</span>; в девоне первые четвероногие вышли на сушу <span class=mk>●</span>.",
+    { gloss:.2, grain:[140,70,55], dust:1.4 }),
+  mk("silurian", "Силур", "443 – 419 млн лет назад", "Рифовый известняк с куполами строматопороидей.",
+    "Купола и бугры — постройки губок-строматопороидей и кораллов тёплого мелкого моря <span class=mk>●</span>. В силуре на сушу вышли первые растения <span class=mk>●</span>.",
+    { gloss:.15, grain:[160,158,150], dust:1.3 }),
+  mk("ordovician", "Ордовик", "487 – 443 млн лет назад", "Красно-зелёный тонкослоистый известняк.",
+    "В таком известняке Балтики полно прямых раковин ортоцерасов — родственников наутилуса <span class=mk>●</span>. В ордовике морская жизнь стремительно разнообразилась <span class=mk>●</span>, а закончился он одним из пяти великих вымираний <span class=mk>●</span>.",
+    { gloss:.25, grain:[130,90,80], dust:1 }),
+  mk("cambrian", "Кембрий", "539 – 487 млн лет назад", "Чёрный сланец, как в Бёрджес.",
+    "Тонкий ил хоронил животных быстро и без кислорода — сохранились даже мягкие тела <span class=mk>●</span>. Сланцу Бёрджес в Канаде около 508 млн лет <span class=mk>●</span>.",
+    { gloss:.55, grain:[60,60,62], soft:"shale", dust:.8 }),
+  mk("ediacaran", "Эдиакарий", "635 – 539 млн лет назад", "Розовый кварцитовый песчаник с «кожей слона».",
+    "Морщинистая поверхность — след бактериального ковра на дне <span class=mk>●</span>. На таких коврах жили первые крупные животные — дикинсонии <span class=mk>●</span>.",
+    { gloss:.15, grain:[220,170,150], dust:1 }),
+  mk("snowball", "Земля-снежок", "720 – 635 млн лет назад", "Тиллит — ледниковая мешанина — и светлая «шапка» доломита.",
+    "Камни, упавшие с тающего льда, продавили слои ила под собой <span class=mk>●</span>. Светлый доломит сверху отложился сразу после оттаивания, в тёплом море <span class=mk>●</span>.",
+    { gloss:.25, grain:[90,100,95], dust:1.2 }),
+  mk("boring", "«Скучный миллиард»", "≈ 1,8 – 0,8 млрд лет назад", "Красный песчаник и доломит со строматолитами.",
+    "Около миллиарда лет условия на Земле почти не менялись <span class=mk>◐</span>. Волнистые слои — строматолиты, постройки цианобактерий <span class=mk>●</span>.",
+    { gloss:.15, grain:[170,110,95], dust:1.2 }),
+  mk("goe", "Кислородное событие", "≈ 2,4 млрд лет назад", "Полосчатая железная руда: красная яшма и серый гематит.",
+    "Кислород цианобактерий окислял растворённое в море железо, и оно оседало слоями <span class=mk>●</span>. Из таких пород добывают большую часть железной руды мира <span class=mk>●</span>.",
+    { gloss:.8, grain:[140,70,70], dust:.7 }),
+  mk("archean", "Архей", "4,0 – 2,5 млрд лет назад", "Подушечные лавы и полосчатый гнейс с жилами кварца.",
+    "Подушки — лава, застывшая под водой <span class=mk>●</span>: такие есть в Гренландии, возрастом ≈ 3,7 млрд лет, значит, океаны уже были <span class=mk>●</span>.",
+    { gloss:.5, grain:[70,80,70], dust:.6 }),
+  mk("hadean", "Гадей", "4,57 – 4,0 млрд лет назад", "Древний метаморфизованный конгломерат с вытянутой кварцевой галькой.",
+    "Пород гадея почти не осталось <span class=mk>●</span>. Древнейшие свидетели — кристаллики циркона ≈ 4,4 млрд лет в более молодой породе Джек-Хиллс (Австралия) <span class=mk>●</span>: по ним видно, что вода была уже тогда <span class=mk>◐</span>.",
+    { gloss:.6, grain:[150,120,100], dust:.6 }),
+];
+const FOS = {
+  now:        { u:.62, v:.55, w:.085, ha:.8, nm:"Пластигломерат", what:"пластик, сплавленный с песком и галькой · ≈ 25 см" },
+  holocene:   { u:.62, v:.50, w:.238, ha:.35, nm:"Рог благородного оленя", what:"сброшенный рог в торфе · ≈ 70 см" },
+  pleistocene:{ u:.62, v:.60, w:.102, ha:.55, nm:"Зуб мамонта", what:"коренной зуб с пластинами эмали · ≈ 30 см" },
+  neogene:    { u:.62, v:.42, w:.083, ha:.75, nm:"Зуб мегалодона", what:"самой крупной хищной акулы · ≈ 17 см" },
+  paleogene:  { u:.62, v:.55, w:.204, ha:.55, nm:"Ранняя лошадь", what:"скелет с контуром тела, как в сланце Мессель · ≈ 60 см" },
+  cretaceous: { u:.60, v:.543, w:.306, ha:.4, nm:"Мозазавр", what:"череп морского ящера · ≈ 90 см" },
+  triassic:   { u:.62, v:.55, w:.085, ha:.7, nm:"Листрозавр", what:"череп с двумя бивнями · ≈ 25 см" },
+  permian:    { u:.62, v:.40, w:.136, ha:.55, nm:"Диметродон", what:"череп хищного синапсида с зубами разной длины · ≈ 40 см" },
+  carboniferous:{ u:.62, v:.50, w:.204, ha:.35, nm:"Лепидодендрон", what:"кора древовидного плауна с ромбическими рубцами листьев · ≈ 60 см" },
+  devonian:   { u:.62, v:.55, w:.136, ha:.45, nm:"Коккостей", what:"панцирная рыба · ≈ 40 см" },
+};
+const DIR3 = ["permian"];   // переделанные окаменелости
+L.forEach(E => { if (FOS[E.id]) E.fos = FOS[E.id]; E.dir = DIR3.includes(E.id) ? "assets/v3/" : E.fos ? "assets/v2/" : "assets/"; });   // стены с вписанной окаменелостью — в v2
+const PANOS = "archean boring cambrian carboniferous devonian ediacaran goe hadean jurassic ordovician permian silurian snowball triassic".split(" ");
+L.forEach(E => { E.pano = PANOS.includes(E.id); });
+const ERAS = L.map(E => E.nm);
+const READY = Object.fromEntries(L.map((E, i) => [i, i]));
+const GAPS = {};
+const NSL = 2048;                                // предел плит в карте
+
+// ---- WebGL ----
+const cv = document.getElementById("gl"), fx = document.getElementById("fx"), c2 = fx.getContext("2d");
+const gl = cv.getContext("webgl", { antialias:false, alpha:false, premultipliedAlpha:false });
+if (!gl){ document.getElementById("load").textContent = "Нужен браузер с WebGL"; return; }
+const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
+const FS = `precision highp float;
+uniform vec2 uRes; uniform float uS, uOffX, uScroll, uBase, uN, uHs, uDay, uDpr;
+uniform vec3 uLight; uniform vec3 uGl;
+uniform sampler2D uC0, uC1, uC2, uH0, uH1, uH2, uF, uP, uId, uSt;
+uniform vec4 uFos; uniform float uFosHa;
+uniform float uMode, uT, uBack, uOpen, uAll;             // способ: 1 плиты, 2 эрозия; время; возврат в камень; доля открытого
+uniform vec2 uO; uniform vec4 uReg;                 // начало (ширины стены); область карты плит
+uniform vec4 uPan; uniform vec2 uPar;
+const float AR = ${AR.toFixed(6)};
+float hash(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1)))*18731.73); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3. - 2.*f);
+  return mix(mix(hash(i), hash(i + vec2(1., 0.)), f.x), mix(hash(i + vec2(0., 1.)), hash(i + vec2(1., 1.)), f.x), f.y); }
+float fbm(vec2 p){ float a = .5, s = 0.; for (int i = 0; i < 5; i++){ s += a*vnoise(p); p = p*2.03 + 7.1; a *= .5; } return s; }
+float wave(float u, float k){ return .016*sin(u*7.3 + k*2.9) + .009*sin(u*19.1 + k*5.3) + .005*sin(u*47. + k); }
+vec3 colS(float s, vec2 uv){ return s < .5 ? texture2D(uC0, uv).rgb : s < 1.5 ? texture2D(uC1, uv).rgb : texture2D(uC2, uv).rgb; }
+float hS0(float s, vec2 uv){ return s < .5 ? texture2D(uH0, uv).r : s < 1.5 ? texture2D(uH1, uv).r : texture2D(uH2, uv).r; }
+float glS(float s){ return s < .5 ? uGl.x : s < 1.5 ? uGl.y : uGl.z; }
+vec2 fosUV(float li, vec2 uv){
+  if (abs(li - uFos.x) > .5) return vec2(-1.);
+  return vec2((uv.x - uFos.y)/uFos.w + .5, (uv.y - uFos.z)/(uFos.w*uFosHa/AR) + .5);   // uFos: слой, u, v, ширина
+}
+float fosM(vec2 f){ return (f.x < 0. || f.x > 1. || f.y < 0. || f.y > 1.) ? 0. : texture2D(uF, f).a; }
+float hgt(float s, float li, vec2 uv){
+  float h = hS0(s, uv);
+  vec2 f = fosUV(li, uv); if (f.x >= 0.){ vec4 F = texture2D(uF, clamp(f, 0., 1.)); float m = fosM(f); h = mix(h, .64 + (F.r - .5)*.7, m*.9); }
+  return h;
+}
+vec3 pano(vec2 px){
+  vec2 q = (px - uPan.xy)/uPan.zw; q = clamp(q, 0., 1.);
+  float d = texture2D(uP, vec2(q.x, .5 + clamp(q.y, .002, .998)*.5)).r; q -= uPar*(d - .3)*.02; q = clamp(q, .002, .998);
+  return pow(texture2D(uP, vec2(q.x, q.y*.5)).rgb, vec3(2.2));
+}
+// карта плит: 0 — линия скола; иначе номер плиты; состояние: 1 — плита ушла со стены
+float slabGone(vec2 w){
+  vec2 iq = (w - uReg.xy)/uReg.zw;
+  if (iq.x < 0. || iq.y < 0. || iq.x > 1. || iq.y > 1.) return 0.;
+  vec4 c = texture2D(uId, iq); float id = floor(c.r*255. + .5) + floor(c.g*255. + .5)*256.;
+  if (id < .5) return -1.;
+  return texture2D(uSt, vec2((id + .5)/${NSL}., .5)).r;
+}
+// треснула ли плита (скоро упадёт): по ней видна линия скола
+float slabCrk(vec2 w){
+  vec2 iq = (w - uReg.xy)/uReg.zw;
+  if (iq.x < 0. || iq.y < 0. || iq.x > 1. || iq.y > 1.) return 0.;
+  vec4 c = texture2D(uId, iq); float id = floor(c.r*255. + .5) + floor(c.g*255. + .5)*256.;
+  if (id < .5) return 0.;
+  return texture2D(uSt, vec2((id + .5)/${NSL}., .5)).g;
+}
+void main(){
+  vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+  float u = (px.x + uOffX)/uS, Y = uScroll + px.y/(uS*AR);
+  float li = floor(Y);
+  if (Y < li + wave(u, li)) li -= 1.;
+  else if (Y >= li + 1. + wave(u, li + 1.)) li += 1.;
+  li = clamp(li, 0., uN - 1.);
+  float s = li - uBase;
+  vec2 uv = vec2(u, Y - li);
+  vec2 uvc = vec2(u, uv.y < 0. ? -uv.y : uv.y > 1. ? 2. - uv.y : uv.y); uvc.y = clamp(uvc.y, .002, .998);
+  vec2 w = vec2(u, Y*AR);                         // координаты стены в её ширинах
+  float pxw = 1./uS;                               // один пиксель экрана в ширинах стены
+  float gone = 0., line = 0., occ = 0., lit = 0., sink = 0., dark = 0., haze = 0.;
+  float dO = length(w - uO);
+  if (uBack > 0.){
+    // ---- назад в камень: осадок нарастает с краёв к окаменелости ----
+    float h = hS0(s, uvc);
+    float D = .42*fbm(w*16.) + .3*(1. - h) + .1*fbm(w*70.) + dO;
+    float thr = -.1 + 1.7*pow(1. - uBack, 1.2);
+    float e = (D - thr)/.06; gone = step(e, 0.);
+    float ed = clamp(1. - e, 0., 1.)*(1. - gone); sink = ed*ed; dark = ed; occ = gone*clamp(1. + e*.6, 0., 1.)*.9;
+  } else if (uMode > .5 && uMode < 1.5){
+    // ---- раскол по слоям: плиты из карты ----
+    float g0 = slabGone(w);
+    float rc = .02 + .55*pow(uT, 1.3);             // фронт трещин
+    if (g0 < -.5){                                 // на линии скола
+      float n = 0., ck = 0.;                        // сколько рядом целых плит; треснула ли соседняя
+      for (int k = 0; k < 6; k++){ float a = float(k)*1.0472; vec2 o = w + vec2(cos(a), sin(a))*5.*pxw; float g = slabGone(o); n += step(-.5, g)*(1. - step(.5, g)); ck = max(ck, slabCrk(o)); }
+      gone = 1. - step(.5, n); line = (1. - gone)*ck;
+    } else gone = step(.5, g0);
+    float ng = 0., nr = 0.;
+    for (int k = 0; k < 6; k++){ float a = float(k)*1.0472 + .4;
+      vec2 o = vec2(cos(a), sin(a));
+      ng += step(.5, slabGone(w + o*28.*pxw));      // рядом пролом — свет из него на камень
+      float g9 = slabGone(w + o*9.*pxw); nr += step(-.5, g9)*(1. - step(.5, g9)); } // рядом целый камень — тень толщины стены на картине
+    lit = ng/6.; occ = nr/6.;
+    if (uAll > .5){ gone = 1.; occ = 0.; line = 0.; }
+  } else if (uMode > 1.5){
+    // ---- стереть временем: камень истирается по своему рельефу ----
+    float h = hS0(s, uvc);
+    float D = .42*fbm(w*16.) + .3*(1. - h) + .1*fbm(w*70.) + dO;
+    float thr = .05 + 1.4*pow(uT/6., 1.1);
+    float e = (D - thr)/.06;
+    gone = step(e, 0.);
+    float ed = clamp(1. - e, 0., 1.)*(1. - gone);
+    sink = ed*ed; dark = ed;
+    occ = gone*clamp(1. + e*.6, 0., 1.)*.9;        // у края пролома — тень от толщины
+    lit = gone > .5 ? 0. : smoothstep(.35, 0., e*.06)*.5;
+    haze = smoothstep(.16, 0., abs(D - thr))*fbm(w*7. + vec2(0., uT*.25))*step(.01, uT);
+  }
+  vec3 col;
+  vec3 rockC;
+  // ---- камень ----
+  {
+    vec3 alb = pow(colS(s, uvc), vec3(2.2));
+    vec2 f = fosUV(li, uvc); float fm = 0.;
+    if (f.x >= 0.){ fm = fosM(f); vec4 F = texture2D(uF, clamp(f, 0., 1.)); alb = mix(alb, alb*vec3(.34, .3, .26)*(.55 + 1.1*F.r), fm*.92); }
+    float tx = 1./1280., ty = 1./714.;
+    float h0 = hgt(s, li, uvc);
+    float hl = hgt(s, li, uvc - vec2(tx, 0.)), hr2 = hgt(s, li, uvc + vec2(tx, 0.));
+    float hu = hgt(s, li, uvc - vec2(0., ty)), hd = hgt(s, li, uvc + vec2(0., ty));
+    float pxT = uS/1280.;
+    float yb = Y - li, bd = min(abs(yb - wave(u, li)), abs(yb - 1. - wave(u, li + 1.)))*uS*AR;
+    float groove = exp(-bd*bd/(2.*pow(uS*.0035, 2.)));
+    h0 -= groove*.25; alb *= 1. - groove*.55;
+    // линия скола: узкая тёмная щель с рваным краем
+    float rough = .6 + .8*vnoise(w*900.);
+    h0 -= line*.6*rough; alb *= 1. - line*.88;
+    // эрозия: край проседает, светлеет свежим сколом и сыплется песком
+    h0 -= sink*.7; alb = mix(alb, alb*.45, dark*.6);
+    float sand = step(.8, hash(floor(px/1.6) + floor(uT*14.)))*dark;
+    alb += vec3(.18, .16, .13)*sand*.5;
+    vec3 N = normalize(vec3(-(hr2 - hl + sink*.0)*uHs/(2.*pxT), -(hd - hu)*uHs/(2.*pxT), 1.));
+    vec3 P = vec3(px, h0*uHs);
+    vec3 Lv = uLight - P; float dist = length(Lv); vec3 Ld = Lv/dist;
+    float R = .5*max(uRes.x, uRes.y);
+    float dxy = length(uLight.xy - px);
+    float att = pow(clamp(1. - dxy/(R*1.15), 0., 1.), 1.7)*(1./(1. + dist*dist/(R*R*.55)));
+    float sh = 1.; vec2 dir = normalize(uLight.xy - px + 1e-4); float lz = Ld.z/max(length(Ld.xy), 1e-3);
+    for (int k = 1; k <= 7; k++){
+      float st = float(k)*float(k)*1.6*pxT; vec2 pp = px + dir*st;
+      vec2 uvk = vec2((pp.x + uOffX)/uS, (uScroll + pp.y/(uS*AR)) - li);
+      float hk = hgt(s, li, clamp(uvk, .002, .998))*uHs; float rz = P.z + st*lz;
+      sh = min(sh, clamp(1. - (hk - rz)/(uHs*.18), 0., 1.));
+    }
+    float diff = max(dot(N, Ld), 0.);
+    vec3 Hh = normalize(Ld + vec3(0., 0., 1.));
+    float lum = dot(alb, vec3(.3, .55, .15));
+    float gm = glS(s)*(.25 + .75*(1. - smoothstep(.0, .25, lum)));
+    float spec = pow(max(dot(N, Hh), 0.), 48.)*gm;
+    vec3 lamp = vec3(1., .9, .74);
+    float day = uDay*.3*exp(-max(Y, 0.)*5.);
+    vec3 amb = vec3(.045, .041, .037) + vec3(.62, .66, .72)*day*(.55 + .45*N.y*-1.);
+    // свет живого мира из пролома: мягкий, рассеянный, растёт с размером пролома
+    vec3 sky = vec3(.95, .9, .78)*(lit*.55 + uOpen*.12);
+    rockC = alb*(amb + sky + lamp*diff*att*1.9*sh) + lamp*spec*att*sh*1.4;
+  }
+  vec3 pc = pano(px)*(1. - .8*occ*occ);
+  col = mix(rockC, pc, gone);
+  // пыль у фронта эрозии — освещена и фонарём, и миром за камнем
+  col += vec3(.55, .5, .42)*haze*.22*(.4 + uOpen);
+  col = col/(1. + col*.55);
+  vec2 sc = px/uRes - .5; col *= 1. - .45*(1. - .7*uOpen)*dot(sc*vec2(1.1, 1.), sc*vec2(1.1, 1.));
+  gl_FragColor = vec4(pow(col, vec3(1./2.2)), 1.);
+}`;
+// плиты, падающие со стены: каждая грань освещена в JS (aK), лицевая грань несёт отпечаток окаменелости
+const VSC = `attribute vec2 aP; attribute vec2 aT; attribute float aK; attribute float aSide; uniform vec2 uRes; varying vec2 vT; varying float vK, vSide;
+void main(){ vT = aT; vK = aK; vSide = aSide; gl_Position = vec4(aP.x/uRes.x*2. - 1., 1. - aP.y/uRes.y*2., 0., 1.); }`;
+const FSC = `precision mediump float; uniform sampler2D uTex, uF, uHt; uniform vec4 uFos; uniform float uFosHa, uHasF; varying vec2 vT; varying float vK, vSide;
+const float AR = ${AR.toFixed(6)};
+void main(){
+  vec3 a = pow(texture2D(uTex, vT).rgb, vec3(2.2));
+  if (uHasF > .5 && vSide < .5){ vec2 f = vec2((vT.x - uFos.y)/uFos.w + .5, (vT.y - uFos.z)/(uFos.w*uFosHa/AR) + .5);
+    if (f.x > 0. && f.x < 1. && f.y > 0. && f.y < 1.){ vec4 F = texture2D(uF, f); a = mix(a, a*vec3(.34, .3, .26)*(.55 + 1.1*F.r), F.a*.92); } }
+  if (vSide > .5) a = mix(a, vec3(dot(a, vec3(.33))), .35)*.8;     // свежий скол: тусклее, серее
+  else { vec2 e = vec2(2./1280., 2./714.); float h = texture2D(uHt, vT).r;
+    float hb = .25*(texture2D(uHt, vT + vec2(e.x, 0.)).r + texture2D(uHt, vT - vec2(e.x, 0.)).r + texture2D(uHt, vT + vec2(0., e.y)).r + texture2D(uHt, vT - vec2(0., e.y)).r);
+    float gy = texture2D(uHt, vT - vec2(0., e.y)).r - texture2D(uHt, vT + vec2(0., e.y)).r;
+    a *= clamp(.8 + (h - hb)*3. + gy*1.5, .35, 1.5); }               // рельеф той же породы, что на стене
+  vec3 c = a*vK; c = c/(1. + c*.55); gl_FragColor = vec4(pow(c, vec3(1./2.2)), 1.); }`;
+function prog(vs, fs){
+  const mk = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+  const p = gl.createProgram(); gl.attachShader(p, mk(gl.VERTEX_SHADER, vs)); gl.attachShader(p, mk(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p;
+}
+const P1 = prog(VS, FS), P2 = prog(VSC, FSC);
+const U1 = {}; ["uRes","uS","uOffX","uScroll","uBase","uN","uHs","uDay","uDpr","uLight","uGl","uC0","uC1","uC2","uH0","uH1","uH2","uF","uP","uId","uSt","uFos","uFosHa","uMode","uT","uBack","uOpen","uAll","uO","uReg","uPan","uPar"].forEach(k => U1[k] = gl.getUniformLocation(P1, k));
+const U2 = {}; ["uRes","uTex","uF","uHt","uFos","uFosHa","uHasF"].forEach(k => U2[k] = gl.getUniformLocation(P2, k));
+const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const slabBuf = gl.createBuffer();
+function tex(img, nearest){
+  const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+  const f = nearest ? gl.NEAREST : gl.LINEAR;
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, f); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, f);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return t;
+}
+const loadImg = src => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error(src)); i.src = src; });
+const black = (() => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,0])); return t; })();
+// состояние плит: 512 × 1, R = 255 — плита ушла
+const stData = new Uint8Array(NSL*4), stTex = (() => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, NSL, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, stData);
+  [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(p => gl.texParameteri(gl.TEXTURE_2D, p, gl.NEAREST));
+  [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(p => gl.texParameteri(gl.TEXTURE_2D, p, gl.CLAMP_TO_EDGE)); return t; })();
+let idTex = black;
+
+// ---- состояние ----
+let W = 0, H = 0, DPR = 1, S = 1, offX = 0;
+let cur = 0, scroll = 0, sFrom = 0, sTo = 0, sT = 1, sDur = 1.7;
+const ptr = { x: 0, y: 0, tx: 0, ty: 0, seen: false, lastMove: 0 };
+let crk = null;                 // { mode, t, O:[u,y], slabs, back, region }
+let panoOn = false, panX = 0, panY = 0;
+const puffs = [], grains = [], crumbs = [], motes = [];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let way = "slab", dbgPause = false;
+
+function size(){
+  DPR = Math.min(1.5, devicePixelRatio || 1); W = innerWidth; H = innerHeight;
+  cv.width = W*DPR | 0; cv.height = H*DPR | 0; fx.width = W*DPR | 0; fx.height = H*DPR | 0;
+  S = Math.max(W*1.1, H*.86/AR);
+  if (!ptr.seen){ ptr.x = ptr.tx = W*.62; ptr.y = ptr.ty = H*.48; }
+  sTo = targetScroll(cur); if (sT >= 1) scroll = sTo;
+}
+const vis = () => H/(S*AR);
+const targetScroll = k => Math.max(-.02, Math.min(L.length - vis() + .02, k + .5 - vis()/2));
+// координаты: стена (ширины) ↔ экран (px)
+const toScr = (wu, wy) => [wu*S - offX, (wy/AR - scroll)*S*AR];
+
+// ---- журнал и керн ----
+const $ = id => document.getElementById(id);
+const core = $("core");
+ERAS.forEach((nm, i) => {
+  const d = document.createElement("div"); d.className = "seg" + (i in READY ? " ready" : "");
+  if (i in READY){ d.style.backgroundImage = `url(assets/th/${L[READY[i]].id}.webp)`; d.onclick = () => go(READY[i]); d.title = nm; }
+  else d.title = nm + " — картинки пока нет";
+  d.innerHTML = `<span class="nm">${nm}</span>`; d.dataset.k = i; core.appendChild(d);
+});
+function journal(){
+  const E = L[cur];
+  $("nm").textContent = E.nm;
+  if (panoOn && E.fos){ $("age").textContent = E.age + " · живая картина"; $("rock").textContent = "Окаменелость ожила: так выглядел этот край, пока камень был морским дном.";
+    $("act").textContent = "Вернуть в камень"; $("act").hidden = false; }
+  else { $("age").textContent = E.age; $("rock").textContent = E.rock; $("txt").innerHTML = E.txt;
+    $("act").textContent = E.pano ? "Оживить окаменелость" : "Живая картина эпохи — скоро"; $("act").hidden = !E.fos; }
+  $("act").disabled = (!!crk && !panoOn) || (E.fos && !E.pano && !panoOn);
+  $("way").hidden = !E.fos || !E.pano || panoOn;
+  [...core.children].forEach(d => d.classList.toggle("cur", READY[d.dataset.k] === cur));
+  $("up").disabled = cur === 0 || !!crk; $("dn").disabled = cur === L.length - 1 || !!crk;
+}
+function go(k){
+  if (crk || k === cur || k < 0 || k >= L.length) return;
+  ensure(k);
+  cur = k; sFrom = scroll; sTo = targetScroll(k); sT = 0; sDur = Math.min(3.4, 1.5 + .12*Math.abs(sTo - sFrom)); journal();
+}
+// пласты грузятся по мере спуска: текущий и по одному соседу
+const LOADS = {};
+function load(E){ if (LOADS[E.id]) return LOADS[E.id];
+  if (E.pano) loadImg(`assets/pano/${E.id}.webp`).then(i => { TX["p_" + E.id] = tex(i); });
+  return LOADS[E.id] = Promise.all([loadImg(`${E.dir}${E.id}.webp`).then(i => { IMG[E.id] = i; TX[E.id] = tex(i); }), loadImg(`${E.dir}${E.id}_h.webp`).then(i => { IMG[E.id + "_h"] = i; TX[E.id + "_h"] = tex(i); })]); }
+function ensure(k){ for (let j = k - 1; j <= k + 2; j++) if (L[j]) load(L[j]); }
+$("up").onclick = () => go(cur - 1); $("dn").onclick = () => go(cur + 1);
+$("act").onclick = () => { if (panoOn) closePano(); else breakRock(); };
+document.querySelectorAll('input[name="way"]').forEach(r => r.onchange = () => { way = r.value; });
+
+// ---- окаменелость ----
+function fosScreen(){
+  const E = L[cur]; if (!E.fos) return null; const F = E.fos;
+  const [x, y] = toScr(F.u, (cur + F.v)*AR);
+  return { x, y, w: F.w*S, h: F.w*(F.ha || .5)*S };
+}
+// ---- карта плит: слои по рельефу картинки, вертикальные трещины-отдельности ----
+const IMG = {}, PIX = {};
+function pix(id){ if (PIX[id]) return PIX[id];
+  if (!IMG[id]) return { d: new Uint8ClampedArray(256*143*4).fill(128), Lm: new Float32Array(256*143).fill(128), med: 128 };   // ещё не загружен
+  const c = document.createElement("canvas"); c.width = 256; c.height = 143; const x = c.getContext("2d");
+  x.drawImage(IMG[id], 0, 0, 256, 143); const d = x.getImageData(0, 0, 256, 143).data; const Lm = new Float32Array(256*143);
+  for (let i = 0; i < Lm.length; i++) Lm[i] = d[i*4]*.3 + d[i*4 + 1]*.55 + d[i*4 + 2]*.15;
+  const srt = [...Lm].sort((a, b) => a - b); return PIX[id] = { d, Lm, med: srt[srt.length >> 1] }; }
+const lumMed = id => pix(id).med;
+const pAt = (id, u, v) => { const P = pix(id), x = Math.max(0, Math.min(255, u*256 | 0)), y = Math.max(0, Math.min(142, v*143 | 0)); return y*256 + x; };
+function lum(id, cu, cv){ const P = pix(id); let s = 0, n = 0; for (let i = -2; i <= 2; i++) for (let j = -1; j <= 1; j++){ s += P.Lm[pAt(id, cu + i*.008, cv + j*.01)]; n++; } return s/n; }
+function avgRgb(id, cu, cv){ const P = pix(id), k = pAt(id, cu, cv)*4; return [P.d[k], P.d[k + 1], P.d[k + 2]]; }
+function bedding(id){
+  // где в картинке границы слоёв: строки с самым сильным перепадом рельефа
+  const im = IMG[id + "_h"], c = document.createElement("canvas"); c.width = 320; c.height = 179;
+  const x = c.getContext("2d"); x.drawImage(im, 0, 0, 320, 179); const d = x.getImageData(0, 0, 320, 179).data;
+  const prof = new Float32Array(179);
+  for (let y = 1; y < 178; y++){ let s = 0; for (let i = 0; i < 320; i++){ s += Math.abs(d[((y + 1)*320 + i)*4] - d[((y - 1)*320 + i)*4]); } prof[y] = s/320; }
+  const sm = prof.map((v, i) => (prof[i - 1] || v)*.25 + v*.5 + (prof[i + 1] || v)*.25);
+  const sorted = [...sm].sort((a, b) => a - b), thr = sorted[(sorted.length*.62) | 0], peaks = [];
+  for (let y = 3; y < 176; y++) if (sm[y] > thr && sm[y] >= sm[y - 1] && sm[y] >= sm[y + 1] && sm[y] >= sm[y - 2] && sm[y] >= sm[y + 2]){
+    if (!peaks.length || y - peaks[peaks.length - 1] > 7) peaks.push(y); }
+  return peaks.map(y => y/179);
+}
+function buildSlabs(){
+  const E = L[cur], O = [E.fos.u, (cur + E.fos.v)*AR];
+  // область: весь экран с запасом
+  const x0 = offX/S - .04, x1 = (offX + W)/S + .04, y0 = scroll*AR - .04, y1 = (scroll + vis())*AR + .04;
+  // границы слоёв: из рельефа картинки в своём пласте, в соседних — через 3,5–6 % ширины
+  const beds = bedding(E.id).map(v => (cur + v)*AR);
+  const ys = [y0]; let y = y0;
+  while (y < y1){ const nb = beds.find(b => b > y + .022 && b < y + .09); y = nb != null ? nb : y + .035 + Math.random()*.03; ys.push(Math.min(y, y1 + .02)); }
+  const slabs = [];
+  for (let r = 0; r < ys.length - 1; r++){
+    const ya = ys[r], yb = ys[r + 1], bh = yb - ya;
+    // вертикальные трещины: ломаные из трёх точек, наклон и изгиб случайны
+    const js = []; let x = x0 - Math.random()*.05;
+    while (x < x1 + .05){ const sl = (Math.random() - .5)*bh*.6, mid = (Math.random() - .5)*bh*.35; js.push([[x + sl/2, ya], [x + mid, (ya + yb)/2 + (Math.random() - .5)*bh*.3], [x - sl/2, yb]]); x += Math.max(.035, bh*(1.3 + Math.random()*2.6)); }
+    js.push([[x, ya], [x, (ya + yb)/2], [x, yb]]);                 // последняя трещина — за правым краем области, чтобы ряд был закрыт
+    for (let k = 1; k < js.length; k++) for (let q = 0; q < 3; q++) js[k][q][0] = Math.max(js[k][q][0], js[k - 1][q][0] + .012);   // соседние трещины не пересекаются
+    for (let k = 0; k < js.length - 1; k++){
+      const a = js[k], b = js[k + 1];
+      const poly = [a[0], b[0], b[1], b[2], a[2], a[1]];
+      const cx = poly.reduce((s, p) => s + p[0], 0)/6, cy = poly.reduce((s, p) => s + p[1], 0)/6;
+      const lay = L[Math.max(0, Math.min(L.length - 1, Math.floor(cy/AR)))];
+      const soft = lay.soft === "all" || lay.soft === "shale" || ((lay.soft === "dark" || lay.soft === "cube") && lum(lay.id, cx, cy/AR - Math.floor(cy/AR), poly) < lumMed(lay.id)*.93);
+      if (!soft){ slabs.push({ poly, cx, cy, d: Math.hypot(cx - O[0], cy - O[1]), th: bh*(.35 + Math.random()*.25), r: Math.random() }); continue; }
+      // мягкая порода: сланец — тонкие чешуи, уголь — кубики по кливажу, грунт — комья
+      const kind = lay.soft === "dark" || lay.soft === "shale" ? "flake" : lay.soft === "cube" ? "cube" : "lump";
+      const wq = Math.hypot(b[0][0] - a[0][0], b[0][1] - a[0][1]);
+      const rows = kind === "flake" ? 2 + (Math.random()*2 | 0) : kind === "cube" ? Math.max(1, Math.round(bh/.022)) : 2;
+      const cols = kind === "flake" ? Math.max(2, Math.round(wq/(bh*.7))) : Math.max(2, Math.round(wq/(bh/rows)));
+      const G = [];
+      for (let i = 0; i <= rows; i++){ G.push([]); for (let j = 0; j <= cols; j++){
+        const t = i/rows, u = j/cols, top = [a[0][0] + (b[0][0] - a[0][0])*u, a[0][1] + (b[0][1] - a[0][1])*u], bot = [a[2][0] + (b[2][0] - a[2][0])*u, a[2][1] + (b[2][1] - a[2][1])*u];
+        let px = top[0] + (bot[0] - top[0])*t, py = top[1] + (bot[1] - top[1])*t;
+        if (i > 0 && i < rows) py += (Math.random() - .5)*bh/rows*.35;
+        if (j > 0 && j < cols) px += (Math.random() - .5)*wq/cols*(kind === "cube" ? .15 : .45);
+        G[i].push([px, py]); } }
+      for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++){
+        const pp = [G[i][j], G[i][j + 1], G[i + 1][j + 1], G[i + 1][j]];
+        const qx = pp.reduce((s, p) => s + p[0], 0)/4, qy = pp.reduce((s, p) => s + p[1], 0)/4;
+        slabs.push({ poly: pp, cx: qx, cy: qy, d: Math.hypot(qx - O[0], qy - O[1]), th: (bh/rows)*(kind === "cube" ? .9 : .45)*(.7 + Math.random()*.5), r: Math.random(), soft: kind });
+      }
+    }
+  }
+  const dmax = Math.max(...slabs.map(s => s.d));
+  slabs.length = Math.min(slabs.length, NSL - 1);
+  slabs.forEach((s, i) => { s.id = i + 1;
+    // порядок: сначала плита с окаменелостью, дальше волна наружу; дальние идут чаще
+    s.td = .7 + 3.1*Math.pow(s.d/dmax, .75) + s.r*.35*(.4 + s.d/dmax);
+    s.alpha = 2.5 + Math.random()*4;                   // как быстро опрокидывается
+    s.slide = s.cy > O[1] + .05 && Math.random() < .5; // нижние чаще сползают, чем опрокидываются
+    s.vx = (s.cx - O[0])*(120 + Math.random()*160)*(1/Math.max(.05, s.d)); s.vz = 70 + Math.random()*150; s.roll = (Math.random() - .5)*2.2;
+    s.layer = Math.max(0, Math.min(L.length - 1, Math.floor(s.cy/AR)));
+    if (s.soft){ s.alpha = .5 + Math.random()*1.5; s.slide = Math.random() < .7; s.roll = (Math.random() - .5)*7; s.vx *= .5; s.vz *= .6; s.td += (Math.random() - .3)*.25; }
+    s.rgb = avgRgb(L[s.layer].id, s.cx, s.cy/AR - s.layer);
+    s.state = 0; });
+  // растр номеров плит: заливка цветом-номером, края — чёрной линией скола
+  const rw = x1 - x0, rh = y1 - y0, MW = 1600, MH = Math.round(MW*rh/rw);
+  const c = document.createElement("canvas"); c.width = MW; c.height = MH; const g = c.getContext("2d");
+  g.fillStyle = "#000"; g.fillRect(0, 0, MW, MH);
+  const mx = p => [(p[0] - x0)/rw*MW, (p[1] - y0)/rh*MH];
+  for (const s of slabs){ g.fillStyle = `rgb(${s.id % 256},${s.id >> 8},${(s.id*37 + 11) % 256})`; g.beginPath(); s.poly.forEach((p, i) => { const [X, Y] = mx(p); i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath(); g.fill(); }
+  g.strokeStyle = "#000"; g.lineWidth = 2.4; g.lineJoin = "round";
+  for (const s of slabs){ g.beginPath(); s.poly.forEach((p, i) => { const [X, Y] = mx(p); i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath(); g.stroke(); }
+  // сглаженные края заливки дают «чужие» номера — по контрольному синему каналу превращаем их в линию скола
+  const im = g.getImageData(0, 0, MW, MH), D = im.data;
+  for (let i = 0; i < D.length; i += 4){ const id = D[i] + D[i + 1]*256; if (id === 0 || D[i + 2] !== (id*37 + 11) % 256 || id > slabs.length){ D[i] = D[i + 1] = D[i + 2] = 0; } }
+  g.putImageData(im, 0, 0);
+  if (idTex !== black) gl.deleteTexture(idTex);
+  idTex = tex(c, true);
+  stData.fill(0); gl.bindTexture(gl.TEXTURE_2D, stTex); gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, NSL, 1, gl.RGBA, gl.UNSIGNED_BYTE, stData);
+  return { slabs, region: [x0, y0, rw, rh], O };
+}
+function breakRock(){
+  const E = L[cur]; if (!E.fos || !E.pano || crk || !TX["p_" + E.id]) return;
+  const O = [E.fos.u, (cur + E.fos.v)*AR];
+  crk = { mode: way, t: 0, back: 0, O, slabs: [], region: [0, 0, 1, 1] };
+  if (way === "slab") Object.assign(crk, buildSlabs());
+  const f = fosScreen(); ptr.tx = f.x; ptr.ty = f.y - f.h*.2;
+  journal();
+}
+function closePano(){ if (!crk || crk.back) return; crk.back = .0001; panoOn = false; trickles.length = 0; journal(); }
+
+// ---- плиты в 3D ----
+// камера перед стеной; z — к зрителю. Плита: лицевой многоугольник на стене + толщина в глубину.
+function project(x, y, z){ const D = Math.max(W, H)*1.25, f = D/Math.max(40, D - z); return [W/2 + (x - W/2)*f, H/2 + (y - H/2)*f]; }
+function slabMesh(s, tau, out){
+  const n = s.poly.length;
+  // точки на экране в момент отрыва (z = 0 — лицевая грань стены)
+  const P = s.poly.map(p => toScr(p[0], p[1]));
+  const by = Math.max(...P.map(p => p[1])), px = P.reduce((a, p) => a + p[0], 0)/n, py = P.reduce((a, p) => a + p[1], 0)/n;
+  const th = s.th*S;
+  let th0 = 0, jit = 0;
+  th0 = s.slide ? .25*s.alpha*tau*tau*.25 : .5*s.alpha*tau*tau;
+  const free = Math.max(0, tau - (s.slide ? .05 : .32));
+  const dy = .5*4200*free*free, dz = s.vz*free + (tau > 0 ? 30*tau : 0), dx = s.vx*free;
+  const roll = s.roll*free;
+  const cr = Math.cos(roll), sr = Math.sin(roll), ct = Math.cos(th0), st = Math.sin(th0);
+  const jx = (Math.random() - .5)*jit, jy = (Math.random() - .5)*jit;
+  const T = (x, y, z) => {                                   // поворот вокруг нижней кромки, затем крен и падение
+    let yy = y - by, zz = z; const y2 = yy*ct + zz*st, z2 = -yy*st + zz*ct; yy = y2; zz = z2;   // верх плиты уходит к зрителю
+    let xx = x - px, yy2 = yy + by - py; const x3 = xx*cr - yy2*sr, y3 = xx*sr + yy2*cr;
+    return [x3 + px + dx + jx, y3 + py + dy + jy, zz + dz]; };
+  const F = P.map(p => T(p[0], p[1], 0)), B = P.map(p => T(p[0], p[1], -th));
+  const uvs = s.poly.map(p => [p[0], p[1]/AR - s.layer]);
+  const lamp = [ptr.x, ptr.y, Math.max(W, H)*.24], R = .5*Math.max(W, H);
+  const cam = [W/2, H/2, Math.max(W, H)*1.25];
+  const shade = (A, Bv, C) => {                              // освещение грани фонарём + свет из пролома
+    const u = [Bv[0] - A[0], Bv[1] - A[1], Bv[2] - A[2]], v = [C[0] - A[0], C[1] - A[1], C[2] - A[2]];
+    let nx = u[1]*v[2] - u[2]*v[1], ny = u[2]*v[0] - u[0]*v[2], nz = u[0]*v[1] - u[1]*v[0]; const nl = Math.hypot(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
+    const c = [(A[0] + Bv[0] + C[0])/3, (A[1] + Bv[1] + C[1])/3, (A[2] + Bv[2] + C[2])/3];
+    const vis = (cam[0] - c[0])*nx + (cam[1] - c[1])*ny + (cam[2] - c[2])*nz;
+    if (vis < 0){ nx = -nx; ny = -ny; nz = -nz; }
+    let lx = lamp[0] - c[0], ly = lamp[1] - c[1], lz = lamp[2] - c[2]; const ll = Math.hypot(lx, ly, lz); lx /= ll; ly /= ll; lz /= ll;
+    const dxy = Math.hypot(lamp[0] - c[0], lamp[1] - c[1]);
+    const att = Math.pow(Math.max(0, 1 - dxy/(R*1.15)), 1.7)/(1 + ll*ll/(R*R*.55));
+    const diff = Math.max(0, nx*lx + ny*ly + nz*lz);
+    return { k: .05 + diff*att*1.7 + (crk ? crk.open : 0)*.16*(.5 + .5*Math.max(0, -ny)), vis };
+  };
+  const tri = (a, b, c, ta, tb, tc, k, side) => { const A = project(...a), Bp = project(...b), C = project(...c);
+    out.push(A[0], A[1], ta[0], ta[1], k, side, Bp[0], Bp[1], tb[0], tb[1], k, side, C[0], C[1], tc[0], tc[1], k, side); };
+  const fc = F.reduce((a, p) => [a[0] + p[0]/n, a[1] + p[1]/n, a[2] + p[2]/n], [0, 0, 0]);
+  const bc = B.reduce((a, p) => [a[0] + p[0]/n, a[1] + p[1]/n, a[2] + p[2]/n], [0, 0, 0]);
+  const tcen = uvs.reduce((a, p) => [a[0] + p[0]/n, a[1] + p[1]/n], [0, 0]);
+  const faces = [];
+  // боковые грани — свежий скол, текстура сдвинута вглубь слоя
+  const dv = s.th/AR;
+  for (let i = 0; i < n; i++){ const j = (i + 1) % n, sh = shade(F[i], F[j], B[j]);
+    const zc = (F[i][2] + F[j][2] + B[i][2] + B[j][2])/4;
+    faces.push({ z: zc, draw: o => { tri(F[i], F[j], B[j], uvs[i], uvs[j], [uvs[j][0], uvs[j][1] + dv], sh.k*.8, 1); tri(F[i], B[j], B[i], uvs[i], [uvs[j][0], uvs[j][1] + dv], [uvs[i][0], uvs[i][1] + dv], sh.k*.8, 1); } }); }
+  const shF = shade(F[0], F[1], F[2]), shB = shade(B[0], B[2], B[1]);
+  faces.push({ z: bc[2], draw: () => { for (let i = 0; i < n; i++){ const j = (i + 1) % n; tri(bc, B[i], B[j], tcen, uvs[i], uvs[j], shB.k*.7, 1); } } });
+  faces.push({ z: fc[2], draw: () => { for (let i = 0; i < n; i++){ const j = (i + 1) % n; tri(fc, F[i], F[j], tcen, uvs[i], uvs[j], shF.k, 0); } } });
+  faces.sort((a, b) => a.z - b.z).forEach(f => f.draw());
+  return { y: Math.min(...F.map(p => project(...p)[1])), z: fc[2], sx: px + dx, sy: by + dy };
+}
+function drawSlabs(list){
+  // дальние — первыми
+  list.sort((a, b) => (a.zs || 0) - (b.zs || 0));
+  gl.useProgram(P2); gl.uniform2f(U2.uRes, W, H);
+  const aP = gl.getAttribLocation(P2, "aP"), aT = gl.getAttribLocation(P2, "aT"), aK = gl.getAttribLocation(P2, "aK"), aS = gl.getAttribLocation(P2, "aSide");
+  gl.bindBuffer(gl.ARRAY_BUFFER, slabBuf);
+  [aP, aT, aK, aS].forEach(a => gl.enableVertexAttribArray(a));
+  gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 24, 0); gl.vertexAttribPointer(aT, 2, gl.FLOAT, false, 24, 8);
+  gl.vertexAttribPointer(aK, 1, gl.FLOAT, false, 24, 16); gl.vertexAttribPointer(aS, 1, gl.FLOAT, false, 24, 20);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, black); gl.uniform1i(U2.uF, 1);
+  gl.uniform4f(U2.uFos, -10, 0, 0, 1); gl.uniform1f(U2.uFosHa, .5);
+  for (const s of list){
+    const d = []; const r = slabMesh(s, crk.t - s.td, d); s.zs = r.z; s.out = r.y > H + 40 || r.z > Math.max(W, H)*1.25*.8;
+    if (s.out) continue;
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(d), gl.DYNAMIC_DRAW);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, TX[L[s.layer].id]); gl.uniform1i(U2.uTex, 0);
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, TX[L[s.layer].id + "_h"]); gl.uniform1i(U2.uHt, 2);
+    gl.uniform1f(U2.uHasF, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, d.length/6);
+  }
+  [aP, aT, aK, aS].forEach(a => gl.disableVertexAttribArray(a));
+}
+
+// ---- ввод ----
+addEventListener("pointermove", e => { ptr.tx = e.clientX; ptr.ty = e.clientY; ptr.seen = true; ptr.lastMove = performance.now(); hover(e.clientX, e.clientY); });
+let tY = null, tT = 0;
+addEventListener("pointerdown", e => { if (e.target !== cv && e.target.closest(".log,.core,button,label")) return; ptr.tx = e.clientX; ptr.ty = e.clientY; ptr.seen = true; ptr.lastMove = performance.now(); tY = e.clientY; tT = performance.now();
+  if (onFossil(e.clientX, e.clientY)) breakRock(); });
+addEventListener("pointerup", e => { if (tY == null) return; const dy = tY - e.clientY, dt = performance.now() - tT; tY = null;
+  if (e.pointerType !== "mouse" && Math.abs(dy) > 70 && dt < 600 && !crk) go(cur + (dy > 0 ? 1 : -1)); });
+let wheelAt = 0;
+addEventListener("wheel", e => { e.preventDefault(); const now = performance.now(); if (now - wheelAt < 900 || Math.abs(e.deltaY) < 6) return; wheelAt = now; if (!crk) go(cur + (e.deltaY > 0 ? 1 : -1)); }, { passive:false });
+addEventListener("keydown", e => { if (e.key === "ArrowDown" || e.key === "PageDown"){ e.preventDefault(); go(cur + 1); } if (e.key === "ArrowUp" || e.key === "PageUp"){ e.preventDefault(); go(cur - 1); } });
+addEventListener("resize", size);
+function onFossil(x, y){
+  if (crk) return false; const r = fosScreen(); if (!r) return false;
+  const dx = (x - r.x)/(r.w*.5), dy = (y - r.y)/(r.h*.5); return dx*dx + dy*dy < .8;
+}
+function hover(x, y){
+  const h = $("hov"), on = onFossil(x, y);
+  cv.style.cursor = on ? "pointer" : "";
+  if (on){ const E = L[cur]; h.innerHTML = `<b>${E.fos.nm}</b> · ${E.fos.what}<br>${E.pano ? "нажмите, чтобы открыть камень" : "живая картина этой эпохи появится позже"}`; h.style.left = x + "px"; h.style.top = y + "px"; }
+  h.style.opacity = on ? 1 : 0;
+}
+
+// ---- метки на стене ----
+const pins = $("pins");
+function drawPins(){
+  let html = "";
+  if (!crk) L.forEach((E, k) => {
+    if (E.pin){ const y = (k + E.pin.v - scroll)*S*AR; if (y > 20 && y < H - 20) html += `<div class="pin" style="top:${y - 7}px">${E.pin.t}</div>`; }
+    if (GAPS[k]){ const y = (k - scroll)*S*AR; if (y > 30 && y < (W < 720 ? H*.55 : H - 30)) html += `<div class="gap" style="top:${y + 8}px">↓ ${GAPS[k]}</div>`; }
+  });
+  if (html !== pins._h){ pins.innerHTML = html; pins._h = html; }
+}
+
+// ---- пыль и крошка: мягкие клубы (готовые спрайты), песчинки ----
+const puffSpr = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+  // клуб из нескольких смещённых пятен — не ровный круг
+  for (let i = 0; i < 9; i++){ const x = 64 + (Math.random() - .5)*46, y = 64 + (Math.random() - .5)*46, r = 22 + Math.random()*26;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, "rgba(255,255,255,.22)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
+  return c; })();
+function tinted(rgb){ const k = rgb.join(","); if (tinted[k]) return tinted[k]; const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+  g.drawImage(puffSpr, 0, 0); g.globalCompositeOperation = "source-in"; g.fillStyle = `rgb(${k})`; g.fillRect(0, 0, 128, 128); return tinted[k] = c; }
+const debris = [], trickles = [];
+function emitDust(x, y, w, rgb, n, chips){
+  if (puffs.length > 160) n = Math.min(n, 1); if (grains.length > 900) return;
+  for (let i = 0; i < n; i++) puffs.push({ x: x + (Math.random() - .5)*w, y: y + (Math.random() - .5)*w*.3, vx: (Math.random() - .5)*50, vy: 6 + Math.random()*30, r: 12 + Math.random()*22, gr: 16 + Math.random()*34, a: .55 + Math.random()*.45, life: 1, rgb, rot: Math.random()*6 });
+  for (let i = 0; i < n*6; i++) grains.push({ x: x + (Math.random() - .5)*w, y: y + (Math.random() - .5)*8, vx: (Math.random() - .5)*110, vy: -Math.random()*80, r: .7 + Math.random()*1.8, rgb, life: 1 });
+  for (let i = 0; i < (chips || 0); i++){ const sz = 2 + Math.random()*6, nv = 4 + (Math.random()*2 | 0), sh = [];
+    for (let k = 0; k < nv; k++){ const a = k/nv*6.283 + Math.random()*.8, r = sz*(.5 + Math.random()*.6); sh.push([Math.cos(a)*r, Math.sin(a)*r*(.5 + Math.random()*.6)]); }
+    if (debris.length < 320) debris.push({ x: x + (Math.random() - .5)*w, y: y - Math.random()*12, vx: (Math.random() - .5)*160, vy: -40 - Math.random()*140, rot: Math.random()*6, vr: (Math.random() - .5)*14, sh, rgb, k: .7 + Math.random()*.5, life: 1 }); }
+}
+for (let i = 0; i < 46; i++) motes.push({ x: Math.random(), y: Math.random(), r: .5 + Math.random()*1.2, ph: Math.random()*7 });
+let crumbAt = 0;
+function effects(dt, now){
+  c2.setTransform(DPR, 0, 0, DPR, 0, 0); c2.clearRect(0, 0, W, H);
+  const R = .5*Math.max(W, H), open = crk ? crk.open : 0;
+  // после падения последней плиты пыль и осыпь затухают быстрее и через 2 с исчезают
+  const after = crk && crk.lastT != null ? crk.t - crk.lastT : -1;
+  const fade = after > 0 ? 1 + after*2 : 1;
+  if (after > 2){ puffs.length = 0; grains.length = 0; debris.length = 0; trickles.length = 0; }
+  // клубы пыли: медленно растут и оседают; освещены фонарём и светом из пролома
+  for (let i = puffs.length - 1; i >= 0; i--){ const p = puffs[i]; p.life -= dt*.62*fade; if (p.life <= 0){ puffs.splice(i, 1); continue; }
+    p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .98; p.vy *= .985; p.r += p.gr*dt;
+    const lit = Math.min(1, .2 + Math.max(0, 1 - Math.hypot(p.x - ptr.x, p.y - ptr.y)/(R*.9)) + open*.35);
+    c2.globalAlpha = Math.min(1, p.a*Math.pow(p.life, .8)*lit*.8); const s = p.r*2.4;
+    c2.save(); c2.translate(p.x, p.y); c2.rotate(p.rot); c2.drawImage(tinted(p.rgb), -s/2, -s/2, s, s); c2.restore(); }
+  c2.globalAlpha = 1;
+  // песчинки
+  for (let i = grains.length - 1; i >= 0; i--){ const g = grains[i]; g.vy += 1600*dt; g.x += g.vx*dt; g.y += g.vy*dt; g.life -= dt*1.1*fade;
+    if (g.y > H + 10 || g.life <= 0){ grains.splice(i, 1); continue; }
+    const lit = Math.min(1, .3 + Math.max(0, 1 - Math.hypot(g.x - ptr.x, g.y - ptr.y)/(R*.7)) + open*.6);
+    c2.fillStyle = `rgba(${g.rgb.map(v => Math.min(255, v*(.5 + lit*.9)) | 0).join(",")},${g.life})`; c2.fillRect(g.x, g.y, g.r, g.r*1.6); }
+  // обломки: мелкие острые кусочки той же породы, кувыркаются
+  for (let i = debris.length - 1; i >= 0; i--){ const d = debris[i]; d.vy += 2600*dt; d.x += d.vx*dt; d.y += d.vy*dt; d.rot += d.vr*dt;
+    if (d.y > H + 20){ debris.splice(i, 1); continue; }
+    const lit = Math.min(1.3, .25 + Math.max(0, 1 - Math.hypot(d.x - ptr.x, d.y - ptr.y)/(R*.8))*1.1 + open*.55)*d.k*(.75 + .25*Math.cos(d.rot*1.7));
+    c2.fillStyle = `rgb(${d.rgb.map(v => Math.min(255, v*lit) | 0).join(",")})`;
+    c2.beginPath(); const cr = Math.cos(d.rot), sr = Math.sin(d.rot); d.sh.forEach(([x, y], k) => { const X = d.x + x*cr - y*sr, Y = d.y + x*sr + y*cr; k ? c2.lineTo(X, Y) : c2.moveTo(X, Y); }); c2.closePath(); c2.fill(); }
+  // ручейки песка с обломанных кромок
+  for (let i = trickles.length - 1; i >= 0; i--){ const t = trickles[i]; t.t += dt*fade; if (t.t > t.dur){ trickles.splice(i, 1); continue; }
+    const rate = 70*(1 - t.t/t.dur)*dt, n = (rate | 0) + (Math.random() < rate % 1 ? 1 : 0);
+    for (let k = 0; k < n; k++) grains.push({ x: t.x0 + Math.random()*(t.x1 - t.x0), y: t.y + Math.random()*3, vx: (Math.random() - .5)*14, vy: Math.random()*30, r: .6 + Math.random()*1.3, rgb: t.rgb, life: 1 });
+    if (Math.random() < dt*2.5) puffs.push({ x: t.x0 + Math.random()*(t.x1 - t.x0), y: t.y + 10, vx: (Math.random() - .5)*20, vy: 15, r: 8, gr: 22, a: .4, life: 1, rgb: t.rgb, rot: Math.random()*6 }); }
+  // пыль в луче фонаря (только в темноте камня)
+  if (!panoOn) for (const d of motes){
+    d.x += (Math.sin(now*.0002 + d.ph)*.00006 + .00002)*dt*60; d.y += (Math.cos(now*.00017 + d.ph*1.3)*.00005 + .00003)*dt*60;
+    if (d.x > 1) d.x -= 1; if (d.y > 1) d.y -= 1; if (d.x < 0) d.x += 1;
+    const X = d.x*W, Y = d.y*H, a = Math.max(0, 1 - Math.hypot(X - ptr.x, Y - ptr.y)/(R*.55))**2*.45*(1 - open);
+    if (a > .01){ c2.fillStyle = `rgba(255,236,200,${a})`; c2.beginPath(); c2.arc(X, Y, d.r, 0, 7); c2.fill(); } }
+  // крошка из-под фонаря, если он задержался
+  const still = ptr.seen && now - ptr.lastMove > 1400 && now - ptr.lastMove < 4000 && !crk;
+  if (still && now - crumbAt > 140){ crumbAt = now; crumbs.push({ x: ptr.x + (Math.random() - .5)*60, y: ptr.y - 10 + (Math.random() - .5)*30, vy: 0, vx: (Math.random() - .5)*12, r: .8 + Math.random()*1.8, rgb: L[cur].grain, life: 1 }); }
+  for (let i = crumbs.length - 1; i >= 0; i--){ const g = crumbs[i]; g.vy += 900*dt; g.x += g.vx*dt; g.y += g.vy*dt; g.life -= dt*.6;
+    if (g.y > H + 10 || g.life <= 0){ crumbs.splice(i, 1); continue; }
+    const lit = Math.max(.15, 1 - Math.hypot(g.x - ptr.x, g.y - ptr.y)/(R*.6));
+    c2.fillStyle = `rgba(${g.rgb.join(",")},${g.life*lit})`; c2.fillRect(g.x, g.y, g.r, g.r); }
+}
+
+// ---- кадр ----
+let TX = {}, TXT = {}, fosHa = .5, last = performance.now(), t0 = performance.now();
+const ease = x => x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3)/2;
+function frame(now){
+  const dt = Math.min(.05, (now - last)/1000); last = now; const T = (now - t0)/1000;
+  if (sT < 1){ sT = Math.min(1, sT + dt/(reduce ? .2 : sDur)); scroll = sFrom + (sTo - sFrom)*ease(sT); } else scroll = sTo;
+  const idle = !ptr.seen || now - ptr.lastMove > 6000;
+  if (idle && !crk){ ptr.tx = W*(.58 + .2*Math.sin(T*.23)); ptr.ty = H*(.48 + .22*Math.sin(T*.31 + 1)); }
+  const k = 1 - Math.exp(-dt*(idle ? 1.2 : 9)); ptr.x += (ptr.tx - ptr.x)*k; ptr.y += (ptr.ty - ptr.y)*k;
+  if (!crk){ const ox = (S - W)*(.5 + .5*((ptr.x/W)*2 - 1)*.8); offX += (ox - offX)*(1 - Math.exp(-dt*1.5)); }   // во время раскола стена неподвижна
+  if (crk && !dbgPause) step(dt);
+  const pk = 1 - Math.exp(-dt*2); panX += ((ptr.x/W)*2 - 1 - panX)*pk; panY += ((ptr.y/H)*2 - 1 - panY)*pk;
+  render();
+  effects(dt, now);
+  drawPins();
+  requestAnimationFrame(frame);
+}
+function step(dt){
+  const c = crk, sp = reduce ? 2.5 : 1;
+  if (c.back){                                       // назад в камень: камень проступает поверх картины
+    c.back = Math.min(1, c.back + dt/2.4);
+    if (c.back >= 1){ crk = null; journal(); }
+    return;
+  }
+  c.t += dt*sp;
+  if (c.mode === "slab"){
+    let changed = false, gone = 0;
+    for (const s of c.slabs){
+      if (!s.crk && c.t > s.td - (s.soft ? .35 : .6)){ s.crk = 1; changed = true; }
+      if (s.crk && s.crk < 255){ s.crk = Math.min(255, s.crk + dt*600); stData[s.id*4 + 1] = s.crk | 0; changed = true; }   // трещина проступает
+      if (!s.state && c.t > s.td){ s.state = 1; stData[s.id*4] = 255; changed = true; }      // плита отделилась
+      if (s.state === 1 && c.t > s.td + .12){ s.state = 2; const [x, y] = toScr(s.cx, s.cy); const P = s.poly.map(p => toScr(p[0], p[1]));
+        const xs = P.map(p => p[0]), ys = P.map(p => p[1]), w = Math.max(...xs) - Math.min(...xs), dk = L[s.layer].dust || 1;
+        const area = w*(Math.max(...ys) - Math.min(...ys))/(W*H), n = Math.min(4, Math.round((s.soft ? .4 : 1.6)*dk*(.5 + Math.random()) + area*120));
+        emitDust(x, Math.max(...ys), w, L[s.layer].grain, n, s.soft ? 1 + (Math.random()*3 | 0) : 3 + (Math.random()*5 | 0));
+        emitDust(x, Math.min(...ys), w, L[s.layer].grain, Math.round(n*.5), 0);
+        // из обнажившейся кромки над плитой ещё сыплется песок
+        trickles.push({ x0: Math.min(...xs), x1: Math.max(...xs), y: Math.min(...ys), t: 0, dur: .5 + Math.random()*.6, rgb: s.rgb || L[s.layer].grain }); }
+      if (s.state) gone++;
+    }
+    if (changed){ gl.bindTexture(gl.TEXTURE_2D, stTex); gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, NSL, 1, gl.RGBA, gl.UNSIGNED_BYTE, stData); }
+    c.open = gone/Math.max(1, c.slabs.length);
+    const lastT = c.lastT != null ? c.lastT : (c.lastT = Math.max(...c.slabs.map(s => s.td)) + .4);   // +0,4 с — плита долетает до края экрана
+    if (!panoOn && c.t > lastT + .6){ panoOn = true; journal(); }
+  } else {
+    c.open = Math.min(1, Math.max(0, (c.t - .6)/5.2));
+    // песок с кромки: точки на примерной окружности фронта
+    const thr = .05 + 1.4*Math.pow(c.t/6, 1.1), rf = thr - .4;
+    if (rf > 0 && c.t < 6.2){ const n = 6; for (let i = 0; i < n; i++){ const a = Math.random()*6.283, r = rf + (Math.random() - .5)*.05;
+      const [x, y] = toScr(c.O[0] + Math.cos(a)*r, c.O[1] + Math.sin(a)*r);
+      if (x > -20 && x < W + 20 && y > -20 && y < H + 20){ grains.push({ x, y, vx: (Math.random() - .5)*30, vy: Math.random()*20, r: .7 + Math.random()*1.6, rgb: L[cur].grain, life: 1 });
+        if (Math.random() < .08) emitDust(x, y, 10, L[cur].grain, 1); } } }
+    if (!panoOn && c.t > 6.3){ panoOn = true; journal(); }
+  }
+}
+function render(){
+  gl.viewport(0, 0, cv.width, cv.height);
+  gl.useProgram(P1);
+  const base = Math.max(0, Math.min(L.length - 1, Math.floor(scroll - .05)));
+  for (let j = 0; j < 3; j++){
+    const E = L[base + j];
+    gl.activeTexture(gl.TEXTURE0 + j); gl.bindTexture(gl.TEXTURE_2D, E ? (TX[E.id] || TXT[E.id] || black) : black); gl.uniform1i(U1["uC" + j], j);   // пока не загружен — миниатюра
+    gl.activeTexture(gl.TEXTURE3 + j); gl.bindTexture(gl.TEXTURE_2D, E && TX[E.id + "_h"] ? TX[E.id + "_h"] : black); gl.uniform1i(U1["uH" + j], 3 + j);
+  }
+  gl.uniform3f(U1.uGl, ...[0, 1, 2].map(j => L[base + j] ? L[base + j].gloss : 0));
+  gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, black); gl.uniform1i(U1.uF, 6);
+  gl.activeTexture(gl.TEXTURE7); gl.bindTexture(gl.TEXTURE_2D, TX["p_" + L[cur].id] || black); gl.uniform1i(U1.uP, 7);
+  gl.activeTexture(gl.TEXTURE8); gl.bindTexture(gl.TEXTURE_2D, idTex); gl.uniform1i(U1.uId, 8);
+  gl.activeTexture(gl.TEXTURE9); gl.bindTexture(gl.TEXTURE_2D, stTex); gl.uniform1i(U1.uSt, 9);
+  gl.uniform2f(U1.uRes, cv.width, cv.height);
+  gl.uniform1f(U1.uS, S*DPR); gl.uniform1f(U1.uOffX, offX*DPR); gl.uniform1f(U1.uScroll, scroll); gl.uniform1f(U1.uBase, base); gl.uniform1f(U1.uN, L.length);
+  gl.uniform1f(U1.uHs, S*DPR*.016); gl.uniform1f(U1.uDay, 1); gl.uniform1f(U1.uDpr, DPR);
+  gl.uniform3f(U1.uLight, ptr.x*DPR, ptr.y*DPR, Math.max(W, H)*.24*DPR);
+  gl.uniform4f(U1.uFos, -10, 0, 0, 1); gl.uniform1f(U1.uFosHa, .5);
+  const c = crk;
+  gl.uniform1f(U1.uMode, c ? (c.mode === "slab" ? 1 : 2) : 0); gl.uniform1f(U1.uT, c ? c.t : 0);
+  gl.uniform1f(U1.uBack, c ? c.back : 0); gl.uniform1f(U1.uAll, c && panoOn && !c.back ? 1 : 0); gl.uniform1f(U1.uOpen, c ? (c.open || 0)*(1 - c.back) : 0);
+  gl.uniform2f(U1.uO, c ? c.O[0] : 0, c ? c.O[1] : 0); gl.uniform4f(U1.uReg, ...(c ? c.region : [0, 0, 1, 1]));
+  // панорама: по высоте экрана с запасом, сдвиг за курсором; пока проём мал — чуть крупнее (как будто дальше)
+  const zoom = 1 + .1*(1 - (c ? (c.open || 0) : 0));
+  const ph = H*1.12*zoom, pw = Math.max(ph*PA, W*1.1), ph2 = pw/PA;
+  const px0 = (W - pw)/2 - panX*(pw - W)/2, py0 = (H - ph2)/2 - panY*(ph2 - H)/2;
+  gl.uniform4f(U1.uPan, px0*DPR, py0*DPR, pw*DPR, ph2*DPR); gl.uniform2f(U1.uPar, panX, panY);
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad); const ap = gl.getAttribLocation(P1, "p"); gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); gl.disableVertexAttribArray(ap);
+  if (c && c.mode === "slab" && !c.back){ const act = c.slabs.filter(s => s.state && !s.out); if (act.length) drawSlabs(act); }
+}
+
+// ---- загрузка ----
+size();
+if (gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) < 10) console.warn("мало текстурных блоков");
+L.forEach(E => loadImg(`assets/th/${E.id}.webp`).then(i => { TXT[E.id] = tex(i); }));
+const jobs = [load(L[0]), load(L[1])];
+
+Promise.all(jobs).then(() => {
+  journal(); requestAnimationFrame(frame); ensure(0);
+  const ld = $("load"); ld.style.opacity = 0; setTimeout(() => ld.remove(), 900);
+}).catch(err => { $("load").textContent = "Не удалось загрузить породу: " + err.message; });
+window.__strata = { pause: v => { dbgPause = v; }, jump: k => { ensure(k); cur = k; sTo = scroll = targetScroll(k); sT = 1; journal(); }, go, breakRock, closePano, way: v => { way = v; const r = document.getElementById(v === "slab" ? "waySlab" : "wayErode"); if (r) r.checked = true; },
+  st: () => ({ cur, scroll, t: crk && crk.t, panoOn, slabs: crk && crk.slabs.length, act: crk && crk.slabs.filter(s => s.state).length }),
+  light: (x, y) => { ptr.tx = x; ptr.ty = y; ptr.x = x; ptr.y = y; ptr.seen = true; ptr.lastMove = performance.now(); },
+  adv: sec => { let k = 0; for (let t = 0; t < sec; t += .033){ if (crk) step(.033); if (++k % 4 === 0) effects(.132, performance.now()); } } };
+})();
+</script>

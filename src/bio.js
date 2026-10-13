@@ -7,6 +7,7 @@ const BIO = (() => {
   const box = $("chBio"), sky = $("bioSky"), rcv = $("bioRock"), cvs = $("bioCv"), lab = $("bioLab"), cardEl = $("bioCard"), scr = $("bioScroll"), colEl = $("bioCol");
   const NE = BIO_ERAS.length;
   let open = false, built = false, rend, scn, cam, raf = 0, last = 0, W3 = 0, H3 = 0, DPR3 = 1, ctx2;
+  let ST;                                   // «Пласты камня» (strata.js): стена породы с фонарём и расколом
   let fc = 0, cmp = false, cmpK = null, cmpInfo = null, skyWas = -1, rockOff = 0, cur = -1, view = null, life = 0, lifeT = 0, lifeAt = 0, trn = null, hov = -1, sel = -1, ptr = { x: -1, y: -1, nx: 0, ny: 0, in: false };
   const smooth = (a, b, x) => { const t = clamp((x - a)/(b - a), 0, 1); return t*t*(3 - 2*t); };
   const hex3 = h => { const c = new THREE.Color(h); return [c.r, c.g, c.b]; };
@@ -467,7 +468,9 @@ void main(){
     RU.uOff.value = rockOff; RU.uTr.value = trn ? 1 : 0; RU.uBy.value = trn ? -7.6 + trT*15.2 : 99;
     setEra(RU.uCA, RU.uIA, trn ? trn.from : cur); setEra(RU.uCB, RU.uIB, trn ? trn.to : cur);
     RU.uLife.value = !trn && cur >= 0 ? life : 0; RU.uPort.value = port ? 1 : 0; pR.visible = !cmp && !bmOn && !(PAN && !trn && life > .9);
-    drawRock(trT, cmp || bmOn ? 0 : trn || cur < 0 ? 1 : 1 - smooth(.05, .8, life));
+    if (ST){ ST.show(open && !mechOn && !cmp && !bmOn && !gal.on && (lifeT < .5 || ST.busy)); if (ST.active !== box.classList.contains("bio-strata")) box.classList.toggle("bio-strata", ST.active); }
+    const under = ST && ST.covers();                 // стена закрывает сцену целиком — её не рисуем
+    if (!under) drawRock(trT, cmp || bmOn ? 0 : trn || cur < 0 ? 1 : 1 - smooth(.05, .8, life));
     // среда
     const envA = cmp ? 0 : bmOn ? 1 : smooth(.25, 1, life)*(trn ? Math.max(0, 1 - trT*3) : 1);
     EU.uT.value = T; EU.uA.value = envA; EU.uPort.value = port ? 1 : 0; if (pEnv) pEnv.visible = envA > .01;
@@ -501,7 +504,7 @@ void main(){
     if (sel >= 0 && INST[sel] && life > .9 && !trn){ const I = INST[sel]; glowS.position.set(I.sx, I.sy, I.Z - .3); glowS.scale.setScalar(I.h*1.4); glowS.material.opacity += (.22 - glowS.material.opacity)*Math.min(1, dt*3); }
     else glowS.material.opacity *= Math.max(0, 1 - dt*4);
     const skyA = (envA*100 | 0)/100; if (skyA !== skyWas){ skyWas = skyA; sky.style.opacity = skyA; }
-    rend.render(scn, cam);
+    if (!under) rend.render(scn, cam);
     overlay(T);
   }
   // экранный прямоугольник существа (для наведения и подписи)
@@ -543,7 +546,7 @@ void main(){
     const h = $("bioHint"); if (!h) return;
     h.textContent = mechOn ? (MK === "basics" ? "Живая схема · переключайте в карточке" : "Живая модель · меняйте условия в карточке") : bmOn ? "Биом сегодня · наведите на существо — имя · нажмите — портрет" : cmp ? "Сравнение размера · линейка внизу" : cur < 0 ? "Листайте вниз — вглубь времени · или выберите пласт в колонне справа"
       : !BIO_ERAS[cur].ready ? "Пласт ещё не раскрыт — листайте дальше вниз"
-      : life < .5 ? "Окаменелости в породе… сейчас они оживут" : "Наведите на существо — имя · нажмите — портрет";
+      : life < .5 ? (ST ? (ST.hasFossil(NE - 1 - cur) ? "Курсор — фонарь · найдите окаменелость и нажмите на неё" : "Курсор — фонарь · ведите по стене") : "Окаменелости в породе… сейчас они оживут") : "Наведите на существо — имя · нажмите — портрет";
     const mb = $("bioMechB"), ab = $("bioBasB"), bb = $("bioBmB"), mm = mechOn && MK === "mech", ba = mechOn && MK === "basics";
     if (mb){ mb.textContent = mm ? "← К пластам" : "Механизмы эволюции"; mb.setAttribute("aria-pressed", String(mm)); }
     if (ab){ ab.textContent = ba ? "← К пластам" : "Основы биологии"; ab.setAttribute("aria-pressed", String(ba)); }
@@ -685,7 +688,7 @@ void main(){
       c.fillText(`увеличено ≈ в ${Math.round(cmpInfo.mag).toLocaleString("ru-RU")} раз`, p[0], p[1] + 34); }
   }
   function galOn(k){ panoClear(); if (bmOn) bmLeave(); if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); } gal.on = true; view = null; compare(k || cmpK || "anom"); card(); }
-  function galOff(){ gal.on = false; cmp = false; cmpK = null; view = null; labClear(); arrive(cur); life = lifeT = cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; lifeAt = 0; column(); card(); }
+  function galOff(){ gal.on = false; cmp = false; cmpK = null; view = null; labClear(); arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
 
   // ======== 13д · механизмы эволюции: опыты на 2D-холсте #bioSim ========
   const simC = $("bioSim"); let simG = null, mechOn = false, mi = -1, MSET = BIO_MECH, MK = "mech"; const MS = {};
@@ -739,7 +742,7 @@ void main(){
   function mechOn_(i, kind){ if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); } if (bmOn) bmLeave();
     MK = kind || "mech"; MSET = MK === "basics" ? BIO_BASICS : BIO_MECH;
     mechOn = true; mi = i == null ? -1 : i; view = null; box.classList.add("bio-mech"); Music.voice("bio:cells", false); hint(); card(); }
-  function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); arrive(cur); life = lifeT = cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; lifeAt = 0; column(); card(); }
+  function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
   // ======== 13е · биомы Земли: та же WebGL-сцена, без породы ========
   let bmOn = false, bi = 0;
   function bmShow(i){ panoClear(); bi = clamp(i, 0, BIO_BIOMES.length - 1); const B = BIO_BIOMES[bi]; sel = -1; hov = -1; view = null;
@@ -749,7 +752,7 @@ void main(){
   function bmOn_(i){ if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); } if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); }
     trn = null; bmOn = true; box.classList.add("bio-bm"); column(); bmShow(i == null ? bi : i); }
   function bmLeave(){ bmOn = false; box.classList.remove("bio-bm"); }
-  function bmOff(){ bmLeave(); view = null; sel = -1; arrive(cur); life = lifeT = cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; lifeAt = 0; column(); card(); }
+  function bmOff(){ bmLeave(); view = null; sel = -1; arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
   function bmBar(nm, f, txt, na){ return `<div class="bio-g${na ? " na" : ""}"><span class="mono">${nm}</span><div class="bio-gt">${na ? "" : `<i style="width:${(clamp(f, .02, 1)*100).toFixed(1)}%"></i>`}</div><span class="bio-gv">${mk(na ? "s" : "h")}${esc(txt)}</span></div>`; }
   function bmCard(){
     const B = BIO_BIOMES[bi], L = (BIO_BSCENE[B.id] || []).map(r => r[0]).filter(k => BIO_SP[k]);
@@ -802,7 +805,7 @@ void main(){
       h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">Биосфера · учебник жизни</span><span class="tm-nav"><button id="bioDown" aria-label="Вниз, в прошлое" data-hover>↓</button></span></div>
         <h3>Пласты камня</h3><p class="tm-ago2">20 пластов · 4,5 миллиарда лет</p>
         <p class="tm-lead">Земля сама записала историю жизни — слоями породы. Чем глубже пласт, тем он древнее.</p>
-        <div class="tm-art"><p>Спускайтесь вниз, сквозь колонну. В каждом пласте сначала виден камень с окаменелостями — так их находят палеонтологи. Потом частицы поднимаются из породы и собираются в живых существ, а вокруг проявляется их мир.</p></div>
+        <div class="tm-art"><p>Спускайтесь вниз, сквозь колонну. В каждом пласте — стена его породы: курсор светит на неё, как фонарь геолога. Найдите окаменелость и нажмите на неё — камень расколется по слоям, и за ним откроется мир той эпохи.</p></div>
         <div class="tm-gos"><button class="btn tm-go" id="bioGal" data-hover>Галерея существ · ${GAL_ALL.length} →</button><button class="btn tm-go" id="bioMech" data-hover>Механизмы эволюции · ${BIO_MECH.length} →</button><button class="btn tm-go" id="bioBas" data-hover>Основы биологии · ${BIO_BASICS.length} →</button><button class="btn tm-go" id="bioBm" data-hover>Биомы Земли · ${BIO_BIOMES.length} →</button></div>
         <h4>${BIO_ERAS.every(e => e.ready) ? "Пласты" : `Открыты сейчас · ${BIO_ERAS.filter(e => e.ready).length} из ${NE}`}</h4><div class="bio-chips">${BIO_ERAS.filter(e => e.ready).slice().reverse().map(e => `<button class="tm-tog" data-go="${e.n - 1}" data-hover>${esc(e.nm)}</button>`).join("")}</div>
         <p class="tm-pr">${BIO_ERAS.every(e => e.ready) ? "Открыты все пласты." : "Остальные пласты раскроются в следующих обновлениях; их породу уже можно пройти."} Чтобы пройти историю жизни по порядку, начните с самого дна — с гадея; чтобы идти от нас вглубь — листайте вниз.</p>
@@ -928,14 +931,19 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     for (const I of INST){ if (I.fossilOnly || I.pu == null) continue; const m = sprite(I, I.wet, false); m.renderOrder = 100 + I.pv*100; if (I.shd) I.shd.renderOrder = 99 + I.pv*100; }
   }
   // раскладка существ по картинке: размер — доля высоты, ступни на земле картинки, сдвиг — тот же параллакс, что у её пикселей
+  // окаменелость в породе: место по слоту картинки, разнесено по всему срезу; те же числа задают uFos при создании (v105: иначе все окаменелости — в одной точке)
+  const fosPos = I => [(I.pu - .5)*9, 2.4 - (I.pv - .15)*5.5, -.35, clamp(I.ps*6, .7, 1.9)];
   function panoLayoutImg(){
-    const r = PAN.st.rect; if (!r) return;
+    const r = PAN.st.rect, kF = r ? smooth(.12, .72, life) : 0;
     INST.forEach((I, q) => { if (I.pu == null) return;
+      const F = fosPos(I);
+      if (!r){ I.h = F[3]; I.U.uS.value = F[3]; I.X = F[0]; I.Y = F[1]; I.Z = F[2]; return; }
       const hs = I.ps*r.H, ar = I.sp.ar, sw = ar >= 1 ? hs : hs*ar, sh = ar >= 1 ? hs/ar : hs, [wx, wy] = PAN.toWorld(I.pu, I.pv), [dx, dy] = PAN.shift(I.pu, I.pv);
       const land = !I.wet && I.anim !== "fly" && I.lane !== "water";
-      I.h = hs; I.U.uS.value = hs; I.X = wx + dx; I.Y = (land ? wy + sh/2 : wy) + dy; I.Z = ZP + .5 + q*.01;
-      if (I.spr){ const u = I.spr.userData; I.spr.scale.set(sw*u.sx*I.F, sh*u.sy, 1); I.spr.position.set(I.X, I.Y, I.Z); }
-      if (I.shd){ I.shd.scale.set(sw*.9, sw*.09, 1); I.shd.position.set(I.X, wy + dy + sw*.01, I.Z - .005); } });
+      const PX = wx + dx, PY = (land ? wy + sh/2 : wy) + dy, PZ = ZP + .5 + q*.01, mixF = (a, b) => a + (b - a)*kF;
+      I.h = mixF(F[3], hs); I.U.uS.value = I.h; I.X = mixF(F[0], PX); I.Y = mixF(F[1], PY); I.Z = mixF(F[2], PZ);
+      if (I.spr){ const u = I.spr.userData; I.spr.scale.set(sw*u.sx*I.F, sh*u.sy, 1); I.spr.position.set(PX, PY, PZ); }
+      if (I.shd){ I.shd.scale.set(sw*.9, sw*.09, 1); I.shd.position.set(PX, wy + dy + sw*.01, PZ - .005); } });
   }
   function panoClear(){
     for (const I of INST){ if (I.spr){ scn.remove(I.spr); I.spr.geometry.dispose(); I.spr.material.uniforms.uTex.value.dispose(); I.spr.material.dispose(); I.spr = null; } if (I.shd){ scn.remove(I.shd); I.shd.material.dispose(); I.shd = null; } }
@@ -951,16 +959,27 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     view = null; sel = -1; hov = -1;
     trn = { from, to: n, t: 0 }; lifeT = 0; lifeAt = 0;
     cur = n; column(); card();
+    if (ST) ST.go(n >= 0 ? NE - 1 - n : -1);
+  }
+  // оживление: камень раскалывается по слоям, за ним — живая панорама эпохи
+  function reviveStone(){
+    if (!ST){ lifeT = 1; lifeAt = 0; hint(); return; }
+    if (cur < 0 || !BIO_ERAS[cur].ready || !ST.revive()) return;
+    life = lifeT = 1; lifeAt = 0; hint();
+  }
+  function toStone(){
+    if (!ST){ lifeT = 0; lifeAt = 0; hint(); return; }
+    ST.back(); hint();
   }
   function arrive(n){
     panoClear();
     const E = n >= 0 ? BIO_ERAS[n] : null, PI = E && E.ready && typeof PIMG !== "undefined" && PIMG.has(E.id) ? BIO_PIMG[E.id] : null;
     const PS = !PI && E && E.ready && typeof PANO !== "undefined" && PANO.has(E.id) ? BIO_PANO[E.id] : null;
-    INST = PI ? makeInst(n, PI.slots.filter(r => BIO_SP[r[0]]).map(([k, u, v, sz, d]) => ({ k, x: 0, y: 0, z: ZP + .5, h: 1, v: 0, dir: d, pu: u, pv: v, ps: sz, wet: !!PI.wl && v > PI.wl })))
+    INST = PI ? makeInst(n, PI.slots.filter(r => BIO_SP[r[0]]).map(([k, u, v, sz, d]) => ({ k, x: (u - .5)*9, y: 2.4 - (v - .15)*5.5, z: -.35, h: clamp(sz*6, .7, 1.9), v: 0, dir: d, pu: u, pv: v, ps: sz, wet: !!PI.wl && v > PI.wl })))
       : PS ? makeInst(n, PS.slots.map(([k, x, y, z, h, d]) => ({ k, x, y, z, h, v: 0, dir: d })), PS.floor) : makeInst(n); life = 0; lifeT = 0;
     makeEnv(E && E.ready && !PS && !PI ? E.world : null); sky.dataset.w = E && E.ready ? E.world : "";
     if (PI) panoBuildImg(E, PI); else if (PS) panoBuild(E, PS);
-    if (E && E.ready) lifeAt = performance.now() + 1300;
+    if (E && E.ready && !ST) lifeAt = performance.now() + 1300;
     if (E) jrMark("bio", E.id, E.nm);
     Music.voice("bio:" + (E && E.ready ? E.world : "rock"), false);
     hint();
@@ -985,13 +1004,15 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     rend.setPixelRatio(DPR3); rend.setSize(W3, H3, false); lab.width = W3*DPR3; lab.height = H3*DPR3; cam.aspect = W3/Math.max(1, H3); cam.updateProjectionMatrix(); }
   function openB(target){
     if (!built) build(); open = bioOn = true; size();
+    if (ST === undefined){ ST = typeof STRATA !== "undefined" ? STRATA.init(box, "strata/") : null;
+      if (ST){ ST.cb.fossil = () => { if (lifeT < .5) reviveStone(); }; ST.cb.opened = () => hint(); ST.cb.closed = () => { life = lifeT = 0; hint(); }; } }
     if (target != null && target !== -2 && bmOn) bmLeave();
     const n = typeof target === "string" ? BIO_ERAS.findIndex(e => e.id === target) : target;
-    if (n != null && n !== -2){ cur = n; trn = null; view = null; arrive(n); column(); card(); }
+    if (n != null && n !== -2){ cur = n; trn = null; view = null; arrive(n); column(); card(); if (ST) ST.go(n >= 0 ? NE - 1 - n : -1, true); }
     else if (!INST.length && cur < 0){ arrive(-1); column(); card(); }
     else { column(); card(); }
     if (typeof target === "string" && BIO_SP[target]){ const E = BIO_ERAS.findIndex(e => e.sp && e.sp.includes(target)); if (E >= 0){ cur = E; arrive(E); column(); portrait(target); } }
-    $("bioLife").onclick = () => { lifeT = lifeT > .5 ? 0 : 1; lifeAt = 0; hint(); };
+    $("bioLife").onclick = () => { if (lifeT > .5) toStone(); else reviveStone(); };
     $("bioGalB").onclick = () => gal.on ? galOff() : galOn();
     $("bioMechB").onclick = () => mechOn && MK === "mech" ? mechOff() : mechOn_();
     $("bioBasB").onclick = () => mechOn && MK === "basics" ? mechOff() : mechOn_(-1, "basics");
@@ -1003,7 +1024,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   const mxb = $("bioMax");
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Сцена" : "⤢ Читать"; };
   return { open: openB, close, get on(){ return open; }, go, portrait,
-    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); }, biome: i => { bmOn_(i); }, dbg: { fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
+    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); }, biome: i => { bmOn_(i); }, dbg: { strata: () => ST, revive: () => reviveStone(), stone: () => toStone(), fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
       pickAt: (x, y) => pick(x, y), scr: k => { const I = INST.find(I => I.k === k && !I.fossilOnly); return I ? scr2(I.sx, I.sy, I.Z) : null; } } };
 })();
 const chBio = $("chBio");

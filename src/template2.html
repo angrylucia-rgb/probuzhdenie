@@ -495,7 +495,16 @@ body.j-white .dot{background:#b09a6a}
 }
 /* «Биосфера» */
 #bioCv,#bioLab,.bio-sky,.bio-rock{position:absolute;inset:0;width:100%;height:100%;display:block}
-#bioCv{pointer-events:auto;touch-action:pan-x}#bioLab,.bio-sky,.bio-rock{pointer-events:none}
+#bioCv{pointer-events:auto;touch-action:pan-x}
+/* «Пласты камня»: стена породы поверх сцены главы */
+.bio-strata-cv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.ch-bio.bio-strata .time-in::before{opacity:1}
+.ch-bio.bio-strata-pt #bioCv{cursor:pointer}
+.bio-strata-hov{position:absolute;z-index:4;font:400 13px/1.35 "JetBrains Mono",ui-monospace,monospace;color:#e9dfcb;background:rgba(8,6,5,.82);border:1px solid rgba(242,200,121,.5);padding:8px 11px;border-radius:6px;pointer-events:none;transform:translate(-50%,-130%);white-space:nowrap;opacity:0;transition:opacity .2s}
+.bio-strata-hov b{color:#f2c879;font-weight:500}
+.bio-strata-pins .pin{position:absolute;right:120px;z-index:3;font:400 11px/1.3 "JetBrains Mono",ui-monospace,monospace;color:#e9dfcb;letter-spacing:.06em;display:flex;align-items:center;gap:8px;pointer-events:none;opacity:.85;text-shadow:0 1px 4px #000}
+.bio-strata-pins .pin::after{content:"";width:46px;height:1px;background:#f2c879}
+@media (max-width:760px){.bio-strata-pins .pin{right:56px}.bio-strata-pins .pin::after{width:20px}.bio-strata-hov{white-space:normal;max-width:70vw}}#bioLab,.bio-sky,.bio-rock{pointer-events:none}
 .bio-rock{-webkit-mask-image:linear-gradient(90deg,transparent 26%,#000 46%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent 26%,#000 46%,#000 97%,transparent)}
 .bio-sky{opacity:0}
 .bio-sky[data-w=sea]{background:radial-gradient(ellipse 70% 60% at 62% 0%,rgba(60,140,170,.30),transparent 70%),linear-gradient(rgba(14,46,62,.55),rgba(6,16,26,.2) 62%,rgba(40,32,18,.35))}
