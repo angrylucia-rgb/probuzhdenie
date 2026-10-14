@@ -1858,7 +1858,7 @@ g => {
     // uSpeed — накопленное «галактическое время». На полёте оно не растёт: при двадцатикратном
     // увеличении поворот диска сдвигал бы кадр быстрее, чем идёт сам полёт
     `float r = position.x; float ang = position.y + uSpeed*GAL_W;
-     p = vec3(cos(ang)*r, position.z, sin(ang)*r); a = 0.8;`.replace("GAL_W", (.3/(.6 + 3.8)).toFixed(5)));
+     p = vec3(cos(ang)*r, position.z, sin(ang)*r); a = 0.8*uSharp;`.replace("GAL_W", (.3/(.6 + 3.8)).toFixed(5)));
   // диск галактики живёт в своей подгруппе: на слое «Ланиакея» он — крошечная точка Млечного Пути
   // в центре Местной группы, а при погружении растёт из неё (см. GL_K ниже)
   const gal = new THREE.Group(); g.add(gal);
@@ -1952,7 +1952,8 @@ g => {
     gSpur.material.uniforms.uSharp.value = .26 + .74*spIn;
     gNear.material.uniforms.uSharp.value = .06 + .94*spIn;
     // gl — где мы между слоями станции: 0 — Ланиакея (галактика — точка), 1 — сама галактика
-    const gl = H.gl === undefined ? 1 : H.gl, gs = Math.exp((gl - 1)*GL_K);
+    const jin = H.jin || 0;   // внутри станции: диск крупнее и тусклее — как на кольце
+    const gl = H.gl === undefined ? 1 : H.gl, gs = Math.exp((gl - 1)*GL_K)*(1 + .3*jin);
     gal.scale.setScalar(gs);
     const ang = SUN_A0 + gT*0.3/(0.6 + SUN_R);
     gYou.position.set(Math.cos(ang)*SUN_R, SUN_H, Math.sin(ang)*SUN_R);
@@ -1969,8 +1970,9 @@ g => {
     const zs = H.zs === undefined ? 1 : H.zs, big = Math.max(1, zs);
     const far = 1 - smooth(.10, .55, zs*gs);
     gCore.scale.setScalar(2.4*(1 + far*4.4)/big);           // мировой размер спрайта держим постоянным
-    gCore.material.opacity = (.55 + far*.45)*(1 - smooth(1.8, 7, zs));
-    gPts.material.uniforms.uSize.value = 1 - far*.55;
+    gCore.material.opacity = (.55 + far*.45)*(1 - smooth(1.8, 7, zs))*(1 - .5*jin);
+    gPts.material.uniforms.uSize.value = (1 - far*.55)*(1 - .35*jin);
+    gPts.material.uniforms.uSharp.value = 1 - .6*jin;
     // слой Ланиакеи: раздувается вокруг Млечного Пути и гаснет, пройдя мимо камеры
     lan.visible = gl < .985;
     if (lan.visible){
@@ -4519,6 +4521,7 @@ function loop(now){
       // «Вселенной» приходим на слой Ланиакеи, на пролётах к Солнцу и к чёрной дыре — на диск
       if (i === 3) st.H.gl = zm && (zm.aSt === 3 || zm.bSt === 3) ? (zm.aSt === 2 ? 0 : 1)
                            : (humanOpen && jKind === "g" && jId === "g3" ? smooth(0, 1, depth) : 1);
+      if (i === 3) st.H.jin = humanOpen && jKind === "g" && jId === "g3" ? hE : 0;   // внутри станции: камера ближе, точки крупнее — гасим, чтобы диск выглядел как на кольце
       if (i === 1) st.H.cym = humanOpen && jKind === "g" && jId === "g1" ? smooth(0, 1, depth) : (tr && tr.morph && (tr.to === "g1" || jId === "g1") ? 1 : 0);
       // ветка станции VII «Сон и сознание»: фигура ложится, над ней — сцена сна (dream.js)
       if (i === 6){ st.H.dr = humanOpen && jId === "dream"; st.H.drd = st.H.dr ? clamp(depth, 0, 3) : 0; }
