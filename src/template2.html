@@ -1827,31 +1827,54 @@ g => {
 // IV · Галактика
 g => {
   const warm = C(0xffdca0), blue = C(0x8fb0ff), white = C(0xf2f4ff), pink = C(0xff7fb0);
-  const gPts = pts(14000*Q, (i,o) => {
-      const arm = Math.floor(Math.random()*4), r = .12 + Math.pow(Math.random(), 1.7)*6.4;
-      const ang = arm*Math.PI/2 + 2.5*Math.log(r + .35) + gauss()*(.22 + .12/(r+.2));
-      const h = gauss()*(r < 1.1 ? .38*(1.2-r) : .1*(1 - r/7));
-      o.p = [r, ang, h];
-      o.c = r < 1.2 ? mixc(warm, white, r/1.2) : (Math.random() < .06 ? pink : mixc(white, blue, Math.min(1, (r-1.2)/4)));
-      o.s = .4 + Math.random()*(r < 1 ? 1.2 : .9); },
+  // Строение — как у Млечного Пути (схема NASA/JPL-Caltech, R. Hurt): перемычка в центре, два главных
+  // рукава (Щита — Центавра и Персея) от её концов, два слабее (Наугольника и Стрельца), между ними
+  // гладкий диск; розовые узлы — области звездообразования. Рукава логарифмические, шаг ≈ 14° (оценки для Млечного Пути — около 12–14°).
+  // Вращение ЖЁСТКОЕ (одна угловая скорость): спиральный узор — волна плотности, он сохраняет форму,
+  // а не накручивается в кольца, как было бы при дифференциальном вращении звёзд
+  const BAR_A = -.75, ARM_K = 1/Math.tan(14*Math.PI/180), ARM_R0 = 1.05;
+  const ARMS = [[BAR_A, 1, 1.0], [BAR_A + Math.PI, 1, 1.0], [BAR_A + Math.PI/2, .45, 1.5], [BAR_A + 1.5*Math.PI, .45, 1.5]];   // [начало, вес, с какого радиуса]
+  const armAng = (j, r) => ARMS[j][0] - ARM_K*Math.log(r/ARM_R0);
+  const pickArm = () => { const w = Math.random()*2.9; return w < 1 ? 0 : w < 2 ? 1 : w < 2.45 ? 2 : 3; };
+  const barY = C(0xffe2a8), dim = (c, k = .55) => mixc([0, 0, 0], c, k);
+  const gPts = pts(20000*Q, (i,o) => {
+      const q = Math.random();
+      if (q < .11){   // перемычка и балдж: вытянутый тёплый эллипсоид
+        const x = gauss()*.6, y = gauss()*.19, cb = Math.cos(BAR_A), sb = Math.sin(BAR_A);
+        const X = x*cb - y*sb, Y = x*sb + y*cb, r = Math.max(.03, Math.hypot(X, Y));
+        o.p = [r, Math.atan2(Y, X), gauss()*.1*(1.2 - Math.min(1, r))];
+        o.c = dim(mixc(barY, warm, Math.min(1, r)), .8); o.s = .45 + Math.random()*.7; return; }
+      if (q < .48){   // гладкий диск между рукавами — тусклый
+        const r = Math.min(6.7, .8 + -Math.log(1 - Math.random()*.95)*2.1), ang = Math.random()*TAU;
+        o.p = [r, ang, gauss()*.07*(1 - r/8)];
+        o.c = dim(mixc(white, blue, Math.min(1, (r - 1)/4.5)), .8); o.s = .4 + Math.random()*.7; return; }
+      const j = pickArm(), r0 = ARMS[j][2], r = r0 + Math.pow(Math.random(), .85)*(6.4 - r0);
+      const knot = q > .94;   // область звездообразования — плотный розовый узел на рукаве
+      const wd = (.36 + .065*r)*(knot ? .25 : 1)*(ARMS[j][1] < 1 ? .85 : 1);
+      o.p = [r, armAng(j, r) + gauss()*wd/r, gauss()*.05*(1 - r/8)];
+      o.c = knot ? pink : (Math.random() < .03 ? pink : mixc(white, blue, Math.min(1, (r - 1.2)/4)));
+      if (ARMS[j][1] < 1) o.c = dim(o.c).map((v, k) => v + o.c[k]*.25);
+      o.s = (knot ? .9 : .5) + Math.random()*(knot ? 1.1 : 1.0); },
     // uSpeed — накопленное «галактическое время». На полёте оно не растёт: при двадцатикратном
-    // увеличении дифференциальное вращение диска сдвигало бы кадр быстрее, чем идёт сам полёт
-    `float r = position.x; float ang = position.y + uSpeed*0.3/(0.6 + r);
-     p = vec3(cos(ang)*r, position.z, sin(ang)*r); a = 0.8;`);
+    // увеличении поворот диска сдвигал бы кадр быстрее, чем идёт сам полёт
+    `float r = position.x; float ang = position.y + uSpeed*GAL_W;
+     p = vec3(cos(ang)*r, position.z, sin(ang)*r); a = 0.8;`.replace("GAL_W", (.3/(.6 + 3.8)).toFixed(5)));
   // диск галактики живёт в своей подгруппе: на слое «Ланиакея» он — крошечная точка Млечного Пути
   // в центре Местной группы, а при погружении растёт из неё (см. GL_K ниже)
   const gal = new THREE.Group(); g.add(gal);
   gal.add(gPts);
-  const gCore = glow(0xffd9a0, 4, .8); gal.add(gCore);
+  const gCore = glow(0xffcf80, 3, .55); gal.add(gCore);
   // Место Солнца: 3,8 из 6,5 радиуса диска — это 0,58, ровно как 8,2 кпк из примерно 14 кпк
   // видимого радиуса Млечного Пути. Угол выбран между двумя рукавами — как Рукав Ориона
-  const SUN_R = 3.8, SUN_A0 = 4.34, SUN_H = .03;
+  const SUN_R = 3.8, SUN_H = .03;
+  // между рукавом Персея (главный, снаружи) и рукавом Стрельца (слабый, внутри) — посередине по углу
+  const SUN_A0 = (() => { const a1 = armAng(1, SUN_R), a2 = armAng(3, SUN_R); let d = ((a2 - a1) % TAU + TAU) % TAU; if (d > Math.PI) d -= TAU; return a1 + d*.5; })();
   // Рукав Ориона: уплотнение вокруг места Солнца, вытянутое вдоль шага спирали. Без него мы
   // ныряли бы в пустой участок внешнего диска — астрономически честно, но в кадре пусто.
   // Разброс СТРОГО ограничен: с гауссовым хвостом частицы расползались на два радиана дуги и
   // на подлёте оказывались за камерой. Вращается рукав жёстко, по скорости на радиусе Солнца, —
   // иначе дифференциальное вращение растаскивает его в кольцо за минуту.
-  const SPUR_ROT = `float r = position.x; float ang = position.y + uSpeed*0.3/(0.6 + ${SUN_R.toFixed(2)});
+  const SPUR_ROT = `float r = position.x; float ang = position.y + uSpeed*${(.3/(.6 + 3.8)).toFixed(5)};
      p = vec3(cos(ang)*r, position.z, sin(ang)*r);`;
   // Чтобы рукав не выбивался из диска, он живёт по трём правилам диска, а не по своим:
   // тот же закон цвета и размера точки на этом радиусе; мягкая огибающая env — плотность, размер и
@@ -1863,7 +1886,7 @@ g => {
   const spurPt = (n, dr, da, dh, wk, s0, s1, al) => pts(n*Q, (i,o) => {
       const u = rn(), v = rn(), w = rn();
       const rr = SUN_R + u*dr;
-      const ang = SUN_A0 + 2.5*(Math.log(rr + .35) - Math.log(SUN_R + .35)) + v*da;
+      const ang = SUN_A0 - ARM_K*Math.log(rr/SUN_R) + v*da;
       const env = (1 - u*u)*(1 - v*v)*(1 - .55*w*w);
       o.p = [rr, ang, SUN_H + w*dh];
       o.c = mixc(diskCol(rr), warm, wk*env);
@@ -1945,8 +1968,8 @@ g => {
     // «издали» галактика и на слое Ланиакеи: там она меньше в GL_K раз, чем в покое
     const zs = H.zs === undefined ? 1 : H.zs, big = Math.max(1, zs);
     const far = 1 - smooth(.10, .55, zs*gs);
-    gCore.scale.setScalar(4*(1 + far*2.6)/big);           // мировой размер спрайта держим постоянным
-    gCore.material.opacity = (.8 + far*.2)*(1 - smooth(1.8, 7, zs));
+    gCore.scale.setScalar(2.4*(1 + far*4.4)/big);           // мировой размер спрайта держим постоянным
+    gCore.material.opacity = (.55 + far*.45)*(1 - smooth(1.8, 7, zs));
     gPts.material.uniforms.uSize.value = 1 - far*.55;
     // слой Ланиакеи: раздувается вокруг Млечного Пути и гаснет, пройдя мимо камеры
     lan.visible = gl < .985;
