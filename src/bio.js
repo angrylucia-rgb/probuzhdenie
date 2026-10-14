@@ -936,8 +936,8 @@ void main(){
         <h3>${esc(E.nm)}</h3><p class="tm-ago2">${esc(E.t)}</p>
         <p class="tm-lead">${esc(E.lead)}</p>
         <div class="bio-gs" aria-label="Приборы эпохи; метка — сегодня">
-          ${gauge("O₂", 21, G.o2[0], G.o2[1], G.o2[2], 35)}${gauge("CO₂", 420, G.co2[0], G.co2[1], G.co2[2], 8000, true)}${gauge("°C", 15, G.t[0], G.t[1], G.t[2], 35)}
-          <p class="bio-gn mono">светлая метка — сегодня: 21 % · ≈ 420 ppm · ≈ 15 °C</p></div>
+          ${gauge("O₂", 21, G.o2[0], G.o2[1], G.o2[2], 35)}${gauge("CO₂", 427, G.co2[0], G.co2[1], G.co2[2], 8000, true)}${gauge("°C", 15, G.t[0], G.t[1], G.t[2], 35)}
+          <p class="bio-gn mono">светлая метка — сегодня: 21 % · ≈ 427 ppm · ≈ 15 °C</p></div>
         <div class="tm-art">${E.what.split("\n\n").map(p => `<p>${esc(p)}</p>`).join("")}</div>
         ${globeHTML(E)}
         ${E.sp.length ? `<h4>Кто жил</h4>` : ""}<div class="bio-chips">${E.sp.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>
