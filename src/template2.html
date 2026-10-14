@@ -258,6 +258,7 @@ body.j-white .dot{background:#b09a6a}
 .hd-try{color:#ffd9a0;margin:-6px 0 0;animation:tryglow 3.2s ease-in-out infinite}
 @keyframes tryglow{50%{color:#fff3dc;text-shadow:0 0 12px rgba(255,210,150,.5)}}
 .depth .dl.loop{fill:#ff9fcf}
+@media (max-width:760px){.depth .dl{font-size:8px;letter-spacing:.05em}}
 .hd-body{overflow:auto;scrollbar-width:none;padding-right:6px;mask-image:linear-gradient(transparent,#000 3%,#000 90%,transparent);display:grid;gap:18px;align-content:start;padding-bottom:30px}
 .hd-body::-webkit-scrollbar{display:none}
 .hd-body.swap{animation:fadein .8s both}
@@ -549,6 +550,7 @@ body.j-white .dot{background:#b09a6a}
 .ch-bio.tm-max #bioHint,.ch-bio.tm-max .bio-col{display:none}
 #bioHint{color:var(--faint);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase}
 .bio-col{position:absolute;right:calc(var(--pad) - 6px);top:calc(env(safe-area-inset-top,0px) + 84px);bottom:calc(env(safe-area-inset-bottom,0px) + 26px);width:30px;display:flex;flex-direction:column;gap:2px;pointer-events:auto;z-index:2}
+.ch-bio.bio-bm .bio-col{display:none}
 .bio-col button{position:relative;min-height:6px;border-radius:2px;background:color-mix(in srgb,var(--c) 52%,#2a2620);opacity:.5;transition:opacity .3s,transform .3s,box-shadow .3s}
 .bio-col button.rd{opacity:.85}
 .bio-col button:hover{opacity:1;transform:scaleX(1.25)}
@@ -637,7 +639,7 @@ body.j-white .dot{background:#b09a6a}
 .rt-compass{display:grid;gap:4px;text-align:left;margin:4px 0 18px;padding:16px 20px;border:1px dashed rgba(214,172,94,.5);border-radius:6px;transition:background .3s,border-color .3s}
 .rt-compass:hover{background:rgba(214,172,94,.07);border-color:var(--brass)}.rt-compass b{font:400 22px var(--display);color:#ffe2a8}.rt-compass span:last-child{color:var(--muted);font-size:13.5px}
 .cp-invite{position:fixed;left:var(--pad);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:39;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 2*var(--pad));background:rgba(8,9,18,.93);border:1px solid rgba(214,172,94,.4);border-radius:8px;padding:10px 12px 10px 16px;font-size:14px;color:#ddd6c6;box-shadow:0 10px 30px rgba(0,0,0,.5);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .6s,visibility .6s,transform .6s}
-.cp-invite.open{opacity:1;visibility:visible;transform:none}.cp-invite b{color:#ffe2a8;font-weight:500}.cp-invite .btn{padding:5px 12px;font-size:13px;flex:none}
+.cp-invite.open{opacity:1;visibility:visible;transform:none}body:has(.chapter.open) .cp-invite,body:has(#chHuman.open) .cp-invite{opacity:0;visibility:hidden}.cp-invite b{color:#ffe2a8;font-weight:500}.cp-invite .btn{padding:5px 12px;font-size:13px;flex:none}
 @media (max-width:760px){
   .cp-steps li{grid-template-columns:24px 1fr}.cp-steps .mono{grid-column:2}.cp-steps b{grid-column:2}
   .cp-cards{grid-template-columns:1fr}.cp-ans button{font-size:18px;padding:13px 16px}
@@ -897,7 +899,7 @@ body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
 .bio-jr-c div{display:flex;gap:6px;flex-wrap:wrap}
 .bio-jr-c div button{font:500 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border:1px solid rgba(214,172,94,.35);border-radius:999px;color:#f0e2c4}
 .bio-jr-c div button:hover{background:rgba(214,172,94,.15)}
-@media (max-width:760px){.bio-jr{left:12px;right:12px;top:70px;bottom:auto;height:calc(42vh - 80px)}.bio-jr-g{grid-template-columns:repeat(2,1fr);gap:10px}.bio-jr-c h5{font-size:15px}.bio-jr-c p{display:none}}
+@media (max-width:760px){.bio-jr{left:12px;right:12px;top:70px;bottom:auto;height:calc(42vh - 80px)}.bio-jr-g{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding-bottom:4px}.bio-jr-c{flex:0 0 min(44vw,200px);scroll-snap-align:start}.bio-jr-c h5{font-size:15px}.bio-jr-c p{display:none}.bio-jr-c div{flex-wrap:nowrap}.bio-jr-c div button{padding:4px 7px;font-size:9px;letter-spacing:.05em}}
 .ch-bio.bio-rise{filter:brightness(0);transition:filter .6s ease-in}
 .bio-jrbg{position:absolute;left:0;top:0;z-index:0;display:none;pointer-events:none;background:url("mbg/journal.webp") center/100% 100% no-repeat;filter:brightness(.92);transform-origin:0 0}
 .ch-bio.bio-mech.bio-jr-on .bio-jrbg{display:block}
@@ -3639,7 +3641,7 @@ function openJourney(id){
   if (humanOpen && jId === id) return;
   if (tr || zm) return;
   if (humanOpen){ toggleMenu(false); flashTo(id, 0); return; }
-  closePath(); closeTime(); closeTree(); closeThought(); surface();
+  closeSide(); surface();
   jHist = [];
   setJourney(id); goTo(jSt);
   // прямой вход в главу — с её «лицевого» слоя: у Галактики это сам диск, а не Ланиакея над ним
@@ -3969,11 +3971,12 @@ $("stages").innerHTML = DATA.stages.map((s, k) => `
     <dl><dt>Узнать</dt><dd>${esc(s.know)}</dd><dt>Почувствовать</dt><dd>${esc(s.prac)}</dd><dt>Прожить</dt><dd>${esc(s.life)}</dd><dt>Осмыслить</dt><dd class="qq">${esc(s.q)}</dd></dl>
   </article>`).join("");
 $("stages").querySelectorAll(".go").forEach(b => b.onclick = () => { const k = +b.dataset.k; closePath(); if (k === 4) openHuman(); else pendingDive = {i:STAGE_ST[k], moved:false}; });
-function openPath(){ closeHuman(); closeTime(); closeTree(); closeThought(); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
+function openPath(){ closeChapters(); toggleMenu(false); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
 $("pathClose").onclick = closePath;
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
-function closeChapters(){ closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeRouteList(); }
+function closeSide(){ closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeRouteList(); }   // все главы, кроме погружения
+function closeChapters(){ closeHuman(); closeSide(); }
 __CHRONO__
 
 /* ---------- Справочник ---------- */
@@ -4048,7 +4051,7 @@ function renderRefTab(tab){
   if (tab === "sounds") refBody.querySelectorAll("[data-snd]").forEach(b => b.onclick = () => { refBody.querySelectorAll("[data-snd]").forEach(x => x.classList.toggle("on", x === b)); Music.preview(b.dataset.snd); });
   document.querySelectorAll(".reftab").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
 }
-function openRef(tab){ closeHuman(); closePath(); closeTime(); closeTree(); closeThought(); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
+function openRef(tab){ closeChapters(); toggleMenu(false); surface(); refOpen = true; chRef.classList.add("open"); chRef.setAttribute("aria-hidden","false"); renderRefTab(tab || "guide"); $("refClose").focus(); }
 function closeRef(){ if (!refOpen) return; refOpen = false; chRef.classList.remove("open"); chRef.setAttribute("aria-hidden","true"); }
 $("mRef").onclick = () => { toggleMenu(false); openRef("guide"); };
 $("refClose").onclick = closeRef;
