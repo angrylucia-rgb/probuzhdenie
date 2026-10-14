@@ -548,8 +548,8 @@ void main(){
       : !BIO_ERAS[cur].ready ? "Пласт ещё не раскрыт — листайте дальше вниз"
       : life < .5 ? (ST ? (ST.hasFossil(NE - 1 - cur) ? "Курсор — фонарь · найдите окаменелость и нажмите на неё" : "Курсор — фонарь · ведите по стене") : "Окаменелости в породе… сейчас они оживут") : "Наведите на существо — имя · нажмите — портрет";
     const mb = $("bioMechB"), ab = $("bioBasB"), bb = $("bioBmB"), mm = mechOn && MK === "mech", ba = mechOn && MK === "basics";
-    if (mb){ mb.textContent = mm ? "← К пластам" : "Механизмы эволюции"; mb.setAttribute("aria-pressed", String(mm)); }
-    if (ab){ ab.textContent = ba ? "← К пластам" : "Основы биологии"; ab.setAttribute("aria-pressed", String(ba)); }
+    if (mb){ mb.textContent = mm ? "← " + backLabel(mOrigin) : "Механизмы эволюции"; mb.setAttribute("aria-pressed", String(mm)); }
+    if (ab){ ab.textContent = ba ? "← " + backLabel(mOrigin) : "Основы биологии"; ab.setAttribute("aria-pressed", String(ba)); }
     if (bb){ bb.textContent = bmOn ? "← К пластам" : "Биомы Земли"; bb.setAttribute("aria-pressed", String(bmOn)); }
     const gb = $("bioGalB"); if (gb){ gb.textContent = gal.on ? "← К пластам" : "Галерея существ"; gb.setAttribute("aria-pressed", String(gal.on)); }
     const lb = $("bioLife"); if (lb){ lb.hidden = mechOn || cmp || bmOn || !(cur >= 0 && BIO_ERAS[cur].ready); lb.textContent = lifeT > .5 ? "Вернуть в камень" : "Оживить окаменелости"; lb.setAttribute("aria-pressed", String(lifeT > .5)); }
@@ -713,7 +713,7 @@ void main(){
   const MHOME = (M) => M.home;
   function goHome(h){
     if (!h) return;
-    if (h.t === "bsc"){ close(); if (typeof closeBio === "function") closeBio();
+    if (h.t === "bsc"){ if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech", "bio-jr-on"); } close(); if (typeof closeBio === "function") closeBio();
       openJourney("earth"); setBranch("bio", h.d); depth = Math.max(depth, h.d - .9); depthT = h.d; lastDepthInput = performance.now();
       if (h.dive && typeof BSC !== "undefined") setTimeout(() => BSC.dbg.dive(h.dive[0], h.dive[1]), 1800); return; }
     if (h.t === "era"){ const n = BIO_ERAS.findIndex(e => e.id === h.e); mechOff(); if (n >= 0) go(n); return; }
@@ -728,7 +728,7 @@ void main(){
       return M ? `<button data-mhere="${x}" data-hover><b>${esc(M.nm)}</b><span>${esc(M.sub)} — опыт из журнала натуралиста</span></button>` : ""; }).join("")}</div>`;
   }
   function hereBind(origin){ cardEl.querySelectorAll("[data-mhere]").forEach(b => b.onclick = () => { const [k, id] = b.dataset.mhere.split(":"); const L = k === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id);
-    if (bmOn) bmLeave(); mechOn_(i, k); mOrigin = origin(); card(); }); }
+    const o = origin(); if (bmOn) bmLeave(); mechOn_(i, k); if (o) mOrigin = Object.assign({ ext:true }, o); card(); hint(); }); }
   // журнал — настоящая тетрадь на столе (картинка Люсии): карточки вклеены на её страницы
   // страницы на картинке: x .39–.655 и .665–.925, y .21–.88 (2752×1536); зарисовки по краям не закрываем
   let jbEl = null;
@@ -757,8 +757,8 @@ void main(){
     jrEl.innerHTML = `<div class="bio-jr-h"><span class="mono">Журнал натуралиста · ${B ? "основы биологии" : "механизмы эволюции"}</span><i>Каждая запись — опыт и место, где это видно в природе</i></div>
       <div class="bio-jr-g">${MSET.map((M, i) => `<article class="bio-jr-c"><button class="bio-jr-ph" data-ji="${i}" data-hover style="${M.bg && MBG_OK.has(M.bg) ? `background-image:url('mbg/${M.bg}.webp')` : ""}"><b>${i + 1}</b></button>
         <h5>${esc(M.nm)}</h5><p>${esc(M.place || M.sub)}</p><div><button data-ji="${i}" data-hover>Опыт ▸</button>${M.home ? `<button data-jh="${i}" data-hover>На месте ↗</button>` : ""}</div></article>`).join("")}</div>`;
-    jrEl.querySelectorAll("[data-ji]").forEach(b => b.onclick = () => { mi = +b.dataset.ji; mOrigin = null; card(); });
-    jrEl.querySelectorAll("[data-jh]").forEach(b => b.onclick = () => goHome(MSET[+b.dataset.jh].home));
+    jrEl.querySelectorAll("[data-ji]").forEach(b => b.onclick = () => { mi = +b.dataset.ji; card(); });
+    jrEl.querySelectorAll("[data-jh]").forEach(b => b.onclick = () => { mOrigin = null; goHome(MSET[+b.dataset.jh].home); });
     jrLayout();
   }
   function mechFrame(dt, T){
@@ -772,7 +772,7 @@ void main(){
   }
   function mechCard(){
     const B = MK === "basics", N = MSET.length;
-    if (mi < 0) return `<div class="tm-bar"><span class="mono eyebrow tm-cat">Биосфера · ${B ? "основы" : "механизмы"}</span><span class="tm-nav"><button id="bioMechX" data-hover>← К пластам</button></span></div>
+    if (mi < 0) return `<div class="tm-bar"><span class="mono eyebrow tm-cat">Биосфера · ${B ? "основы" : "механизмы"}</span><span class="tm-nav"><button id="bioMechX" data-hover>← ${esc(backLabel(mOrigin))}</button></span></div>
       <h3>${B ? "Основы биологии" : "Механизмы эволюции"}</h3><p class="tm-ago2">${N} ${B ? "тем" : "опытов"}</p>
       <p class="tm-lead">${B ? "Из чего сделано живое и как оно работает: клетка, гены, энергия, пищевые цепи и вечное движение атомов. Каждая тема — живая схема." : "Как из случайных изменений и отбора получается всё разнообразие жизни. Каждый опыт — маленькая живая модель: меняйте условия и смотрите, что происходит."}</p>
       <div class="bio-mlist">${MSET.map((M, i) => `<button data-mi="${i}" data-hover><b>${i + 1}</b><span><i>${esc(M.nm)}</i><small>${esc(M.sub)}</small></span></button>`).join("")}</div>
@@ -788,13 +788,13 @@ void main(){
       <h4>Что происходит</h4><p class="tm-pr bio-p">${esc(M.how)}</p>
       <h4>В природе</h4><p class="tm-pr bio-p">${esc(M.nature)}</p>
       <h4>Наука</h4><ul class="list">${M.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}</ul>
-      ${M.place ? `<h4>Где это в природе</h4><div class="hd-fork bio-home">${mOrigin ? `<button id="bioMBack" data-hover><b>← Вернуться к месту</b><span>${esc(M.place)}</span></button>` : `<button id="bioMHome" data-hover><b>На месте ↗</b><span>${esc(M.place)}</span></button>`}</div>` : ""}
+      ${M.place ? `<h4>Где это в природе</h4><div class="hd-fork bio-home">${mOrigin && mOrigin.ext ? `<button id="bioMBack" data-hover><b>← Вернуться к месту</b><span>${esc(backLabel(mOrigin))}</span></button>` : `<button id="bioMHome" data-hover><b>На месте ↗</b><span>${esc(M.place)}</span></button>`}</div>` : ""}
       <div class="tm-gos"><button class="btn tm-go" id="bioMList" data-hover>← ${B ? "Журнал: все темы" : "Журнал: все опыты"}</button></div>`;
   }
   function mechBind(){
     const on = (id, f) => { const b = $(id); if (b) b.onclick = f; };
-    on("bioMechX", () => mechOff()); on("bioMList", () => { mi = -1; mOrigin = null; card(); });
-    on("bioMHome", () => goHome(MSET[mi].home)); on("bioMBack", () => { const o = mOrigin; mOrigin = null; goHome(o); });
+    on("bioMechX", () => goBack()); on("bioMList", () => { mi = -1; card(); });
+    on("bioMHome", () => { mOrigin = null; goHome(MSET[mi].home); }); on("bioMBack", () => goBack());
     if (mi < 0) journal();
     on("bioMPrev", () => { mi = Math.max(0, mi - 1); card(); }); on("bioMNext", () => { mi = Math.min(MSET.length - 1, mi + 1); card(); });
     on("bioMSwap", () => mechOn_(-1, MK === "basics" ? "mech" : "basics"));
@@ -806,8 +806,23 @@ void main(){
     cardEl.querySelectorAll("[data-mr]").forEach(r => r.oninput = () => { S.p[r.dataset.mr] = +r.value; r.nextElementSibling.textContent = (+r.value).toFixed(2); });
     cardEl.querySelectorAll("[data-mb]").forEach(b => b.onclick = () => { const k = b.dataset.mb; if (k === "reset"){ M.init(S); } else if (k === "cellst"){ close(); if (typeof goTo === "function") goTo(7); } else if (M.on) M.on(S, k); });
   }
-  function mechOn_(i, kind){ if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); } if (bmOn) bmLeave();
-    MK = kind || "mech"; MSET = MK === "basics" ? BIO_BASICS : BIO_MECH; if (typeof i !== "number" || i < 0) mOrigin = null;
+  // откуда пришли в опыты: туда же и возвращаемся (слой Биосферы, пласт, биом, галерея)
+  function hereNow(){ return gal.on ? { t:"gal" } : bmOn ? { t:"biome", b:BIO_BIOMES[bi].id } : { t:"era", e: cur >= 0 ? BIO_ERAS[cur].id : null }; }
+  function backLabel(o){
+    if (!o) return "К пластам";
+    if (o.t === "bsc") return ["К кроне сейбы", "К стволу сейбы", "К подстилке", "К корням сейбы"][Math.max(0, Math.min(3, (o.d || 7) - 7))];
+    if (o.t === "era"){ const E = o.e && BIO_ERAS.find(e => e.id === o.e); return E ? `К пласту «${E.nm}»` : "К пластам"; }
+    if (o.t === "biome"){ const B = BIO_BIOMES.find(b => b.id === o.b); return B ? `К биому «${B.nm}»` : "К биомам"; }
+    if (o.t === "gal") return "В галерею";
+    return "К пластам";
+  }
+  function goBack(){ const o = mOrigin; mOrigin = null;
+    if (!o || (o.t === "era" && !o.e)){ mechOff(); return; }
+    if (o.t === "gal"){ mechOff(); galOn(); return; }
+    goHome(o); }
+  function mechOn_(i, kind){ if (!mechOn) mOrigin = hereNow();
+    if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); } if (bmOn) bmLeave();
+    MK = kind || "mech"; MSET = MK === "basics" ? BIO_BASICS : BIO_MECH;
     mechOn = true; mi = i == null ? -1 : i; view = null; box.classList.add("bio-mech"); Music.voice("bio:cells", false); hint(); card(); }
   function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech", "bio-jr-on"); arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
   // ======== 13е · биомы Земли: та же WebGL-сцена, без породы ========
@@ -1086,7 +1101,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   box.addEventListener("touchend", e => { if (tY == null) return; const dy = tY - e.changedTouches[0].clientY; tY = null; if (Math.abs(dy) < 40 || cmp || mechOn || bmOn) return;
     if (dy > 0){ if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); } else up(); }, { passive:true });
   addEventListener("keydown", e => { if (!open || (e.target && e.target.tagName === "INPUT")) return;
-    if (e.key === "Escape"){ e.stopPropagation(); if (mechOn){ if (mi >= 0){ mi = -1; card(); } else mechOff(); } else if (view){ view = null; sel = -1; card(); } else if (bmOn) bmOff(); else if (gal.on) galOff(); else close(); }
+    if (e.key === "Escape"){ e.stopPropagation(); if (mechOn){ if (mi >= 0){ mi = -1; card(); } else goBack(); } else if (view){ view = null; sel = -1; card(); } else if (bmOn) bmOff(); else if (gal.on) galOff(); else close(); }
     else if (cmp || mechOn || bmOn) return;
     else if (e.key === "ArrowDown" || e.key === "PageDown"){ e.preventDefault(); if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); }
     else if (e.key === "ArrowUp" || e.key === "PageUp"){ e.preventDefault(); up(); } }, true);
@@ -1104,8 +1119,8 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     if (typeof target === "string" && BIO_SP[target]){ const E = BIO_ERAS.findIndex(e => e.sp && e.sp.includes(target)); if (E >= 0){ cur = E; arrive(E); column(); portrait(target); } }
     $("bioLife").onclick = () => { if (lifeT > .5) toStone(); else reviveStone(); };
     $("bioGalB").onclick = () => gal.on ? galOff() : galOn();
-    $("bioMechB").onclick = () => mechOn && MK === "mech" ? mechOff() : mechOn_();
-    $("bioBasB").onclick = () => mechOn && MK === "basics" ? mechOff() : mechOn_(-1, "basics");
+    $("bioMechB").onclick = () => mechOn && MK === "mech" ? goBack() : mechOn_();
+    $("bioBasB").onclick = () => mechOn && MK === "basics" ? goBack() : mechOn_(-1, "basics");
     $("bioBmB").onclick = () => bmOn ? bmOff() : bmOn_();
     if (!raf){ last = performance.now(); raf = requestAnimationFrame(frame); }
   }
@@ -1115,7 +1130,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Сцена" : "⤢ Читать"; };
   return { open: openB, close, get on(){ return open; }, go, portrait,
     gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); },
-    mechAt: (id, kind, origin) => { const L = kind === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id); mechOn_(i, kind || "mech"); mOrigin = origin || null; card(); }, biome: i => { bmOn_(i); }, dbg: { strata: () => ST, revive: () => reviveStone(), stone: () => toStone(), fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
+    mechAt: (id, kind, origin) => { const L = kind === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id); mechOn_(i, kind || "mech"); if (origin) mOrigin = Object.assign({ ext:true }, origin); card(); hint(); }, biome: i => { bmOn_(i); }, dbg: { strata: () => ST, revive: () => reviveStone(), stone: () => toStone(), fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
       pickAt: (x, y) => pick(x, y), scr: k => { const I = INST.find(I => I.k === k && !I.fossilOnly); return I ? scr2(I.sx, I.sy, I.Z) : null; } } };
 })();
 const chBio = $("chBio");
