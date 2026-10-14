@@ -1129,7 +1129,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   const mxb = $("bioMax");
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Сцена" : "⤢ Читать"; };
   return { open: openB, close, get on(){ return open; }, go, portrait,
-    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); },
+    gallery: k => galOn(k), journal: () => { mechOn_(-1, "mech"); }, mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); },
     mechAt: (id, kind, origin) => { const L = kind === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id); mechOn_(i, kind || "mech"); if (origin) mOrigin = Object.assign({ ext:true }, origin); card(); hint(); }, biome: i => { bmOn_(i); }, dbg: { strata: () => ST, revive: () => reviveStone(), stone: () => toStone(), fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
       pickAt: (x, y) => pick(x, y), scr: k => { const I = INST.find(I => I.k === k && !I.fossilOnly); return I ? scr2(I.sx, I.sy, I.Z) : null; } } };
 })();
@@ -1138,6 +1138,7 @@ function openBio(t){ closeChapters(); toggleMenu(false); surface(); chBio.classL
 function closeBio(){ BIO.close(); }
 $("bioClose").onclick = closeBio;
 $("mBio").onclick = () => openBio();
+$("mJournal").onclick = () => { openBio(); BIO.journal(); };
 // ---- 13ж · связи: из Древа и Календаря — в «Биосферу» ----
 // начало каждого пласта, лет назад (порядок BIO_ERAS); событие на границе относим к пласту, который оно открывает,
 // кроме вымираний — они закрывают свой пласт
