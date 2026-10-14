@@ -241,6 +241,15 @@ const BIO_PIMG = {
     slots:[["eudim", .15, .22, .08, 1], ["posto", .27, .515, .19, 1], ["morga", .38, .53, .055, 1], ["coelo", .45, .52, .13, -1], ["lystr", .56, .52, .066, 1],
     ["herre", .72, .47, .11, -1], ["eorap", .82, .50, .055, -1], ["thrin", .92, .52, .055, -1],
     ["notho", .25, .73, .2, 1], ["shoni", .72, .67, .3, -1]] },
+  // ---- атлас биомов (16:9, картинки Люсии v114): та же раскладка «ступни на земле / пловцы — центр» ----
+  bm_rain:{ ar:2752/1536, wl:null, fx:["motes", "mist", "rays"], slots:[["jagua", .62, .86, .22, -1], ["orang", .16, .70, .12, 1], ["sloth", .70, .33, .08, -1], ["touca", .40, .30, .06, 1]] },
+  bm_sav:{ ar:2752/1536, wl:null, fx:["dust", "haze"], slots:[["eleph", .22, .50, .34, 1], ["giraf", .74, .52, .36, -1], ["zebra", .54, .55, .2, -1], ["lion", .40, .62, .3, 1]] },
+  bm_taiga:{ ar:2752/1536, wl:null, fx:["snow", "mist"], slots:[["moose", .30, .74, .22, 1], ["bear", .66, .80, .24, -1], ["lynx", .50, .88, .16, 1], ["capce", .86, .72, .07, -1]] },
+  bm_tundra:{ ar:2752/1536, wl:null, fx:["haze"], slots:[["reind", .30, .52, .22, 1], ["afox", .62, .70, .18, -1], ["sowl", .78, .22, .08, -1], ["lemm", .12, .92, .06, 1]] },
+  bm_desert:{ ar:2752/1536, wl:null, fx:["dust", "haze"], slots:[["camel", .66, .57, .27, -1], ["fenec", .30, .80, .12, 1], ["jerbo", .48, .90, .06, 1], ["scorp", .84, .94, .06, -1]] },
+  bm_reef:{ ar:2752/1536, wl:.2, fx:["plankton", "rays"], slots:[["turtl", .32, .44, .2, 1], ["manta", .62, .32, .3, -1], ["clown", .82, .60, .05, -1], ["parro", .45, .62, .1, 1], ["octo", .58, .86, .12, -1]] },
+  bm_ocean:{ ar:2752/1536, wl:.31, fx:["plankton", "rays"], slots:[["albat", .70, .10, .12, -1], ["bwhale", .42, .72, .55, 1], ["tuna", .74, .47, .12, -1], ["bshark", .16, .52, .17, 1], ["jelly", .88, .64, .07, -1]] },
+  bm_deep:{ ar:2752/1536, wl:.005, fx:["plankton"], slots:[["riftia", .30, .86, .12, 1], ["angle", .62, .45, .08, -1], ["gsquid", .78, .34, .3, -1], ["dumbo", .45, .30, .07, 1], ["coela", .20, .55, .14, 1], ["nauti", .88, .62, .05, -1]] },
   jurassic:{ wl:.625, fx:["motes", "plankton", "rays"], scale:"Крупные динозавры — в одном масштабе (как будто на одном расстоянии); мелкие юрамайя и анхиорнис — на ветках у самого зрителя.",
     slots:[["brach", .14, .53, .30, 1], ["diplo", .31, .525, .34, 1], ["stego", .45, .548, .14, -1], ["allo", .76, .53, .118, -1],
     ["rhamp", .47, .18, .09, 1], ["archx", .74, .3, .055, -1], ["jurama", .6, .598, .1, 1], ["anchi", .93, .57, .13, -1],
@@ -248,8 +257,8 @@ const BIO_PIMG = {
 };
 const PIMG = (() => {
   const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }`;
-  const FI = `uniform sampler2D uTex, uDep; uniform vec2 uPar; uniform vec4 uR; uniform float uA, uT, uWl, uK; varying vec2 vUv;
-void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float out_ = max(abs(q.y - qc.y)*uR.w/uR.z*2.357, abs(q.x - qc.x)*2.357);
+  const FI = `uniform sampler2D uTex, uDep; uniform vec2 uPar; uniform vec4 uR; uniform float uA, uT, uWl, uK, uAR; varying vec2 vUv;
+void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float out_ = max(abs(q.y - qc.y)*uR.w/uR.z*uAR, abs(q.x - qc.x)*uAR);
   float d = texture2D(uDep, qc).r; vec2 uv = qc - uPar*(d - 0.3)*uK;
   if (out_ > 0.002){ uv = vec2(qc.x, clamp(qc.y, 0.004, 0.996)); vec3 e = vec3(0.0); for (int i = -4; i <= 4; i++) e += texture2D(uTex, vec2(uv.x + float(i)*0.03, uv.y + (uv.y > 0.5 ? -0.03 : 0.03))).rgb; e /= 9.0;
     gl_FragColor = vec4(mix(e*0.8, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.055, out_)), uA); return; }
@@ -285,7 +294,7 @@ void main(){ float x = vUv.x*7.0 - vUv.y*1.8; float s = pow(max(0.0, sin(x + sin
     const ld = new THREE.TextureLoader(), tI = ld.load(base + id + ".webp", () => { st.ok = true; }), tD = ld.load(base + id + "_d.webp");
     [tI, tD].forEach(t => { t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; disp.push(t); });
     const di = new Image(); di.onload = () => { const c = document.createElement("canvas"); c.width = di.naturalWidth; c.height = di.naturalHeight; const x = c.getContext("2d"); x.drawImage(di, 0, 0); st.dep = x.getImageData(0, 0, c.width, c.height).data; st.dw = c.width; st.dh = c.height; }; di.src = base + id + "_d.webp";
-    const IU = { uTex:{ value:tI }, uDep:{ value:tD }, uPar:{ value:st.par }, uWl:{ value:C.wl || 0 }, uK:{ value:.022 }, uR:{ value:new THREE.Vector4(0, 0, 1, 1) } };
+    const IU = { uTex:{ value:tI }, uDep:{ value:tD }, uPar:{ value:st.par }, uWl:{ value:C.wl || 0 }, uK:{ value:.022 }, uAR:{ value:C.ar || 3168/1344 }, uR:{ value:new THREE.Vector4(0, 0, 1, 1) } };
     const img = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mk(VS, FI, IU)); img.renderOrder = -20; grp.add(img); disp.push(img.geometry);
     const R = (s => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; })(id.length*97);
     const fx = [];
@@ -305,7 +314,7 @@ void main(){ float x = vUv.x*7.0 - vUv.y*1.8; float s = pow(max(0.0, sin(x + sin
     function layout(cam, port, Z, pan, fold, left, tilt){
       const un = (x, y) => new THREE.Vector3(x, y, .5).unproject(cam).sub(cam.position).normalize();
       const at = (x, y) => { const d = un(x, y), t = (Z - cam.position.z)/d.z; return cam.position.clone().addScaledVector(d, t); };
-      const a = at(-1, -1), b = at(1, 1), rw = b.x - a.x, rh = b.y - a.y, A = 3168/1344;
+      const a = at(-1, -1), b = at(1, 1), rw = b.x - a.x, rh = b.y - a.y, A = C.ar || 3168/1344;
       img.scale.set(rw*1.02, rh*1.02, 1); img.position.set((a.x + b.x)/2, (a.y + b.y)/2, Z);
       let W, H, cx, cy;
       if (port){ H = rh*(.48 + .26*fold); W = H*A; cx = (a.x + b.x)/2 + (W - rw)*.5*(pan || 0); cy = (b.y - rh*.235)*(1 - fold) + ((a.y + b.y)/2 + rh*.03)*fold; }

@@ -898,6 +898,20 @@ body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
 .bio-jr-c div button:hover{background:rgba(214,172,94,.15)}
 @media (max-width:760px){.bio-jr{left:12px;right:12px;top:70px;bottom:auto;height:calc(42vh - 80px)}.bio-jr-g{grid-template-columns:repeat(2,1fr);gap:10px}.bio-jr-c h5{font-size:15px}.bio-jr-c p{display:none}}
 .ch-bio.bio-rise{filter:brightness(0);transition:filter .6s ease-in}
+.bio-jrbg{position:absolute;left:0;top:0;z-index:0;display:none;pointer-events:none;background:url("mbg/journal.webp") center/100% 100% no-repeat;filter:brightness(.92);transform-origin:0 0}
+.ch-bio.bio-mech.bio-jr-on .bio-jrbg{display:block}
+.ch-bio:not(.bio-mech) .bio-jrbg,.ch-bio:not(.bio-jr-on) .bio-jrbg,.ch-bio:not(.bio-mech) .bio-jr{display:none!important}
+.bio-jr.on-pages{left:0;right:0;top:0;bottom:0;overflow:visible;pointer-events:none}
+.bio-jr.on-pages .bio-jr-g{display:block}
+.bio-jr.on-pages .bio-jr-c,.bio-jr.on-pages .bio-jr-h{position:absolute;pointer-events:auto}
+.bio-jr.on-pages .bio-jr-h span{color:#7a5a2a}.bio-jr.on-pages .bio-jr-h i{color:#4a3520;opacity:.9}
+.bio-jr.on-pages .bio-jr-c{background:none;border:0;padding:0;gap:.35em;grid-template-rows:minmax(0,1fr) auto auto auto;align-content:start}
+.bio-jr.on-pages .bio-jr-ph{aspect-ratio:auto;height:100%;min-height:0;border:.45em solid #f4ecd9;border-bottom-width:.45em;box-shadow:0 2px 6px rgba(40,25,10,.35);border-radius:1px}
+.bio-jr.on-pages .bio-jr-ph::before{content:"";position:absolute;left:50%;top:-.9em;width:3.2em;height:1.2em;transform:translateX(-50%) rotate(-3deg);background:rgba(235,225,190,.75);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.bio-jr.on-pages .bio-jr-c h5{font-size:1.25em;color:#2e2112;margin:0}
+.bio-jr.on-pages .bio-jr-c p{font-size:.86em;color:#5a4329;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bio-jr.on-pages .bio-jr-c div button{font-size:.78em;padding:.25em .6em;color:#4a3216;border-color:rgba(90,60,25,.45)}
+.bio-jr.on-pages .bio-jr-c div button:hover{background:rgba(120,80,30,.12)}
 .izhint{position:fixed;left:50%;bottom:calc(40px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:28px;height:28px;opacity:.35;pointer-events:none;transition:opacity 3s;animation:izb 6s ease-in-out infinite;z-index:81;display:none;fill:none;stroke:#fff;stroke-width:1.2}
 .izhint.gone{opacity:0;animation:none}
 .izcur{position:fixed;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;pointer-events:none;z-index:83;display:none;opacity:0;transition:opacity .4s;will-change:transform}

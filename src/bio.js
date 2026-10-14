@@ -477,10 +477,10 @@ void main(){
     if (PAN){ const k = 1 - Math.exp(-Math.min(dt, .1)*2.4);
       if (PAN.img){ panX += (gpx - panX)*k; panY += (gpy - panY)*k; }
       // один сглаженный сигнал и для сдвига панорамы, и для глубинного параллакса — иначе два слоя движения с разной инерцией дают рывки
-      PAN.update(T, cmp || bmOn ? 0 : envA, port ? 0 : (PAN.img ? panX : ptr.nx)*.9, -(PAN.img ? panY : ptr.ny)*.5);
+      PAN.update(T, cmp ? 0 : bmOn ? (PAN.img ? 1 : 0) : envA, port ? 0 : (PAN.img ? panX : ptr.nx)*.9, -(PAN.img ? panY : ptr.ny)*.5);
       if (PAN.img){ if (!(fc % 30) && !fold){ const r = box.querySelector(".time-in").getBoundingClientRect(); panL = port ? 0 : Math.min(.6, (r.right + 24)/W3); }
         PAN.layout(cam, port, ZP, port ? -ptr.nx : panX, foldK, panL, panY); panoLayoutImg(); } }
-    const pon = !!PAN && envA > .35 && !cmp && !bmOn; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
+    const pon = !!PAN && (bmOn ? !!PAN.img : envA > .35) && !cmp; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
     const hid = fold && pon; if (hid !== box.classList.contains("bio-hide")){ box.classList.toggle("bio-hide", hid); foldBtn(); }
     foldK += ((hid ? 1 : 0) - foldK)*Math.min(1, dt*3.2);
     // существа: режиссура на процессоре (несколько чисел), точки — в шейдере
@@ -495,7 +495,7 @@ void main(){
       else if (I.anim === "swim" || I.anim === "eel") Yb += Math.sin(T*.7 + I.ph)*.1*lifeI;
       else if (I.anim === "walk") Yb += .02*I.h*Math.abs(Math.sin(T*3.4 + I.ph))*I.act;
       u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = PAN ? instA*(1 - smooth(.8, .97, life)) : instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
-      if (I.spr){ const su = I.spr.material.uniforms; su.uT.value = T; su.uA.value = instA*smooth(.74, .97, life)*(cmp || bmOn ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*.55; I.shd.visible = I.spr.visible; } }
+      if (I.spr){ const su = I.spr.material.uniforms; su.uT.value = T; su.uA.value = instA*smooth(.74, .97, life)*(cmp || (bmOn && !(PAN && PAN.img)) ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*.55; I.shd.visible = I.spr.visible; } }
       u.uC.value.set(I.X, Yb, I.Z); u.uF.value = I.F; u.uTilt.value = I.tl; u.uAct.value = I.act;
       I.o.visible = instA > .005 && !(PAN && life > .975);
       I.sx = I.X; I.sy = Yb;
@@ -701,7 +701,7 @@ void main(){
   }
   // фон опыта — фото того места, где механизм виден в природе; список опытов — «журнал натуралиста»
   let mbgEl = null, mbgK = "", jrEl = null, mOrigin = null;
-  const MBG_OK = new Set(["bark", "bark_soot", "brom", "chloro", "cells", "leaf", "litter", "crown", "floor", "soil", "sea_jur", "kpg"]);
+  const MBG_OK = new Set(["bark", "bark_soot", "brom", "chloro", "cells", "leaf", "litter", "crown", "floor", "soil", "sea_jur", "kpg", "galapagos", "orchid", "nucleus", "taiga"]);
   function mbg(k){
     if (!mbgEl){ mbgEl = document.createElement("div"); mbgEl.className = "bio-mbg"; mbgEl.innerHTML = "<i></i><i></i>"; box.insertBefore(mbgEl, simC); }
     if (k === mbgK) return; mbgK = k;
@@ -729,7 +729,29 @@ void main(){
   }
   function hereBind(origin){ cardEl.querySelectorAll("[data-mhere]").forEach(b => b.onclick = () => { const [k, id] = b.dataset.mhere.split(":"); const L = k === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id);
     if (bmOn) bmLeave(); mechOn_(i, k); mOrigin = origin(); card(); }); }
+  // журнал — настоящая тетрадь на столе (картинка Люсии): карточки вклеены на её страницы
+  // страницы на картинке: x .39–.655 и .665–.925, y .21–.88 (2752×1536); зарисовки по краям не закрываем
+  let jbEl = null;
+  function jrLayout(){
+    if (!jrEl || !jbEl) return;
+    const port = W3 < 760, B = box.getBoundingClientRect();
+    if (port){ jbEl.style.display = "none"; jrEl.classList.remove("on-pages"); return; }
+    const s = Math.max(B.width/2752, B.height/1536), iw = 2752*s, ih = 1536*s;
+    const r = box.querySelector(".time-in").getBoundingClientRect(), need = r.right - B.left + 20;
+    let ox = (B.width - iw)/2; if (ox + .39*iw < need) ox = Math.min(0, need - .39*iw); const oy = (B.height - ih)/2;
+    jbEl.style.display = "block"; jbEl.style.width = iw + "px"; jbEl.style.height = ih + "px"; jbEl.style.transform = `translate(${ox.toFixed(0)}px,${oy.toFixed(0)}px)`;
+    jrEl.classList.add("on-pages");
+    const P = [[.452, .652], [.668, .862]], Y0 = .235, Y1 = .865, cards = [...jrEl.querySelectorAll(".bio-jr-c")], n = cards.length;
+    const rows = 3, cw = (P[0][1] - P[0][0])/2*iw - 12, rh = (Y1 - Y0)/rows*ih;
+    jrEl.style.fontSize = Math.max(9, Math.min(14, iw*.0052)) + "px";
+    cards.forEach((c, i) => { const pg = i < 6 ? 0 : 1, k = pg ? i - 6 : i, col = k % 2, row = (k/2) | 0;
+      const x = ox + (P[pg][0] + (P[pg][1] - P[pg][0])/2*col)*iw + 6, y = oy + Y0*ih + row*rh;
+      Object.assign(c.style, { left: x + "px", top: y + "px", width: cw + "px", height: (rh - 8) + "px" }); });
+    const h = jrEl.querySelector(".bio-jr-h"); if (h){ const pg = n <= 6 ? 1 : 1, x = ox + P[1][0]*iw + 6, y = oy + (n > 6 ? (Y0 + (Y1 - Y0)*(Math.ceil((n - 6)/2)/rows)) : Y0)*ih + 6;
+      Object.assign(h.style, { left: x + "px", top: y + "px", width: ((P[1][1] - P[1][0])*iw - 12) + "px" }); }
+  }
   function journal(){
+    if (!jbEl){ jbEl = document.createElement("div"); jbEl.className = "bio-jrbg"; box.insertBefore(jbEl, simC); }
     if (!jrEl){ jrEl = document.createElement("div"); jrEl.className = "bio-jr"; box.insertBefore(jrEl, simC.nextSibling); }
     const B = MK === "basics";
     jrEl.innerHTML = `<div class="bio-jr-h"><span class="mono">Журнал натуралиста · ${B ? "основы биологии" : "механизмы эволюции"}</span><i>Каждая запись — опыт и место, где это видно в природе</i></div>
@@ -737,13 +759,14 @@ void main(){
         <h5>${esc(M.nm)}</h5><p>${esc(M.place || M.sub)}</p><div><button data-ji="${i}" data-hover>Опыт ▸</button>${M.home ? `<button data-jh="${i}" data-hover>На месте ↗</button>` : ""}</div></article>`).join("")}</div>`;
     jrEl.querySelectorAll("[data-ji]").forEach(b => b.onclick = () => { mi = +b.dataset.ji; mOrigin = null; card(); });
     jrEl.querySelectorAll("[data-jh]").forEach(b => b.onclick = () => goHome(MSET[+b.dataset.jh].home));
+    jrLayout();
   }
   function mechFrame(dt, T){
     if (!simG) simG = simC.getContext("2d");
     const d = DPR3; if (simC.width !== Math.round(W3*d) || simC.height !== Math.round(H3*d)){ simC.width = Math.round(W3*d); simC.height = Math.round(H3*d); }
     simG.setTransform(1, 0, 0, 1, 0, 0); simG.clearRect(0, 0, simC.width, simC.height); simG.clearRect(0, 0, simC.width, simC.height); simG.setTransform(d, 0, 0, d, 0, 0);
     box.classList.toggle("bio-jr-on", mi < 0);
-    if (mi < 0){ mbg("journal"); return; }
+    if (mi < 0){ mbg(""); if (!(fc % 20)) jrLayout(); return; }
     const M = MSET[mi], S = mechState(mi); mbg(M.id === "moth" && S.p && S.p.bark === "soot" ? "bark_soot" : M.bg || "");
     M.step(S, Math.min(dt, .1)); M.draw(simG, simRect(), S, T);
   }
@@ -786,14 +809,18 @@ void main(){
   function mechOn_(i, kind){ if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); } if (bmOn) bmLeave();
     MK = kind || "mech"; MSET = MK === "basics" ? BIO_BASICS : BIO_MECH; if (typeof i !== "number" || i < 0) mOrigin = null;
     mechOn = true; mi = i == null ? -1 : i; view = null; box.classList.add("bio-mech"); Music.voice("bio:cells", false); hint(); card(); }
-  function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
+  function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech", "bio-jr-on"); arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
   // ======== 13е · биомы Земли: та же WebGL-сцена, без породы ========
   let bmOn = false, bi = 0;
   function bmShow(i){ panoClear(); bi = clamp(i, 0, BIO_BIOMES.length - 1); const B = BIO_BIOMES[bi]; sel = -1; hov = -1; view = null;
-    INST = makeInst(-1, (BIO_BSCENE[B.id] || []).map(([k, x, y, h, z, v]) => ({ k, x, y, z, h, v })), B.world);
-    makeEnv(B.world); sky.dataset.w = B.world; life = lifeT = 1; lifeAt = 0;
+    const pid = "bm_" + B.id, PI = typeof PIMG !== "undefined" && PIMG.has(pid) ? BIO_PIMG[pid] : null;
+    if (PI){   // фото-панорама биома (атлас): существа на картинке, как в эпохах
+      INST = makeInst(-1, PI.slots.filter(r => BIO_SP[r[0]]).map(([k, u, v, sz, d, fl]) => ({ k, fl, x: (u - .5)*9, y: 2.4 - (v - .15)*5.5, z: -.35, h: clamp(sz*6, .7, 1.9), v: 0, dir: d, pu: u, pv: v, ps: sz, wet: !!PI.wl && v > PI.wl })), B.world);
+      makeEnv(null); sky.dataset.w = ""; panoBuildImg({ id: pid }, PI);
+    } else { INST = makeInst(-1, (BIO_BSCENE[B.id] || []).map(([k, x, y, h, z, v]) => ({ k, x, y, z, h, v })), B.world); makeEnv(B.world); sky.dataset.w = B.world; }
+    life = lifeT = 1; lifeAt = 0;
     jrMark("bio", "biome:" + B.id, B.nm); Music.voice("bio:" + B.world, false); card(); }
-  function bmOn_(i){ if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); } if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); }
+  function bmOn_(i){ if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech", "bio-jr-on"); } if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); }
     trn = null; bmOn = true; box.classList.add("bio-bm"); column(); bmShow(i == null ? bi : i); }
   function bmLeave(){ bmOn = false; box.classList.remove("bio-bm"); }
   function bmOff(){ bmLeave(); view = null; sel = -1; arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
