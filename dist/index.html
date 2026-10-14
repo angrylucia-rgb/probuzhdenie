@@ -884,7 +884,8 @@ body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
   .bsc-dive{left:12px;right:12px;bottom:auto;top:calc(env(safe-area-inset-top,0px) + 58px);padding:10px 12px}
   .bsc-dv-t{font-size:18px}.bsc-dv-x{font-size:13px}
 }
-.bio-mbg{position:absolute;inset:0;z-index:0;pointer-events:none;display:none}
+.bio-mbg{position:absolute;inset:0;z-index:0;pointer-events:none;display:none;transition:opacity .6s}
+.ch-bio.bio-jr-on .bio-mbg{opacity:0}
 .ch-bio.bio-mech .bio-mbg{display:block}
 .bio-mbg i{position:absolute;inset:-20px;background:#07080c center/cover no-repeat;opacity:0;transition:opacity .9s;filter:brightness(.5) saturate(.9) blur(1.5px)}
 .bio-mbg i.on{opacity:1}
@@ -17647,7 +17648,7 @@ void main(){
   let mbgEl = null, mbgK = "", jrEl = null, mOrigin = null;
   const MBG_OK = new Set(["bark", "bark_soot", "brom", "chloro", "cells", "leaf", "litter", "crown", "floor", "soil", "sea_jur", "kpg", "galapagos", "orchid", "nucleus", "taiga"]);
   function mbg(k){
-    if (!mbgEl){ mbgEl = document.createElement("div"); mbgEl.className = "bio-mbg"; mbgEl.innerHTML = "<i></i><i></i>"; box.insertBefore(mbgEl, simC); }
+    if (!mbgEl){ mbgEl = document.createElement("div"); mbgEl.className = "bio-mbg"; mbgEl.innerHTML = "<i></i><i></i>"; box.insertBefore(mbgEl, jbEl || simC); }
     if (k === mbgK) return; mbgK = k;
     const [a, b] = mbgEl.children, cur = a.classList.contains("on") ? a : b, nx = cur === a ? b : a;
     if (k && !MBG_OK.has(k)) k = "";

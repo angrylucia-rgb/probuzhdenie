@@ -703,7 +703,7 @@ void main(){
   let mbgEl = null, mbgK = "", jrEl = null, mOrigin = null;
   const MBG_OK = new Set(["bark", "bark_soot", "brom", "chloro", "cells", "leaf", "litter", "crown", "floor", "soil", "sea_jur", "kpg", "galapagos", "orchid", "nucleus", "taiga"]);
   function mbg(k){
-    if (!mbgEl){ mbgEl = document.createElement("div"); mbgEl.className = "bio-mbg"; mbgEl.innerHTML = "<i></i><i></i>"; box.insertBefore(mbgEl, simC); }
+    if (!mbgEl){ mbgEl = document.createElement("div"); mbgEl.className = "bio-mbg"; mbgEl.innerHTML = "<i></i><i></i>"; box.insertBefore(mbgEl, jbEl || simC); }
     if (k === mbgK) return; mbgK = k;
     const [a, b] = mbgEl.children, cur = a.classList.contains("on") ? a : b, nx = cur === a ? b : a;
     if (k && !MBG_OK.has(k)) k = "";
