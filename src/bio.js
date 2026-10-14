@@ -713,9 +713,7 @@ void main(){
   const MHOME = (M) => M.home;
   function goHome(h){
     if (!h) return;
-    if (h.t === "bsc"){ if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech", "bio-jr-on"); } close(); if (typeof closeBio === "function") closeBio();
-      openJourney("earth"); setBranch("bio", h.d); depth = Math.max(depth, h.d - .9); depthT = h.d; lastDepthInput = performance.now();
-      if (h.dive && typeof BSC !== "undefined") setTimeout(() => BSC.dbg.dive(h.dive[0], h.dive[1]), 1800); return; }
+    if (h.t === "bsc"){ riseTo(h.d, () => { if (mechOn){ mechOn = false; mi = -1; box.classList.remove("bio-mech", "bio-jr-on"); } }, () => { if (h.dive) setTimeout(() => BSC.dbg.dive(h.dive[0], h.dive[1]), 900); }); return; }
     if (h.t === "era"){ const n = BIO_ERAS.findIndex(e => e.id === h.e); mechOff(); if (n >= 0) go(n); return; }
     if (h.t === "biome"){ const n = BIO_BIOMES.findIndex(b => b.id === h.b); mechOn = false; mi = -1; box.classList.remove("bio-mech"); bmOn_(Math.max(0, n)); }
   }
@@ -1084,13 +1082,15 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     go(cur < NE - 1 ? cur + 1 : -1);
   }
   let rising = false;
-  function toRoots(){
+  function toRoots(){ riseTo(10); }
+  // уход из главы в слой сейбы через темноту: без пролёта по другим слоям Земли
+  function riseTo(d, pre, post){
     if (rising || typeof BSC === "undefined" || typeof openJourney !== "function") return; rising = true; BSC.preload();
     box.classList.add("bio-rise");
-    setTimeout(() => { close(); if (typeof closeBio === "function") closeBio(); setTimeout(() => box.classList.remove("bio-rise"), 1000);
+    setTimeout(() => { if (pre) pre(); close(); if (typeof closeBio === "function") closeBio(); setTimeout(() => box.classList.remove("bio-rise"), 1000);
       let n = 0; const tryOpen = () => { openJourney("earth");
         if (!(humanOpen && jId === "earth")){ if (++n < 20) setTimeout(tryOpen, 200); else rising = false; return; }
-        setBranch("bio", 10); depth = depthT = 10; lastDepthInput = performance.now(); BSC.rise(); rising = false; };
+        setBranch("bio", d); depth = depthT = d; lastDepthInput = performance.now(); BSC.rise(); rising = false; if (post) post(); };
       tryOpen(); }, 650);
   }
   box.addEventListener("wheel", e => { if (!open) return; if (e.target.closest && e.target.closest(".time-in, .bio-jr, .bio-col, button, input")) return; e.preventDefault(); if (cmp || mechOn || bmOn) return; const now = performance.now(); if (now - wheelAt < 650 || Math.abs(e.deltaY) < 8) return; wheelAt = now;
