@@ -884,6 +884,30 @@ body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
   .bsc-dive{left:12px;right:12px;bottom:auto;top:calc(env(safe-area-inset-top,0px) + 58px);padding:10px 12px}
   .bsc-dv-t{font-size:18px}.bsc-dv-x{font-size:13px}
 }
+.bio-mbg{position:absolute;inset:0;z-index:0;pointer-events:none;display:none}
+.ch-bio.bio-mech .bio-mbg{display:block}
+.bio-mbg i{position:absolute;inset:-20px;background:#07080c center/cover no-repeat;opacity:0;transition:opacity .9s;filter:brightness(.5) saturate(.9) blur(1.5px)}
+.bio-mbg i.on{opacity:1}
+.bio-mbg i.none{background:radial-gradient(ellipse at 65% 45%,#1a1610,#07080c 70%)}
+.bio-mbg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,6,10,.92),rgba(5,6,10,.55) 42%,rgba(5,6,10,.15) 70%,rgba(5,6,10,.35))}
+.ch-bio.bio-mech .bio-strata-cv,.ch-bio.bio-mech .bio-strata-hov,.ch-bio.bio-mech .bio-strata-pins,.ch-bio.bio-bm .bio-strata-cv,.ch-bio.bio-bm .bio-strata-hov,.ch-bio.bio-bm .bio-strata-pins{display:none!important}
+.bio-jr{position:absolute;z-index:3;display:none;left:max(calc(var(--pad) + min(460px,36vw) + 70px),36vw);right:110px;top:96px;bottom:40px;overflow:auto;scrollbar-width:none}
+.ch-bio.bio-mech.bio-jr-on .bio-jr{display:block}
+.bio-jr-h{display:grid;gap:4px;margin:0 0 16px}
+.bio-jr-h span{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+.bio-jr-h i{font:italic 400 16px Forum,serif;color:#e8dcc0;opacity:.8}
+.bio-jr-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.bio-jr-c{background:rgba(236,224,198,.06);border:1px solid rgba(214,172,94,.22);border-radius:6px;padding:10px 10px 12px;display:grid;gap:6px;transform:rotate(var(--r,0deg))}
+.bio-jr-c:nth-child(3n+1){--r:-.6deg}.bio-jr-c:nth-child(3n+2){--r:.5deg}
+.bio-jr-ph{display:block;width:100%;aspect-ratio:4/3;border-radius:3px;background:#1a1610 center/cover no-repeat;filter:sepia(.55) contrast(1.05) brightness(.9);position:relative;border:1px solid rgba(255,240,210,.12);transition:filter .4s}
+.bio-jr-ph:hover{filter:none}
+.bio-jr-ph b{position:absolute;left:8px;top:6px;font:400 22px Forum,serif;color:#fff1d6;text-shadow:0 1px 6px #000}
+.bio-jr-c h5{margin:2px 0 0;font:400 18px/1.2 Forum,serif;color:#fff3dc}
+.bio-jr-c p{margin:0;font-size:12px;line-height:1.4;color:#cfc4ac}
+.bio-jr-c div{display:flex;gap:6px;flex-wrap:wrap}
+.bio-jr-c div button{font:500 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border:1px solid rgba(214,172,94,.35);border-radius:999px;color:#f0e2c4}
+.bio-jr-c div button:hover{background:rgba(214,172,94,.15)}
+@media (max-width:760px){.bio-jr{left:12px;right:12px;top:70px;bottom:auto;height:calc(42vh - 80px)}.bio-jr-g{grid-template-columns:repeat(2,1fr);gap:10px}.bio-jr-c h5{font-size:15px}.bio-jr-c p{display:none}}
 .izhint{position:fixed;left:50%;bottom:calc(40px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:28px;height:28px;opacity:.35;pointer-events:none;transition:opacity 3s;animation:izb 6s ease-in-out infinite;z-index:81;display:none;fill:none;stroke:#fff;stroke-width:1.2}
 .izhint.gone{opacity:0;animation:none}
 .izcur{position:fixed;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;pointer-events:none;z-index:83;display:none;opacity:0;transition:opacity .4s;will-change:transform}
@@ -9627,6 +9651,7 @@ function renderLevel(L){
   if (typeof BSC !== "undefined"){
     hdBody.querySelectorAll("button[data-bsctree]").forEach(bt => bt.onclick = () => BSC.setTol(!BSC.tol));
     hdBody.querySelectorAll("button[data-bscgo]").forEach(bt => bt.onclick = () => bt.dataset.bscgo === "strata" ? BSC.goStrata() : BSC.goHuman());
+    hdBody.querySelectorAll("button[data-bscm]").forEach(bt => bt.onclick = () => bscMech(bt.dataset.bscm));
     BSC.setTol(BSC.tol); BSC.co2();
   }
   const up = $("hdUp"), dn = $("hdDown");
@@ -9649,11 +9674,15 @@ $("hdDown").onclick = () => { if (solarOn() && SOLAR.sel >= 0) solarSelect(-1); 
 
 // слой «Биосфера» в фотореализме (bsc.js): дыхание леса, Древо жизни на кроне, развилка у корней
 const BSC_BRANCH = `<section class="hd-fork"><h3>Ответвление</h3><button data-tree="1" data-hover><b>Древо жизни</b><span>4 млрд лет родства: от LUCA через растения, грибы и животных — к человеку</span></button><button data-biob="1" data-hover><b>Биосфера — учебник жизни</b><span>Пласты камня: 20 эпох и больше 140 существ, механизмы эволюции, основы биологии и биомы Земли</span></button></section>`;
+function bscMech(x){ const [k, id] = x.split(":"), d = Math.round(Math.max(7, Math.min(10, depth))); closeHuman(); openBio(); BIO.mechAt(id, k, { t:"bsc", d }); }
 function bscPanel(v){
   let h = "";
   if (v.bsc === 0) h += `<section class="bsc-co2" id="bscCO2"><h3>Дыхание леса · сейчас</h3><div class="bsc-co2-bars"><span class="mono">фотосинтез</span><i><b class="bsc-co2-p"></b></i><span class="mono">дыхание</span><i><b class="bsc-co2-r"></b></i></div><p class="hd-par bsc-co2-t"></p><p class="mono hd-try">Двигайте «время суток» справа вверху</p></section>`
     + `<section class="hd-fork"><h3>Знание поверх материи</h3><button data-bsctree="1" aria-pressed="false" data-hover><b>Показать Древо жизни на кроне</b><span>Золотая схема родства на ветвях: бактерии, археи, эукариоты → растения, грибы, животные → человек (упрощено ◐)</span></button></section>`;
   if (v.bioFork) h += `<section class="hd-fork"><h3>Развилка пути</h3><button data-bscgo="strata" data-hover><b>Вниз по корню — в Эпохи</b><span>Почва темнеет до камня, зажигается фонарь геолога — и 20 пластов: 4,5 млрд лет истории жизни</span></button><button data-bscgo="human" data-hover><b>Хлорофилл → гем — к Человеку</b><span>Магний меняется на железо: молекула света становится молекулой крови. Дальше — станция «Человек»</span></button></section>`;
+  const HERE = [["mech:sex", "mech:symb", "basics:photo", "basics:cell"], ["mech:moth", "mech:coev", "mech:drift"], ["basics:pyr", "basics:cycle"], ["basics:cycle"]][v.bsc] || [];
+  if (HERE.length) h += `<section class="hd-fork"><h3>⚙ Опыты здесь · журнал натуралиста</h3>${HERE.map(x => { const [k, id] = x.split(":"), M = (k === "basics" ? BIO_BASICS : BIO_MECH).find(m => m.id === id);
+    return M ? `<button data-bscm="${x}" data-hover><b>${esc(M.nm)}</b><span>${esc(M.sub)}</span></button>` : ""; }).join("")}</section>`;
   if (v.bsc === 0 || v.bioFork) h += BSC_BRANCH;
   return h;
 }
@@ -15345,6 +15374,12 @@ const BIO_MECH = (() => {
     for (const s of ser){ if (!s.v.length) continue; g.strokeStyle = `rgba(${s.c},${s.a || .9})`; g.lineWidth = s.w || 1.6; g.beginPath();
       s.v.forEach((v, i) => { const x = R.x + i/Math.max(1, (xmax || s.v.length) - 1)*R.w, y = R.y + R.h - clamp((v - y0)/(y1 - y0), 0, 1)*R.h; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
   }
+  // фото места внутри рамки опыта (кэш картинок; пока не загрузилось — false)
+  const PH = {};
+  function photo(g, A, k){ let im = PH[k]; if (!im){ im = PH[k] = new Image(); im.src = "mbg/" + k + ".webp"; }
+    if (!im.complete || !im.naturalWidth) return false;
+    const s = Math.max(A.w/im.naturalWidth, A.h/im.naturalHeight), w = im.naturalWidth*s, h = im.naturalHeight*s;
+    g.save(); g.beginPath(); g.rect(A.x, A.y, A.w, A.h); g.clip(); g.drawImage(im, A.x + (A.w - w)/2, A.y + (A.h - h)/2, w, h); g.restore(); return true; }
   const split = (R, f) => [{ x: R.x, y: R.y, w: R.w*f - 12, h: R.h }, { x: R.x + R.w*f + 12, y: R.y + 18, w: R.w*(1 - f) - 12, h: R.h - 46 }];
   const vsplit = (R, f) => [{ x: R.x, y: R.y, w: R.w, h: R.h*f - 10 }, { x: R.x + 8, y: R.y + R.h*f + 14, w: R.w - 16, h: R.h*(1 - f) - 34 }];
   const lay = (R, f) => R.w > R.h*1.15 ? split(R, f) : vsplit(R, f);
@@ -15364,7 +15399,7 @@ const BIO_MECH = (() => {
 
   return [
   // ———————————————————— 1 · естественный отбор
-  { id:"moth", nm:"Естественный отбор", sub:"Берёзовая пяденица и копоть на коре",
+  { id:"moth", bg:"bark", place:"Кора сейбы · слой «Ствол»", home:{t:"bsc", d:8}, nm:"Естественный отбор", sub:"Берёзовая пяденица и копоть на коре",
     lead:"На светлой коре птицы легче замечают тёмных бабочек, на закопчённой — светлых. Смените кору и посмотрите, как за десятки поколений меняется окраска популяции.",
     how:"Каждое поколение птицы съедают часть бабочек: заметных — чаще. Выжившие откладывают яйца, и потомки похожи на родителей. Редкая мутация иногда даёт бабочку другого цвета. Никто не «старается» потемнеть — просто тёмные чаще доживают до размножения.",
     nature:"Первую тёмную пяденицу записали в Манчестере в 1848 году, а к концу XIX века в промышленных районах тёмных стало подавляющее большинство. Когда воздух очистили, светлые снова вернулись.",
@@ -15377,21 +15412,21 @@ const BIO_MECH = (() => {
         const kids = []; while (kids.length < S.N && surv.length){ const p = surv[(rnd()*surv.length) | 0]; let d = p.d; if (rnd() < .006) d = !d; kids.push({ x: rnd(), y: rnd(), d, a: rnd()*TAU }); }
         S.m = kids; S.hist.push(S.m.filter(m => m.d).length/S.N); if (S.hist.length > 80) S.hist.shift(); } },
     draw(g, R, S, T){ const [A, B] = lay(R, .55), soot = S.p.bark === "soot";
-      // кора
-      for (let i = 0; i < 900; i++){ const u = (i*0.6180339)%1, v = ((i*0.7548776)%1); const x = A.x + u*A.w, y = A.y + v*A.h, l = soot ? .18 + .1*Math.sin(i) : .62 + .2*Math.sin(i*1.7);
-        g.fillStyle = `rgba(${soot ? "70,64,58" : "205,200,182"},${l})`; g.fillRect(x, y, 3 + (i % 3), 2); }
+      if (!photo(g, A, soot ? "bark_soot" : "bark"))   // кора: настоящее фото коры сейбы с лишайниками (сажа губит лишайники и темнит кору)
+        for (let i = 0; i < 900; i++){ const u = (i*0.6180339)%1, v = ((i*0.7548776)%1); const x = A.x + u*A.w, y = A.y + v*A.h, l = soot ? .18 + .1*Math.sin(i) : .62 + .2*Math.sin(i*1.7);
+          g.fillStyle = `rgba(${soot ? "70,64,58" : "205,200,182"},${l})`; g.fillRect(x, y, 3 + (i % 3), 2); }
       g.strokeStyle = `rgba(${DIM},.3)`; g.strokeRect(A.x, A.y, A.w, A.h);
-      const ms = clamp(Math.sqrt(A.w*A.h/(S.N*900)), .45, 1);
+      const ms = clamp(Math.sqrt(A.w*A.h/(S.N*900)), .75, 1.3);
       for (const m of S.m){ const x = A.x + 10 + m.x*(A.w - 20), y = A.y + 10 + m.y*(A.h - 20), c = m.d ? "40,36,34" : "236,228,206";
         g.save(); g.translate(x, y); g.rotate(m.a); g.scale(ms, ms); g.fillStyle = `rgb(${c})`; g.beginPath(); g.ellipse(-4, 0, 5, 3, -.4, 0, TAU); g.ellipse(4, 0, 5, 3, .4, 0, TAU); g.fill();
-        g.strokeStyle = m.d ? "rgba(255,214,150,.35)" : "rgba(40,30,20,.25)"; g.lineWidth = .7; g.stroke(); g.restore(); }
+        g.strokeStyle = m.d ? "rgba(255,214,150,.4)" : "rgba(30,22,14,.6)"; g.lineWidth = 1; g.stroke(); g.restore(); }
       for (const e of S.eaten){ const x = A.x + 10 + e.x*(A.w - 20), y = A.y + 10 + e.y*(A.h - 20); dot(g, x, y, 8*(1.4 - e.l), ROSE, .5*e.l); }
       title(g, `Поколение ${S.gen}`, A.x, A.y - 8);
       chart(g, B, [{ v: S.hist, c: GOLD }], 0, 1, "доля тёмных", 80, "поколения →");
       txt(g, `${Math.round(S.hist[S.hist.length - 1]*100)} % тёмных`, B.x + 4, B.y + 26, GOLD, 12, .95); } },
 
   // ———————————————————— 2 · дрейф генов
-  { id:"drift", nm:"Дрейф генов", sub:"Случай решает в маленьких популяциях",
+  { id:"drift", bg:"brom", place:"Бромелия на стволе сейбы · слой «Ствол»", home:{t:"bsc", d:8}, nm:"Дрейф генов", sub:"Случай решает в маленьких популяциях",
     lead:"Восемь одинаковых популяций, никакого отбора: два варианта гена одинаково хороши. Сравните, что случай делает с маленькой и с большой популяцией.",
     how:"Каждое поколение — это случайная выборка генов родителей. В маленькой популяции частота варианта гуляет сильно и рано или поздно один из вариантов исчезает совсем. В большой она почти не меняется — случайности уравновешивают друг друга.",
     nature:"Северные морские слоны в 1890-х годах сократились, по оценкам, до двух-трёх десятков животных. Сегодня их больше двухсот тысяч, но генетическое разнообразие у них очень низкое — след «бутылочного горлышка».",
@@ -15409,7 +15444,7 @@ const BIO_MECH = (() => {
       txt(g, `потерян или закреплён: ${fixed} из 8`, B.x + 4, B.y + 26, GOLD, 12, .95); } },
 
   // ———————————————————— 3 · половой отбор
-  { id:"sex", nm:"Половой отбор", sub:"Длинный хвост: и украшение, и обуза",
+  { id:"sex", bg:"crown", place:"Крона сейбы: птица-кетцаль · слой «Крона»", home:{t:"bsc", d:7}, nm:"Половой отбор", sub:"Длинный хвост: и украшение, и обуза",
     lead:"Самки выбирают самцов с длинными хвостами, а хищники легче ловят таких самцов. Передвиньте две силы и посмотрите, где установится длина хвоста.",
     how:"Каждое поколение часть самцов гибнет: чем длиннее хвост, тем чаще. Выжившие спариваются тем чаще, чем длиннее у них хвост. Сыновья наследуют длину хвоста отца с небольшим разбросом. Хвост растёт, пока выгода у самок не уравновесит опасность.",
     nature:"В 1982 году Мальте Андерссон удлинил хвосты самцам длиннохвостого бархатного ткача в Кении — и они привлекли больше самок, чем самцы с укороченными хвостами. Дарвин признавался, что вид павлиньего пера его мучил — пока он не понял роль выбора самок.",
@@ -15429,7 +15464,7 @@ const BIO_MECH = (() => {
       chart(g, B, [{ v: S.hist, c: GOLD }], 0, 3, "средняя длина хвоста", 120, "поколения →"); } },
 
   // ———————————————————— 4 · симбиогенез
-  { id:"symb", nm:"Симбиогенез", sub:"Как клетка стала сложной",
+  { id:"symb", bg:"chloro", place:"Хлоропласт в листе · лупа на кроне", home:{t:"bsc", d:7, dive:["leaf", 3]}, nm:"Симбиогенез", sub:"Как клетка стала сложной",
     lead:"Сложная клетка — это союз. Шаг за шагом посмотрите, как крупная клетка-архея приютила бактерию, а потом водоросль — цианобактерию.",
     how:"По теории симбиогенеза одна клетка поглотила другую, но не переварила. Бактерия осталась жить внутри, делилась вместе с хозяином и стала митохондрией. Позже у предков растений так же поселилась цианобактерия — она стала хлоропластом.",
     nature:"Митохондрии и хлоропласты до сих пор похожи на бактерии: у них свои кольцевые ДНК, свои рибосомы и деление пополам. Ближайшие живые родственники клетки-хозяина — асгард-археи, найденные в 2015 году.",
@@ -15457,7 +15492,7 @@ const BIO_MECH = (() => {
       title(g, L[Math.round(clamp(k, 0, 4))], R.x, R.y + 4); } },
 
   // ———————————————————— 5 · конвергенция
-  { id:"conv", nm:"Конвергенция", sub:"Разные предки — одинаковые решения",
+  { id:"conv", bg:"sea_jur", place:"Море юрского периода · пласт «Юра»", home:{t:"era", e:"jurassic"}, nm:"Конвергенция", sub:"Разные предки — одинаковые решения",
     lead:"Неродственные животные, живущие похожей жизнью, приходят к похожей форме. Совместите силуэты и сравните.",
     how:"Законы физики одни для всех: в воде выгодна обтекаемая «торпеда», в воздухе — крыло. Отбор у разных групп независимо приводит к похожим решениям. Но внутри они устроены по-разному: у ихтиозавра — кости рептилии, у акулы — хрящ.",
     nature:"Активный полёт изобретали минимум четыре раза: насекомые, птерозавры, птицы и летучие мыши. Сумчатый волк Тасмании внешне очень похож на волка, хотя их общий предок жил больше 160 млн лет назад.",
@@ -15472,7 +15507,7 @@ const BIO_MECH = (() => {
         g.font = "11px 'JetBrains Mono', monospace"; g.fillStyle = `rgba(${c},.9)`; g.textAlign = "center"; g.fillText(lab, cx0 + (R.x + R.w/2 - cx0)*S.o, cy + sz*.5 + 16 + i*14*S.o); g.textAlign = "left"; }); } },
 
   // ———————————————————— 6 · вьюрки Дарвина
-  { id:"finch", nm:"Вьюрки Дарвина", sub:"Засуха и толщина клюва",
+  { id:"finch", bg:"galapagos", place:"Галапагосские острова · пласт «Плейстоцен»", home:{t:"era", e:"pleistocene"}, nm:"Вьюрки Дарвина", sub:"Засуха и толщина клюва",
     lead:"Средний земляной вьюрок с острова Дафне-Майор. В засуху остаются только крупные твёрдые семена — их раскалывают птицы с толстым клювом.",
     how:"Каждый год часть птиц погибает. В обычный год выживание почти не зависит от клюва. В засуху выживают в основном птицы с толстым клювом. Птенцы наследуют клюв родителей — и среднее значение в следующем поколении сдвигается.",
     nature:"Питер и Розмари Грант изучали вьюрков на Дафне-Майор с 1973 года. После засухи 1977 года выжила лишь малая часть птиц, а клюв у следующего поколения стал в среднем примерно на 4 % толще. Эволюцию увидели почти в реальном времени.",
@@ -15495,7 +15530,7 @@ const BIO_MECH = (() => {
       chart(g, B, [{ v: S.hist, c: BLUE }], 8.8, 11, "средняя толщина клюва, мм", Math.max(10, S.hist.length), "годы →"); } },
 
   // ———————————————————— 7 · коэволюция
-  { id:"coev", nm:"Коэволюция", sub:"Цветок и бабочка тянут друг друга",
+  { id:"coev", bg:"orchid", place:"Орхидея на стволе сейбы · слой «Ствол»", home:{t:"bsc", d:8}, nm:"Коэволюция", sub:"Цветок и бабочка тянут друг друга",
     lead:"Нектар спрятан на дне длинного шпорца орхидеи. Бабочка с длинным хоботком достаёт его, а цветок опыляется, только если бабочке приходится прижаться к нему головой.",
     how:"Цветки с шпорцем длиннее хоботка выигрывают: бабочка глубже погружает голову и уносит пыльцу. Бабочки с более длинным хоботком выигрывают: им достаётся больше нектара. Так обе длины растут — гонка, в которой ни один не может остановиться.",
     nature:"В 1862 году Дарвин увидел мадагаскарскую орхидею со шпорцем длиной 20–35 см и предсказал бабочку с таким же хоботком. Её описали лишь в 1903 году — и назвали praedicta, «предсказанная».",
@@ -15520,7 +15555,7 @@ const BIO_MECH = (() => {
       chart(g, B, [{ v: S.hf, c: GREEN }, { v: S.hm, c: ROSE }], 0, 36, "длина, см", Math.max(40, S.hf.length), "поколения →"); } },
 
   // ———————————————————— 8 · вымирание и радиация
-  { id:"rad", nm:"Вымирание и радиация", sub:"Что происходит после катастрофы",
+  { id:"rad", bg:"kpg", place:"Граница мела и палеогена · пласт «Мел»", home:{t:"era", e:"cretaceous"}, nm:"Вымирание и радиация", sub:"Что происходит после катастрофы",
     lead:"Ветви жизни ветвятся и обрываются. Нажмите «Астероид» — три четверти ветвей погибнут. Посмотрите, как выжившие быстро займут освободившиеся места.",
     how:"В спокойное время новые виды появляются примерно так же часто, как исчезают старые. Катастрофа резко обрывает большинство ветвей. Выжившим больше не мешают конкуренты, и они быстро дают множество новых видов — это адаптивная радиация.",
     nature:"После падения астероида 66 млн лет назад исчезло около 75 % видов. Млекопитающие и птицы, жившие до этого в тени динозавров, за несколько миллионов лет разошлись по всем освободившимся нишам.",
@@ -15542,7 +15577,7 @@ const BIO_MECH = (() => {
       chart(g, B, [{ v: S.hist, c: GOLD }], 0, 80, "число видов", 600, "время →"); } },
 
   // ———————————————————— 9 · Красная Королева
-  { id:"queen", nm:"Красная Королева", sub:"Бежать, чтобы оставаться на месте",
+  { id:"queen", bg:"taiga", place:"Тайга: заяц-беляк и рысь · Биомы Земли", home:{t:"biome", b:"taiga"}, nm:"Красная Королева", sub:"Бежать, чтобы оставаться на месте",
     lead:"Зайцы и рыси. Чем больше зайцев, тем больше рысей; чем больше рысей, тем меньше зайцев — и численности качаются. Включите гонку вооружений: обе стороны ускоряются, но никто не выигрывает.",
     how:"Хищники и жертвы связаны: рост одних ведёт к росту других, а затем к спаду — получаются циклы. В гонке вооружений жертвы бегают всё быстрее, хищники тоже, но доля пойманных почти не меняется. Чтобы просто удержаться, приходится всё время меняться.",
     nature:"Записи о шкурах, которые Компания Гудзонова залива скупала больше ста лет, показывают циклы численности зайцев-беляков и канадских рысей с периодом около 10 лет. Название гипотезы Ли Ван Вален в 1973 году взял из сказки Льюиса Кэрролла.",
@@ -15575,7 +15610,7 @@ const BIO_BASICS = (() => {
 
   return [
   // ———————————————————— клетка
-  { id:"cell", nm:"Клетка", sub:"Кирпичик всего живого",
+  { id:"cell", bg:"cells", place:"Клетки листа · лупа на кроне", home:{t:"bsc", d:7, dive:["leaf", 2]}, nm:"Клетка", sub:"Кирпичик всего живого",
     lead:"Всё живое состоит из клеток — от бактерии из одной клетки до человека из десятков триллионов. Сравните три главных типа клеток.",
     how:"Бактерия — маленькая клетка без ядра: её ДНК лежит прямо в цитоплазме. Клетки животных и растений — эукариотические: у них есть ядро и «энергостанции»-митохондрии. У растительной клетки добавляются жёсткая стенка, хлоропласты для фотосинтеза и большая вакуоль с соком.",
     nature:"Роберт Гук в 1665 году увидел в микроскоп пустые ячейки пробки и назвал их «клетками». В 1838–1839 годах Шлейден и Шванн сформулировали клеточную теорию: все организмы состоят из клеток. В теле человека — около 37 триллионов клеток.",
@@ -15612,7 +15647,7 @@ const BIO_BASICS = (() => {
       title(g, pl ? "Растительная клетка · 10–100 мкм" : "Животная клетка · 10–30 мкм", R.x, R.y + 4); } },
 
   // ———————————————————— ДНК → белок
-  { id:"dna", nm:"От ДНК к белку", sub:"Как гены становятся телом",
+  { id:"dna", bg:"nucleus", place:"Ядро клетки листа · лупа на кроне", home:{t:"bsc", d:7, dive:["leaf", 2]}, nm:"От ДНК к белку", sub:"Как гены становятся телом",
     lead:"Ген — это текст из четырёх «букв» A, T, G, C. Клетка переписывает его в РНК, а рибосома читает тройками и собирает белок из аминокислот.",
     how:"Транскрипция: участок двойной спирали ДНК расплетается, и по одной цепи собирается копия — матричная РНК (вместо T в ней U). Трансляция: рибосома движется по РНК и читает её по три буквы — кодон за кодоном. Каждый кодон означает одну из 20 аминокислот или сигнал «стоп».",
     nature:"Двойную спираль описали Джеймс Уотсон и Фрэнсис Крик в 1953 году; ключевым был рентгеновский снимок Розалинд Франклин. Генетический код почти одинаков у всех живых существ — ещё одно свидетельство общего происхождения.",
@@ -15639,7 +15674,7 @@ const BIO_BASICS = (() => {
       lab(g, "каждые три буквы — одна аминокислота", x0, yr + 70, DIM, 11, .85); title(g, "Трансляция: РНК → белок", R.x, R.y + 4); } },
 
   // ———————————————————— фотосинтез и дыхание
-  { id:"photo", nm:"Фотосинтез и дыхание", sub:"Два встречных потока",
+  { id:"photo", bg:"leaf", place:"Лист сейбы на просвет · слой «Крона»", home:{t:"bsc", d:7, dive:["leaf", 0]}, nm:"Фотосинтез и дыхание", sub:"Два встречных потока",
     lead:"Растение днём собирает из углекислого газа и воды сахар, используя свет, и выделяет кислород. И растения, и животные «сжигают» сахар в митохондриях и выдыхают углекислый газ.",
     how:"Фотосинтез: 6 CO₂ + 6 H₂O + свет → C₆H₁₂O₆ + 6 O₂. Дыхание — почти обратная реакция: сахар и кислород дают энергию (молекулы АТФ), углекислый газ и воду. Ночью фотосинтез останавливается, а дыхание идёт всегда.",
     nature:"Почти вся энергия живого мира — солнечный свет, запасённый фотосинтезом. Около половины кислорода Земли дают морские водоросли и цианобактерии, другую половину — растения суши.",
@@ -15662,7 +15697,7 @@ const BIO_BASICS = (() => {
       title(g, day ? "День: фотосинтез и дыхание" : "Ночь: идёт только дыхание", R.x, R.y + 4); } },
 
   // ———————————————————— пищевая пирамида
-  { id:"pyr", nm:"Пищевые сети", sub:"Почему хищников мало",
+  { id:"pyr", bg:"floor", place:"Лесная подстилка · слой «Подстилка»", home:{t:"bsc", d:9}, nm:"Пищевые сети", sub:"Почему хищников мало",
     lead:"Энергия переходит от растений к травоядным и дальше к хищникам. На каждом шаге большая её часть уходит в тепло. Передвиньте долю, которая переходит на следующую ступень.",
     how:"Растения запасают энергию Солнца. Травоядное получает лишь малую часть — остальное тратится на жизнь растения, уходит в тепло или не съедается. То же на каждой ступени. Поэтому на вершине пирамиды мало животных, а цепи редко длиннее четырёх-пяти звеньев.",
     nature:"Средняя эффективность перехода — порядка 10 % («правило десяти процентов»), но разброс большой. Отсюда простой вывод: одна и та же площадь полей прокормит гораздо больше людей растительной пищей, чем мясом.",
@@ -15679,7 +15714,7 @@ const BIO_BASICS = (() => {
       lab(g, "красные искры — энергия, ушедшая в тепло", R.x, R.y + 30, "255,140,110", 11, .9); title(g, `Из 10 000 единиц до вершины доходит ${E[3] >= 1 ? Math.round(E[3]) : E[3].toFixed(2)}`, R.x, R.y + 4); } },
 
   // ———————————————————— круговороты
-  { id:"cycle", nm:"Круговороты веществ", sub:"Атомы, которые всё время в пути",
+  { id:"cycle", bg:"soil", place:"Почва и корни · слой «Подстилка»", home:{t:"bsc", d:9}, nm:"Круговороты веществ", sub:"Атомы, которые всё время в пути",
     lead:"Атомы углерода и азота не исчезают — они переходят из воздуха в растения, животных, почву, океан и обратно. Переключите круговорот.",
     how:"Растения забирают углерод из воздуха при фотосинтезе, дыхание и гниение возвращают его. Океан растворяет углекислый газ и отдаёт его обратно. Люди добавили новый поток: сжигание угля, нефти и газа переносит в воздух углерод, который миллионы лет лежал под землёй. Азот воздуха могут связывать только бактерии — и, с начала XX века, химические заводы.",
     nature:"В атмосфере сейчас около 880 млрд тонн углерода, в океане — около 38 000 млрд тонн. Сжигание ископаемого топлива добавляет около 10 млрд тонн углерода в год. Метод Габера — Боша (1909–1913) связывает азот для удобрений: без него нельзя было бы прокормить около половины человечества.",
@@ -17583,12 +17618,53 @@ void main(){
     const x0 = mx ? r.right + 50 : Math.max(r.right + 60, W3*.36);
     return { x: x0, y: 110, w: W3 - x0 - 90, h: H3 - 190 };
   }
+  // фон опыта — фото того места, где механизм виден в природе; список опытов — «журнал натуралиста»
+  let mbgEl = null, mbgK = "", jrEl = null, mOrigin = null;
+  const MBG_OK = new Set(["bark", "bark_soot", "brom", "chloro", "cells", "leaf", "litter", "crown", "floor", "soil", "sea_jur", "kpg"]);
+  function mbg(k){
+    if (!mbgEl){ mbgEl = document.createElement("div"); mbgEl.className = "bio-mbg"; mbgEl.innerHTML = "<i></i><i></i>"; box.insertBefore(mbgEl, simC); }
+    if (k === mbgK) return; mbgK = k;
+    const [a, b] = mbgEl.children, cur = a.classList.contains("on") ? a : b, nx = cur === a ? b : a;
+    if (k && !MBG_OK.has(k)) k = "";
+    nx.style.backgroundImage = k ? `url("mbg/${k}.webp")` : ""; nx.classList.toggle("none", !k);
+    nx.classList.add("on"); cur.classList.remove("on");
+  }
+  const MHOME = (M) => M.home;
+  function goHome(h){
+    if (!h) return;
+    if (h.t === "bsc"){ close(); if (typeof closeBio === "function") closeBio();
+      openJourney("earth"); setBranch("bio", h.d); depth = Math.max(depth, h.d - .9); depthT = h.d; lastDepthInput = performance.now();
+      if (h.dive && typeof BSC !== "undefined") setTimeout(() => BSC.dbg.dive(h.dive[0], h.dive[1]), 1800); return; }
+    if (h.t === "era"){ const n = BIO_ERAS.findIndex(e => e.id === h.e); mechOff(); if (n >= 0) go(n); return; }
+    if (h.t === "biome"){ const n = BIO_BIOMES.findIndex(b => b.id === h.b); mechOn = false; mi = -1; box.classList.remove("bio-mech"); bmOn_(Math.max(0, n)); }
+  }
+  // «механизм здесь»: какие опыты журнала видны в этом пласте или биоме
+  const ERA_MECH = { now:["mech:moth"], pleistocene:["mech:finch"], paleogene:["mech:rad"], cretaceous:["mech:rad"], jurassic:["mech:conv"] };
+  const BM_MECH = { taiga:["mech:queen"], sav:["basics:pyr"], rain:["mech:coev", "mech:sex"] };
+  function hereHTML(L){
+    if (!L || !L.length) return "";
+    return `<h4>⚙ Механизм здесь</h4><div class="hd-fork bio-home">${L.map(x => { const [k, id] = x.split(":"), M = (k === "basics" ? BIO_BASICS : BIO_MECH).find(m => m.id === id);
+      return M ? `<button data-mhere="${x}" data-hover><b>${esc(M.nm)}</b><span>${esc(M.sub)} — опыт из журнала натуралиста</span></button>` : ""; }).join("")}</div>`;
+  }
+  function hereBind(origin){ cardEl.querySelectorAll("[data-mhere]").forEach(b => b.onclick = () => { const [k, id] = b.dataset.mhere.split(":"); const L = k === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id);
+    if (bmOn) bmLeave(); mechOn_(i, k); mOrigin = origin(); card(); }); }
+  function journal(){
+    if (!jrEl){ jrEl = document.createElement("div"); jrEl.className = "bio-jr"; box.insertBefore(jrEl, simC.nextSibling); }
+    const B = MK === "basics";
+    jrEl.innerHTML = `<div class="bio-jr-h"><span class="mono">Журнал натуралиста · ${B ? "основы биологии" : "механизмы эволюции"}</span><i>Каждая запись — опыт и место, где это видно в природе</i></div>
+      <div class="bio-jr-g">${MSET.map((M, i) => `<article class="bio-jr-c"><button class="bio-jr-ph" data-ji="${i}" data-hover style="${M.bg && MBG_OK.has(M.bg) ? `background-image:url('mbg/${M.bg}.webp')` : ""}"><b>${i + 1}</b></button>
+        <h5>${esc(M.nm)}</h5><p>${esc(M.place || M.sub)}</p><div><button data-ji="${i}" data-hover>Опыт ▸</button>${M.home ? `<button data-jh="${i}" data-hover>На месте ↗</button>` : ""}</div></article>`).join("")}</div>`;
+    jrEl.querySelectorAll("[data-ji]").forEach(b => b.onclick = () => { mi = +b.dataset.ji; mOrigin = null; card(); });
+    jrEl.querySelectorAll("[data-jh]").forEach(b => b.onclick = () => goHome(MSET[+b.dataset.jh].home));
+  }
   function mechFrame(dt, T){
     if (!simG) simG = simC.getContext("2d");
     const d = DPR3; if (simC.width !== Math.round(W3*d) || simC.height !== Math.round(H3*d)){ simC.width = Math.round(W3*d); simC.height = Math.round(H3*d); }
     simG.setTransform(1, 0, 0, 1, 0, 0); simG.clearRect(0, 0, simC.width, simC.height); simG.clearRect(0, 0, simC.width, simC.height); simG.setTransform(d, 0, 0, d, 0, 0);
-    if (mi < 0) return;
-    const M = MSET[mi], S = mechState(mi); M.step(S, Math.min(dt, .1)); M.draw(simG, simRect(), S, T);
+    box.classList.toggle("bio-jr-on", mi < 0);
+    if (mi < 0){ mbg("journal"); return; }
+    const M = MSET[mi], S = mechState(mi); mbg(M.id === "moth" && S.p && S.p.bark === "soot" ? "bark_soot" : M.bg || "");
+    M.step(S, Math.min(dt, .1)); M.draw(simG, simRect(), S, T);
   }
   function mechCard(){
     const B = MK === "basics", N = MSET.length;
@@ -17608,11 +17684,14 @@ void main(){
       <h4>Что происходит</h4><p class="tm-pr bio-p">${esc(M.how)}</p>
       <h4>В природе</h4><p class="tm-pr bio-p">${esc(M.nature)}</p>
       <h4>Наука</h4><ul class="list">${M.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}</ul>
-      <div class="tm-gos"><button class="btn tm-go" id="bioMList" data-hover>← ${B ? "Все темы" : "Все опыты"}</button></div>`;
+      ${M.place ? `<h4>Где это в природе</h4><div class="hd-fork bio-home">${mOrigin ? `<button id="bioMBack" data-hover><b>← Вернуться к месту</b><span>${esc(M.place)}</span></button>` : `<button id="bioMHome" data-hover><b>На месте ↗</b><span>${esc(M.place)}</span></button>`}</div>` : ""}
+      <div class="tm-gos"><button class="btn tm-go" id="bioMList" data-hover>← ${B ? "Журнал: все темы" : "Журнал: все опыты"}</button></div>`;
   }
   function mechBind(){
     const on = (id, f) => { const b = $(id); if (b) b.onclick = f; };
-    on("bioMechX", () => mechOff()); on("bioMList", () => { mi = -1; card(); });
+    on("bioMechX", () => mechOff()); on("bioMList", () => { mi = -1; mOrigin = null; card(); });
+    on("bioMHome", () => goHome(MSET[mi].home)); on("bioMBack", () => { const o = mOrigin; mOrigin = null; goHome(o); });
+    if (mi < 0) journal();
     on("bioMPrev", () => { mi = Math.max(0, mi - 1); card(); }); on("bioMNext", () => { mi = Math.min(MSET.length - 1, mi + 1); card(); });
     on("bioMSwap", () => mechOn_(-1, MK === "basics" ? "mech" : "basics"));
     cardEl.querySelectorAll("[data-mi]").forEach(b => b.onclick = () => { mi = +b.dataset.mi; card(); });
@@ -17624,7 +17703,7 @@ void main(){
     cardEl.querySelectorAll("[data-mb]").forEach(b => b.onclick = () => { const k = b.dataset.mb; if (k === "reset"){ M.init(S); } else if (k === "cellst"){ close(); if (typeof goTo === "function") goTo(7); } else if (M.on) M.on(S, k); });
   }
   function mechOn_(i, kind){ if (gal.on || cmp){ gal.on = false; cmp = false; cmpK = null; labClear(); } if (bmOn) bmLeave();
-    MK = kind || "mech"; MSET = MK === "basics" ? BIO_BASICS : BIO_MECH;
+    MK = kind || "mech"; MSET = MK === "basics" ? BIO_BASICS : BIO_MECH; if (typeof i !== "number" || i < 0) mOrigin = null;
     mechOn = true; mi = i == null ? -1 : i; view = null; box.classList.add("bio-mech"); Music.voice("bio:cells", false); hint(); card(); }
   function mechOff(){ mechOn = false; mi = -1; box.classList.remove("bio-mech"); arrive(cur); life = lifeT = ST ? 0 : cur >= 0 && BIO_ERAS[cur].ready ? 1 : 0; if (ST) ST.go(cur >= 0 ? NE - 1 - cur : -1, true); lifeAt = 0; column(); card(); }
   // ======== 13е · биомы Земли: та же WebGL-сцена, без породы ========
@@ -17648,6 +17727,7 @@ void main(){
         <p class="bio-gn mono">«жизнь» — продуктивность: сколько граммов сухого вещества создают за год растения и водоросли на квадратном метре</p></div>
       <h4>Кто живёт</h4><p class="tm-pr bio-p">${esc(B.who)}</p>
       ${L.length ? `<div class="bio-chips">${L.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>` : ""}
+      ${hereHTML(BM_MECH[B.id])}
       <h4>Удивительное</h4><p class="tm-pr bio-p">${esc(B.wow)}</p>
       <h4>Что ему грозит</h4><p class="tm-pr bio-p">${esc(B.threat)}</p>
       <h4>Наука</h4><ul class="list">${B.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}<li>${mk("h")}<span>Цифры приборов — типичные значения; внутри биома разброс большой</span></li></ul>
@@ -17718,11 +17798,13 @@ void main(){
         ${E.sp.length ? `<h4>Кто жил</h4>` : ""}<div class="bio-chips">${E.sp.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>
         <h4>Изобретение эпохи</h4><p class="tm-pr bio-p">${esc(E.inv)}</p>
         <h4>Что досталось нам</h4><p class="tm-pr bio-p">${esc(E.legacy)}</p>
+        ${hereHTML(ERA_MECH[E.id])}
         <h4>Наука</h4><ul class="list">${E.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}</ul>
         <div class="tm-gos"><button class="btn tm-go" id="bioCal" data-hover>В календаре →</button><button class="btn tm-go" id="bioTree" data-hover>В Древе жизни →</button></div>`;
     }
     cardEl.innerHTML = h;
     cardEl.classList.remove("swap"); void cardEl.offsetWidth; cardEl.classList.add("swap"); scr.scrollTop = 0;
+    if (!mechOn) hereBind(() => bmOn ? { t:"biome", b:BIO_BIOMES[bi].id } : cur >= 0 ? { t:"era", e:BIO_ERAS[cur].id } : null);
     const on = (id, f) => { const b = $(id); if (b) b.onclick = f; };
     on("bioUp", () => go(cur < NE - 1 ? cur + 1 : -1)); on("bioDown", () => go(cur < 0 ? NE - 1 : cur - 1));
     on("bioBack", () => { view = null; sel = -1; card(); });
@@ -17908,7 +17990,8 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   const mxb = $("bioMax");
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Сцена" : "⤢ Читать"; };
   return { open: openB, close, get on(){ return open; }, go, portrait,
-    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); }, biome: i => { bmOn_(i); }, dbg: { strata: () => ST, revive: () => reviveStone(), stone: () => toStone(), fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
+    gallery: k => galOn(k), mech: i => { mechOn_(i); }, basics: i => { mechOn_(i, "basics"); },
+    mechAt: (id, kind, origin) => { const L = kind === "basics" ? BIO_BASICS : BIO_MECH, i = L.findIndex(m => m.id === id); mechOn_(i, kind || "mech"); mOrigin = origin || null; card(); }, biome: i => { bmOn_(i); }, dbg: { strata: () => ST, revive: () => reviveStone(), stone: () => toStone(), fc: () => fc, gal: () => ({ on: gal.on, cmp, cmpK, n: galList().length, grp: GRP }), setGal: o => { Object.assign(gal, o); card(); }, env: () => envN, cur: () => cur, life: v => { if (v != null){ life = lifeT = v; lifeAt = 0; } return life; }, inst: () => INST.map(I => [I.k, I.n, +I.X.toFixed(2), I.st]), hov: () => hov, view: () => view, trn: () => !!trn, pano: () => !!PAN, fold: v => { if (v != null) fold = !!v; return fold; },
       pickAt: (x, y) => pick(x, y), scr: k => { const I = INST.find(I => I.k === k && !I.fossilOnly); return I ? scr2(I.sx, I.sy, I.Z) : null; } } };
 })();
 const chBio = $("chBio");
@@ -17940,17 +18023,17 @@ const BSC = (() => {
   const BASE = "bsc/", AR = 2752/1536;
   const HOT = [
     { id:"leaf", u:.70, v:.105, r:.075, lv:0, chain:[
-      { img:"lens_leaf_1", t:"Лист на просвет", s:"≈ 5 см", tx:"Пальчатый лист сейбы. Жилки — водопровод и опора: вода поднимается сюда из почвы на 60 м вверх, её тянет испарение с листьев ●" },
+      { img:"lens_leaf_1", m:"basics:photo", t:"Лист на просвет", s:"≈ 5 см", tx:"Пальчатый лист сейбы. Жилки — водопровод и опора: вода поднимается сюда из почвы на 60 м вверх, её тянет испарение с листьев ●" },
       { img:"lens_leaf_2", t:"Устьица", s:"≈ 300 мкм", tx:"На изнанке листа — сотни устьиц на квадратный миллиметр. Две клетки-замыкающие открывают щель: внутрь входит CO₂, наружу уходят вода и кислород ●" },
-      { img:"lens_leaf_3", t:"Клетки с хлоропластами", s:"≈ 60 мкм", tx:"Столбчатые клетки листа набиты зелёными хлоропластами — по 20–100 в каждой ●" },
-      { img:"lens_leaf_4", t:"Хлоропласт", s:"≈ 5 мкм", tx:"Стопки мембран-тилакоидов — граны. В них хлорофилл ловит свет. Хлоропласт — потомок цианобактерии, которая больше миллиарда лет назад поселилась внутри клетки ●" },
+      { img:"lens_leaf_3", m:"basics:cell", t:"Клетки с хлоропластами", s:"≈ 60 мкм", tx:"Столбчатые клетки листа набиты зелёными хлоропластами — по 20–100 в каждой ●" },
+      { img:"lens_leaf_4", m:"mech:symb", t:"Хлоропласт", s:"≈ 5 мкм", tx:"Стопки мембран-тилакоидов — граны. В них хлорофилл ловит свет. Хлоропласт — потомок цианобактерии, которая больше миллиарда лет назад поселилась внутри клетки ●" },
       { img:"chl", mol:1, t:"Хлорофилл a", s:"≈ 1,5 нм", tx:"C₅₅H₇₂MgN₄O₅. В центре кольца — атом магния (зелёный), длинный хвост держит молекулу в мембране. Модель по атомам из PubChem ●", alt:{ img:"heme", t:"Гем", s:"≈ 1 нм", tx:"C₃₄H₃₂FeN₄O₄. То же порфириновое кольцо, но в центре железо (оранжевое) — оно держит кислород в гемоглобине вашей крови ●" } } ] },
     { id:"brom", u:.555, v:.415, r:.05, lv:1, chain:[
-      { img:"lens_bromeliad", t:"Бромелия: пруд на дереве", s:"≈ 15 см", tx:"В розетке листьев собирается дождь. В этой чашке живут личинки, головастики, бактерии — целая экосистема на высоте десятков метров ●" } ] },
+      { img:"lens_bromeliad", m:"mech:drift", t:"Бромелия: пруд на дереве", s:"≈ 15 см", tx:"В розетке листьев собирается дождь. В этой чашке живут личинки, головастики, бактерии — целая экосистема на высоте десятков метров ●" } ] },
     { id:"bark", u:.515, v:.49, r:.04, lv:1, chain:[
-      { img:"lens_bark", t:"Кора: мох и лишайники", s:"≈ 3 см", tx:"Серые и оранжевые корочки — лишайники, союз гриба и водоросли. Подушки мха держат воду, как губка ●" } ] },
+      { img:"lens_bark", m:"mech:moth", t:"Кора: мох и лишайники", s:"≈ 3 см", tx:"Серые и оранжевые корочки — лишайники, союз гриба и водоросли. Подушки мха держат воду, как губка ●" } ] },
     { id:"litter", u:.46, v:.676, r:.05, lv:2, chain:[
-      { img:"lens_litter", t:"Подстилка", s:"≈ 3 см", tx:"Белые нити — гифы грибов: они растворяют лист снаружи ферментами. Рядом ногохвостка и клещ — тоже разложители ●" } ] },
+      { img:"lens_litter", m:"basics:cycle", t:"Подстилка", s:"≈ 3 см", tx:"Белые нити — гифы грибов: они растворяют лист снаружи ферментами. Рядом ногохвостка и клещ — тоже разложители ●" } ] },
     { id:"root", u:.60, v:.745, r:.05, lv:3, chain:[
       { img:"lens_root", t:"Кончик корня", s:"≈ 5 мм", tx:"Корневые волоски и тонкие белые нити грибов уходят в красную глину ●" },
       { img:"lens_myco", t:"Микориза внутри корня", s:"≈ 100 мкм", tx:"Окрашенный срез корня: внутри клеток — ветвистые арбускулы гриба, здесь дерево и гриб меняют сахар на фосфор. Круглые пузырьки — запасы гриба ●" } ] },
@@ -18096,8 +18179,8 @@ void main(){
     sunEl.querySelectorAll("i").forEach((el, k) => el.onclick = () => { rg.value = k*50; sunAim = k*.5; co2(); });
     lab = document.createElement("div"); lab.className = "bsc-lab"; lab.setAttribute("aria-hidden", "true");
     dv = document.createElement("div"); dv.className = "bsc-dive"; dv.setAttribute("role", "dialog"); dv.setAttribute("aria-label", "Нырок сквозь масштабы");
-    dv.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b></div><p class="bsc-dv-x"></p><div class="bsc-dv-b"><button data-a="up" data-hover>↑ крупнее</button><button data-a="dn" data-hover>глубже ↓</button><button data-a="mol" data-hover>Mg → Fe: гем крови</button><button data-a="x" data-hover>✕ закрыть</button></div>`;
-    dv.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const a = bt.dataset.a; if (a === "up") step(-1); else if (a === "dn") step(1); else if (a === "x") closeDive(); else if (a === "mol") morph(); });
+    dv.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b></div><p class="bsc-dv-x"></p><div class="bsc-dv-b"><button data-a="up" data-hover>↑ крупнее</button><button data-a="dn" data-hover>глубже ↓</button><button data-a="mol" data-hover>Mg → Fe: гем крови</button><button data-a="mech" data-hover>⚙ опыт</button><button data-a="x" data-hover>✕ закрыть</button></div>`;
+    dv.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const a = bt.dataset.a; if (a === "up") step(-1); else if (a === "dn") step(1); else if (a === "x") closeDive(); else if (a === "mol") morph(); else if (a === "mech"){ const it = dive.h.chain[dive.i]; if (it.m){ closeDive(); bscMech(it.m); } } });
     cv.addEventListener("pointermove", e => { const t = performance.now(); spd = Math.min(1, spd + Math.hypot(e.clientX - px, e.clientY - py)/180); px = e.clientX; py = e.clientY; over = true; lastMove = t; });
     cv.addEventListener("pointerleave", () => { over = false; });
     cv.addEventListener("pointerdown", e => { px = e.clientX; py = e.clientY; over = e.pointerType !== "touch"; });
@@ -18146,6 +18229,8 @@ void main(){
     dv.querySelector(".bsc-dv-t").textContent = c.t; dv.querySelector(".bsc-dv-x").textContent = c.tx;
     dv.querySelector('[data-a="up"]').disabled = false;
     dv.querySelector('[data-a="dn"]').style.display = dive.i < n - 1 ? "" : "none";
+    const me = dv.querySelector('[data-a="mech"]'), mm = it.m ? it.m.split(":") : null, MM = mm ? (mm[0] === "basics" ? BIO_BASICS : BIO_MECH).find(x => x.id === mm[1]) : null;
+    me.style.display = MM ? "" : "none"; if (MM) me.textContent = "⚙ опыт: " + MM.nm.toLowerCase();
     const mb = dv.querySelector('[data-a="mol"]'); mb.style.display = it.alt ? "" : "none"; mb.textContent = dive.molB ? "Fe → Mg: снова хлорофилл" : "Mg → Fe: гем крови";
     dv.querySelector('[data-a="up"]').textContent = dive.i > 0 ? "↑ крупнее" : "↑ к дереву";
   }

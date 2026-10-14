@@ -6,17 +6,17 @@ const BSC = (() => {
   const BASE = "bsc/", AR = 2752/1536;
   const HOT = [
     { id:"leaf", u:.70, v:.105, r:.075, lv:0, chain:[
-      { img:"lens_leaf_1", t:"Лист на просвет", s:"≈ 5 см", tx:"Пальчатый лист сейбы. Жилки — водопровод и опора: вода поднимается сюда из почвы на 60 м вверх, её тянет испарение с листьев ●" },
+      { img:"lens_leaf_1", m:"basics:photo", t:"Лист на просвет", s:"≈ 5 см", tx:"Пальчатый лист сейбы. Жилки — водопровод и опора: вода поднимается сюда из почвы на 60 м вверх, её тянет испарение с листьев ●" },
       { img:"lens_leaf_2", t:"Устьица", s:"≈ 300 мкм", tx:"На изнанке листа — сотни устьиц на квадратный миллиметр. Две клетки-замыкающие открывают щель: внутрь входит CO₂, наружу уходят вода и кислород ●" },
-      { img:"lens_leaf_3", t:"Клетки с хлоропластами", s:"≈ 60 мкм", tx:"Столбчатые клетки листа набиты зелёными хлоропластами — по 20–100 в каждой ●" },
-      { img:"lens_leaf_4", t:"Хлоропласт", s:"≈ 5 мкм", tx:"Стопки мембран-тилакоидов — граны. В них хлорофилл ловит свет. Хлоропласт — потомок цианобактерии, которая больше миллиарда лет назад поселилась внутри клетки ●" },
+      { img:"lens_leaf_3", m:"basics:cell", t:"Клетки с хлоропластами", s:"≈ 60 мкм", tx:"Столбчатые клетки листа набиты зелёными хлоропластами — по 20–100 в каждой ●" },
+      { img:"lens_leaf_4", m:"mech:symb", t:"Хлоропласт", s:"≈ 5 мкм", tx:"Стопки мембран-тилакоидов — граны. В них хлорофилл ловит свет. Хлоропласт — потомок цианобактерии, которая больше миллиарда лет назад поселилась внутри клетки ●" },
       { img:"chl", mol:1, t:"Хлорофилл a", s:"≈ 1,5 нм", tx:"C₅₅H₇₂MgN₄O₅. В центре кольца — атом магния (зелёный), длинный хвост держит молекулу в мембране. Модель по атомам из PubChem ●", alt:{ img:"heme", t:"Гем", s:"≈ 1 нм", tx:"C₃₄H₃₂FeN₄O₄. То же порфириновое кольцо, но в центре железо (оранжевое) — оно держит кислород в гемоглобине вашей крови ●" } } ] },
     { id:"brom", u:.555, v:.415, r:.05, lv:1, chain:[
-      { img:"lens_bromeliad", t:"Бромелия: пруд на дереве", s:"≈ 15 см", tx:"В розетке листьев собирается дождь. В этой чашке живут личинки, головастики, бактерии — целая экосистема на высоте десятков метров ●" } ] },
+      { img:"lens_bromeliad", m:"mech:drift", t:"Бромелия: пруд на дереве", s:"≈ 15 см", tx:"В розетке листьев собирается дождь. В этой чашке живут личинки, головастики, бактерии — целая экосистема на высоте десятков метров ●" } ] },
     { id:"bark", u:.515, v:.49, r:.04, lv:1, chain:[
-      { img:"lens_bark", t:"Кора: мох и лишайники", s:"≈ 3 см", tx:"Серые и оранжевые корочки — лишайники, союз гриба и водоросли. Подушки мха держат воду, как губка ●" } ] },
+      { img:"lens_bark", m:"mech:moth", t:"Кора: мох и лишайники", s:"≈ 3 см", tx:"Серые и оранжевые корочки — лишайники, союз гриба и водоросли. Подушки мха держат воду, как губка ●" } ] },
     { id:"litter", u:.46, v:.676, r:.05, lv:2, chain:[
-      { img:"lens_litter", t:"Подстилка", s:"≈ 3 см", tx:"Белые нити — гифы грибов: они растворяют лист снаружи ферментами. Рядом ногохвостка и клещ — тоже разложители ●" } ] },
+      { img:"lens_litter", m:"basics:cycle", t:"Подстилка", s:"≈ 3 см", tx:"Белые нити — гифы грибов: они растворяют лист снаружи ферментами. Рядом ногохвостка и клещ — тоже разложители ●" } ] },
     { id:"root", u:.60, v:.745, r:.05, lv:3, chain:[
       { img:"lens_root", t:"Кончик корня", s:"≈ 5 мм", tx:"Корневые волоски и тонкие белые нити грибов уходят в красную глину ●" },
       { img:"lens_myco", t:"Микориза внутри корня", s:"≈ 100 мкм", tx:"Окрашенный срез корня: внутри клеток — ветвистые арбускулы гриба, здесь дерево и гриб меняют сахар на фосфор. Круглые пузырьки — запасы гриба ●" } ] },
@@ -162,8 +162,8 @@ void main(){
     sunEl.querySelectorAll("i").forEach((el, k) => el.onclick = () => { rg.value = k*50; sunAim = k*.5; co2(); });
     lab = document.createElement("div"); lab.className = "bsc-lab"; lab.setAttribute("aria-hidden", "true");
     dv = document.createElement("div"); dv.className = "bsc-dive"; dv.setAttribute("role", "dialog"); dv.setAttribute("aria-label", "Нырок сквозь масштабы");
-    dv.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b></div><p class="bsc-dv-x"></p><div class="bsc-dv-b"><button data-a="up" data-hover>↑ крупнее</button><button data-a="dn" data-hover>глубже ↓</button><button data-a="mol" data-hover>Mg → Fe: гем крови</button><button data-a="x" data-hover>✕ закрыть</button></div>`;
-    dv.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const a = bt.dataset.a; if (a === "up") step(-1); else if (a === "dn") step(1); else if (a === "x") closeDive(); else if (a === "mol") morph(); });
+    dv.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b></div><p class="bsc-dv-x"></p><div class="bsc-dv-b"><button data-a="up" data-hover>↑ крупнее</button><button data-a="dn" data-hover>глубже ↓</button><button data-a="mol" data-hover>Mg → Fe: гем крови</button><button data-a="mech" data-hover>⚙ опыт</button><button data-a="x" data-hover>✕ закрыть</button></div>`;
+    dv.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const a = bt.dataset.a; if (a === "up") step(-1); else if (a === "dn") step(1); else if (a === "x") closeDive(); else if (a === "mol") morph(); else if (a === "mech"){ const it = dive.h.chain[dive.i]; if (it.m){ closeDive(); bscMech(it.m); } } });
     cv.addEventListener("pointermove", e => { const t = performance.now(); spd = Math.min(1, spd + Math.hypot(e.clientX - px, e.clientY - py)/180); px = e.clientX; py = e.clientY; over = true; lastMove = t; });
     cv.addEventListener("pointerleave", () => { over = false; });
     cv.addEventListener("pointerdown", e => { px = e.clientX; py = e.clientY; over = e.pointerType !== "touch"; });
@@ -212,6 +212,8 @@ void main(){
     dv.querySelector(".bsc-dv-t").textContent = c.t; dv.querySelector(".bsc-dv-x").textContent = c.tx;
     dv.querySelector('[data-a="up"]').disabled = false;
     dv.querySelector('[data-a="dn"]').style.display = dive.i < n - 1 ? "" : "none";
+    const me = dv.querySelector('[data-a="mech"]'), mm = it.m ? it.m.split(":") : null, MM = mm ? (mm[0] === "basics" ? BIO_BASICS : BIO_MECH).find(x => x.id === mm[1]) : null;
+    me.style.display = MM ? "" : "none"; if (MM) me.textContent = "⚙ опыт: " + MM.nm.toLowerCase();
     const mb = dv.querySelector('[data-a="mol"]'); mb.style.display = it.alt ? "" : "none"; mb.textContent = dive.molB ? "Fe → Mg: снова хлорофилл" : "Mg → Fe: гем крови";
     dv.querySelector('[data-a="up"]').textContent = dive.i > 0 ? "↑ крупнее" : "↑ к дереву";
   }

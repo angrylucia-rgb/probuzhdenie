@@ -873,6 +873,30 @@ body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
   .bsc-dive{left:12px;right:12px;bottom:auto;top:calc(env(safe-area-inset-top,0px) + 58px);padding:10px 12px}
   .bsc-dv-t{font-size:18px}.bsc-dv-x{font-size:13px}
 }
+.bio-mbg{position:absolute;inset:0;z-index:0;pointer-events:none;display:none}
+.ch-bio.bio-mech .bio-mbg{display:block}
+.bio-mbg i{position:absolute;inset:-20px;background:#07080c center/cover no-repeat;opacity:0;transition:opacity .9s;filter:brightness(.5) saturate(.9) blur(1.5px)}
+.bio-mbg i.on{opacity:1}
+.bio-mbg i.none{background:radial-gradient(ellipse at 65% 45%,#1a1610,#07080c 70%)}
+.bio-mbg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,6,10,.92),rgba(5,6,10,.55) 42%,rgba(5,6,10,.15) 70%,rgba(5,6,10,.35))}
+.ch-bio.bio-mech .bio-strata-cv,.ch-bio.bio-mech .bio-strata-hov,.ch-bio.bio-mech .bio-strata-pins,.ch-bio.bio-bm .bio-strata-cv,.ch-bio.bio-bm .bio-strata-hov,.ch-bio.bio-bm .bio-strata-pins{display:none!important}
+.bio-jr{position:absolute;z-index:3;display:none;left:max(calc(var(--pad) + min(460px,36vw) + 70px),36vw);right:110px;top:96px;bottom:40px;overflow:auto;scrollbar-width:none}
+.ch-bio.bio-mech.bio-jr-on .bio-jr{display:block}
+.bio-jr-h{display:grid;gap:4px;margin:0 0 16px}
+.bio-jr-h span{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+.bio-jr-h i{font:italic 400 16px Forum,serif;color:#e8dcc0;opacity:.8}
+.bio-jr-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.bio-jr-c{background:rgba(236,224,198,.06);border:1px solid rgba(214,172,94,.22);border-radius:6px;padding:10px 10px 12px;display:grid;gap:6px;transform:rotate(var(--r,0deg))}
+.bio-jr-c:nth-child(3n+1){--r:-.6deg}.bio-jr-c:nth-child(3n+2){--r:.5deg}
+.bio-jr-ph{display:block;width:100%;aspect-ratio:4/3;border-radius:3px;background:#1a1610 center/cover no-repeat;filter:sepia(.55) contrast(1.05) brightness(.9);position:relative;border:1px solid rgba(255,240,210,.12);transition:filter .4s}
+.bio-jr-ph:hover{filter:none}
+.bio-jr-ph b{position:absolute;left:8px;top:6px;font:400 22px Forum,serif;color:#fff1d6;text-shadow:0 1px 6px #000}
+.bio-jr-c h5{margin:2px 0 0;font:400 18px/1.2 Forum,serif;color:#fff3dc}
+.bio-jr-c p{margin:0;font-size:12px;line-height:1.4;color:#cfc4ac}
+.bio-jr-c div{display:flex;gap:6px;flex-wrap:wrap}
+.bio-jr-c div button{font:500 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border:1px solid rgba(214,172,94,.35);border-radius:999px;color:#f0e2c4}
+.bio-jr-c div button:hover{background:rgba(214,172,94,.15)}
+@media (max-width:760px){.bio-jr{left:12px;right:12px;top:70px;bottom:auto;height:calc(42vh - 80px)}.bio-jr-g{grid-template-columns:repeat(2,1fr);gap:10px}.bio-jr-c h5{font-size:15px}.bio-jr-c p{display:none}}
 .izhint{position:fixed;left:50%;bottom:calc(40px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:28px;height:28px;opacity:.35;pointer-events:none;transition:opacity 3s;animation:izb 6s ease-in-out infinite;z-index:81;display:none;fill:none;stroke:#fff;stroke-width:1.2}
 .izhint.gone{opacity:0;animation:none}
 .izcur{position:fixed;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;pointer-events:none;z-index:83;display:none;opacity:0;transition:opacity .4s;will-change:transform}
@@ -3550,6 +3574,7 @@ function renderLevel(L){
   if (typeof BSC !== "undefined"){
     hdBody.querySelectorAll("button[data-bsctree]").forEach(bt => bt.onclick = () => BSC.setTol(!BSC.tol));
     hdBody.querySelectorAll("button[data-bscgo]").forEach(bt => bt.onclick = () => bt.dataset.bscgo === "strata" ? BSC.goStrata() : BSC.goHuman());
+    hdBody.querySelectorAll("button[data-bscm]").forEach(bt => bt.onclick = () => bscMech(bt.dataset.bscm));
     BSC.setTol(BSC.tol); BSC.co2();
   }
   const up = $("hdUp"), dn = $("hdDown");
@@ -3572,11 +3597,15 @@ $("hdDown").onclick = () => { if (solarOn() && SOLAR.sel >= 0) solarSelect(-1); 
 
 // слой «Биосфера» в фотореализме (bsc.js): дыхание леса, Древо жизни на кроне, развилка у корней
 const BSC_BRANCH = `<section class="hd-fork"><h3>Ответвление</h3><button data-tree="1" data-hover><b>Древо жизни</b><span>4 млрд лет родства: от LUCA через растения, грибы и животных — к человеку</span></button><button data-biob="1" data-hover><b>Биосфера — учебник жизни</b><span>Пласты камня: 20 эпох и больше 140 существ, механизмы эволюции, основы биологии и биомы Земли</span></button></section>`;
+function bscMech(x){ const [k, id] = x.split(":"), d = Math.round(Math.max(7, Math.min(10, depth))); closeHuman(); openBio(); BIO.mechAt(id, k, { t:"bsc", d }); }
 function bscPanel(v){
   let h = "";
   if (v.bsc === 0) h += `<section class="bsc-co2" id="bscCO2"><h3>Дыхание леса · сейчас</h3><div class="bsc-co2-bars"><span class="mono">фотосинтез</span><i><b class="bsc-co2-p"></b></i><span class="mono">дыхание</span><i><b class="bsc-co2-r"></b></i></div><p class="hd-par bsc-co2-t"></p><p class="mono hd-try">Двигайте «время суток» справа вверху</p></section>`
     + `<section class="hd-fork"><h3>Знание поверх материи</h3><button data-bsctree="1" aria-pressed="false" data-hover><b>Показать Древо жизни на кроне</b><span>Золотая схема родства на ветвях: бактерии, археи, эукариоты → растения, грибы, животные → человек (упрощено ◐)</span></button></section>`;
   if (v.bioFork) h += `<section class="hd-fork"><h3>Развилка пути</h3><button data-bscgo="strata" data-hover><b>Вниз по корню — в Эпохи</b><span>Почва темнеет до камня, зажигается фонарь геолога — и 20 пластов: 4,5 млрд лет истории жизни</span></button><button data-bscgo="human" data-hover><b>Хлорофилл → гем — к Человеку</b><span>Магний меняется на железо: молекула света становится молекулой крови. Дальше — станция «Человек»</span></button></section>`;
+  const HERE = [["mech:sex", "mech:symb", "basics:photo", "basics:cell"], ["mech:moth", "mech:coev", "mech:drift"], ["basics:pyr", "basics:cycle"], ["basics:cycle"]][v.bsc] || [];
+  if (HERE.length) h += `<section class="hd-fork"><h3>⚙ Опыты здесь · журнал натуралиста</h3>${HERE.map(x => { const [k, id] = x.split(":"), M = (k === "basics" ? BIO_BASICS : BIO_MECH).find(m => m.id === id);
+    return M ? `<button data-bscm="${x}" data-hover><b>${esc(M.nm)}</b><span>${esc(M.sub)}</span></button>` : ""; }).join("")}</section>`;
   if (v.bsc === 0 || v.bioFork) h += BSC_BRANCH;
   return h;
 }
