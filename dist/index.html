@@ -7837,17 +7837,31 @@ vec3 wMandala(vec2 p, float t){
   return col * (.55 + .3 * uBreath);
 }
 
+// Один мир на программу: шейдер собирается вариантами (WID — номер авторского мира, GEN — семейство
+// процедурного). Единый шейдер со всеми мирами, вызванными дважды, на D3D11 (ANGLE/FXC, Windows) компилировался
+// больше минуты — всё это время Изнанка была чёрной при живом звуке. Вариант — меньше секунды
 vec3 world(int id, vec2 p, float t){
-  if (id == 1) return wFrost(p, t);
-  if (id == 2) return wWaterlights(p, t);
-  if (id == 3) return wFlame(p, t);
-  if (id == 4) return wCorona(p, t);
-  if (id == 5) return wNebula(p, t);
-  if (id == 6) return wField(p, t);
-  if (id == 7) return wPrism(p, t);
-  if (id == 8) return wLight(p, t);
-  if (id == 9) return wMandala(p, t);
+#if WID == 1
+  return wFrost(p, t);
+#elif WID == 2
+  return wWaterlights(p, t);
+#elif WID == 3
+  return wFlame(p, t);
+#elif WID == 4
+  return wCorona(p, t);
+#elif WID == 5
+  return wNebula(p, t);
+#elif WID == 6
+  return wField(p, t);
+#elif WID == 7
+  return wPrism(p, t);
+#elif WID == 8
+  return wLight(p, t);
+#elif WID == 9
+  return wMandala(p, t);
+#else
   return vec3(0.);
+#endif
 }
 
 // ═══ Процедурные миры: органические/физические семейства (генерируются на JS-стороне, worlds/generator.js) ═══
@@ -7973,14 +7987,23 @@ vec3 gAurora(vec2 p, float t){
 }
 vec3 worldGen(vec2 p, float t){
   vec3 c = vec3(0.);
-  if (uFamily == 1) c = gGrowth(p, t);
-  else if (uFamily == 2) c = gFlow(p, t);
-  else if (uFamily == 3) c = gMembrane(p, t);
-  else if (uFamily == 4) c = gPulse(p, t);
-  else if (uFamily == 5) c = gWeb(p, t);
-  else if (uFamily == 6) c = gFoam(p, t);
-  else if (uFamily == 7) c = gRipple(p, t);
-  else if (uFamily == 8) c = gAurora(p, t);
+#if GEN == 1
+  c = gGrowth(p, t);
+#elif GEN == 2
+  c = gFlow(p, t);
+#elif GEN == 3
+  c = gMembrane(p, t);
+#elif GEN == 4
+  c = gPulse(p, t);
+#elif GEN == 5
+  c = gWeb(p, t);
+#elif GEN == 6
+  c = gFoam(p, t);
+#elif GEN == 7
+  c = gRipple(p, t);
+#elif GEN == 8
+  c = gAurora(p, t);
+#endif
   return c * (.55 + .25 * uBreath);
 }
 
@@ -7999,12 +8022,16 @@ void main(){
   bool needPl = uA == 0 || (uB == 0 && uMix > .001) || uFold > .001 || uMicro.w > 0.;
   vec3 pl = needPl ? plasma(p, uTime) : vec3(0.);
   vec2 pw = bend(p, uFold, uTime);
-  vec3 col = uMix < .999 ? (uA == 0 ? pl : (uGen == 1 ? worldGen(pw, uTimeA) : world(uA, pw, uTimeA))) : vec3(0.);
+  // активный мир кадра один (переход всегда идёт через Изнанку) — считаем его один раз
+  bool aw = uA != 0, bw = uB != 0;
+  vec3 W = vec3(0.);
+  if ((aw && uMix < .999) || (bw && uMix > .001)){ float tw = aw ? uTimeA : uTimeB; W = uGen == 1 ? worldGen(pw, tw) : world(aw ? uA : uB, pw, tw); }
+  vec3 col = uMix < .999 ? (aw ? W : pl) : vec3(0.);
   if (uMix > .001){
     // новая реальность проступает сквозь складки
     float n = fbm(p * 2.2 + uSeed * 7.) - .25 * dot(pl, vec3(.33));
     float m = smoothstep(n - .12, n + .12, uMix * 1.3 - .15);
-    vec3 cb = uB == 0 ? pl : (uGen == 1 ? worldGen(pw, uTimeB) : world(uB, pw, uTimeB));
+    vec3 cb = bw ? W : pl;
     col = mix(col, cb, uMix > .999 ? 1. : m);
   }
   // во время перехода плазма проходит сквозь любой мир
@@ -8024,6 +8051,13 @@ void main(){
   col = max(fin(col), prev * uTrail);
   outColor = vec4(clamp(col, 0., 6.), 1.);
 }`;
+
+// вариант сцены: hub — только Изнанка; w1…w9 — авторские миры; g1…g8 — семейства процедурных
+function sceneVariant(key) {
+  const wid = key[0] === 'w' ? +key.slice(1) : 0, gen = key[0] === 'g' ? +key.slice(1) : 0;
+  return SCENE.replace('#version 300 es\n', `#version 300 es\n#define WID ${wid}\n#define GEN ${gen}\n`);
+}
+const VARIANTS = ['w9', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
 
 const POST = COMMON + `
 uniform sampler2D uTex;
@@ -8085,28 +8119,43 @@ function createVisualEngine(canvas) {
   if (!gl) throw new Error('webgl2');
   const half = !!gl.getExtension('EXT_color_buffer_float');
   const parallel = gl.getExtension('KHR_parallel_shader_compile');
-  let scene = program(gl, SCENE), post = program(gl, POST);
-  let ready = false, broken = false;
-  // Если компиляция/линковка реально провалилась (не везде одинаковый драйвер/видеокарта —
-  // SwiftShader и настольный GPU проверяют шейдер не одинаково строго), не даём этому уронить
-  // весь кадр молча: раньше необработанное исключение здесь останавливало requestAnimationFrame
-  // навсегда — картинка пропадала (чёрный фон), а звук и остальная логика шли себе дальше,
-  // ничем не выдавая причину. Теперь ошибка попадает в консоль и рендер просто перестаёт
-  // пытаться — остальной цикл (ввод, звук, переходы) не ломается.
+  // Сцена — набор небольших программ-вариантов (Изнанка + один мир), а не одна огромная: см. shaders.js.
+  // Первой собирается чистая Изнанка (≈ 0,6 с даже на встроенной Intel под D3D11), остальные — в фоне по очереди.
+  let post, progs = {}, queue = [], broken = false;
+  function boot() {
+    post = program(gl, POST); progs = {}; broken = false;
+    progs.h = Object.assign(program(gl, sceneVariant('h')), { st: 0 });
+    queue = VARIANTS.slice();
+  }
+  boot();
+  // st: 0 — компилируется, 1 — готова, −1 — не собралась
+  function check(pr) {
+    if (pr.st) return pr.st;
+    if (parallel && !gl.getProgramParameter(pr.p, parallel.COMPLETION_STATUS_KHR)) return 0;
+    try { finalize(gl, pr); pr.st = 1; } catch (e) { console.error('[iznanka] shader variant failed:', e); pr.st = -1; }
+    return pr.st;
+  }
+  function want(key) {
+    if (!progs[key]) { progs[key] = Object.assign(program(gl, sceneVariant(key)), { st: 0 }); queue = queue.filter((k) => k !== key); }
+    return progs[key];
+  }
+  // фоновая сборка: по одной программе за раз и только с расширением параллельной компиляции —
+  // без него каждая сборка блокирует кадр, тогда варианты собираются лишь по требованию
+  function pump() {
+    if (!parallel || !queue.length) return;
+    for (const k in progs) if (!progs[k].st) return;
+    want(queue[0]);
+  }
+  let postOk = false;
   function pollReady() {
-    if (ready) return true;
     if (broken) return false;
-    // без расширения нет способа спросить драйвер «готово ли» без блокировки — тогда просто
-    // завершаем на первом кадре (уже не в обработчике клика, а в rAF — почти всегда меньше одного кадра)
-    const done = !parallel || (gl.getProgramParameter(scene.p, parallel.COMPLETION_STATUS_KHR) && gl.getProgramParameter(post.p, parallel.COMPLETION_STATUS_KHR));
-    if (!done) return false;
-    try {
-      finalize(gl, scene); finalize(gl, post); ready = true;
-    } catch (e) {
-      console.error('[iznanka] shader compile/link failed:', e);
-      broken = true;
+    if (!postOk) {
+      if (parallel && !gl.getProgramParameter(post.p, parallel.COMPLETION_STATUS_KHR)) return false;
+      try { finalize(gl, post); postOk = true; } catch (e) { console.error('[iznanka] shader compile/link failed:', e); broken = true; return false; }
     }
-    return ready;
+    const h = check(progs.h);
+    if (h < 0) broken = true;
+    return h === 1;
   }
   function initGeometry() {
     const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
@@ -8120,10 +8169,10 @@ function createVisualEngine(canvas) {
   // браузер сам уведомляет о восстановлении, и тогда пересоздаём программы, геометрию и буферы заново
   // (все GL-объекты из потерянного контекста недействительны, даже если сам `gl` — тот же JS-объект).
   let lost = false;
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); ready = false; broken = false; lost = true; console.warn('[iznanka] webgl context lost'); }, false);
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); postOk = false; broken = false; lost = true; console.warn('[iznanka] webgl context lost'); }, false);
   canvas.addEventListener('webglcontextrestored', () => {
     lost = false;
-    scene = program(gl, SCENE); post = program(gl, POST);
+    postOk = false; boot();
     initGeometry();
     w = 0; h = 0; targets = []; resize();
   }, false);
@@ -8173,6 +8222,11 @@ function createVisualEngine(canvas) {
     // пока шейдер ещё компилируется на драйвере — просто не рисуем кадр; канвас и так чёрный
     // (CSS-фон .izc), поэтому пауза читается как продолжение затемнения при входе, а не как зависание
     if (!pollReady()) return;
+    pump();
+    // какой мир в кадре: тот из A/B, что не Изнанка; пока его вариант собирается — показываем чистую Изнанку
+    const aw = u.uA !== 0, bw = u.uB !== 0, key = !aw && !bw ? 'h' : u.uGen ? 'g' + u.uFamily : 'w' + (aw ? u.uA : u.uB);
+    let scene = progs.h;
+    if (key !== 'h') { const pr = want(key); if (check(pr) === 1) scene = pr; else u = { ...u, uA: 0, uB: 0, uMix: 0 }; }
     adapt(dt);
     const src = targets[ping], dst = targets[1 - ping];
     gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fb); gl.viewport(0, 0, w, h);
@@ -8194,7 +8248,9 @@ function createVisualEngine(canvas) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
   function dispose() { removeEventListener('resize', resize); }
-  return { render, resize, reset, dispose, get lost() { return lost; }, get broken() { return broken; } };
+  // заранее собрать мир, в который вот-вот пойдём
+  function prefetch(key) { if (key && key !== 'h' && !lost) want(key); }
+  return { render, resize, reset, dispose, prefetch, get lost() { return lost; }, get broken() { return broken; } };
 }
 
 // «Изнанка» внутри Астролябии. Своё полотно WebGL2 поверх всей страницы и свой цикл кадров;

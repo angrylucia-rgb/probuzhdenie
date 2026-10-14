@@ -254,17 +254,31 @@ vec3 wMandala(vec2 p, float t){
   return col * (.55 + .3 * uBreath);
 }
 
+// Один мир на программу: шейдер собирается вариантами (WID — номер авторского мира, GEN — семейство
+// процедурного). Единый шейдер со всеми мирами, вызванными дважды, на D3D11 (ANGLE/FXC, Windows) компилировался
+// больше минуты — всё это время Изнанка была чёрной при живом звуке. Вариант — меньше секунды
 vec3 world(int id, vec2 p, float t){
-  if (id == 1) return wFrost(p, t);
-  if (id == 2) return wWaterlights(p, t);
-  if (id == 3) return wFlame(p, t);
-  if (id == 4) return wCorona(p, t);
-  if (id == 5) return wNebula(p, t);
-  if (id == 6) return wField(p, t);
-  if (id == 7) return wPrism(p, t);
-  if (id == 8) return wLight(p, t);
-  if (id == 9) return wMandala(p, t);
+#if WID == 1
+  return wFrost(p, t);
+#elif WID == 2
+  return wWaterlights(p, t);
+#elif WID == 3
+  return wFlame(p, t);
+#elif WID == 4
+  return wCorona(p, t);
+#elif WID == 5
+  return wNebula(p, t);
+#elif WID == 6
+  return wField(p, t);
+#elif WID == 7
+  return wPrism(p, t);
+#elif WID == 8
+  return wLight(p, t);
+#elif WID == 9
+  return wMandala(p, t);
+#else
   return vec3(0.);
+#endif
 }
 
 // ═══ Процедурные миры: органические/физические семейства (генерируются на JS-стороне, worlds/generator.js) ═══
@@ -390,14 +404,23 @@ vec3 gAurora(vec2 p, float t){
 }
 vec3 worldGen(vec2 p, float t){
   vec3 c = vec3(0.);
-  if (uFamily == 1) c = gGrowth(p, t);
-  else if (uFamily == 2) c = gFlow(p, t);
-  else if (uFamily == 3) c = gMembrane(p, t);
-  else if (uFamily == 4) c = gPulse(p, t);
-  else if (uFamily == 5) c = gWeb(p, t);
-  else if (uFamily == 6) c = gFoam(p, t);
-  else if (uFamily == 7) c = gRipple(p, t);
-  else if (uFamily == 8) c = gAurora(p, t);
+#if GEN == 1
+  c = gGrowth(p, t);
+#elif GEN == 2
+  c = gFlow(p, t);
+#elif GEN == 3
+  c = gMembrane(p, t);
+#elif GEN == 4
+  c = gPulse(p, t);
+#elif GEN == 5
+  c = gWeb(p, t);
+#elif GEN == 6
+  c = gFoam(p, t);
+#elif GEN == 7
+  c = gRipple(p, t);
+#elif GEN == 8
+  c = gAurora(p, t);
+#endif
   return c * (.55 + .25 * uBreath);
 }
 
@@ -416,12 +439,16 @@ void main(){
   bool needPl = uA == 0 || (uB == 0 && uMix > .001) || uFold > .001 || uMicro.w > 0.;
   vec3 pl = needPl ? plasma(p, uTime) : vec3(0.);
   vec2 pw = bend(p, uFold, uTime);
-  vec3 col = uMix < .999 ? (uA == 0 ? pl : (uGen == 1 ? worldGen(pw, uTimeA) : world(uA, pw, uTimeA))) : vec3(0.);
+  // активный мир кадра один (переход всегда идёт через Изнанку) — считаем его один раз
+  bool aw = uA != 0, bw = uB != 0;
+  vec3 W = vec3(0.);
+  if ((aw && uMix < .999) || (bw && uMix > .001)){ float tw = aw ? uTimeA : uTimeB; W = uGen == 1 ? worldGen(pw, tw) : world(aw ? uA : uB, pw, tw); }
+  vec3 col = uMix < .999 ? (aw ? W : pl) : vec3(0.);
   if (uMix > .001){
     // новая реальность проступает сквозь складки
     float n = fbm(p * 2.2 + uSeed * 7.) - .25 * dot(pl, vec3(.33));
     float m = smoothstep(n - .12, n + .12, uMix * 1.3 - .15);
-    vec3 cb = uB == 0 ? pl : (uGen == 1 ? worldGen(pw, uTimeB) : world(uB, pw, uTimeB));
+    vec3 cb = bw ? W : pl;
     col = mix(col, cb, uMix > .999 ? 1. : m);
   }
   // во время перехода плазма проходит сквозь любой мир
@@ -441,6 +468,13 @@ void main(){
   col = max(fin(col), prev * uTrail);
   outColor = vec4(clamp(col, 0., 6.), 1.);
 }`;
+
+// вариант сцены: hub — только Изнанка; w1…w9 — авторские миры; g1…g8 — семейства процедурных
+export function sceneVariant(key) {
+  const wid = key[0] === 'w' ? +key.slice(1) : 0, gen = key[0] === 'g' ? +key.slice(1) : 0;
+  return SCENE.replace('#version 300 es\n', `#version 300 es\n#define WID ${wid}\n#define GEN ${gen}\n`);
+}
+export const VARIANTS = ['w9', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
 
 export const POST = COMMON + `
 uniform sampler2D uTex;

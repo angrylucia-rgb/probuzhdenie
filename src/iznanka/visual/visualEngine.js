@@ -1,5 +1,5 @@
 // Рендер: сцена (миры + разрыв + долгая выдержка) в ping-pong буфер, затем оптика (свечение, линза) на экран.
-import { VERT, SCENE, POST } from './shaders.js';
+import { VERT, POST, sceneVariant, VARIANTS } from './shaders.js';
 
 // Компиляция/линковка запускаются сразу (это ставит задачу драйверу, само по себе не блокирует),
 // а проверка статуса и выборка uniform-локаций — только когда драйвер действительно готов (finalize).
@@ -29,28 +29,43 @@ export function createVisualEngine(canvas) {
   if (!gl) throw new Error('webgl2');
   const half = !!gl.getExtension('EXT_color_buffer_float');
   const parallel = gl.getExtension('KHR_parallel_shader_compile');
-  let scene = program(gl, SCENE), post = program(gl, POST);
-  let ready = false, broken = false;
-  // Если компиляция/линковка реально провалилась (не везде одинаковый драйвер/видеокарта —
-  // SwiftShader и настольный GPU проверяют шейдер не одинаково строго), не даём этому уронить
-  // весь кадр молча: раньше необработанное исключение здесь останавливало requestAnimationFrame
-  // навсегда — картинка пропадала (чёрный фон), а звук и остальная логика шли себе дальше,
-  // ничем не выдавая причину. Теперь ошибка попадает в консоль и рендер просто перестаёт
-  // пытаться — остальной цикл (ввод, звук, переходы) не ломается.
+  // Сцена — набор небольших программ-вариантов (Изнанка + один мир), а не одна огромная: см. shaders.js.
+  // Первой собирается чистая Изнанка (≈ 0,6 с даже на встроенной Intel под D3D11), остальные — в фоне по очереди.
+  let post, progs = {}, queue = [], broken = false;
+  function boot() {
+    post = program(gl, POST); progs = {}; broken = false;
+    progs.h = Object.assign(program(gl, sceneVariant('h')), { st: 0 });
+    queue = VARIANTS.slice();
+  }
+  boot();
+  // st: 0 — компилируется, 1 — готова, −1 — не собралась
+  function check(pr) {
+    if (pr.st) return pr.st;
+    if (parallel && !gl.getProgramParameter(pr.p, parallel.COMPLETION_STATUS_KHR)) return 0;
+    try { finalize(gl, pr); pr.st = 1; } catch (e) { console.error('[iznanka] shader variant failed:', e); pr.st = -1; }
+    return pr.st;
+  }
+  function want(key) {
+    if (!progs[key]) { progs[key] = Object.assign(program(gl, sceneVariant(key)), { st: 0 }); queue = queue.filter((k) => k !== key); }
+    return progs[key];
+  }
+  // фоновая сборка: по одной программе за раз и только с расширением параллельной компиляции —
+  // без него каждая сборка блокирует кадр, тогда варианты собираются лишь по требованию
+  function pump() {
+    if (!parallel || !queue.length) return;
+    for (const k in progs) if (!progs[k].st) return;
+    want(queue[0]);
+  }
+  let postOk = false;
   function pollReady() {
-    if (ready) return true;
     if (broken) return false;
-    // без расширения нет способа спросить драйвер «готово ли» без блокировки — тогда просто
-    // завершаем на первом кадре (уже не в обработчике клика, а в rAF — почти всегда меньше одного кадра)
-    const done = !parallel || (gl.getProgramParameter(scene.p, parallel.COMPLETION_STATUS_KHR) && gl.getProgramParameter(post.p, parallel.COMPLETION_STATUS_KHR));
-    if (!done) return false;
-    try {
-      finalize(gl, scene); finalize(gl, post); ready = true;
-    } catch (e) {
-      console.error('[iznanka] shader compile/link failed:', e);
-      broken = true;
+    if (!postOk) {
+      if (parallel && !gl.getProgramParameter(post.p, parallel.COMPLETION_STATUS_KHR)) return false;
+      try { finalize(gl, post); postOk = true; } catch (e) { console.error('[iznanka] shader compile/link failed:', e); broken = true; return false; }
     }
-    return ready;
+    const h = check(progs.h);
+    if (h < 0) broken = true;
+    return h === 1;
   }
   function initGeometry() {
     const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
@@ -64,10 +79,10 @@ export function createVisualEngine(canvas) {
   // браузер сам уведомляет о восстановлении, и тогда пересоздаём программы, геометрию и буферы заново
   // (все GL-объекты из потерянного контекста недействительны, даже если сам `gl` — тот же JS-объект).
   let lost = false;
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); ready = false; broken = false; lost = true; console.warn('[iznanka] webgl context lost'); }, false);
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); postOk = false; broken = false; lost = true; console.warn('[iznanka] webgl context lost'); }, false);
   canvas.addEventListener('webglcontextrestored', () => {
     lost = false;
-    scene = program(gl, SCENE); post = program(gl, POST);
+    postOk = false; boot();
     initGeometry();
     w = 0; h = 0; targets = []; resize();
   }, false);
@@ -117,6 +132,11 @@ export function createVisualEngine(canvas) {
     // пока шейдер ещё компилируется на драйвере — просто не рисуем кадр; канвас и так чёрный
     // (CSS-фон .izc), поэтому пауза читается как продолжение затемнения при входе, а не как зависание
     if (!pollReady()) return;
+    pump();
+    // какой мир в кадре: тот из A/B, что не Изнанка; пока его вариант собирается — показываем чистую Изнанку
+    const aw = u.uA !== 0, bw = u.uB !== 0, key = !aw && !bw ? 'h' : u.uGen ? 'g' + u.uFamily : 'w' + (aw ? u.uA : u.uB);
+    let scene = progs.h;
+    if (key !== 'h') { const pr = want(key); if (check(pr) === 1) scene = pr; else u = { ...u, uA: 0, uB: 0, uMix: 0 }; }
     adapt(dt);
     const src = targets[ping], dst = targets[1 - ping];
     gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fb); gl.viewport(0, 0, w, h);
@@ -138,5 +158,7 @@ export function createVisualEngine(canvas) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
   function dispose() { removeEventListener('resize', resize); }
-  return { render, resize, reset, dispose, get lost() { return lost; }, get broken() { return broken; } };
+  // заранее собрать мир, в который вот-вот пойдём
+  function prefetch(key) { if (key && key !== 'h' && !lost) want(key); }
+  return { render, resize, reset, dispose, prefetch, get lost() { return lost; }, get broken() { return broken; } };
 }
