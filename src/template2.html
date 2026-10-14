@@ -836,6 +836,15 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
 .izc{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:none;opacity:0;z-index:80;cursor:none;background:#000;touch-action:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .izhint{position:fixed;left:50%;bottom:calc(40px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:28px;height:28px;opacity:.35;pointer-events:none;transition:opacity 3s;animation:izb 6s ease-in-out infinite;z-index:81;display:none;fill:none;stroke:#fff;stroke-width:1.2}
 .izhint.gone{opacity:0;animation:none}
+.izcur{position:fixed;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;pointer-events:none;z-index:83;display:none;opacity:0;transition:opacity .4s;will-change:transform}
+.izcur svg{display:block;overflow:visible}
+.izcur circle{fill:none;stroke-linecap:round}
+.izcur .r0{stroke:rgba(255,255,255,.42);stroke-width:1}
+.izcur .r1{stroke:rgba(255,236,205,.95);stroke-width:1.6;transform:rotate(-90deg);transform-origin:20px 20px;filter:drop-shadow(0 0 3px rgba(255,220,170,.7))}
+.izcur .c{fill:rgba(255,245,230,.9);stroke:none}
+.izlab{position:fixed;left:0;top:0;pointer-events:none;z-index:83;display:none;opacity:0;white-space:nowrap;font:11px/1 var(--mono, monospace);letter-spacing:.14em;text-transform:lowercase;color:#fff;text-shadow:0 0 8px rgba(0,0,0,.9)}
+.izlab.tc{left:50%;top:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%)!important}
+@media (prefers-reduced-motion: reduce){.izcur{transition:none}}
 @keyframes izb{50%{opacity:.15}}
 .izexit{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:calc(14px + env(safe-area-inset-left,0px));width:40px;height:40px;display:none;align-items:center;justify-content:center;z-index:82;opacity:.32;background:transparent;border:0;padding:0;border-radius:50%;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .25s}
 .izexit:hover,.izexit:focus-visible{opacity:.8}
