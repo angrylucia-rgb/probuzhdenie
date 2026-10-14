@@ -40,7 +40,8 @@ const BSC = (() => {
   let rect = [0, 0, 1, 1], free = [0, 0, 1, 1], W = 1, H = 1, DPR = 1, lv = 0;
   let dive = null, tolOn = false, tolA = 0;
   let ov, sunEl, lab, dv;
-  const cb = { toStrata: () => { closeHuman(); openBio("now"); }, toHuman: () => { depthT = DMAX; lastDepthInput = performance.now(); } };
+  let fromRoots = false, riseWait = false;
+  const cb = { toStrata: () => { closeHuman(); openBio("now"); fromRoots = true; }, toHuman: () => { depthT = DMAX; lastDepthInput = performance.now(); } };
   const VS = "attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }";
   const FS = `#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -135,7 +136,7 @@ void main(){
     mob = matchMedia("(max-width: 760px), (pointer: coarse)").matches;
     const sfx = mob ? "_m" : "";
     const b0 = blank(); ["d", "s", "n", "m", "l", "a", "b"].forEach(k => T[k] = mkTex(b0, false));
-    Promise.all([load(BASE + "master" + sfx + ".webp"), load(BASE + "maps.webp")]).then(([d, m]) => { T.d = mkTex(d, false); T.s = T.d; T.n = T.d; T.m = mkTex(m, false); loaded = 1;
+    Promise.all([load(BASE + "master" + sfx + ".webp"), load(BASE + "maps.webp")]).then(([d, m]) => { T.d = mkTex(d, false); T.s = T.d; T.n = T.d; T.m = mkTex(m, false); loaded = 1; if (riseWait){ riseWait = false; A = 1; dark = 1; darkAim = 0; }
       return Promise.all([load(BASE + "sunset" + sfx + ".webp"), load(BASE + "night" + sfx + ".webp")]); })
       .then(([s, n]) => { T.s = mkTex(s, false); T.n = mkTex(n, false); loaded = 2; sunEl.classList.add("ok"); })
       .catch(e => console.warn("[bsc] load", e));
@@ -333,6 +334,9 @@ void main(){
     update, preload, cb, goStrata, goHuman, setTol, co2,
     get tol(){ return tolOn; },
     covers(){ return A > .995 && !failed; },
+    get fromRoots(){ return fromRoots; }, set fromRoots(v){ fromRoots = !!v; },
+    // подъём из пластов к корням: из темноты, обратным ходом спуска
+    rise(){ fromRoots = false; preload(); if (failed) return false; if (loaded){ A = 1; dark = 1; darkAim = 0; } else riseWait = true; vcS = -1; return true; },
     get active(){ return A > .02; },
     dbg: { sun: v => { sunAim = v; }, dive: (id, i) => { const h = HOT.find(x => x.id === id); if (h) openDive(h, i || 0); }, step, at: (x, y) => { px = x; py = y; over = true; lastMove = performance.now(); }, st: () => ({ A, loaded, lv, hot: hot && hot.id, dive: dive && { i: dive.i, t: dive.t, o: dive.o }, rect }) }
   };

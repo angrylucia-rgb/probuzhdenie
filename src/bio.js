@@ -544,7 +544,7 @@ void main(){
   }
   function hint(){
     const h = $("bioHint"); if (!h) return;
-    h.textContent = mechOn ? (MK === "basics" ? "Живая схема · переключайте в карточке" : "Живая модель · меняйте условия в карточке") : bmOn ? "Биом сегодня · наведите на существо — имя · нажмите — портрет" : cmp ? "Сравнение размера · линейка внизу" : cur < 0 ? "Листайте вниз — вглубь времени · или выберите пласт в колонне справа"
+    h.textContent = mechOn ? (MK === "basics" ? "Живая схема · переключайте в карточке" : "Живая модель · меняйте условия в карточке") : bmOn ? "Биом сегодня · наведите на существо — имя · нажмите — портрет" : cmp ? "Сравнение размера · линейка внизу" : cur < 0 ? "Листайте вниз — вглубь времени · вверх — к корням сейбы · или выберите пласт в колонне справа"
       : !BIO_ERAS[cur].ready ? "Пласт ещё не раскрыт — листайте дальше вниз"
       : life < .5 ? (ST ? (ST.hasFossil(NE - 1 - cur) ? "Курсор — фонарь · найдите окаменелость и нажмите на неё" : "Курсор — фонарь · ведите по стене") : "Окаменелости в породе… сейчас они оживут") : "Наведите на существо — имя · нажмите — портрет";
     const mb = $("bioMechB"), ab = $("bioBasB"), bb = $("bioBmB"), mm = mechOn && MK === "mech", ba = mechOn && MK === "basics";
@@ -1036,17 +1036,33 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   cvs.addEventListener("pointerleave", () => { ptr.in = false; hov = -1; cvs.style.cursor = ""; });
   cvs.addEventListener("pointerdown", e => { const r = cvs.getBoundingClientRect(); const q = pick(e.clientX - r.left, e.clientY - r.top); if (q >= 0) portrait(INST[q].k, q); });
   let wheelAt = 0;
-  cvs.addEventListener("wheel", e => { if (!open) return; e.preventDefault(); if (cmp || mechOn || bmOn) return; const now = performance.now(); if (now - wheelAt < 650 || Math.abs(e.deltaY) < 8) return; wheelAt = now;
-    if (e.deltaY > 0){ if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); } else if (cur >= 0) go(cur < NE - 1 ? cur + 1 : -1); }, { passive:false });
+  // вверх: с самого верха (введение или верхний пласт, если пришли от корней) — обратно к корням сейбы
+  function up(){
+    if (cur < 0 || (cur === NE - 1 && typeof BSC !== "undefined" && BSC.fromRoots)){ toRoots(); return; }
+    go(cur < NE - 1 ? cur + 1 : -1);
+  }
+  let rising = false;
+  function toRoots(){
+    if (rising || typeof BSC === "undefined" || typeof openJourney !== "function") return; rising = true; BSC.preload();
+    box.classList.add("bio-rise");
+    setTimeout(() => { close(); if (typeof closeBio === "function") closeBio(); setTimeout(() => box.classList.remove("bio-rise"), 1000);
+      let n = 0; const tryOpen = () => { openJourney("earth");
+        if (!(humanOpen && jId === "earth")){ if (++n < 20) setTimeout(tryOpen, 200); else rising = false; return; }
+        setBranch("bio", 10); depth = depthT = 10; lastDepthInput = performance.now(); BSC.rise(); rising = false; };
+      tryOpen(); }, 650);
+  }
+  box.addEventListener("wheel", e => { if (!open) return; if (e.target.closest && e.target.closest(".time-in, .bio-jr, .bio-col, button, input")) return; e.preventDefault(); if (cmp || mechOn || bmOn) return; const now = performance.now(); if (now - wheelAt < 650 || Math.abs(e.deltaY) < 8) return; wheelAt = now;
+    if (e.deltaY > 0){ if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); } else up(); }, { passive:false });
   let tY = null;
-  cvs.addEventListener("touchstart", e => { tY = e.touches[0].clientY; }, { passive:true });
-  cvs.addEventListener("touchend", e => { if (tY == null) return; const dy = tY - e.changedTouches[0].clientY; tY = null; if (Math.abs(dy) < 40 || cmp || mechOn || bmOn) return;
-    if (dy > 0){ if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); } else if (cur >= 0) go(cur < NE - 1 ? cur + 1 : -1); }, { passive:true });
+  const tOk = e => !(e.target.closest && e.target.closest(".time-in, .bio-jr, .bio-col, button, input"));
+  box.addEventListener("touchstart", e => { tY = tOk(e) ? e.touches[0].clientY : null; }, { passive:true });
+  box.addEventListener("touchend", e => { if (tY == null) return; const dy = tY - e.changedTouches[0].clientY; tY = null; if (Math.abs(dy) < 40 || cmp || mechOn || bmOn) return;
+    if (dy > 0){ if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); } else up(); }, { passive:true });
   addEventListener("keydown", e => { if (!open || (e.target && e.target.tagName === "INPUT")) return;
     if (e.key === "Escape"){ e.stopPropagation(); if (mechOn){ if (mi >= 0){ mi = -1; card(); } else mechOff(); } else if (view){ view = null; sel = -1; card(); } else if (bmOn) bmOff(); else if (gal.on) galOff(); else close(); }
     else if (cmp || mechOn || bmOn) return;
     else if (e.key === "ArrowDown" || e.key === "PageDown"){ e.preventDefault(); if (cur !== 0) go(cur < 0 ? NE - 1 : cur - 1); }
-    else if (e.key === "ArrowUp" || e.key === "PageUp"){ e.preventDefault(); if (cur >= 0) go(cur < NE - 1 ? cur + 1 : -1); } }, true);
+    else if (e.key === "ArrowUp" || e.key === "PageUp"){ e.preventDefault(); up(); } }, true);
   function size(){ DPR3 = Math.min(1.6, devicePixelRatio || 1); W3 = cvs.clientWidth; H3 = cvs.clientHeight;
     rend.setPixelRatio(DPR3); rend.setSize(W3, H3, false); lab.width = W3*DPR3; lab.height = H3*DPR3; cam.aspect = W3/Math.max(1, H3); cam.updateProjectionMatrix(); }
   function openB(target){
