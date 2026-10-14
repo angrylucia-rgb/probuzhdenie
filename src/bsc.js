@@ -20,7 +20,7 @@ const BSC = (() => {
     { id:"root", u:.60, v:.745, r:.05, lv:3, chain:[
       { img:"lens_root", t:"Кончик корня", s:"≈ 5 мм", tx:"Корневые волоски и тонкие белые нити грибов уходят в красную глину ●" },
       { img:"lens_myco", t:"Микориза внутри корня", s:"≈ 100 мкм", tx:"Окрашенный срез корня: внутри клеток — ветвистые арбускулы гриба, здесь дерево и гриб меняют сахар на фосфор. Круглые пузырьки — запасы гриба ●" } ] },
-    { id:"down", u:.53, v:.955, r:.05, lv:3, act:"strata", t:"Вниз по корню — в Эпохи" }
+    { id:"down", u:.53, v:.955, r:.05, lv:3, act:"strata", t:"Вниз в прошлое" }
   ];
   // золотая схема родства на ветвях кроны (u, v) — упрощено ◐
   const TOL = [
@@ -154,7 +154,7 @@ void main(){
     TOL.forEach((b, i) => { s += `<path d="M${b.p.map(q => X(q[0]) + " " + Y(q[1])).join(" L")}" pathLength="1" style="--i:${i}"/>`; if (b.l) s += `<text x="${X(b.at[0])}" y="${Y(b.at[1])}" text-anchor="${b.a}" style="--i:${i}">${b.l}</text>`; });
     s += `<circle class="bsc-tol-h" cx="${X(.56)}" cy="${Y(.035)}" r="6"/><text class="bsc-tol-hl" x="${X(.548)}" y="${Y(.031)}" text-anchor="end">Человек · 300 тыс. лет</text></g>`;
     HOT.forEach(h => { s += `<circle class="bsc-hs" data-h="${h.id}" cx="${X(h.u)}" cy="${Y(h.v)}" r="${(h.r*1000*.45).toFixed(1)}"/>`; });
-    s += `<text class="bsc-down" x="${X(.53)}" y="${Y(.93)}" text-anchor="middle">↓ вниз по корню — в Эпохи</text>`;
+    s += `<text class="bsc-down" x="${X(.53)}" y="${Y(.93)}" text-anchor="middle">↓ вниз в прошлое</text>`;
     ov.innerHTML = s;
     sunEl = document.createElement("div"); sunEl.className = "bsc-sun";
     sunEl.innerHTML = `<span class="mono">☀ время суток</span><input type="range" min="0" max="100" value="0" aria-label="Время суток: день, закат, ночь"><span class="mono bsc-sun-l"><i>день</i><i>закат</i><i>ночь</i></span>`;
@@ -262,7 +262,7 @@ void main(){
     const pxn = o.mx/W - .5, pyn = o.my/H - .5;
     x0 = xc - .515*Wi - (mob ? 0 : pxn*18); const y0 = yc - vcS*Hi - (mob ? 0 : pyn*10);
     rect = [x0, y0, Wi, Hi];
-    ov.style.width = Wi + "px"; ov.style.height = Hi + "px"; ov.style.transform = `translate(${x0.toFixed(1)}px,${y0.toFixed(1)}px)`;
+    ov.style.width = Wi + "px"; ov.style.height = Hi + "px"; ov.style.transform = `translate(${x0.toFixed(1)}px,${y0.toFixed(1)}px)`; ov.style.setProperty("--px", (1000/Wi).toFixed(4));
     tolA += ((tolOn && !dive ? 1 : 0) - tolA)*Math.min(1, dt*3);
     sun += (sunAim - sun)*Math.min(1, dt*2.2);
     spd *= Math.exp(-dt*1.6); sway = .35 + spd*1.8;
