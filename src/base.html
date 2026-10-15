@@ -5539,6 +5539,7 @@ function updatePortal(pi, k, q, T, speed){
 const mscene = new THREE.Scene();
 const mcam = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 0.05, 300);
 const MICRO = (() => {
+  let microIdle = false;   // микромир закрыт и уже скрыт — update() возвращается сразу
   const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
   const nrm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0]/l, v[1]/l, v[2]/l]; };
   const add = (a, b, k) => [a[0] + b[0]*k, a[1] + b[1]*k, a[2] + b[2]*k];
@@ -6198,6 +6199,8 @@ void main(){ vec3 n = normalize(vN); float fr = pow(1.0 - abs(n.z), 2.2); float 
       return NH.nid;
     },
     update(D, hE, T, px, py, portrait){
+      // микромир закрыт: один проход, чтобы всё скрыть, — и дальше ничего не считаем каждый кадр
+      const off = !(hE > 0); if (off && microIdle) return 0; microIdle = off;
       const M = hE*smooth(8.4, 8.62, D);
       bgM.uniforms.uA.value = M;
       const ti = clamp(D - 9, 0, 6), i0 = Math.floor(ti), i1 = Math.min(6, i0 + 1);
@@ -17932,6 +17935,9 @@ void main(){
     let last = performance.now();
     const draw = now => {
       if (!open || !document.body.contains(cv)){ gRaf = 0; return; }
+      // глобус ушёл из вида (карточку прокрутили, свернули или открыт опыт) — не рисуем, только ждём
+      const vr = cv.getBoundingClientRect();
+      if (vr.width === 0 || vr.bottom < 0 || vr.top > innerHeight || box.classList.contains("bio-hide")){ last = now; gRaf = requestAnimationFrame(draw); return; }
       const dt = Math.min(.1, (now - last)/1000); last = now; if (!gDrag) gRot += dt*.12;
       x.clearRect(0, 0, S, S);
       const g = x.createRadialGradient(c - R*.3, c - R*.35, R*.1, c, c, R); g.addColorStop(0, "rgba(40,70,110,.55)"); g.addColorStop(1, "rgba(8,14,30,.75)");
@@ -19551,10 +19557,12 @@ function loop(now){
   scene.visible = Mv < .995;
   const bscOn = humanOpen && jKind === "e" && earthBranch === "bio" && !tr && !zm;
   if (typeof BSC !== "undefined") BSC.update({ on: bscOn, d: dPos, dt, mx, my, portrait });
-  // полноэкранные главы со своей сценой (Биосфера, Календарь, Древо) целиком закрывают кольцо: после того как
-  // глава проявилась, кольцо под ней не рисуем — иначе видеокарта считает две сцены сразу и курсор с панорамой
-  // «тянутся». На закрытие флаг снимается сразу, и кольцо снова рисуется ещё до того, как глава погаснет
-  coverT = bioOn || timeOn || treeOn ? coverT + dt : 0;
+  // полноэкранные главы целиком закрывают кольцо (фон 93–98 % непрозрачности с размытием): после того как
+  // глава проявилась, кольцо под ней не рисуем — иначе видеокарта считает две сцены сразу, размытие фона
+  // пересчитывается каждый кадр, и курсор с панорамой «тянутся». На закрытие флаг снимается сразу, и кольцо
+  // снова рисуется ещё до того, как глава погаснет. Поиск полупрозрачный — под ним кольцо рисуется как обычно
+  coverT = bioOn || timeOn || treeOn || thoughtOn || dimsOn || compassOn || mineOn || pathOpen || refOpen || menuOpen
+    || chRoutes.classList.contains("open") ? coverT + dt : 0;
   if (typeof BSC !== "undefined" && BSC.covers()){}
   else if (coverT > .9){}
   else if (composer) composer.render(dt);
