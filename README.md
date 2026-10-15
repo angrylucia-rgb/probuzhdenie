@@ -30,6 +30,7 @@
 - `src/build3.py` — сборка из `base.html`: `astrolabia.html` (артефакт, three.js с CDN), `preview.html` (локальные `vendor/` и отладочные хуки),
   а с переменной окружения `DIST=../dist` — ещё и `dist/index.html`;
 - `src/head.txt` — точная шапка `dist/index.html`.
+- `src/data/bio.json` — силуэты существ и материки эпох «Биосферы» (с v128 — отдельным файлом, грузятся в простое или при входе в главу); сборка копирует его в `dist/data/`.
 
 ```bash
 cd src

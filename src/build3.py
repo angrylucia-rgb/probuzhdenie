@@ -19,3 +19,7 @@ if DIST:
     i = body.index('<style>')
     page = head + body[:i] + body[i:body.index('</style>')+8] + "\n</head>\n<body>\n" + body[body.index('</style>')+8:] + "\n</body>\n</html>\n"
     open(DIST + '/index.html','w').write(page)
+    # данные, вынесенные из страницы (силуэты и материки «Биосферы»), — рядом с index.html
+    import shutil
+    os.makedirs(DIST + '/data', exist_ok=True)
+    shutil.copy('data/bio.json', DIST + '/data/bio.json')
