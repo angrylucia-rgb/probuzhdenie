@@ -185,6 +185,12 @@ sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 .slit-row .btn{font-size:13px;padding:8px 14px}
 .slit-row .btn[aria-pressed="true"]{border-color:var(--brass);color:#FFD88A;background:rgba(214,172,94,.12)}
 .slit-n{color:var(--faint);margin:0}.slit-n b{color:var(--ink);font-weight:500}
+.sm-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.sm-c{display:grid;gap:2px;justify-items:center;padding:7px 2px;border:1px solid rgba(214,172,94,.22);border-radius:6px;background:rgba(10,12,24,.4);color:var(--ink);cursor:pointer;font:inherit;min-width:0}
+.sm-c b{font-family:Forum,Georgia,serif;font-size:17px;font-weight:400;line-height:1}.sm-c span{font-size:9.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.sm-c.sm-q b{color:#d6a8ff}.sm-c.sm-l b{color:#7ff5cf}.sm-c.sm-b b{color:#ffb98a}.sm-c.sm-h b{color:#ffd88a}
+.sm-c[aria-pressed="true"]{border-color:var(--brass);background:rgba(214,172,94,.14)}
+.sm-c:focus-visible{outline:1px solid var(--brass)}
 .hd-open{justify-self:start;color:var(--brass);border-bottom:1px solid var(--line);padding:6px 0;font-size:14px}
 .hd-grid,.brand,.acts .act,.vign,.grain,.shade,.foot,.gauge,.ch-human{transition:opacity .9s,visibility .9s,color .9s,background .9s}
 body.j-white .ch-human{background:transparent!important;border-color:transparent!important;pointer-events:none}
@@ -1302,7 +1308,8 @@ const LV_VOICE = {
   "human:7": { m:"s", h:"Сердце крупным планом", tx:"Около 60 ударов в минуту: «тук» — закрываются клапаны между предсердиями и желудочками, «тук» — клапаны аорты и лёгочной артерии." },
   "human:10": { m:"s", h:"Щелчки нейронов", tx:"Потенциалы действия, пропущенные через динамик, звучат щелчками и очередями — так нейрофизиологи со времён Хьюбела и Визела слушают отдельные клетки." },
   "g7:1": { m:"s", h:"Колебания воды", tx:"Три собственных колебания молекулы воды — 1595, 3657 и 3756 см⁻¹ (около 10¹⁴ Гц) — опущены примерно на 40 октав и звучат аккордом с настоящими отношениями." },
-  "g9:1": { m:"s", h:"Частицы падают на экран", tx:"Каждый щелчок — одна частица; высота тона — место попадания, выпавшее случайно, но по картине интерференции. Со временем слышно, что одни высоты повторяются чаще — это полосы." },
+  "g8:1": { m:"s", h:"Счётчик Гейгера", tx:"Каждый щелчок — один распад: моменты случайны, предсказать следующий нельзя, но в среднем их число постоянно. Так звучит радиоактивность в природе — например, калий-40 в граните или в нашем теле." },
+  "g9:2": { m:"s", h:"Частицы падают на экран", tx:"Каждый щелчок — одна частица; высота тона — место попадания, выпавшее случайно, но по картине интерференции. Со временем слышно, что одни высоты повторяются чаще — это полосы." },
   "dream:0": { m:"s", h:"Альфа уступает тете", tx:"Тон пульсирует то с частотой альфа-ритма (10 Гц), то тета-ритма (6 Гц) — так меняется ЭЭГ при засыпании." },
   "dream:1": { m:"t", h:"Всплески образов", tx:"Неровные тихие звоны — образ быстрого сна, когда мозг активен почти как днём, а тело неподвижно." },
   "dream:2": { m:"t", h:"Всплески образов", tx:"Неровные тихие звоны — образ быстрого сна, в котором вспыхнула ясность." },
@@ -4191,6 +4198,109 @@ function buildChladni(g){
     }
   };
 }
+// Станция IX трёхслойная: электронное облако (H, C, O, Fe) → ядро → нуклон. Каждый следующий слой
+// вырастает из центра предыдущего, как Атом вырос из ядра атома углерода в молекуле
+const ATOM_LV = [
+  { short:"Атом", kind:"orb", st:8, name:"Атом", sub:"Электронное облако · таблица Менделеева",
+    scale:"10⁻¹⁰ м", hint:"Выберите элемент — облако перестроится. Листайте — вглубь, к ядру",
+    lead:"Электрон в атоме не летает по орбите, как планета. Он размазан облаком вероятности — орбиталью, и у орбиталей есть форма: шар, гантель, четырёхлистник. Сколько у атома электронов и как они расселены по орбиталям, определяет всё, что атом умеет в химии. Сравните четыре элемента, из которых в основном и построены звёзды, Земля и вы сами.",
+    sci:[["s","Форму орбиталей дало уравнение Шрёдингера (1926). Облако на экране — карта вероятности: где точек гуще, там электрон обнаружится чаще"],
+         ["s","Принцип Паули (1925): на одной орбитали не больше двух электронов. Поэтому электроны заселяют оболочки слоями — 1s, 2s, 2p, 3s… — и свойства элементов повторяются периодами"],
+         ["s","Менделеев составил таблицу в 1869 году, ничего не зная об электронах, и оставил в ней пустые клетки. Предсказанные им галлий, скандий и германий нашли в 1875–1886 годах. Почему таблица периодична, объяснила только квантовая механика"],
+         ["s","У углерода четыре внешних электрона — значит, четыре связи. Поэтому он строит цепи и кольца, из которых сделана вся органическая химия"],
+         ["s","Орбитали атома водорода удалось увидеть напрямую: в 2013 году их сфотографировали «квантовым микроскопом» (Стодольна и коллеги)"],
+         ["t","Облака на экране стилизованы: лепестки орбиталей заострены, а внутренние оболочки раздвинуты — иначе у железа они слились бы в точку. Ядро настоящего атома в десятки тысяч раз меньше облака, здесь оно показано лишь искрой"]],
+    trad:["Левкипп и Демокрит — «атомос», неделимое: мир состоит из мельчайших частиц и пустоты",
+          "Вайшешика, мудрец Канада — параману: вечные неделимые частицы, сочетания которых складываются в вещи",
+          "Абхидхамма — калапы, мельчайшие узелки материи, которые возникают и исчезают быстрее мгновения",
+          "Честное пересечение: атом оказался делимым, но древние уловили главное — разнообразие мира рождается из немногих повторяющихся единиц"],
+    par:"Тело почти целиком собрано из четырёх элементов: кислород, углерод, водород и азот дают около 96 % его массы. А по числу атомов первенство у водорода — примерно шесть атомов из каждых десяти.",
+    prac:"Касание: положите ладонь на стол и почувствуйте твёрдость. Атомы ладони и стола в бытовом смысле не соприкасаются: их электронные облака отталкиваются. Твёрдость, которую вы чувствуете, — это поле." },
+  { short:"Ядро", kind:"nuc", st:8, name:"Ядро", sub:"Сильное взаимодействие · часы распада · звёздная кузница",
+    scale:"10⁻¹⁴ м", hint:"Переключайте: ядро, часы распада, звёздная кузница. Листайте — вглубь, в протон",
+    lead:"Больше 99,9 % массы атома собрано в крошечном ядре. Если атом раздуть до стадиона, ядро будет горошиной в центре поля. Протоны в ядре отталкиваются друг от друга, но их удерживает сильное взаимодействие — самое мощное в природе, хотя действует оно только на расстоянии размером с само ядро. В ядре спрятаны и часы, по которым датируют Землю, и топка, в которой звёзды куют элементы.",
+    sci:[["s","Ядро открыл Резерфорд в 1911 году: альфа-частицы, пущенные в тонкую золотую фольгу, изредка отскакивали назад. Значит, почти вся масса атома сжата в точку"],
+         ["s","Плотность ядерного вещества — около 2·10¹⁷ кг/м³: чайная ложка такого вещества весила бы порядка миллиарда тонн"],
+         ["s","Беккерель открыл радиоактивность в 1896 году, Мария и Пьер Кюри — полоний и радий в 1898-м. В 1902 году Резерфорд и Содди поняли: распадаясь, один элемент превращается в другой"],
+         ["s","Когда распадётся отдельное ядро, предсказать нельзя, но половина ядер распадается за строго определённое время — период полураспада. Радиоуглерод (≈5 700 лет) датирует кости и древесину до ~50 000 лет назад; уран-238 (4,47 млрд лет) — древнейшие кристаллы циркона, им 4,4 млрд лет"],
+         ["s","Звёзды — кузницы элементов. Слияние лёгких ядер выделяет энергию вплоть до железа и никеля: у них энергия связи на нуклон наибольшая. Солнце каждую секунду превращает в гелий около 600 млн тонн водорода"],
+         ["s","Ядра тяжелее железа рождаются захватом нейтронов — медленным в старых звёздах-гигантах и быстрым при слиянии нейтронных звёзд. Такое слияние впервые «услышали» по гравитационным волнам в 2017 году (GW170817) и увидели в его свете новорождённые тяжёлые элементы"],
+         ["t","Модель условная: нуклоны нарисованы шариками, хотя это размытые облака кварков и глюонов, а чёткой поверхности у ядра нет. В «часах» распады случайны, как в природе; кривая энергии связи построена по табличным значениям"]],
+    trad:["Бхагавад-гита (11:32) — Кришна в своём вселенском облике говорит: «Я — Время (кала), разрушитель миров». Эти строки вспомнил Роберт Оппенгеймер, глядя на первый ядерный взрыв в 1945 году (интервью 1965 года); в его передаче — «Я стал Смертью»",
+          "Шива-Натараджа — космический танец творения и разрушения. Статую Натараджи Индия подарила ЦЕРН в 2004 году, она стоит у зданий лаборатории",
+          "Гераклит — мир есть вечно живой огонь, мерами вспыхивающий и мерами угасающий",
+          "Алхимия мечтала превращать одни элементы в другие. В 1919 году Резерфорд впервые сделал это на опыте: превратил азот в кислород",
+          "Буддизм — аничча, непостоянство всего составного. Период полураспада — точная мера этого непостоянства"],
+    links:[["g4","Солнце — термоядерная топка"],["earth","Земля — пласты и древнейшие цирконы"]],
+    par:"В теле взрослого около 4 граммов железа — в основном в геме крови. Почти всё оно выковано в звёздах и при их взрывах задолго до рождения Солнца. И тело слегка радиоактивно: каждую секунду в нём распадается около 8 000 ядер калия-40 и углерода-14.",
+    prac:"Пульс звезды: положите пальцы на запястье. Кровь под ними красна от железа гема, а это железо родилось в звёздах, погибших до рождения Солнца. Отсчитайте десять ударов — десять толчков звёздного вещества." },
+  { short:"Нуклон", kind:"qrk", st:8, name:"Нуклон", sub:"Три кварка и море глюонов",
+    scale:"10⁻¹⁵ м", hint:"Нажмите «Потянуть кварк». Листайте — дальше, к квантам",
+    lead:"Протон — не шарик. Внутри три кварка, связанные полем глюонов, а вокруг них кипит «море» пар кварк — антикварк, которые рождаются и тут же исчезают. Кварки всё время обмениваются «цветом» — так физики назвали заряд сильного взаимодействия, — но вместе всегда дают бесцветное целое. Попробуйте вытащить один кварк.",
+    sci:[["s","Кварки предложили независимо Гелл-Манн и Цвейг в 1964 году; слово Гелл-Манн взял из «Поминок по Финнегану» Джойса. В 1968 году на ускорителе в Стэнфорде (SLAC) электроны, рассеянные на протонах, показали внутри них точечные частицы"],
+         ["s","Сами кварки дают около 1 % массы протона. Остальные 99 % — энергия их движения и глюонного поля: E = mc² в действии. В 2008 году это подтвердил расчёт на суперкомпьютерах (решёточная КХД)"],
+         ["s","Сила между кварками с расстоянием не слабеет: трубка поля тянет с силой порядка веса 15 тонн. Если тянуть дальше, энергии трубки хватает на новую пару кварк — антикварк, и вместо свободного кварка вылетает мезон. Это называют конфайнментом — «пленением» кварков"],
+         ["s","Вблизи друг друга кварки, наоборот, почти свободны — асимптотическая свобода (Гросс, Вильчек и Политцер, 1973; Нобелевская премия 2004 года)"],
+         ["s","Давление в центре протона — около 10³⁵ паскалей, выше, чем в нейтронной звезде (Буркерт и коллеги, 2018)"],
+         ["s","Протон, похоже, вечен: его распад ни разу не наблюдали, время жизни больше 10³⁴ лет. Свободный нейтрон живёт около 15 минут, а в ядре стабилен"],
+         ["t","Модель условная: «цвета» кварков — названия зарядов, а не цвета; кварки — не шарики, у трубки поля нет чёткой толщины, расстояния растянуты"]],
+    trad:["Дао дэ цзин (42) — Дао рождает одно, одно рождает два, два рождают три, а три рождают все вещи",
+          "Тримурти, христианская Троица — единое, которое проявляется в трёх ликах и не делится на части. Отзвук станции «Абсолют» и её Триединства",
+          "Джойс — «Три кварка для мистера Марка!»: из строки романа физика взяла имя для частиц, которые всегда держатся по трое",
+          "Адвайта — часть не существует сама по себе: вырвать её из целого нельзя, можно лишь получить новое целое. Кварк ведёт себя так же"],
+    links:[["abs","Абсолют — Триединство"]],
+    par:"Ваш вес почти целиком не «вещество», а энергия: около 99 % массы тела — это энергия кварков и глюонного поля внутри протонов и нейтронов.",
+    prac:"Связь, которая крепнет: разведите руки, будто растягиваете тугой жгут, и почувствуйте, как с расстоянием растёт усилие. Затем сведите ладони — и ощутите свободу вблизи. Так ведут себя кварки: рядом они свободны, порознь связаны сильнее всего." }
+];
+// Станция X: между волнами и опытом с двумя щелями — таблица Стандартной модели
+const SM_LV = { short:"17 частиц", kind:"sm", st:9, name:"Стандартная модель", sub:"17 элементарных частиц",
+  scale:"меньше 10⁻¹⁸ м", hint:"Выберите частицу — в таблице или в списке",
+  lead:"Всё, что встречалось на предыдущих станциях, — звёзды, клетки, атомы — собрано из горстки частиц. Их семнадцать: шесть кварков и шесть лептонов — частицы вещества, четыре переносчика сил и бозон Хиггса. Обычный мир построен из первого столбца таблицы.",
+  sci:[["s","Стандартная модель сложилась в 1960–70-х годах: электрослабая теория Глэшоу, Вайнберга и Салама и квантовая хромодинамика. Последнюю предсказанную ею частицу — бозон Хиггса — нашли в ЦЕРН 4 июля 2012 года"],
+       ["s","Это одна из самых точно проверенных теорий: магнитный момент электрона теория и опыт дают одинаково примерно до триллионной доли"],
+       ["s","Через каждый квадратный сантиметр вашего тела в секунду проходит около 65 миллиардов нейтрино от Солнца. Почти все пролетают Землю насквозь, не задев ни одного атома"],
+       ["s","Размер кварков и электрона не измерен: известно лишь, что они меньше 10⁻¹⁸ м, в тысячу с лишним раз меньше протона. В теории это точки"],
+       ["h","Модель неполна: в ней нет гравитации, тёмной материи и тёмной энергии, она не объясняет, почему поколений частиц ровно три и почему во Вселенной вещества больше, чем антивещества"],
+       ["t","На экране — схема: величина шара показывает массу частицы в логарифмическом масштабе, а не размер; цвета групп выбраны для наглядности. Античастицы не показаны"]],
+  trad:["Мюррей Гелл-Манн назвал свою классификацию частиц (1961) «восьмеричным путём» — в честь Благородного восьмеричного пути Будды",
+        "Платон, «Тимей» — у мира немного простых первоэлементов, а всё разнообразие рождается из их сочетаний и симметрий",
+        "Эмми Нётер (1918) — каждой симметрии мира соответствует свой закон сохранения: энергии, импульса, заряда. Древняя интуиция о гармонии мира в строгой математике",
+        "Закон Одного — у всего сотворённого один источник, а многообразие форм — его вибрации и искажения"],
+  par:"Тело собрано из трёх частиц первого поколения — u- и d-кварков и электронов, — которые держат вместе глюоны и фотоны. Остальные четырнадцать в обычной жизни почти не встречаются, хотя прямо сейчас сквозь вас летят нейтрино от Солнца и мюоны из верхних слоёв атмосферы.",
+  prac:"Прозрачность: минуту посидите неподвижно, помня, что сквозь ладонь каждую секунду пролетает примерно один мюон, а сквозь ноготь — десятки миллиардов нейтрино. Ничего не удерживать и ничему не сопротивляться — просто пропускать." };
+// элементы для слоя «Атом»: электронная конфигурация (n, l, число электронов, ориентация) и эффективные
+// заряды по правилам Слейтера — от них зависит, насколько плотно прижата к ядру каждая оболочка
+const ATOM_EL = {
+  H:{ nm:"Водород", Z:1, A:1, N:0, cfg:"1s¹", sh:[[1,0,1,1]],
+      tx:"Один протон и один электрон. Самый простой и самый распространённый элемент: около 74 % массы обычного вещества Вселенной" },
+  C:{ nm:"Углерод", Z:6, A:12, N:6, cfg:"1s² 2s² 2p²", sh:[[1,0,2,5.7],[2,0,2,3.25],[2,1,2,3.25]],
+      tx:"Четыре внешних электрона — четыре связи. Основа органической химии и всего живого" },
+  O:{ nm:"Кислород", Z:8, A:16, N:8, cfg:"1s² 2s² 2p⁴", sh:[[1,0,2,7.7],[2,0,2,4.55],[2,1,4,4.55]],
+      tx:"Жадно притягивает электроны. Дыхание — это передача электронов от пищи кислороду" },
+  Fe:{ nm:"Железо", Z:26, A:56, N:30, cfg:"[Ar] 3d⁶ 4s²", sh:[[1,0,2,25.4],[2,0,2,21.8],[2,1,6,21.8],[3,0,2,14.8],[3,1,6,14.8],[3,2,6,6.25],[4,0,2,3.75]],
+      tx:"Конец звёздной кузницы. В центре гема железо переносит кислород в крови" }
+};
+// Стандартная модель: символ, имя, масса, заряд, год открытия, заметка; g — группа (q, l, b, h)
+const SM_P = [
+  ["u","u-кварк (верхний)","≈2,2 МэВ","+2/3",1968,"q","Два u и один d — протон. Самый лёгкий кварк"],
+  ["c","c-кварк (очарованный)","≈1,27 ГэВ","+2/3",1974,"q","Открыт в ноябре 1974 года сразу двумя группами — «ноябрьская революция» физики"],
+  ["t","t-кварк (истинный)","≈173 ГэВ","+2/3",1995,"q","Самая тяжёлая известная частица — почти как атом вольфрама. Распадается раньше, чем успевает связаться с другими кварками"],
+  ["d","d-кварк (нижний)","≈4,7 МэВ","−1/3",1968,"q","Один u и два d — нейтрон"],
+  ["s","s-кварк (странный)","≈94 МэВ","−1/3",1968,"q","Частицы с ним нашли в космических лучах в 1947 году; «странными» их назвали за неожиданно долгую жизнь"],
+  ["b","b-кварк (прелестный)","≈4,18 ГэВ","−1/3",1977,"q","Распады частиц с b-кварком изучают, чтобы понять, почему вещества во Вселенной больше, чем антивещества"],
+  ["e","электрон","0,511 МэВ","−1",1897,"l","Открыт Томсоном. Электронные облака определяют всю химию"],
+  ["μ","мюон","≈106 МэВ","−1",1936,"l","Тяжёлый двойник электрона. Рождается в верхних слоях атмосферы; через ладонь пролетает примерно один мюон в секунду"],
+  ["τ","тау-лептон","≈1,78 ГэВ","−1",1975,"l","Самый тяжёлый лептон — примерно в 3 500 раз тяжелее электрона"],
+  ["νₑ","электронное нейтрино","< 0,45 эВ","0",1956,"l","Солнце рождает их в термоядерных реакциях: около 65 млрд в секунду через каждый квадратный сантиметр"],
+  ["ν_μ","мюонное нейтрино","крошечная","0",1962,"l","Нейтрино на лету меняют сорт — осцилляции. Отсюда следует, что у них есть масса (Нобелевская премия 2015 года)"],
+  ["ν_τ","тау-нейтрино","крошечная","0",2000,"l","Последний открытый лептон: на ускорителе Фермилаба удалось зарегистрировать всего несколько таких частиц"],
+  ["g","глюон","0","0",1979,"b","Переносчик сильного взаимодействия. Сам несёт «цвет», поэтому глюоны притягивают друг друга и запирают кварки"],
+  ["γ","фотон","0","0",1923,"b","Квант света, переносчик электромагнитного взаимодействия. Идея — Эйнштейн, 1905; доказательство — опыт Комптона, 1923"],
+  ["Z","Z-бозон","≈91,2 ГэВ","0",1983,"b","Переносчик слабого взаимодействия. Открыт в ЦЕРН вместе с W"],
+  ["W","W-бозон","≈80,4 ГэВ","±1",1983,"b","Слабое взаимодействие: превращает нейтрон в протон при бета-распаде и запускает первую реакцию синтеза в Солнце"],
+  ["H","бозон Хиггса","≈125 ГэВ","0",2012,"h","Поле Хиггса придаёт массу W, Z, кваркам и лептонам. Найден в ЦЕРН 4 июля 2012 года"]
+];
+let ATOM = null, SM_STATE = null;   // состояния опытов станций IX и X — панель управляет ими отсюда
 let SLIT = null;   // состояние опыта с двумя щелями (станция X), панель управляет им отсюда
 const BUILD = [
 // I · Абсолют
@@ -4767,21 +4877,314 @@ g => {
   upd7.zoomFocus = () => molFoc;
   return upd7;
 },
-// IX · Атом
+// IX · Атом. Три слоя (H.at: 0 → 1 → 2): электронное облако выбранного элемента → ядро → нуклон.
+// Каждый следующий слой вырастает из центра предыдущего: облако разлетается за кадр, а ядро растёт из
+// искры в центре; затем так же ядро расступается, и из центрального протона вырастает нуклон
 g => {
-  g.add(pts(70, (i,o) => { o.p = [gauss()*.2, gauss()*.2, gauss()*.2]; o.c = i % 2 ? C(0xff7a5c) : C(0xf1e6cf); o.s = 3.2; },
-    `p += aRnd*0.02*sin(uTime*8.0 + aSeed*30.0); a = 0.95;`));
-  const cols = [C(0x70d8ff), C(0x5ff0bf), C(0x7f96ff), C(0xbf8cff)];
-  const e = () => -Math.log(Math.random() || 1e-6);
-  g.add(pts(9000*Q, (i,o) => { const k = i % 4; let d;
-      if (k === 0){ d = dir(); const r = (e()+e()+e())*.55; o.p = d.map(v => v*r); }
-      else { do { d = dir(); } while (Math.random() > d[k-1]*d[k-1]); const r = Math.min(5, (e()+e()+e()+e()+e())*.5); o.p = d.map(v => v*r); }
-      o.c = cols[k]; o.s = 1.0 + Math.random()*.9; },
-    `a = 0.3 + 0.7*step(0.7, fract(aSeed*17.0 + uTime*0.6));`));
-  g.add(glow(0xffc08a, 1.8, .9));
-  return t => { g.rotation.y = t*.12; g.rotation.x = .35 + Math.sin(t*.2)*.1; };
+  const S = { el:"C", mode:"nuc", mk:{ nuc:1, clock:0, forge:0 }, iso:0, ck:-1, ckT:0, n0:0, pr:true, pull:-1, pulls:0, mesons:0, onTick:null };
+  const lt0 = { v:0 };
+  // ================= слой 0: орбитали =================
+  const L0 = new THREE.Group(); g.add(L0);
+  const NO = Math.round(9000*Q);
+  // радиальная часть водородоподобной орбитали (n, l) с эффективным зарядом Z: r²·R²
+  const lag = (k, a, x) => { if (k === 0) return 1; let l0 = 1, l1 = 1 + a - x; for (let j = 1; j < k; j++){ const l2 = ((2*j + 1 + a - x)*l1 - (j + a)*l0)/(j + 1); l0 = l1; l1 = l2; } return l1; };
+  const rad = (n, l, Z, r) => { const rho = 2*Z*r/n, R = Math.pow(rho, l)*Math.exp(-rho/2)*lag(n - l - 1, 2*l + 1, rho); return r*r*R*R; };
+  const meanR = (n, l, Z) => (3*n*n - l*(l + 1))/(2*Z);
+  // угловые части: s — шар, p — гантели вдоль осей, d — лепестки
+  const ANG = { s:[() => 1], p:[d => d[0]*d[0], d => d[1]*d[1], d => d[2]*d[2]],
+    d:[d => 4*d[0]*d[0]*d[1]*d[1], d => 4*d[0]*d[0]*d[2]*d[2], d => 4*d[1]*d[1]*d[2]*d[2], d => Math.pow(d[0]*d[0] - d[1]*d[1], 2), d => Math.pow((3*d[1]*d[1] - 1)/2, 2)] };
+  const OCOL = { s:[C(0x70d8ff)], p:[C(0x5ff0bf), C(0x7f96ff), C(0xbf8cff)], d:[C(0xff9a3c), C(0xff5f9e), C(0xffc23c), C(0xff7a4c), C(0xe07cff)] };
+  // как электроны расселяются по орбиталям подоболочки (правило Хунда): сначала по одному, потом парами
+  const occ = (m, ne) => { const o = new Array(m).fill(0); for (let k = 0; k < ne; k++) o[k < m ? k : k - m]++; return o; };
+  function sampleEl(key){
+    const E = ATOM_EL[key], last = E.sh[E.sh.length - 1], rRef = meanR(last[0], last[1], last[3]);
+    const P = new Float32Array(NO*3), CO = new Float32Array(NO*3), SZ = new Float32Array(NO);
+    // внутренним оболочкам — меньше точек на электрон: иначе центр слепнет и не видно формы внешних
+    const wt = x => x[2]*(x[0] === last[0] ? 1 : x[1] === 2 ? .6 : .2), tot = E.sh.reduce((s, x) => s + wt(x), 0);
+    let i = 0;
+    E.sh.forEach((sh, si) => {
+      const [n, l, ne, Z] = sh, kind = "spd"[l], m = 2*l + 1, oc = occ(m, ne);
+      const cnt = si === E.sh.length - 1 ? NO - i : Math.round(NO*wt(sh)/tot);
+      const mr = meanR(n, l, Z), rmax = mr*3.2 + 2/Z;
+      let pm = 0; for (let k = 1; k <= 240; k++) pm = Math.max(pm, rad(n, l, Z, rmax*k/240)); pm *= 1.12;
+      const inner = n < last[0] && l < 2 ? 1 : 0;
+      for (let c = 0; c < cnt && i < NO; c++, i++){
+        let r; do { r = Math.random()*rmax; } while (Math.random()*pm > rad(n, l, Z, r));
+        let w = Math.random()*ne, ob = 0; while (w >= oc[ob]){ w -= oc[ob]; ob++; }
+        // лепестки заострены (угловая плотность в степени 2,2), а разброс по радиусу у p и d сжат:
+        // это стилизация — у настоящих орбиталей края размыты, и формы сливались бы в общий шар
+        let d; do { d = dir(); } while (Math.random() > (l ? Math.pow(ANG[kind][ob](d), 2.2) : 1));
+        if (l) r = Math.max(.02*mr, mr + (r - mr)*.55);
+        const rd = 3.2*Math.pow(r/rRef, .5);
+        P[i*3] = d[0]*rd; P[i*3 + 1] = d[1]*rd; P[i*3 + 2] = d[2]*rd;
+        // ближе к центру точки гуще — там они тусклее, чтобы плотные оболочки не слепли в белое
+        const cc = mixc(OCOL[kind][ob], CREAM, inner*.35), dim = .3 + .7*Math.min(1, Math.pow(rd/2.4, 1.3));
+        CO.set(cc.map(v => v*dim), i*3);
+        SZ[i] = (.9 + Math.random()*.8)*(.4 + .6*Math.min(1, rd/1.8));
+      }
+    });
+    return { P, CO, SZ };
+  }
+  const orb = pts(NO, (i,o) => { o.s = 1; },
+    `vec3 q0 = mix(aFrom, position, uMix);
+     p = q0 + aRnd*0.012*sin(uTime*3.0 + aSeed*40.0);
+     col = mix(aCFrom, aColor, uMix);
+     a = (0.13 + 0.5*step(0.75, fract(aSeed*17.0 + uTime*0.6)))*uSharp;`, .9,
+    `attribute vec3 aFrom; attribute vec3 aCFrom; uniform float uMix;`);
+  orb.material.uniforms.uMix = { value:1 };
+  const oG = orb.geometry;
+  oG.setAttribute("aFrom", new THREE.BufferAttribute(new Float32Array(NO*3), 3));
+  oG.setAttribute("aCFrom", new THREE.BufferAttribute(new Float32Array(NO*3), 3));
+  L0.add(orb);
+  let mixT = 1;
+  function setOrb(key, instant){
+    const s = sampleEl(key), pa = oG.attributes.position, ca = oG.attributes.aColor, fa = oG.attributes.aFrom, cf = oG.attributes.aCFrom;
+    const u = orb.material.uniforms.uMix.value;
+    // откуда морфим: текущее видимое положение (смесь прежних «откуда» и «куда»)
+    for (let k = 0; k < NO*3; k++){ fa.array[k] = fa.array[k] + (pa.array[k] - fa.array[k])*u; cf.array[k] = cf.array[k] + (ca.array[k] - cf.array[k])*u; }
+    pa.array.set(s.P); ca.array.set(s.CO); oG.attributes.aSize.array.set(s.SZ);
+    if (instant){ fa.array.set(s.P); cf.array.set(s.CO); }
+    for (const a of [pa, ca, fa, cf, oG.attributes.aSize]) a.needsUpdate = true;
+    orb.material.uniforms.uMix.value = instant ? 1 : 0; mixT = instant ? 1 : 0;
+  }
+
+  // ================= слой 1: ядро =================
+  const L1 = new THREE.Group(); g.add(L1);
+  const NUC = new THREE.Group(); L1.add(NUC);
+  const AMAX = 56, NPB = Math.round(64*Math.sqrt(Q)) || 40;
+  // укладка нуклонов: случайно в шаре, затем расталкивание до касания. Нуклон 0 — протон в центре:
+  // в него ныряем на следующем слое
+  function pack(A, Z){
+    const p = [[0, 0, 0]], R = .62*Math.cbrt(A);
+    for (let j = 1; j < A; j++){ const d = dir(), r = R*Math.cbrt(Math.random()); p.push(d.map(v => v*r)); }
+    for (let it = 0; it < 80; it++){
+      for (let a = 0; a < A; a++) for (let b = a + 1; b < A; b++){
+        const dx = p[b][0] - p[a][0], dy = p[b][1] - p[a][1], dz = p[b][2] - p[a][2], dd = Math.hypot(dx, dy, dz) || 1e-3;
+        if (dd < 1){ const f = (1 - dd)*.5/dd; if (a) { p[a][0] -= dx*f; p[a][1] -= dy*f; p[a][2] -= dz*f; } p[b][0] += dx*f; p[b][1] += dy*f; p[b][2] += dz*f; }
+      }
+      for (let a = 1; a < A; a++){ const r = Math.hypot(...p[a]); if (r > R){ const k = .9 + .1*R/r; p[a] = p[a].map(v => v*k); } }
+    }
+    const pr = new Array(A).fill(false); pr[0] = true;
+    const idx = Array.from({length:A - 1}, (_, k) => k + 1).sort(() => Math.random() - .5);
+    for (let k = 0; k < Z - 1; k++) pr[idx[k]] = true;
+    return { p, pr };
+  }
+  const PK = {}; for (const k in ATOM_EL) PK[k] = pack(ATOM_EL[k].A, ATOM_EL[k].Z);
+  const PCOL = C(0xff6a4c), NCOL = C(0x8fb4ff);
+  const nucl = pts(AMAX*NPB, (i,o) => { o.s = 0; o.rnd = [gauss()*.21, gauss()*.21, gauss()*.21]; },
+    `p += aRnd + aRnd*0.25*sin(uTime*6.0 + aSeed*30.0);
+     a = (0.16 + 0.16*fract(aSeed*7.0 + uTime*0.4))*uSharp;`, 1);
+  // обмен сильного взаимодействия между соседями: золотые искры бегут от нуклона к нуклону
+  const NX = Math.round(320*Q);
+  const xch = pts(NX, (i,o) => { o.s = 0; o.c = C(0xffd27a); },
+    `float f = fract(uTime*0.8 + aSeed);
+     p = mix(position, aB, f);
+     a = sin(f*3.14159)*0.6*uSharp;`, 1, `attribute vec3 aB;`);
+  xch.geometry.setAttribute("aB", new THREE.BufferAttribute(new Float32Array(NX*3), 3));
+  const nGlow = glow(0xffc08a, 2.4, .5);
+  NUC.add(nGlow, nucl, xch);
+  function setNuc(key){
+    const E = ATOM_EL[key], pk = PK[key], pa = nucl.geometry.attributes.position, ca = nucl.geometry.attributes.aColor, sa = nucl.geometry.attributes.aSize;
+    for (let j = 0; j < AMAX; j++) for (let k = 0; k < NPB; k++){
+      const i = j*NPB + k, on = j < E.A;
+      if (on){ pa.array.set(pk.p[j], i*3); ca.array.set(pk.pr[j] ? PCOL : NCOL, i*3); }
+      sa.array[i] = on ? (k < 3 ? 2.2 : .8 + Math.random()*.7) : 0;
+    }
+    pa.needsUpdate = ca.needsUpdate = sa.needsUpdate = true;
+    const xp = xch.geometry.attributes.position, xb = xch.geometry.attributes.aB, xs = xch.geometry.attributes.aSize;
+    const pairs = [];
+    for (let a = 0; a < E.A; a++) for (let b = a + 1; b < E.A; b++) if (Math.hypot(pk.p[a][0] - pk.p[b][0], pk.p[a][1] - pk.p[b][1], pk.p[a][2] - pk.p[b][2]) < 1.35) pairs.push([a, b]);
+    for (let i = 0; i < NX; i++){
+      const pr = pairs.length ? pairs[i % pairs.length] : null;
+      xs.array[i] = pr ? 1.5 : 0;
+      if (pr){ const f = Math.random() < .5; xp.array.set(pk.p[f ? pr[0] : pr[1]], i*3); xb.array.set(pk.p[f ? pr[1] : pr[0]], i*3); }
+    }
+    xp.needsUpdate = xb.needsUpdate = xs.needsUpdate = true;
+    nGlow.scale.setScalar(1.6 + 1.1*Math.cbrt(E.A));
+  }
+
+  // ---- часы распада: решётка ядер, каждое распадается в свой случайный момент ----
+  const CLK = new THREE.Group(); CLK.visible = false; L1.add(CLK);
+  const CW = 24, CH = 16, NCK = CW*CH, ISO = S.ISO = [
+    { nm:"Углерод-14", r:"¹⁴C → ¹⁴N", T:5730, u:"лет", use:"радиоуглерод: кости, древесина, ткани — до ~50 000 лет", c0:0xf1e6cf, c1:0x7f96ff },
+    { nm:"Калий-40", r:"⁴⁰K → ⁴⁰Ar, ⁴⁰Ca", T:1.25e9, u:"лет", use:"калий-аргоновый метод: вулканические породы; он же главный источник радиоактивности тела", c0:0xffd27a, c1:0x5ff0bf },
+    { nm:"Уран-238", r:"²³⁸U → … → ²⁰⁶Pb", T:4.468e9, u:"лет", use:"уран-свинцовый метод: цирконы, древнейшие минералы Земли и метеориты", c0:0x9dff8a, c1:0xa9a7bd } ];
+  const dT = new Float32Array(NCK);
+  const ck = pts(NCK, (i,o) => { const a = i % CW, b = Math.floor(i/CW); o.p = [(a - (CW - 1)/2)*.28, .55 + (b - (CH - 1)/2)*.28 + 1.0, 0]; o.s = 1.9; },
+    `float dec = step(aRnd.x, uProg);
+     float fl = dec*exp(-(uProg - aRnd.x)*9.0);
+     col = mix(uC0, uC1, dec);
+     col = mix(col, vec3(1.0), fl);
+     s *= 1.0 + 2.2*fl - 0.3*dec;
+     a = (0.42 - 0.22*dec + 1.0*fl)*uSharp;`, 1, `uniform vec3 uC0; uniform vec3 uC1;`);
+  ck.material.uniforms.uC0 = { value:new THREE.Color(0xf1e6cf) }; ck.material.uniforms.uC1 = { value:new THREE.Color(0x7f96ff) };
+  // кривая: какая доля ядер должна остаться через t периодов — 2^(−t)
+  const CXW = 6.4, CY0 = -3.1, CYH = 2.2, TMAX = 5;
+  const curve = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({length:121}, (_, k) => { const tt = TMAX*k/120; return new THREE.Vector3(-CXW/2 + CXW*tt/TMAX, CY0 + CYH*Math.pow(2, -tt), 0); })), lineMat(0xD6AC5E, .8));
+  const axes = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-CXW/2, CY0, 0), new THREE.Vector3(CXW/2, CY0, 0), new THREE.Vector3(-CXW/2, CY0, 0), new THREE.Vector3(-CXW/2, CY0 + CYH + .2, 0),
+    ...[1, 2, 3, 4].flatMap(k => [new THREE.Vector3(-CXW/2 + CXW*k/TMAX, CY0, 0), new THREE.Vector3(-CXW/2 + CXW*k/TMAX, CY0 - .12, 0)])]), lineMat(0xA9A7BD, .4));
+  const cMark = glow(0xffe2a0, .55, 1), cReal = glow(0x9fd8ff, .45, 1);
+  const cLbl = haloLabel("доля нераспавшихся ядер", .5, "#D6AC5E"); cLbl.position.set(-CXW/2 + 2.1, CY0 + CYH + .45, 0);
+  const tLbl = haloLabel("периоды полураспада: 1 · 2 · 3 · 4", .44, "#A9A7BD"); tLbl.position.set(.4, CY0 - .5, 0);
+  CLK.add(ck, curve, axes, cMark, cReal, cLbl, tLbl);
+  for (const o of [curve, axes, cMark, cReal]) o.userData.self = true;
+  S.setIso = k => { S.iso = k; const I = ISO[k]; ck.material.uniforms.uC0.value.set(I.c0); ck.material.uniforms.uC1.value.set(I.c1); S.restart(); };
+  S.restart = () => { for (let i = 0; i < NCK; i++) ck.geometry.attributes.aRnd.array[i*3] = -Math.log(1 - Math.random())/Math.LN2;
+    ck.geometry.attributes.aRnd.needsUpdate = true; for (let i = 0; i < NCK; i++) dT[i] = ck.geometry.attributes.aRnd.array[i*3]; S.ckT = 0; S.ck = lt0.v; };
+  S.left = () => { let n = 0; for (let i = 0; i < NCK; i++) if (dT[i] > S.ckT) n++; return n; };
+  S.NCK = NCK;
+
+  // ---- звёздная кузница: энергия связи на нуклон по табличным значениям (МэВ) ----
+  const FRG = new THREE.Group(); FRG.visible = false; L1.add(FRG);
+  const BE = [[1,0],[2,1.112],[3,2.573],[4,7.074],[6,5.332],[7,5.606],[9,6.463],[11,6.928],[12,7.680],[14,7.476],[16,7.976],[20,8.032],[24,8.261],[28,8.448],[32,8.493],[40,8.551],[48,8.666],[56,8.790],[62,8.795],[84,8.717],[120,8.505],[138,8.393],[180,8.025],[208,7.868],[238,7.570]];
+  const FX = A => -3.4 + 6.8*Math.log(A)/Math.log(240), FY = b => -2.4 + 4.6*b/9;
+  const beAt = A => { for (let k = 1; k < BE.length; k++) if (A <= BE[k][0]){ const [a0, b0] = BE[k - 1], [a1, b1] = BE[k], u = (Math.log(A) - Math.log(a0))/(Math.log(a1) - Math.log(a0)); return b0 + (b1 - b0)*u; } return BE[BE.length - 1][1]; };
+  const NF = Math.round(900*Q);
+  const fcurve = pts(NF, (i,o) => { const A = Math.exp(Math.log(240)*Math.pow(i/(NF - 1), 1)); const b = beAt(Math.max(1, A));
+      o.p = [FX(Math.max(1, A)) + rn()*.02, FY(b) + rn()*.03, rn()*.05]; o.c = mixc(C(0x7f96ff), C(0xffd27a), Math.min(1, b/8.8)); o.s = 1.3; },
+    `a = (0.45 + 0.35*sin(uTime*2.0 + aSeed*30.0))*uSharp;`);
+  const fAx = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-3.4, -2.4, 0), new THREE.Vector3(3.5, -2.4, 0), new THREE.Vector3(-3.4, -2.4, 0), new THREE.Vector3(-3.4, 2.5, 0)]), lineMat(0xA9A7BD, .4));
+  fAx.userData.self = true;
+  const FM = [[1,"¹H"],[4,"⁴He"],[12,"¹²C"],[16,"¹⁶O"],[56,"⁵⁶Fe"],[238,"²³⁸U"]].map(([A, s]) => { const l = haloLabel(s, .66); l.position.set(FX(A) + (A === 1 ? .35 : 0), FY(beAt(A)) + (A === 1 ? .1 : .5), 0); const gl = glow(A === 56 ? 0xffc35a : 0xfff1d0, A === 56 ? .9 : .5, 1); gl.position.set(FX(A), FY(beAt(A)), 0); gl.userData.self = true; return [l, gl]; });
+  const fLb = [["синтез в звёздах →", -1.4, -1.5], ["← деление", 2.5, 1.0], ["энергия связи на нуклон", -1.6, 2.95]].map(([s, x, y]) => { const l = haloLabel(s, .48, "#A9A7BD"); l.position.set(x, y, 0); return l; });
+  // искры: синтез поднимается по кривой к железу, деление скатывается к нему же справа
+  const NSP = 36, spP = new Float32Array(NSP*3), spU = Array.from({length:NSP}, Math.random);
+  const sparks = pts(NSP, (i,o) => { o.c = i < NSP*.7 ? C(0xfff1d0) : C(0xff9c7a); o.s = 3.2; }, `a = uSharp;`);
+  sparks.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
+  FRG.add(fcurve, fAx, sparks, ...FM.flat(), ...fLb);
+
+  // ================= слой 2: нуклон =================
+  const L2 = new THREE.Group(); g.add(L2);
+  const QC = [new THREE.Color(0xff5a5a), new THREE.Color(0x5aff8a), new THREE.Color(0x5a8aff)];
+  const qBall = (n, sg) => { const p = pts(n, (i,o) => { o.rnd = [gauss()*sg, gauss()*sg, gauss()*sg]; o.s = i < 4 ? 2.4 : .9 + Math.random()*.8; },
+      `p = aRnd*(1.0 + 0.25*sin(uTime*9.0 + aSeed*20.0)); col = mix(uQC, vec3(1.0), 0.3*step(0.96, aSeed)); a = (0.1 + 0.14*fract(aSeed*11.0 + uTime*0.9))*uSharp;`, 1, `uniform vec3 uQC;`);
+    p.material.uniforms.uQC = { value:new THREE.Color(1, 1, 1) }; return p; };
+  const qs = [0, 1, 2].map(() => qBall(Math.round(280*Math.sqrt(Q)), .17));
+  const mA = qBall(150, .13), mB = qBall(150, .13);
+  // трубки поля: от общей точки-узла к каждому кварку (Y-образная конфигурация)
+  const NT = Math.round(260*Math.sqrt(Q));
+  const tube = () => { const p = pts(NT, (i,o) => { o.rnd = [Math.random(), gauss()*.5, gauss()*.5]; o.c = mixc(GOLD, CREAM, Math.random()*.6); o.s = .9 + Math.random()*.9; },
+      `vec3 ax = uB - uA; vec3 n1 = normalize(cross(ax + vec3(0.0, 0.0, 1e-4), vec3(0.0, 0.0, 1.0)) + vec3(1e-4)); vec3 n2 = normalize(cross(ax, n1) + vec3(1e-4));
+       p = mix(uA, uB, aRnd.x) + (n1*aRnd.y + n2*aRnd.z)*uW*(0.7 + 0.3*sin(uTime*7.0 + aSeed*30.0));
+       a = (0.08 + 0.22*fract(aSeed*13.0 - uTime*1.6 + aRnd.x*2.0))*uK*uSharp;`, 1, `uniform vec3 uA; uniform vec3 uB; uniform float uW; uniform float uK;`);
+    const u = p.material.uniforms; u.uA = { value:new THREE.Vector3() }; u.uB = { value:new THREE.Vector3() }; u.uW = { value:.2 }; u.uK = { value:1 }; return p; };
+  const tubes = [tube(), tube(), tube()];
+  // море: пары кварк — антикварк и глюоны, вспыхивающие и гаснущие
+  const sea = pts(Math.round(1800*Q), (i,o) => { const d = dir(), r = 2.3*Math.cbrt(Math.random()); o.p = d.map(v => v*r); o.rnd = dir();
+      o.c = [C(0xff7a7a), C(0x7affa0), C(0x7aa0ff), C(0xffd27a)][i % 4]; o.s = .8 + Math.random()*.8; },
+    `float life = fract(aSeed*5.0 + uTime*(0.35 + aSeed*0.5)); float k = sin(life*3.14159);
+     p += aRnd*0.18*life; a = k*k*0.55*uSharp;`);
+  const QLB = ["u", "u", "d", "d"].map(s => haloLabel(s, .62, "#F6EBCF"));
+  const brk = glow(0xffffff, 1.6, 0); brk.userData.self = true;
+  L2.add(...qs, mA, mB, ...tubes, sea, ...QLB, brk);
+  const qRest = [0, 1, 2].map(k => new THREE.Vector3(Math.cos(TAU*k/3 + Math.PI/2)*1.15, Math.sin(TAU*k/3 + Math.PI/2)*1.15, 0));
+  const qPos = qRest.map(v => v.clone()), mPos = new THREE.Vector3(), mDir = new THREE.Vector3(), jn = new THREE.Vector3();
+  S.pullGo = () => { if (S.pull >= 0) return; S.pull = lt0.v; S.pulls++; if (S.onTick) S.onTick(); };
+  S.setEl = (k, instant) => { if (!ATOM_EL[k]) return; S.el = k; setOrb(k, instant); setNuc(k); if (S.onTick) S.onTick(); };
+  S.setMode = m => { S.mode = m; if (m === "clock") S.restart(); if (S.onTick) S.onTick(); };
+  setOrb("C", true); setNuc("C"); S.restart();
+  ATOM = S;
+
+  const sm = (a, b, x) => smooth(a, b, x);
+  let rotY = 0;
+  const upd8 = (t, H) => {
+    const dt = Math.min(.05, Math.max(0, t - lt0.v)); lt0.v = t;
+    const d = Math.min(2, Math.max(0, H.at || 0)), v = H.v === undefined ? 1 : H.v;
+    // облако вращается; к слою ядра поворот плавно уходит в ноль — часы и кривая должны смотреть в камеру
+    rotY = (rotY + dt*.12) % TAU; const fz = 1 - sm(.55, .95, d);
+    g.rotation.y = (rotY > Math.PI ? rotY - TAU : rotY)*fz; g.rotation.x = (.35 + Math.sin(t*.2)*.1)*fz;
+    // ---- облако ----
+    if (mixT < 1){ mixT = Math.min(1, mixT + dt/1.4); orb.material.uniforms.uMix.value = mixT*mixT*(3 - 2*mixT); }
+    const o0 = 1 - sm(.12, .62, d);
+    L0.visible = o0 > .004; orb.material.uniforms.uSharp.value = o0;
+    L0.scale.setScalar(1 + 6*Math.pow(sm(0, 1, d), 2));
+    // ---- ядро: из искры в центре облака до полного кадра, затем расступается ----
+    const k01 = sm(.05, .95, d), k12 = sm(1.02, 2, d);
+    L1.scale.setScalar(d <= 1 ? .055 + .945*k01*k01 : 1 + 7*k12*k12);
+    const o1 = d <= 1 ? .18 + .82*sm(.2, .8, d) : 1 - sm(1.12, 1.6, d);
+    L1.visible = o1 > .004;
+    // режимы слоя ядра переключаются плавно; вне слоя ядра — всегда само ядро
+    const want = d > .5 && d < 1.5 ? S.mode : "nuc";
+    for (const m in S.mk) S.mk[m] += ((m === want ? 1 : 0) - S.mk[m])*Math.min(1, dt*3);
+    const on = S.mk.nuc*o1, oc = S.mk.clock*o1, of = S.mk.forge*o1;
+    NUC.visible = on > .004; nucl.material.uniforms.uSharp.value = on; xch.material.uniforms.uSharp.value = on*sm(.5, .95, d);
+    nGlow.material.opacity = on*(d < .5 ? .9 : .35)*v;
+    NUC.rotation.y = t*.15; NUC.rotation.x = Math.sin(t*.13)*.2;
+    NUC.scale.setScalar(1.3 - .7*(1 - S.mk.nuc));
+    for (const p of [nucl, xch]) p.material.uniforms.uPush.value = .15;
+    CLK.visible = oc > .004;
+    if (CLK.visible){
+      if (S.ck >= 0){ S.ckT = Math.min(TMAX, (t - S.ck)/3.4); if (S.ckT >= TMAX) S.ck = -1; }
+      ck.material.uniforms.uProg.value = S.ckT; ck.material.uniforms.uSharp.value = oc; ck.material.uniforms.uPush.value = 0;
+      curve.material.opacity = .8*oc*v; axes.material.opacity = .4*oc*v; cLbl.material.opacity = tLbl.material.opacity = .9*oc*v;
+      cMark.position.set(-CXW/2 + CXW*S.ckT/TMAX, CY0 + CYH*Math.pow(2, -S.ckT), 0); cMark.material.opacity = oc*v;
+      cReal.position.set(cMark.position.x, CY0 + CYH*S.left()/NCK, 0); cReal.material.opacity = .9*oc*v;
+      if (S.onTick && Math.floor(t*8) !== Math.floor((t - dt)*8)) S.onTick(true);
+    }
+    FRG.visible = of > .004;
+    if (FRG.visible){
+      fcurve.material.uniforms.uSharp.value = of; sparks.material.uniforms.uSharp.value = of; fcurve.material.uniforms.uPush.value = sparks.material.uniforms.uPush.value = 0;
+      fAx.material.opacity = .4*of*v; for (const [l, gl] of FM){ l.material.opacity = .95*of*v; gl.material.opacity = of*v; } for (const l of fLb) l.material.opacity = .85*of*v;
+      for (let i = 0; i < NSP; i++){
+        spU[i] = (spU[i] + dt*.16) % 1; const fu = i < NSP*.7;
+        const A = fu ? Math.exp(Math.log(56)*spU[i]) : Math.exp(Math.log(238) - (Math.log(238) - Math.log(56))*spU[i]);
+        spP[i*3] = FX(A); spP[i*3 + 1] = FY(beAt(A)) + .06; spP[i*3 + 2] = .1;
+      }
+      sparks.geometry.attributes.position.array.set(spP); sparks.geometry.attributes.position.needsUpdate = true;
+    }
+    // ---- нуклон: вырастает из центрального протона ядра ----
+    const o2 = sm(1.18, 1.72, d);
+    L2.visible = o2 > .004;
+    if (!L2.visible){ for (const l of QLB) l.material.opacity = 0; return; }
+    L2.scale.setScalar(.06 + .94*Math.pow(sm(1.0, 1.9, d), 1.5));
+    L2.rotation.y = Math.sin(t*.15)*.35; L2.rotation.x = Math.sin(t*.11)*.15;
+    // «цвет» кочует между кварками: сумма всегда бесцветна
+    const ph = t/2.4, kk = Math.floor(ph), fr = sm(0, .25, ph - kk);   // каждые 2,4 с — обмен глюоном
+    // вытягивание кварка 0: 0–1,5 с — трубка растягивается, 1,5 с — рвётся, рождается пара, мезон улетает
+    let pu = -1; if (S.pull >= 0){ pu = t - S.pull; if (pu > 3.4){ S.pull = -1; pu = -1; } }
+    const out = qRest[0].clone().normalize();
+    let stretch = 0, back = 0, mes = -1;
+    if (pu >= 0){
+      if (pu < 1.5) stretch = sm(0, 1.5, pu);
+      else { mes = pu - 1.5; back = 1 - sm(0, 1.1, mes); stretch = 0; if (!S._m){ S._m = 1; S.mesons++; if (S.onTick) S.onTick(); } }
+    } else S._m = 0;
+    for (let k = 0; k < 3; k++){
+      const cn = QC[(k + kk + 1) % 3];
+      qs[k].material.uniforms.uQC.value.copy(QC[(k + kk) % 3]).lerp(cn, fr);
+      qPos[k].copy(qRest[k]).add(new THREE.Vector3(Math.sin(t*1.7 + k*2)*.08, Math.cos(t*1.3 + k)*.08, Math.sin(t*1.1 + k*3)*.08));
+    }
+    if (stretch > 0) qPos[0].addScaledVector(out, 2.3*stretch*stretch);
+    if (back > 0) qPos[0].addScaledVector(out, 1.6*back);
+    jn.set(0, 0, 0); for (const q of qPos) jn.add(q); jn.multiplyScalar(1/3); jn.lerp(new THREE.Vector3(), .4);
+    for (let k = 0; k < 3; k++){
+      qs[k].position.copy(qPos[k]); qs[k].material.uniforms.uSharp.value = o2;
+      const u = tubes[k].material.uniforms; u.uA.value.copy(jn); u.uB.value.copy(qPos[k]);
+      u.uW.value = k === 0 ? .2 - .12*stretch : .2; u.uK.value = (k === 0 ? 1 + 1.6*stretch : 1)*(1 + .6*(1 - fr));
+      tubes[k].material.uniforms.uSharp.value = o2;
+    }
+    sea.material.uniforms.uSharp.value = o2;
+    for (const p of [...qs, ...tubes, sea, mA, mB]) p.material.uniforms.uPush.value = .1;
+    // мезон: прежний кварк и новорождённый антикварк улетают парой
+    const brkP = qRest[0].clone().addScaledVector(out, 1.6);
+    if (mes >= 0){
+      const mo = 1 - sm(1.2, 1.9, mes);
+      mPos.copy(brkP).addScaledVector(out, .9 + 3.2*mes);
+      mDir.set(Math.cos(t*6), Math.sin(t*6), 0).multiplyScalar(.28);
+      mA.position.copy(mPos).add(mDir); mB.position.copy(mPos).sub(mDir);
+      mA.material.uniforms.uQC.value.copy(qs[0].material.uniforms.uQC.value);
+      mB.material.uniforms.uQC.value.setRGB(1, 1, 1).sub(mA.material.uniforms.uQC.value).multiplyScalar(.85).addScalar(.15);
+      mA.material.uniforms.uSharp.value = mB.material.uniforms.uSharp.value = o2*mo;
+      mA.visible = mB.visible = true;
+      brk.position.copy(brkP); brk.material.opacity = o2*Math.exp(-mes*4)*v; brk.scale.setScalar(1 + 2.5*mes);
+    } else { mA.visible = mB.visible = false; brk.material.opacity = 0; }
+    // подписи кварков: протон uud, нейтрон udd
+    const lab = [QLB[0], S.pr ? QLB[1] : QLB[2], QLB[3]];
+    for (const l of QLB) l.material.opacity = 0;
+    lab.forEach((l, k) => { l.position.copy(qPos[k]).add(new THREE.Vector3(.38, .38, 0)); l.material.opacity = .95*o2*v; });
+  };
+  return upd8;
 },
-// X · Частицы и кванты. Два слоя: 0 — волны от двух источников (как было), 1 — опыт с двумя щелями
+// X · Частицы и кванты. Три слоя: 0 — волны от двух источников, 1 — Стандартная модель, 2 — опыт с двумя щелями
 g => {
   const side = Math.round(120*Math.sqrt(Q));
   const plane = new THREE.Group(); g.add(plane);
@@ -4859,6 +5262,39 @@ g => {
   const lblDet = haloLabel("Детектор", .5); lblDet.position.set(BX + .95, 0, 0);
   slit.add(field, wall, scr, src, detA, detB, hits, prof, fly, ...LBL, lblDet);
 
+
+  // ---- слой 1: Стандартная модель — таблица из 17 частиц ----
+  // Раскладка как в классической таблице: три столбца-поколения вещества (кварки сверху, лептоны снизу),
+  // столбец переносчиков сил и бозон Хиггса справа. Величина шара — масса в логарифмическом масштабе;
+  // у безмассовых фотона и глюона — пустая оболочка вместо шара
+  const smG = new THREE.Group(); smG.visible = false; g.add(smG);
+  const SMX = [-3.3, -1.95, -.6, .95, 2.75], SMY = [2.1, .75, -.6, -1.95];
+  const SMC = { q:C(0xc58cff), l:C(0x5ff0bf), b:C(0xffa36b), h:C(0xffd27a) };
+  const smMass = s => { const m = /([\d,]+)\s*(эВ|МэВ|ГэВ)/.exec(s); if (!m) return s === "0" ? 0 : .05; return parseFloat(m[1].replace(",", "."))*{ "эВ":1, "МэВ":1e6, "ГэВ":1e9 }[m[2]]; };
+  const smAt = SM_P.map((p, k) => { const col = k < 12 ? k % 3 : k < 16 ? 3 : 4, row = k < 12 ? Math.floor(k/3) : k < 16 ? k - 12 : 1.5;
+    const m = smMass(p[2]); return { x:SMX[col], y:k === 16 ? .1 : SMY[Math.floor(row)], m, r:m ? .13 + .036*(Math.log10(Math.max(.05, m)) + 1.3) : .3, g:p[5] }; });
+  const NPS = Math.round(200*Math.sqrt(Q));
+  const smP = pts(SM_P.length*NPS, (i,o) => { const k = Math.floor(i/NPS), A = smAt[k], d = dir();
+      const r = A.m ? A.r*Math.cbrt(Math.random()) : A.r*(.92 + Math.random()*.12);
+      o.p = [A.x + d[0]*r, A.y + d[1]*r, d[2]*r]; o.rnd = [k, rn(), rn()];
+      o.c = mixc(SMC[A.g], CREAM, Math.random()*.3); o.s = A.m ? .9 + Math.random()*.9 : .8 + Math.random()*.6; },
+    `float sel = 1.0 - step(0.5, abs(aRnd.x - uSel));
+     float any = step(-0.5, uSel);
+     p += vec3(aRnd.y, aRnd.z, aRnd.y*aRnd.z)*0.02*sin(uTime*4.0 + aSeed*30.0);
+     s *= 1.0 + sel*0.5*(0.7 + 0.3*sin(uTime*5.0));
+     a = (0.55 + 0.35*fract(aSeed*9.0 + uTime*0.5))*mix(1.0, mix(0.22, 1.5, sel), any)*uSharp;`, 1, `uniform float uSel;`);
+  smP.material.uniforms.uSel = { value:-1 };
+  const smL = SM_P.map((p, k) => { const l = haloLabel(p[0].replace("_μ", "μ").replace("_τ", "τ"), .5, "#F6EBCF"); l.position.set(smAt[k].x + .42, smAt[k].y + .36, .1); return l; });
+  const smH = ["I", "II", "III"].map((s, k) => { const l = haloLabel(s, .42, "#D6AC5E"); l.position.set(SMX[k], 2.95, 0); return l; });
+  // нейтрино солнца: поток, который проходит сквозь таблицу и не задевает ничего
+  const smN = pts(Math.round(420*Q), (i,o) => { o.p = [rn()*3, rn()*4, rn()*2]; o.c = C(0xd8fbff); o.s = .7 + Math.random()*.5; },
+    `float f = fract(uTime*0.22 + aSeed);
+     p += vec3(1.0, -0.28, 0.15)*(f*13.0 - 6.5);
+     a = sin(f*3.14159)*0.35*uSharp;`);
+  smG.add(smP, smN, ...smL, ...smH);
+  const SMS = { sel:-1, set:k => { SMS.sel = k; smP.material.uniforms.uSel.value = k; } };
+  SM_STATE = SMS;
+
   // распределения на экране — по той же разности хода, что и волновое поле
   const env = (y, sy) => { const dx = EX - BX, r = Math.hypot(dx, y - sy), sn = (y - sy)/r, u = Math.PI*SW*sn/LAM;
     return u === 0 ? 1 : Math.pow(Math.sin(u)/u, 2); };
@@ -4889,12 +5325,19 @@ g => {
   const profArr = prof.geometry.attributes.position;
   const upd10 = (t, H) => {
     const dt = Math.min(.05, Math.max(0, t - lt)); lt = t;
-    const s = H.slit || 0, v = H.v === undefined ? 1 : H.v;
-    // слой 0 ↔ слой 1: старая сцена уступает место установке
-    const o0 = 1 - smooth(.05, .55, s), o1 = smooth(.35, .9, s);
+    const s = H.slit || 0, q = H.sm || 0, v = H.v === undefined ? 1 : H.v;
+    // слой 0 → 1 → 2: волны уступают место таблице частиц, таблица — установке с двумя щелями
+    const o0 = 1 - smooth(.05, .55, q), o1 = smooth(.35, .9, s), osm = smooth(.35, .9, q)*(1 - smooth(.02, .45, s));
     plane.visible = o0 > .004; wavePts.material.uniforms.uSharp.value = o0;
     pa.material.opacity = pb.material.opacity = o0*v; ln.material.opacity = .35*o0*v;
     const pv = 1 + (.5 + H.h*.4)*Math.pow(Math.max(0, Math.sin(t*1.2)), 6); pa.scale.set(pv,pv,1); pb.scale.set(pv,pv,1);
+    smG.visible = osm > .004;
+    if (smG.visible){
+      smP.material.uniforms.uSharp.value = osm; smN.material.uniforms.uSharp.value = osm;
+      smP.material.uniforms.uPush.value = smN.material.uniforms.uPush.value = 0;
+      for (const l of smL) l.material.opacity = .92*osm*v; for (const l of smH) l.material.opacity = .8*osm*v;
+      smG.rotation.y = Math.sin(t*.13)*.12; smG.rotation.x = Math.sin(t*.09)*.05;
+    }
     slit.visible = o1 > .004;
     if (!slit.visible) return;
     S.detK += ((S.det ? 1 : 0) - S.detK)*Math.min(1, dt*3);
@@ -8848,7 +9291,12 @@ const Music = (() => {
     // молекула: колебания воды — валентные 3657 и 3756 см⁻¹, деформационное 1595 см⁻¹ (≈ 10¹⁴ Гц), опущенные на ~40 октав
     "g7:1": (k, out) => { const a = [1595, 3657, 3756].map((w, j) => vOsc(k*2*w/1595, "sine", [.04, .022, .016][j], out)); return { stop: () => a.forEach(x => x.o.stop()) }; },
     // опыт с двумя щелями: каждый щелчок — частица на экране; высота — место попадания, выпавшее по картине интерференции
-    "g9:1": (k, out) => { let live = true, tm = 0; const P = x => Math.pow(Math.cos(x*9.4), 2)*Math.pow(Math.sin(x*3.1 + 1e-6)/(x*3.1 + 1e-6), 2);
+    // ядро: счётчик Гейгера — распады в случайные моменты (процесс Пуассона), изредка — пачкой от космических лучей
+    "g8:1": (k, out) => { let live = true, tm = 0; const d = vOsc(k, "sine", .006, out);
+      const next = () => { if (!live) return; const t = ac.currentTime + .02; vClick(t, .09 + Math.random()*.05, out, Math.random()*1.4 - .7);
+        tm = setTimeout(next, -Math.log(1 - Math.random())*420); }; next();
+      return { stop: () => { live = false; clearTimeout(tm); d.o.stop(); } }; },
+    "g9:2": (k, out) => { let live = true, tm = 0; const P = x => Math.pow(Math.cos(x*9.4), 2)*Math.pow(Math.sin(x*3.1 + 1e-6)/(x*3.1 + 1e-6), 2);
       const drop = () => { if (!live) return; let x; do { x = Math.random()*2 - 1; } while (Math.random() > P(x)); const t = ac.currentTime + .02;
         vGlide(t, k*4*Math.pow(2, x*1.2), k*4*Math.pow(2, x*1.2), .18, .03, "sine", out); vClick(t, .04, out, x*.9); tm = setTimeout(drop, -Math.log(1 - Math.random())*380); }; drop();
       return { stop: () => { live = false; clearTimeout(tm); } }; },
@@ -9478,7 +9926,7 @@ const CYM_LV = { short:"Хладни", kind:"cym", st:1, name:"Звук и фо�
         "Хазрат Инайят Хан, «Мистика звука» — всё проявленное есть вибрация разной плотности",
         "Честное пересечение: из всех этих образов лаборатория подтверждает один — что колебание при определённых частотах само выстраивает вещество в правильный узор"],
   prac:"Звучащий ОМ: на выдохе тянуть «О-О-М» на одной ноте, положив ладонь на грудь, затем на макушку. Заметить, где вибрация сильнее, а где тело «молчит», — как узловые линии на пластине." };
-// Станция X двухслойная: волны и частицы (как было), затем опыт с двумя щелями — интерактивный
+// Станция X: волны и частицы, Стандартная модель (SM_LV), затем опыт с двумя щелями — интерактивный
 const SLIT_LV = { short:"Две щели", kind:"slit", st:9, name:"Опыт с двумя щелями", sub:"Волна или частица · что значит «наблюдать»",
   scale:"щели ≈ 10⁻⁷ м", hint:"Включите детектор — и смотрите, что станет с полосами",
   lead:"Электроны выпускают по одному. Каждый оставляет на экране одну точку — как частица. Но точки складываются в полосы, будто каждый электрон прошёл сразу через обе щели и встретился сам с собой, как волна. Поставьте у щелей детектор, который отмечает, через какую щель прошёл электрон, — и полосы исчезнут.",
@@ -9507,8 +9955,8 @@ const JOURNEYS = {
   // ответвление станции VII: сон и изменённые состояния сознания (вход — с тонких тел и центров)
   dream:{ st:6, kind:"g", title:"Сон и сознание", levels:() => DREAM_LV, next:() => "g7" },
   g7:{ st:7, kind:"g", levels:() => DNA_LV, next:() => "g8" },
-  g8:{ st:8, kind:"g", levels:() => GEN(8), next:() => "g9" },
-  g9:{ st:9, kind:"g", levels:() => [GEN(9)[0], SLIT_LV], next:() => "g10" },
+  g8:{ st:8, kind:"g", levels:() => ATOM_LV, next:() => "g9" },
+  g9:{ st:9, kind:"g", levels:() => [GEN(9)[0], SM_LV, SLIT_LV], next:() => "g10" },
   g10:{ st:10, kind:"g", levels:() => GEN(10), next:() => "g11" },
   g11:{ st:11, kind:"g", levels:() => GEN(11), next:() => "abs" }
 };
@@ -9562,6 +10010,57 @@ function renderChakraDetail(){
     <p class="note">${mk("t")}<span>Чакры — модель внутреннего опыта; как анатомические органы наука их не находит. Но в этих зонах лежат крупные нервные сплетения, а практики дыхания и внимания измеримо влияют на нервную систему.</span></p>`;
   hdBody.querySelectorAll(".hlist button").forEach((b, k) => b.setAttribute("aria-current", String(k === hSel)));
 }
+// пульты опытов станций IX и X. Разметка — здесь, обработчики — в atomWire (после вставки в панель)
+const fmtN = x => x >= 1e9 ? (x/1e9).toFixed(x >= 1e10 ? 0 : 1).replace(".", ",") + " млрд" : x >= 1e6 ? (x/1e6).toFixed(1).replace(".", ",") + " млн" : Math.round(x).toLocaleString("ru-RU");
+function atomCtl(kind){
+  const A = ATOM, elBtns = () => `<div class="slit-row">${Object.keys(ATOM_EL).map(k => `<button class="btn" data-el="${k}" aria-pressed="${A && A.el === k}" data-hover>${ATOM_EL[k].nm}</button>`).join("")}</div>`;
+  if (kind === "orb") return elBtns() + `<p class="slit-n" id="atInfo"></p>`;
+  if (kind === "nuc") return `<div class="slit-row">${[["nuc", "Ядро"], ["clock", "Часы распада"], ["forge", "Звёздная кузница"]].map(([m, t]) => `<button class="btn" data-am="${m}" aria-pressed="${A && A.mode === m}" data-hover>${t}</button>`).join("")}</div><div id="atMode" class="slit-ctl"></div>`;
+  if (kind === "qrk") return `<div class="slit-row"><button class="btn" id="qPull" data-hover>Потянуть кварк</button><button class="btn" id="qPN" aria-pressed="${!A || A.pr}" data-hover>${!A || A.pr ? "Протон · uud" : "Нейтрон · udd"}</button></div><p class="slit-n" id="qR"></p>`;
+  if (kind === "sm") return `<div class="sm-grid">${SM_P.map((p, k) => `<button class="sm-c sm-${p[5]}" style="grid-column:${k < 12 ? k % 3 + 1 : k < 16 ? 4 : 5};grid-row:${k < 12 ? Math.floor(k/3) + 1 : k < 16 ? k - 11 : 1}" data-sm="${k}" aria-pressed="${!!SM_STATE && SM_STATE.sel === k}" data-hover><b>${esc(p[0].replace("_", ""))}</b><span>${esc(p[2])}</span></button>`).join("")}</div><div id="smInfo"></div>`;
+  return "";
+}
+function atomInfo(){
+  const A = ATOM; if (!A) return;
+  const E = ATOM_EL[A.el], ai = $("atInfo");
+  hdBody.querySelectorAll("button[data-el]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.el === A.el)));
+  if (ai) ai.innerHTML = `<span class="mono"><b>${esc(E.nm)}</b> · Z = ${E.Z} · ${esc(E.cfg)}</span><br>${esc(E.tx)}.`;
+  hdBody.querySelectorAll("button[data-am]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.am === A.mode)));
+  const am = $("atMode");
+  if (am && am.dataset.m !== A.mode + A.el + A.iso){
+    am.dataset.m = A.mode + A.el + A.iso;
+    if (A.mode === "nuc") am.innerHTML = `<div class="slit-row">${Object.keys(ATOM_EL).map(k => `<button class="btn" data-el="${k}" aria-pressed="${A.el === k}" data-hover>${ATOM_EL[k].nm}</button>`).join("")}</div>
+      <p class="slit-n">${esc(E.nm)}-${E.A}: ${E.Z} ${E.Z === 1 ? "протон" : E.Z < 5 ? "протона" : "протонов"}${E.N ? ` и ${E.N} нейтронов` : ", нейтронов нет"}. Протоны — красноватые, нейтроны — голубоватые; золотые искры — обмен сильного взаимодействия между соседями.</p>`;
+    else if (A.mode === "clock"){ const I = A.ISO[A.iso];
+      am.innerHTML = `<div class="slit-row">${A.ISO.map((x, k) => `<button class="btn" data-iso="${k}" aria-pressed="${k === A.iso}" data-hover>${esc(x.nm)}</button>`).join("")}<button class="btn" id="ckRe" data-hover>Сначала</button></div>
+        <p class="slit-n">${esc(I.r)} · период полураспада ${fmtN(I.T)} ${I.u}. ${esc(I.use[0].toUpperCase() + I.use.slice(1))}.</p><p class="slit-n mono" id="ckR"></p>`;
+    } else am.innerHTML = `<p class="slit-n">Слияние лёгких ядер поднимается по кривой к железу и выделяет энергию — так светят звёзды. Деление тяжёлых ядер скатывается к железу справа — так работают АЭС. Железо и никель лежат на вершине: из них энергию не получить ни синтезом, ни делением, поэтому, наработав железное ядро, массивная звезда гибнет.</p>`;
+    atomWire();
+  }
+  const cr = $("ckR");
+  if (cr && A.mode === "clock"){ const I = A.ISO[A.iso], n = A.left();
+    cr.innerHTML = `Прошло <b>${A.ckT.toFixed(1).replace(".", ",")}</b> периода ≈ <b>${fmtN(A.ckT*I.T)}</b> ${I.u}<br>Осталось ядер: <b>${n}</b> из ${A.NCK} (${Math.round(100*n/A.NCK)} %; по закону — ${Math.round(100*Math.pow(2, -A.ckT))} %)`; }
+  const qr = $("qR");
+  if (qr) qr.innerHTML = `Попыток вытащить кварк: <b>${A.pulls}</b> · свободных кварков: <b>0</b> · родилось мезонов: <b>${A.mesons}</b>`;
+  const qp = $("qPN"); if (qp){ qp.setAttribute("aria-pressed", String(A.pr)); qp.textContent = A.pr ? "Протон · uud" : "Нейтрон · udd"; }
+}
+function smInfo(){
+  const S = SM_STATE, box = $("smInfo"); if (!box) return;
+  hdBody.querySelectorAll("button[data-sm]").forEach(b => b.setAttribute("aria-pressed", String(!!S && S.sel === +b.dataset.sm)));
+  if (!S || S.sel < 0){ box.innerHTML = `<p class="slit-n">Фиолетовые — кварки, зелёные — лептоны, оранжевые — переносчики сил, золотой — бозон Хиггса. Столбцы I, II, III — три поколения: каждое следующее тяжелее предыдущего. Светлые искры, пролетающие насквозь, — нейтрино от Солнца.</p>`; return; }
+  const p = SM_P[S.sel], GN = { q:"кварк", l:"лептон", b:"переносчик силы", h:"скалярный бозон" };
+  box.innerHTML = `<p class="slit-n"><span class="mono"><b>${esc(p[1])}</b> · ${GN[p[5]]} · масса ${esc(p[2])} · заряд ${esc(p[3])} · открыт в ${p[4]}</span><br>${esc(p[6])}.</p>`;
+}
+function atomWire(){
+  const A = ATOM;
+  hdBody.querySelectorAll("button[data-el]").forEach(b => b.onclick = () => { if (A) A.setEl(b.dataset.el); atomInfo(); });
+  hdBody.querySelectorAll("button[data-am]").forEach(b => b.onclick = () => { if (A) A.setMode(b.dataset.am); atomInfo(); });
+  hdBody.querySelectorAll("button[data-iso]").forEach(b => b.onclick = () => { if (A) A.setIso(+b.dataset.iso); atomInfo(); });
+  const re = $("ckRe"); if (re) re.onclick = () => { if (A){ A.restart(); atomInfo(); } };
+  const qp = $("qPull"); if (qp) qp.onclick = () => { if (A) A.pullGo(); };
+  const pn = $("qPN"); if (pn) pn.onclick = () => { if (A){ A.pr = !A.pr; atomInfo(); } };
+  hdBody.querySelectorAll("button[data-sm]").forEach(b => b.onclick = () => { if (SM_STATE) SM_STATE.set(SM_STATE.sel === +b.dataset.sm ? -1 : +b.dataset.sm); smInfo(); });
+}
 function renderLevel(L){
   shownLevel = L;
   const v = JL[L]; if (!v) return;
@@ -9606,6 +10105,16 @@ function renderLevel(L){
         <p class="mono slit-n">Электронов на экране: <b id="slitN">${SLIT ? SLIT.n : 0}</b></p></section>`
       + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad)
       + `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>`;
+  } else if (jKind === "g" && (v.kind === "orb" || v.kind === "nuc" || v.kind === "qrk" || v.kind === "sm")){
+    // слои станций «Атом» и «Кванты» с опытами: пульт опыта, затем наука, традиции, параллель, практика
+    name = v.name; sub = v.sub; hSel = -1;
+    $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${v.scale}`;
+    $("hdHint").textContent = v.hint;
+    h = `<p class="hd-lead">${esc(v.lead)}</p><p class="mono hd-scale">Масштаб ${esc(v.scale)}</p><section class="slit-ctl"><h3>Опыт</h3>${atomCtl(v.kind)}</section>`
+      + listHTML("Наука", v.sci) + listHTML("Традиции", v.trad)
+      + (v.par ? `<section><h3>Параллель с человеком</h3><p class="hd-par">${esc(v.par)}</p></section>` : "")
+      + (v.prac ? `<section><h3>Практика</h3><p class="hd-par">${esc(v.prac)}</p></section>` : "")
+      + (v.links ? `<section><h3>Связи</h3><div class="hd-fork">${v.links.map(([id, tx]) => `<button data-go="${id}" data-hover><b>${esc(tx)}</b></button>`).join("")}</div></section>` : "");
   } else if (jKind === "g" && (v.kind === "mol" || v.kind === "lan" || v.kind === "body" || v.kind === "dream")){
     name = v.name; sub = v.sub; hSel = -1;
     $("hdEye").textContent = `Станция ${stTag} · слой ${L + 1} из ${JL.length} · ${v.scale}`;
@@ -9682,6 +10191,8 @@ function renderLevel(L){
       osc.type = "sine"; osc.frequency.value = CYM.f; gain.gain.value = 0; osc.connect(gain).connect(ctx.destination); osc.start();
       CYM.tone = { ctx, osc, gain }; tb.setAttribute("aria-pressed", "true"); };
   }
+  if (ATOM) ATOM.onTick = $("atInfo") || $("atMode") || $("qR") ? () => atomInfo() : null;
+  atomWire(); atomInfo(); smInfo();
   const sd = $("slitDet");
   if (sd && SLIT){
     SLIT.onCount = n => { const e = $("slitN"); if (e) e.textContent = n; };
@@ -9802,7 +10313,11 @@ function stDissolve(i){
   if (!tr || !tr.morph || i !== jSt) return 0;
   return tr.jumped ? 1 - smooth(.62, 2.05, tr.t) : smooth(.02, .58, tr.t);
 }
+// станция «Атом» встречает тем элементом, из которого мы в неё пришли: из молекулы — углеродом,
+// из ядра Земли — железом
+function atomArrive(to){ if (to === "g8" && ATOM && (jId === "earth" || jId === "g7")) ATOM.setEl(jId === "earth" ? "Fe" : "C", true); }
 function flashTo(to, dir){
+  atomArrive(to);
   const soft = softPair(jId, to);
   // человек ↔ сон: одна станция, без вспышки — фигура сама рассыпается и собирается (dream.js)
   const dreamTr = (jId === "human" && to === "dream") || (jId === "dream" && to === "human");
@@ -9893,6 +10408,7 @@ function zDustEnsure(){
   zDustG = new THREE.Group(); zDustG.add(zDust); zDustG.visible = false; scene.add(zDustG);
 }
 function startZoom(to, dir){
+  atomArrive(to);
   const pair = ZOOM_PAIRS.find(p => (p[0] === jId && p[1] === to) || (p[1] === jId && p[0] === to));
   const aSt = JOURNEYS[pair[0]].st, bSt = JOURNEYS[pair[1]].st;
   const thOf = st => Math.atan2(stations[st].g.position.x, -stations[st].g.position.z);
@@ -12943,7 +13459,7 @@ const ROUTES = [
       { t:"j", id:"g4", d:11, h:"Сердце Солнца", tx:"Свет Солнца рождается в его ядре. Чтобы выбраться наружу сквозь плотные слои, энергии нужны десятки тысяч лет — а потом всего 8 минут до Земли." },
       { t:"tree", id:"cyano", h:"Свет становится пищей", tx:"Цианобактерии научились ловить свет и расщеплять воду. Почти вся пища и весь кислород, которыми мы живём, — переработанный солнечный свет." },
       { t:"tree", id:"vert", h:"Глаз", tx:"У позвоночных появился глаз-камера с хрусталиком. Свет, проделавший путь от Солнца, заканчивает его на сетчатке — и становится образом." },
-      { t:"j", id:"g9", d:1, h:"Волна и частица", tx:"Свет приходит порциями — фотонами, но ведёт себя как волна. Опыт с двумя щелями показывает это на одной частице за другой." },
+      { t:"j", id:"g9", d:2, h:"Волна и частица", tx:"Свет приходит порциями — фотонами, но ведёт себя как волна. Опыт с двумя щелями показывает это на одной частице за другой." },
       { t:"j", id:"abs", d:0, h:"Свет без масштаба", tx:"«Да будет свет», ясный свет тибетской традиции, свет Плотинова Единого — почти все традиции начинают с света. Здесь, у Абсолюта, путь света замыкается — как образ, а не как физика." }
     ] },
   { id:"sleep", nm:"Сон и пробуждение", sub:"Засыпание → сновидения → осознанный сон → турия → Изнанка → практика",
@@ -12984,7 +13500,7 @@ const ROUTES = [
       { t:"th", br:"pyt>kep", h:"Музыка сфер", tx:"Пифагорейцы услышали число в созвучиях. Через две тысячи лет Кеплер, ища гармонию планет, нашёл свой третий закон. Красивая мечта привела к точной формуле." },
       { t:"j", id:"g4", d:0, h:"Где живут законы Кеплера", tx:"Солнечная система — эллипсы орбит и периоды, связанные одной формулой. Гармония оказалась не музыкой, а следствием тяготения." },
       { t:"th", br:"lao>boh", h:"Инь-ян и дополнительность", tx:"Бор выбрал для герба тайцзи: волна и частица исключают друг друга и вместе необходимы. Созвучие узнано после открытия, а не до него." },
-      { t:"j", id:"g9", d:1, h:"Опыт с двумя щелями", tx:"Здесь дополнительность видна своими глазами: пока путь частицы не известен — интерференция волны; узнали путь — остались два пятна частиц." },
+      { t:"j", id:"g9", d:2, h:"Опыт с двумя щелями", tx:"Здесь дополнительность видна своими глазами: пока путь частицы не известен — интерференция волны; узнали путь — остались два пятна частиц." },
       { t:"th", br:"upa>shr", h:"«Ты есть То»", tx:"Шрёдингер всю жизнь читал Упанишады и писал о едином сознании. Его уравнение из них не выведено — но вопрос «кто наблюдает?» он задавал вместе с ними." },
       { t:"j", id:"dream", d:3, h:"Турия — четвёртое", tx:"Мандукья-упанишада описывает свидетеля трёх состояний — бодрствования, сна и глубокого сна. Наука изучает их по ЭЭГ; само свидетельство остаётся опытом." },
       { t:"th", br:"dal>med", h:"Монахи в лаборатории", tx:"Диалоги Далай-ламы с учёными привели к исследованиям медитации. Измеряют внимание и сострадание — честно отделяя данные от заголовков." },
@@ -13220,7 +13736,7 @@ const CP_FR = [
   // ---- атомы и кванты ----
   { t:"j", id:"g7", d:0, o:7, z:["micro","earth"], e:["img","know"], tr:["sci"], h:"Клетка и ДНК", tx:"Двойная спираль — текст из четырёх букв, общий для всего живого." },
   { t:"j", id:"g8", d:0, o:8, z:["micro"], e:["know","img"], tr:["sci"], h:"Атом", tx:"Почти пустота: если ядро — горошина, электроны носятся в пределах футбольного стадиона." },
-  { t:"j", id:"g9", d:1, o:9, z:["micro"], e:["img","q"], tr:["sci"], h:"Опыт с двумя щелями", tx:"Включите детектор у щелей — и интерференция исчезнет. Самый странный опыт физики, который можно повторить своими руками." },
+  { t:"j", id:"g9", d:2, o:9, z:["micro"], e:["img","q"], tr:["sci"], h:"Опыт с двумя щелями", tx:"Включите детектор у щелей — и интерференция исчезнет. Самый странный опыт физики, который можно повторить своими руками." },
   { t:"j", id:"g10", d:0, o:10, z:["micro","cos"], e:["know","q"], tr:["sci"], h:"Квантовый вакуум", tx:"Пустота, которая не пуста: поля дрожат даже в отсутствие частиц. Эффект Казимира это подтверждает." },
   { t:"th", br:"dem>dlt", o:8, z:["micro"], e:["know"], tr:["sci"], h:"Атомы: от рассуждения к весам", tx:"Демокрит догадался — Дальтон взвесил. Две тысячи лет между идеей и измерением." },
   { t:"th", br:"lao>boh", o:9, z:["micro"], e:["q"], tr:["chi"], h:"Инь-ян и дополнительность", tx:"Почему Нильс Бор поместил даосский символ на свой герб." },
@@ -19021,7 +19537,10 @@ function loop(now){
       if (i === 1) st.H.cym = humanOpen && jKind === "g" && jId === "g1" ? smooth(0, 1, depth) : (tr && tr.morph && (tr.to === "g1" || jId === "g1") ? 1 : 0);
       // ветка станции VII «Сон и сознание»: фигура ложится, над ней — сцена сна (dream.js)
       if (i === 6){ st.H.dr = humanOpen && jId === "dream"; st.H.drd = st.H.dr ? clamp(depth, 0, 3) : 0; }
-      if (i === 9) st.H.slit = humanOpen && jKind === "g" && jSt === 9 ? smooth(0, 1, depth) : 0;
+      // станция X трёхслойная: 0 — волны, 1 — Стандартная модель, 2 — две щели
+      if (i === 9){ const qd = humanOpen && jKind === "g" && jSt === 9 ? clamp(depth, 0, 2) : 0; st.H.sm = qd; st.H.slit = smooth(0, 1, qd - 1); }
+      // станция IX трёхслойная: 0 — облако, 1 — ядро, 2 — нуклон. На пролёте «Молекула → Атом» — облако
+      if (i === 8) st.H.at = zm && (zm.aSt === 8 || zm.bSt === 8) ? 0 : (humanOpen && jKind === "g" && jSt === 8 ? clamp(depth, 0, 2) : 0);
       if (i === 7) st.H.dna = zm && (zm.aSt === 7 || zm.bSt === 7) ? 1
                             : (humanOpen && jKind === "g" && jSt === 7 ? clamp(depth, 0, 1) : 0);
       // степень растворения в общую сферу (только у станций морф-пары; вне перехода всегда 0, поэтому
