@@ -55,9 +55,9 @@ head = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Пробуждение — интерактивная астролябия сознания: путь сквозь 12 станций от Абсолюта до квантового вакуума, где духовные учения встречаются с наукой.">
+<meta name="description" content="Космолябия — интерактивный атлас пробуждения: путь сквозь 12 станций от Абсолюта до квантового вакуума, где духовные учения встречаются с наукой.">
 <meta name="theme-color" content="#05060C">
-<meta property="og:title" content="Пробуждение · Астролябия сознания">
+<meta property="og:title" content="Космолябия · Атлас пробуждения">
 <meta property="og:description" content="Интерактивное погружение сквозь 12 станций: от Абсолюта — через Землю и Человека — к квантовому вакууму.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2305060C'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23D6AC5E' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23D6AC5E'/%3E%3Cpath d='M32 6v52M6 32h52' stroke='%23D6AC5E' stroke-width='1' opacity='.5'/%3E%3C/svg%3E">

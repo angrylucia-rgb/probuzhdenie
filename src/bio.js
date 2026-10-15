@@ -909,7 +909,7 @@ void main(){
         <h4>${S.bio ? "Что ему грозит" : "Что досталось нам"}</h4><p class="tm-pr bio-p">${esc(S.legacy)}</p>
         <h4>Наука</h4><ul class="list">${S.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}<li>${mk("h")}<span>${S.bio ? "Цвета на сцене условные: силуэт показывает форму, а не окраску" : "Цвета на сцене — реконструкция: окраска этого существа неизвестна"}</span></li></ul>
         <div class="tm-gos">${gal.on ? (SE ? `<button class="btn tm-go" id="bioToEra" data-hover>В пласт «${esc(SE.nm)}» →</button>` : "") : bmOn ? "" : `<button class="btn tm-go" id="bioCmp" data-hover>Рядом с человеком →</button>`}${S.tree ? `<button class="btn tm-go" id="bioTree" data-hover>В Древе жизни →</button>` : ""}</div>
-        <p class="bio-cr">${ARTD[k] ? "Рисунок «Пробуждения»" : "Силуэт: " + credit(k)}</p>`;
+        <p class="bio-cr">${ARTD[k] ? "Рисунок «Космолябии»" : "Силуэт: " + credit(k)}</p>`;
     } else if (!E){
       h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">Биосфера · учебник жизни</span><span class="tm-nav"><button id="bioDown" aria-label="Вниз, в прошлое" data-hover>↓</button></span></div>
         <h3>Пласты камня</h3><p class="tm-ago2">20 пластов · 4,5 миллиарда лет</p>
@@ -925,7 +925,7 @@ void main(){
         <h4>Наука</h4><ul class="list">
           <li>${mk("s")}<span>Принцип напластования: нижние слои отложились раньше верхних. Его сформулировал Николас Стено в 1669 году.</span></li>
           <li>${mk("s")}<span>Окаменелости — редкая удача: обычно сохраняются только раковины, кости и панцири. Мягкие тела — лишь в исключительных местах вроде сланцев Бёрджес.</span></li></ul>
-        <p class="bio-cr">Силуэты существ — свободные научные рисунки PhyloPic; авторы указаны в портретах. Позже их заменят рисунки «Пробуждения».</p>`;
+        <p class="bio-cr">Силуэты существ — свободные научные рисунки PhyloPic; авторы указаны в портретах. Позже их заменят рисунки «Космолябии».</p>`;
     } else if (!E.ready){
       h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">Пласт ${E.n} из ${NE}</span><span class="tm-nav"><button id="bioUp" aria-label="Выше, ближе к нам" data-hover>↑</button><button id="bioDown" ${cur ? "" : "disabled"} aria-label="Ниже, в прошлое" data-hover>↓</button></span></div>
         <h3>${esc(E.nm)}</h3><p class="tm-ago2">${esc(E.t)}</p><p class="tm-lead">${esc(E.sub)}</p>

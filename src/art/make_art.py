@@ -52,7 +52,7 @@ ap = os.path.join(SITE, "bio_art.js"); old = {}
 if os.path.exists(ap):
     mm = re.search(r"const BIO_ART = (\{.*\});", open(ap, encoding="utf-8").read(), re.S); old = json.loads(mm.group(1)) if mm else {}
 for k, v in out.items(): old[k] = {"img": v["img"], "f": v["f"], "a": v["a"]}
-open(ap, "w", encoding="utf-8").write("// Рисунки существ «Пробуждения» (Люсия): код → { img: WebP, f: куда смотрит (1 вправо, -1 влево), a: движение }. Генератор — art/make_art.py\nconst BIO_ART = " + json.dumps(old, ensure_ascii=False, separators=(",", ":")) + ";\n")
+open(ap, "w", encoding="utf-8").write("// Рисунки существ «Космолябии» (Люсия): код → { img: WebP, f: куда смотрит (1 вправо, -1 влево), a: движение }. Генератор — art/make_art.py\nconst BIO_ART = " + json.dumps(old, ensure_ascii=False, separators=(",", ":")) + ";\n")
 mp = os.path.join(SITE, "bio_masks.js"); s = open(mp, encoding="utf-8").read()
 for k, v in out.items():
     s, n = re.subn(r'^%s:\[\d+,\d+,"[^"]*"\],$' % k, '%s:[%d,%d,"%s"],' % (k, *v["m"]), s, count=1, flags=re.M)

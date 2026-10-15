@@ -1,4 +1,4 @@
-<title>Астролябия Пробуждения</title>
+<title>Космолябия · Атлас пробуждения</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=Golos+Text:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -47,7 +47,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 
 /* интро */
 .intro{position:fixed;inset:0;display:grid;place-content:center;justify-items:center;text-align:center;gap:18px;pointer-events:none;padding:var(--pad)}
-.intro h1{font:400 clamp(54px,11vw,168px)/.9 var(--display);letter-spacing:.12em;margin:0;text-transform:uppercase;padding-left:.12em;text-shadow:0 0 60px rgba(0,0,0,.8)}
+.intro h1{font:400 clamp(30px,10.5vw,168px)/.9 var(--display);letter-spacing:.12em;margin:0;text-transform:uppercase;padding-left:.12em;text-shadow:0 0 60px rgba(0,0,0,.8)}
+@media (max-width:760px){.intro h1{letter-spacing:.06em;padding-left:.06em}}
 .intro p{margin:0;color:var(--muted);max-width:44ch;text-wrap:balance}
 .begin{pointer-events:auto;margin-top:10px;display:inline-flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:999px;padding:12px 22px;transition:border-color .3s,background .3s}
 .begin:hover{border-color:var(--brass);background:rgba(214,172,94,.08)}
@@ -946,7 +947,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 
 <div class="intro" id="intro">
   <span class="mono eyebrow">Карта вселенной · 12 станций · 2 перехода</span>
-  <h1>Пробуждение</h1>
+  <h1>Космолябия</h1>
   <p>Путь по кольцу астролябии: от Единого — в частицу, из пустоты — обратно в Единое.</p>
   <button class="begin" id="begin" data-hover><span class="mono">Начать путь</span></button>
 </div>
@@ -961,7 +962,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 
 <div class="ui" id="ui">
   <div class="bar">
-    <div class="brand">Пробуждение<small>Астролябия сознания</small></div>
+    <div class="brand">Космолябия<small>Атлас пробуждения</small></div>
     <div class="acts">
       <button class="act mono" id="btnHuman" aria-pressed="false" data-hover><span class="lbl">Человек</span><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="6" cy="3" r="2"/><path d="M1 13c0-4 2-6 5-6s5 2 5 6"/></svg></button>
       <button class="act mono" id="btnEarth" aria-pressed="false" data-hover><span class="lbl">Земля</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M1.5 5.5h11M1.5 8.5h11M7 1c-2.4 3.4-2.4 8.6 0 12M7 1c2.4 3.4 2.4 8.6 0 12"/></svg></button>
