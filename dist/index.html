@@ -19016,7 +19016,7 @@ function ringS(u){ const cyc = Math.floor(u/14), m = u - cyc*14; let s;
 const bell = (x, c) => smooth(c - .85, c - .25, x)*(1 - smooth(c + .25, c + .85, x));
 
 let target = -1, pos = -1, vel = 0, lastInput = 0, travel = false;
-let timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false;                                   // открыт «Космический календарь» (chrono.js)
+let coverT = 0, timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false;                                   // открыт «Космический календарь» (chrono.js)
 const locked = () => timeOn || treeOn || thoughtOn || compassOn || mineOn || dimsOn || bioOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
 function goTo(i){
   const u = uOfStation(i);
@@ -19528,7 +19528,9 @@ function loop(now){
   miniAli.setAttribute("transform", `rotate(${mod(s, 12)/N*360})`);
   const sm = mod(s, 12), i0 = Math.floor(sm), i1 = (i0 + 1) % N, fr = sm - i0;
   gmark.style.top = gy(pos < -.5 ? 30 : EXP[i0] + (EXP[i1] - EXP[i0])*smooth(0, 1, fr)) + "%";
-  if (!coarse){ cx += (mx - cx)*.18; cy += (my - cy)*.18; cur.style.transform = `translate(${cx}px,${cy}px)`; }
+  // кольцо курсора догоняет точку одинаково быстро при любой частоте кадров (раньше — доля за кадр, и при
+  // просадке до 30 кадров в секунду кольцо отставало вдвое сильнее)
+  if (!coarse){ const kc = 1 - Math.exp(-dt*20); cx += (mx - cx)*kc; cy += (my - cy)*kc; cur.style.transform = `translate(${cx}px,${cy}px)`; }
 
   const Mh = hH > .001 ? MICRO.update(dPos, hH, T, px, py, portrait) : (MICRO.update(0, 0, T, px, py, portrait), 0);
   // на мягком переходе «Железо → Атом» сцена Земли не гаснет в один кадр: глубину замораживаем
@@ -19569,7 +19571,12 @@ function loop(now){
   scene.visible = Mv < .995;
   const bscOn = humanOpen && jKind === "e" && earthBranch === "bio" && !tr && !zm;
   if (typeof BSC !== "undefined") BSC.update({ on: bscOn, d: dPos, dt, mx, my, portrait });
+  // полноэкранные главы со своей сценой (Биосфера, Календарь, Древо) целиком закрывают кольцо: после того как
+  // глава проявилась, кольцо под ней не рисуем — иначе видеокарта считает две сцены сразу и курсор с панорамой
+  // «тянутся». На закрытие флаг снимается сразу, и кольцо снова рисуется ещё до того, как глава погаснет
+  coverT = bioOn || timeOn || treeOn ? coverT + dt : 0;
   if (typeof BSC !== "undefined" && BSC.covers()){}
+  else if (coverT > .9){}
   else if (composer) composer.render(dt);
   else { renderer.clear(); renderer.render(scene, camera); if (mscene.visible){ renderer.clearDepth(); renderer.render(mscene, mcam); } if (k > .01){ renderer.clearDepth(); renderer.render(tscene, tcam); } }
   requestAnimationFrame(loop);
