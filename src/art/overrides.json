@@ -67,5 +67,27 @@
  },
  "herre": {
   "face": -1
+ },
+ "coelo": {
+  "face": 1
+ },
+ "posto": {
+  "face": -1
+ },
+ "thrin": {
+  "face": 1
+ },
+ "morga": {
+  "face": 1
+ },
+ "eudim": {
+  "face": -1,
+  "anim": "fly"
+ },
+ "notho": {
+  "face": -1
+ },
+ "shoni": {
+  "face": -1
  }
 }

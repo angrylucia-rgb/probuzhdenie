@@ -35,7 +35,9 @@ for f in sorted(os.listdir(SRC)):
         far = ndimage.binary_erosion(ndimage.binary_fill_holes(keep), iterations=12)
         for j in range(hn):
             r = hl == j + 1
-            if hs[j] > 400 and (r & far).sum() > .5*hs[j]: keep |= r
+            # заливаем только «дыры», которые по цвету заметно отличаются от фона (светлые пятна на теле);
+            # просвет фона между лапой и телом остаётся прозрачным
+            if hs[j] > 400 and (r & far).sum() > .5*hs[j] and dist[r].mean() > 14: keep |= r
     al = np.clip((dist - 8)/(26 - 8), 0, 1)
     al = np.where(keep, 1.0, np.where(zone, al, 0.0))
     al = np.asarray(Image.fromarray((al*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(.7))).astype(np.float32)/255
