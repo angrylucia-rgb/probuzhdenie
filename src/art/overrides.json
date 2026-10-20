@@ -89,5 +89,63 @@
  },
  "shoni": {
   "face": -1
+ },
+ "trice": {
+  "face": -1
+ },
+ "veloc": {
+  "face": -1
+ },
+ "ankyl": {
+  "face": -1
+ },
+ "iguan": {
+  "face": -1
+ },
+ "sinos": {
+  "face": 1
+ },
+ "repen": {
+  "face": -1
+ },
+ "spino": {
+  "face": -1
+ },
+ "bwhale": {
+  "face": -1
+ },
+ "octo": {
+  "face": 1
+ },
+ "nauti": {
+  "face": -1
+ },
+ "coela": {
+  "face": -1
+ },
+ "limul": {
+  "face": 1
+ },
+ "axolo": {
+  "face": -1
+ },
+ "tardi": {
+  "face": -1
+ },
+ "ptera": {
+  "face": -1,
+  "anim": "fly"
+ },
+ "bee": {
+  "face": 1,
+  "anim": "fly"
+ },
+ "ginkg": {
+  "face": 1,
+  "anim": "still"
+ },
+ "physa": {
+  "face": 1,
+  "anim": "still"
  }
 }

@@ -19,6 +19,14 @@ for f in sorted(os.listdir(SRC)):
     d = np.sqrt(((a - bg)**2).sum(-1))
     lum = a.mean(-1); dl = np.abs(lum - bg.mean())
     dist = np.maximum(d, dl*1.2)
+    # тень под лапами (генератор иногда рисует её, хотя просили без): для кодов из SHADOW=... в нижней
+    # пятой части кадра бесцветные пиксели чуть темнее фона считаем фоном
+    if k in os.environ.get("SHADOW", "").split(","):
+        sat = a.max(-1) - a.min(-1); lum = a.mean(-1); bgl = bg.mean()
+        ys0 = np.nonzero((dist > 26).any(1))[0]; yb = ys0.max() if len(ys0) else h
+        zone = np.zeros_like(dist, bool); zone[int(yb - .22*(yb - ys0.min())):, :] = True
+        sh = zone & (sat < 14) & (lum > bgl - 70) & (lum < bgl + 4)
+        dist[sh] = 0
     core = dist > 26                                   # уверенно «не фон»
     lab, n = ndimage.label(ndimage.binary_closing(core, iterations=3))
     if n == 0: print(k, "пусто"); continue
@@ -38,6 +46,9 @@ for f in sorted(os.listdir(SRC)):
             # заливаем только «дыры», которые по цвету заметно отличаются от фона (светлые пятна на теле);
             # просвет фона между лапой и телом остаётся прозрачным
             if hs[j] > 400 and (r & far).sum() > .5*hs[j] and dist[r].mean() > 14: keep |= r
+    CL = dict(x.split(':') for x in os.environ.get('CLOSE', '').split(',') if ':' in x)
+    if k in CL:  # закрыть мелкие «выкусы» по краю (светлые блики, похожие на фон)
+        keep = ndimage.binary_fill_holes(ndimage.binary_closing(keep, structure=np.ones((3, 3)), iterations=int(CL[k])))
     al = np.clip((dist - 8)/(26 - 8), 0, 1)
     al = np.where(keep, 1.0, np.where(zone, al, 0.0))
     al = np.asarray(Image.fromarray((al*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(.7))).astype(np.float32)/255
