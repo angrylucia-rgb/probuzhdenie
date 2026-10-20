@@ -16504,7 +16504,7 @@ const BIO_PIMG = {
   //      метр на земле ≈ (v − .275)/3,8 высоты кадра; размер = длинная сторона рисунка × это число
   //      v138: 7-й элемент слота — доля дымки дали, hc — её цвет. v139: аргентинозавр — на ближнем берегу протоки (за ней, у горизонта, он читался великаном: дальние деревья там крошечные)
   cretaceous:{ ar:2752/1536, wl:.605, hc:[.66, .71, .74], fx:["motes", "plankton", "rays"], scale:"Горизонт ≈ .275, камера ≈ 3,8 м: метр ≈ (v−.275)/3,8. Аргентинозавр 32 м — на равнине перед протокой, чуть дальше трицератопса; мелкие (синозавроптерикс, репеномам, микрораптор на коряге) — в истинном размере.",
-    slots:[["argen", .52, .335, .40, 1, null, .08], ["iguan", .12, .36, .22, 1, null, .08], ["spino", .92, .35, .28, -1, null, .1], ["ankyl", .27, .375, .17, 1, null, .05], ["trice", .63, .37, .21, -1, null, .06],
+    slots:[["argen", .52, .335, .28, 1, null, .08], ["iguan", .12, .36, .22, 1, null, .08], ["spino", .92, .35, .28, -1, null, .1], ["ankyl", .27, .375, .17, 1, null, .05], ["trice", .63, .37, .21, -1, null, .06],
     ["trex", .80, .36, .25, -1, null, .08], ["quetz", .38, .40, .20, 1], ["veloc", .68, .46, .10, -1], ["sinos", .56, .50, .06, 1], ["repen", .36, .52, .06, 1],
     ["micro", .06, .455, .04, 1], ["ptera", .64, .12, .13, -1], ["mosa", .55, .78, .48, -1]] },
   now:{ ar:2752/1536, wl:.58, fx:["plankton", "rays", "motes"], scale:"Под водой масштаб — по морской траве (≈ 1 м) и горгонарии у зрителя; синий кит 25 м — в глубине. Пчелы на панораме нет: в истинном размере у деревьев её не видно.",
@@ -18398,7 +18398,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   }
   function panoBuildImg(E, PI){
     PAN = PIMG.build(E.id, PANO_BASE); if (!PAN) return; scn.add(PAN.grp);
-    for (const I of INST){ if (I.fossilOnly || I.pu == null) continue; const m = sprite(I, I.wet, false); m.renderOrder = 100 + I.pv*100;
+    for (const I of INST){ if (I.fossilOnly || I.pu == null) continue; const m = sprite(I, I.wet, false); m.renderOrder = 100 + (I.pv + (I.anim === "fly" ? .5 : 0))*100;   // v140: летящие — перед дальними наземными
       if (I.hz){ const su = m.material.uniforms; su.uHz.value = I.hz; if (PI && PI.hc) su.uHc.value.fromArray(PI.hc); } if (I.shd) I.shd.renderOrder = 99 + I.pv*100; }
   }
   // раскладка существ по картинке: размер — доля высоты, ступни на земле картинки, сдвиг — тот же параллакс, что у её пикселей
