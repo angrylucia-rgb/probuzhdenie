@@ -147,5 +147,51 @@
  "physa": {
   "face": 1,
   "anim": "still"
+ },
+ "anom": {
+  "face": -1
+ },
+ "opab": {
+  "face": -1
+ },
+ "hall": {
+  "face": 1
+ },
+ "pika": {
+  "face": 1
+ },
+ "trilo": {
+  "face": 1
+ },
+ "marr": {
+  "face": 1
+ },
+ "wiwa": {
+  "face": 1
+ },
+ "haik": {
+  "face": -1
+ },
+ "lepid": {
+  "face": 1
+ },
+ "arthr": {
+  "face": 1
+ },
+ "hylo": {
+  "face": -1
+ },
+ "pulmo": {
+  "face": 1
+ },
+ "aqtet": {
+  "face": 1
+ },
+ "steth": {
+  "face": -1
+ },
+ "megan": {
+  "face": -1,
+  "anim": "fly"
  }
 }
