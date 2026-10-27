@@ -193,5 +193,62 @@
  "megan": {
   "face": -1,
   "anim": "fly"
+ },
+ "dimet": {
+  "face": -1
+ },
+ "edaph": {
+  "face": -1
+ },
+ "inos": {
+  "face": -1
+ },
+ "scut": {
+  "face": -1
+ },
+ "estem": {
+  "face": -1
+ },
+ "helic": {
+  "face": -1
+ },
+ "meso": {
+  "face": -1
+ },
+ "dunk": {
+  "face": -1
+ },
+ "austr": {
+  "face": -1
+ },
+ "megal": {
+  "face": -1
+ },
+ "mammo": {
+  "face": -1
+ },
+ "rhino": {
+  "face": -1
+ },
+ "megac": {
+  "face": -1
+ },
+ "smilo": {
+  "face": -1
+ },
+ "glypt": {
+  "face": -1
+ },
+ "diprot": {
+  "face": -1
+ },
+ "erect": {
+  "face": -1
+ },
+ "deino": {
+  "face": 1
+ },
+ "neand": {
+  "face": 1
  }
 }
