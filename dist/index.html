@@ -17374,7 +17374,7 @@ L.forEach(E => loadImg(`${BASE}th/${E.id}.webp`).then(i => { TXT[E.id] = tex(i);
 function show(v){
   if (v === active) return;
   active = v; cv.style.display = fx.style.display = v ? "" : "none"; if (!v){ hov.style.opacity = 0; pins.innerHTML = pins._h = ""; box.classList.remove("bio-strata-pt"); }
-  if (v){ size(); last = performance.now(); if (!raf) raf = requestAnimationFrame(frame); }
+  if (v){ size(); ensure(Math.max(0, cur)); last = performance.now(); if (!raf) raf = requestAnimationFrame(frame); }   // v143: при входе сразу грузим текущий пласт (раньше — только после прокрутки, и стена оставалась мутной миниатюрой)
 }
 cv.style.display = fx.style.display = "none";
 return {
