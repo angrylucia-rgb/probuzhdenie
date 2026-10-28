@@ -17942,7 +17942,7 @@ void main(){
     if (living && life > .6) direct(dt, T);
     if (cmp) life = lifeT = 1;
     // v146: сборка существ из частиц начинается, когда камень уже осыпался (раньше шла под падающей стеной и была не видна)
-    if (PAN && PAN.img && !bmOn && !cmp && ST){ const go = lifeT > .5 && life > .97 && (!ST.busy || (ST.left > 0 && ST.left < .5));   /* v147: проявление — за 0,5 с до конца раскола */ asm = go ? Math.min(1, asm + dt/2.6) : (lifeT > .5 ? asm : Math.max(0, asm - dt/1.1)); } else asm = life;
+    if (PAN && PAN.img && !bmOn && !cmp && ST){ const go = lifeT > .5 && life > .97 && (!ST.busy || (ST.left > 0 && ST.left < 1.5));   /* v148: проявление — за 1,5 с до конца раскола */ asm = go ? Math.min(1, asm + dt/2.6) : (lifeT > .5 ? asm : Math.max(0, asm - dt/1.1)); } else asm = life;
     for (let q = 0; q < INST.length; q++){
       const I = INST[q], u = I.U, lifeI = I.fossilOnly ? 0 : asm;
       let Yb = I.Y;
@@ -18346,6 +18346,23 @@ void main(){
     if (val == null) return `<div class="bio-g na"><span class="mono">${nm}</span><div class="bio-gt"><b style="left:${(clamp(f(now), 0, 1)*100).toFixed(1)}%" title="сегодня"></b></div><span class="bio-gv">${mk(m)}${esc(txt)}</span></div>`;
     return `<div class="bio-g"><span class="mono">${nm}</span><div class="bio-gt"><i style="width:${(clamp(f(val), .02, 1)*100).toFixed(1)}%"></i><b style="left:${(clamp(f(now), 0, 1)*100).toFixed(1)}%" title="сегодня"></b></div><span class="bio-gv">${mk(m)}${esc(txt)}</span></div>`;
   }
+  // v148: сноска об окраске — только там, где окраска действительно неизвестна
+  const COL_KNOWN = new Set(["cyano","bwhale","octo","nauti","coela","limul","axolo","bee","tardi","ginkg","physa","sapie","dog","cow","wheat","thyla"]);
+  const COL_PART = {
+    sinos: "Окраска частично известна по меланосомам в перьях: рыжеватая, с полосатым хвостом и тёмной «маской» у глаз (Zhang et al., 2010; Smithwick et al., 2017)",
+    anchi: "Окраска частично известна по меланосомам: серое тело, чёрно-белые крылья, рыжеватый хохолок (Li et al., 2010)",
+    micro: "Окраска частично известна по меланосомам: чёрное оперение с переливчатым отливом, как у ворона (Li et al., 2012)",
+    archx: "Известен цвет одного изученного пера — чёрный (Carney et al., 2012; 2020); окраска остального тела — реконструкция",
+    mammo: "Шерсть известна по мёрзлым тушам — рыжевато-бурая, хотя за тысячелетия цвет мог измениться; по ДНК встречались и светлые особи (Römpler et al., 2006)",
+    rhino: "Шерсть известна по мёрзлым тушам из Якутии — рыжевато-бурая; за тысячелетия цвет мог измениться",
+    dodo: "Окраска известна по рисункам и описаниям XVII века — серо-бурое оперение; тушки с перьями не сохранились",
+    neand: "По ДНК у части неандертальцев — светлая кожа и рыжие волосы (Lalueza-Fox et al., 2007); облик остальных — реконструкция"
+  };
+  function colNote(k, S){
+    if (COL_KNOWN.has(k) || (S.bio && ARTD[k])) return "";
+    if (COL_PART[k]) return `<li>${mk("s")}<span>${esc(COL_PART[k])}</span></li>`;
+    return `<li>${mk("h")}<span>${S.bio ? "Цвета на сцене условные: силуэт показывает форму, а не окраску" : "Цвета на сцене — реконструкция: окраска этого существа неизвестна"}</span></li>`;
+  }
   function card(){
     const E = cur >= 0 ? BIO_ERAS[cur] : null;
     let h;
@@ -18362,7 +18379,7 @@ void main(){
         <h4>${S.bio ? "Как приспособлен" : "Главное изобретение"}</h4><p class="tm-pr bio-p">${esc(S.inv)}</p>
         <h4>Удивительное</h4><p class="tm-pr bio-p">${esc(S.wow)}</p>
         <h4>${S.bio ? "Что ему грозит" : "Что досталось нам"}</h4><p class="tm-pr bio-p">${esc(S.legacy)}</p>
-        <h4>Наука</h4><ul class="list">${S.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}<li>${mk("h")}<span>${S.bio ? "Цвета на сцене условные: силуэт показывает форму, а не окраску" : "Цвета на сцене — реконструкция: окраска этого существа неизвестна"}</span></li></ul>
+        <h4>Наука</h4><ul class="list">${S.sci.map(([m, t]) => `<li>${mk(m)}<span>${esc(t)}</span></li>`).join("")}${colNote(k, S)}</ul>
         <div class="tm-gos">${gal.on ? (SE ? `<button class="btn tm-go" id="bioToEra" data-hover>В пласт «${esc(SE.nm)}» →</button>` : "") : bmOn ? "" : `<button class="btn tm-go" id="bioCmp" data-hover>Рядом с человеком →</button>`}${S.tree ? `<button class="btn tm-go" id="bioTree" data-hover>В Древе жизни →</button>` : ""}</div>
         <p class="bio-cr">${ARTD[k] ? "Рисунок «Космолябии»" : "Силуэт: " + credit(k)}</p>`;
     } else if (!E){
