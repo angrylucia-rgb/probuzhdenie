@@ -19229,7 +19229,8 @@ function bhReturn(){
 }
 function izEnter(fromBH){
   IZ.prime();
-  if (!fromBH){ toggleMenu(false); izMusicOff(); IZ.open({ onExit: izMusicBack }); return; }
+  // v151: открытые главы (Биосфера, Древо, Календарь…) рисуют свои сцены в своих циклах кадров — под непрозрачной Изнанкой это двойная нагрузка на видеокарту. Закрываем их на входе.
+  if (!fromBH){ toggleMenu(false); closeChapters(); izMusicOff(); IZ.open({ onExit: izMusicBack }); return; }
   izMusicOff();
   IZ.open({ fromBlack:true, onExit: bhReturn });
 }
