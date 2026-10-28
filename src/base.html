@@ -945,6 +945,10 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   .chars>span,.fade{animation:none;transform:none;opacity:1}
   .hint i::after,.on .eq i{animation:none}
 }
+/* v145: перелёт превью существа в портрет; остальная страница меняется мгновенно (холст сцены не замирает) */
+::view-transition-old(root), ::view-transition-new(root){ animation: none; }
+::view-transition-group(bio-sp){ animation-duration: .5s; animation-timing-function: cubic-bezier(.2, .8, .2, 1); }
+::view-transition-old(bio-sp), ::view-transition-new(bio-sp){ animation-duration: .5s; height: 100%; object-fit: contain; }
 </style>
 
 <canvas id="gl" aria-hidden="true"></canvas>
@@ -9338,13 +9342,14 @@ const Music = (() => {
   };
   function vStart(key){
     const parts = key.split(":"), kind = parts[0];
-    const out = ac.createGain(); out.gain.value = .0001; out.connect(bus);
+    const out = ac.createGain(); out.gain.value = .0001;
+    let mf = null; if (kind === "bio"){ mf = ac.createBiquadFilter(); mf.type = "lowpass"; mf.frequency.value = 16000; mf.Q.value = .5; out.connect(mf); mf.connect(bus); } else out.connect(bus);   // v145: курсор под водой — звук глохнет
     let b = null;
     if (kind === "bio"){ b = BIOBED[parts[1]] ? BIOBED[parts[1]](root, out) : null; }
     else if (kind === "lv"){ const lk = parts[1] === "bh" ? "bh" : parts[1] + ":" + parts[2], J = JOURNEYS[parts[1]], k = NOTES[J ? J.st : 0]; b = LBED[lk] ? LBED[lk](k, out) : null; }
     else { const i = +parts[1], k = NOTES[i] || root; b = BED[i] ? BED[i](k, out) : null; }
     out.gain.setTargetAtTime(VVOL, ac.currentTime + .1, 1.2);
-    return { key, out, b };
+    return { key, out, b, mf };
   }
   function vStop(v){ if (!v) return; const t = ac.currentTime; v.out.gain.cancelScheduledValues(t); v.out.gain.setTargetAtTime(.0001, t, .9); setTimeout(() => { try { v.b && v.b.stop(); } catch(e){} v.out.disconnect(); }, 4500); }
   function voiceSet(key, phrase){
@@ -9369,6 +9374,15 @@ const Music = (() => {
     // «Послушать» из Справочника: включает музыку и сразу ставит нужный голос (с фразой станции)
     preview(key){ const sb = $("sound"); if (sb.getAttribute("aria-pressed") !== "true") sb.click(); clearTimeout(vPend); if (vcur && vcur.key === key){ vStop(vcur); vcur = null; } voiceSet(key, true); },
     portal(rise){ if (ac && on && !omOn) whoosh(ac.currentTime + .05, rise); },
+    // v145: под водой (k = 1) фон эпохи глухой, над водой (0) — открытый
+    muffle(k){ if (!ac || !vcur || !vcur.mf) return; vcur.mf.frequency.setTargetAtTime(k ? 520 : 16000, ac.currentTime, k ? .12 : .25); },
+    // v145: раскол камня — серия сухих щелчков и хруста, низкий удар в конце
+    crack(){ if (!ac || !on || omOn) return; const t0 = ac.currentTime + .02, len = Math.floor(ac.sampleRate*.35), nb = ac.createBuffer(1, len, ac.sampleRate), d = nb.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/len, 3);
+      for (let j = 0; j < 6; j++){ const t = t0 + j*(.09 + Math.random()*.16), s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+        s.buffer = nb; f.type = "bandpass"; f.frequency.value = 900 + Math.random()*2200; f.Q.value = 1.4; g.gain.value = .22*(1 - j*.1); s.connect(f); f.connect(g); g.connect(bus); s.start(t); s.stop(t + .4); }
+      const o = ac.createOscillator(), og = ac.createGain(); o.frequency.setValueAtTime(70, t0 + .7); o.frequency.exponentialRampToValueAtTime(38, t0 + 1.5);
+      og.gain.setValueAtTime(.0001, t0 + .7); og.gain.exponentialRampToValueAtTime(.18, t0 + .74); og.gain.exponentialRampToValueAtTime(.0001, t0 + 1.8); o.connect(og); og.connect(bus); o.start(t0 + .7); o.stop(t0 + 1.9); },
     chime(){ if (ac && on && !omOn) bell(root*4, ac.currentTime + .02, .35); },
     tick(k){ if (ac && on && !omOn && ac.currentTime - (this._tk || -9) > .22){ this._tk = ac.currentTime; bell(root*2*Math.pow(2, PENTA[clamp(k, 0, 4) + 2]/12), ac.currentTime + .02, .14); } },
     hover(){ if (ac && on && !omOn && ac.currentTime - (this._h || -9) > 3){ this._h = ac.currentTime; bell(root*3, ac.currentTime + .02, .18); } },
@@ -9389,13 +9403,20 @@ const Music = (() => {
 
 /* ---------- интерфейс ---------- */
 const stEl = $("st"), intro = $("intro"), count = $("count"), hint = $("hint"), portalEl = $("portal");
+// v145: буквы поднимаются и на ходу «расшифровываются» — перебирают знаки и складываются в слово (≈ 0,5 с, только при смене заголовка)
+const SCR_G = "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ·∴∵◊○●◐";
 function chars(el, text, base){
-  el.innerHTML = "";
+  el.innerHTML = ""; const all = [];
   text.split(" ").forEach((w, wi, arr) => {
     const wrap = document.createElement("span"); wrap.className = "chars";
-    [...w].forEach((ch, k) => { const s = document.createElement("span"); s.textContent = ch; s.style.animationDelay = (base + (wi*3 + k)*0.028) + "s"; wrap.appendChild(s); });
+    [...w].forEach((ch, k) => { const s = document.createElement("span"), dl = base + (wi*3 + k)*0.028; s.textContent = ch; s.style.animationDelay = dl + "s"; wrap.appendChild(s); all.push([s, ch, dl]); });
     el.appendChild(wrap); if (wi < arr.length - 1) el.appendChild(document.createTextNode(" "));
   });
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !all.length) return;
+  const t0 = performance.now(), tok = el._scr = {};
+  (function step(now){ if (el._scr !== tok) return; const t = (now - t0)/1000; let busy = false;
+    for (const [s, ch, dl] of all){ const end = dl + .38; if (t < end && ch.trim()){ busy = true; if (Math.random() < .5) s.textContent = SCR_G[Math.random()*SCR_G.length | 0]; } else if (s.textContent !== ch) s.textContent = ch; }
+    if (busy) requestAnimationFrame(step); })(t0);
 }
 function refade(el, text){ el.textContent = text; el.classList.remove("fade"); void el.offsetWidth; el.classList.add("fade"); }
 // ---------- журнал пройденного (новый блок, этап 3, подэтап 10б) ----------
@@ -16543,7 +16564,18 @@ void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float out_ =
   if (out_ > 0.002){ uv = vec2(qc.x, clamp(qc.y, 0.004, 0.996)); vec3 e = vec3(0.0); for (int i = -4; i <= 4; i++) e += texture2D(uTex, vec2(uv.x + float(i)*0.03, uv.y + (uv.y > 0.5 ? -0.03 : 0.03))).rgb; e /= 9.0;
     gl_FragColor = vec4(mix(e*0.8, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.055, out_)), uA); return; }
   if (uWl > 0.0 && uv.y < 1.0 - uWl){ float w = (1.0 - uWl - uv.y); uv.x += sin(uv.y*140.0 + uT*1.3)*0.00045*smoothstep(0.0, 0.05, w); uv.y += sin(uv.x*90.0 + uT*0.9)*0.0003*smoothstep(0.0, 0.05, w); }
+  // v145 «живая панорама»: облака (самое дальнее — небо) чуть плывут; у кромки воды — рябь; ближняя зелень колышется
+  float sky = smoothstep(0.03, 0.006, d)*step(0.45, uv.y);
+  uv.x += sky*sin(uT*0.045 + uv.y*4.0)*0.0035;
+  float surf = uWl > 0.0 ? smoothstep(0.0, 0.012, uv.y - (1.0 - uWl))*smoothstep(0.1, 0.0, uv.y - (1.0 - uWl)) : 0.0;
+  uv.x += surf*sin(uv.y*420.0 - uT*1.6)*0.0007; uv.y += surf*sin(uv.x*160.0 + uT*1.1)*0.0004;
+  vec3 c0 = texture2D(uTex, clamp(uv, 0.001, 0.999)).rgb;
+  float veg = smoothstep(0.02, 0.09, c0.g - max(c0.r*0.92, c0.b))*smoothstep(0.12, 0.45, d)*(1.0 - sky)*(uWl > 0.0 ? step(1.0 - uWl, uv.y) : 1.0);
+  uv.x += veg*(sin(uT*1.15 + uv.x*23.0 + uv.y*11.0) + 0.5*sin(uT*2.3 + uv.y*57.0))*0.0009*d;
   vec3 c = texture2D(uTex, clamp(uv, 0.001, 0.999)).rgb; c *= 0.97 + 0.03*sin(uT*0.35);
+  c += surf*vec3(1.0, 0.97, 0.9)*pow(max(0.0, sin(uv.x*900.0 + uT*2.1)*sin(uv.y*700.0 - uT*1.4)), 12.0)*0.35*smoothstep(0.35, 0.8, dot(c, vec3(0.33)));   // блики на воде
+  if (uWl > 0.0 && uv.y < 1.0 - uWl){ vec2 p = uv*vec2(26.0, 18.0); float k = abs(sin(p.x + sin(p.y*1.3 + uT*0.7)*1.6 + uT*0.4))*abs(sin(p.y*0.9 + sin(p.x*1.1 - uT*0.5)*1.4));
+    c += vec3(0.75, 1.0, 0.95)*pow(1.0 - k, 6.0)*0.07*smoothstep(0.55, 0.0, (1.0 - uWl) - uv.y); }                                                       // каустика у поверхности
   c = mix(c, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.16, out_));
   gl_FragColor = vec4(c, uA); }`;
   const VP = `attribute float aS, aPh; uniform float uT, uPR, uK, uY0, uY1; varying float vA;
@@ -16571,7 +16603,10 @@ void main(){ float x = vUv.x*7.0 - vUv.y*1.8; float s = pow(max(0.0, sin(x + sin
     const grp = new THREE.Group(), disp = [], U = { uT:{ value:0 }, uA:{ value:0 }, uPR:{ value:Math.min(2, devicePixelRatio || 1) } };
     const st = { ok:false, dep:null, dw:0, dh:0, rect:null, par:new THREE.Vector2() };
     const mk = (vs, fs, uni, o) => { const m = new THREE.ShaderMaterial(Object.assign({ vertexShader: vs, fragmentShader: fs, uniforms: Object.assign({}, U, uni), transparent: true, depthWrite: false, depthTest: false }, o || {})); disp.push(m); return m; };
-    const ld = new THREE.TextureLoader(), tI = ld.load(base + id + ".webp", () => { st.ok = true; }), tD = ld.load(base + id + "_d.webp");
+    const ld = new THREE.TextureLoader(), tI = ld.load(base + id + ".webp", () => { st.ok = true; amb(); }), tD = ld.load(base + id + "_d.webp");
+    // v145: уменьшенная копия картинки 64 px — средний цвет вокруг существа (подстройка его света под окружение)
+    function amb(){ try { const im = tI.image, w = 64, h = Math.max(8, Math.round(64*im.height/im.width)), c = document.createElement("canvas"); c.width = w; c.height = h;
+      const x = c.getContext("2d"); x.drawImage(im, 0, 0, w, h); st.col = x.getImageData(0, 0, w, h).data; st.cw = w; st.ch = h; } catch (e){} }
     [tI, tD].forEach(t => { t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; disp.push(t); });
     const di = new Image(); di.onload = () => { const c = document.createElement("canvas"); c.width = di.naturalWidth; c.height = di.naturalHeight; const x = c.getContext("2d"); x.drawImage(di, 0, 0); st.dep = x.getImageData(0, 0, c.width, c.height).data; st.dw = c.width; st.dh = c.height; }; di.src = base + id + "_d.webp";
     const IU = { uTex:{ value:tI }, uDep:{ value:tD }, uPar:{ value:st.par }, uWl:{ value:C.wl || 0 }, uK:{ value:.022 }, uAR:{ value:C.ar || 3168/1344 }, uR:{ value:new THREE.Vector4(0, 0, 1, 1) } };
@@ -16617,7 +16652,12 @@ void main(){ float x = vUv.x*7.0 - vUv.y*1.8; float s = pow(max(0.0, sin(x + sin
       return r;
     }
     grp.visible = false;
-    return { grp, C, st, img: true, depthAt, layout,
+    // средний цвет окна картинки вокруг (u, v сверху), радиус — в долях ширины; null, пока картинка не загружена
+    const colorAt = (u, v, rad) => { if (!st.col) return null; const w = st.cw, h = st.ch, cx = u*w, cy = v*h, rx = Math.max(1, rad*w), ry = Math.max(1, rad*w);
+      let r = 0, g = 0, bl = 0, n = 0;
+      for (let y = Math.max(0, cy - ry | 0); y <= Math.min(h - 1, cy + ry | 0); y++) for (let x = Math.max(0, cx - rx | 0); x <= Math.min(w - 1, cx + rx | 0); x++){ const i = (y*w + x)*4; r += st.col[i]; g += st.col[i + 1]; bl += st.col[i + 2]; n++; }
+      return n ? [r/n/255, g/n/255, bl/n/255] : null; };
+    return { grp, C, st, img: true, depthAt, colorAt, dep: tD, tex: tI, kPar: IU.uK, layout,
       toWorld(u, v){ const r = st.rect; return r ? [r.x0 + u*r.W, r.y1 - v*r.H] : [0, 0]; },
       shift(u, v){ const r = st.rect; if (!r) return [0, 0]; const d = depthAt(u, v); return [st.par.x*(d - .3)*IU.uK.value*r.W, st.par.y*(d - .3)*IU.uK.value*r.H]; },
       update(T, A, px, py){ U.uT.value = T; U.uA.value = A*(st.ok ? 1 : 0); st.par.set(px, py); grp.visible = U.uA.value > .004; },
@@ -17867,7 +17907,9 @@ void main(){
       // один сглаженный сигнал и для сдвига панорамы, и для глубинного параллакса — иначе два слоя движения с разной инерцией дают рывки
       PAN.update(T, cmp ? 0 : bmOn ? (PAN.img ? 1 : 0) : envA, port ? 0 : (PAN.img ? panX : ptr.nx)*.9, -(PAN.img ? panY : ptr.ny)*.5);
       if (PAN.img){ if (!(fc % 30) && !fold){ const r = box.querySelector(".time-in").getBoundingClientRect(); panL = port ? 0 : Math.min(.6, (r.right + 24)/W3); }
-        PAN.layout(cam, port, ZP, port ? -ptr.nx : panX, foldK, panL, panY); panoLayoutImg(); } }
+        PAN.layout(cam, port, ZP, port ? -ptr.nx : panX, foldK, panL, panY); panoLayoutImg();
+        if (PAN.C.wl && PAN.st.rect && life > .5){ WLV.set(0, PAN.st.rect.y1 - PAN.C.wl*PAN.st.rect.H, ZP).project(cam); const under = (gpy + 1)/2 > (1 - WLV.y)/2 ? 1 : 0;   // v145: курсор ниже линии воды
+          if (under !== wetSnd){ wetSnd = under; Music.muffle(under); } } else if (wetSnd){ wetSnd = 0; Music.muffle(0); } } }
     const pon = !!PAN && (bmOn ? !!PAN.img : envA > .35) && !cmp; if (pon !== box.classList.contains("bio-pano")) box.classList.toggle("bio-pano", pon);
     const hid = fold && pon; if (hid !== box.classList.contains("bio-hide")){ box.classList.toggle("bio-hide", hid); foldBtn(); }
     foldK += ((hid ? 1 : 0) - foldK)*Math.min(1, dt*3.2);
@@ -17883,7 +17925,8 @@ void main(){
       else if (I.anim === "swim" || I.anim === "eel") Yb += Math.sin(T*.7 + I.ph)*.1*lifeI;
       else if (I.anim === "walk") Yb += .02*I.h*Math.abs(Math.sin(T*3.4 + I.ph))*I.act;
       u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = PAN ? instA*(1 - smooth(.8, .97, life)) : instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
-      if (I.spr){ const su = I.spr.material.uniforms; su.uT.value = T; su.uA.value = instA*smooth(.74, .97, life)*(cmp || (bmOn && !(PAN && PAN.img)) ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*.55*Math.max(0, 1 - 1.6*(I.hz || 0)); I.shd.visible = I.spr.visible; } }
+      if (I.spr){ const su = I.spr.material.uniforms, rev = smooth(.70, .98, life); su.uT.value = T; su.uRev.value = rev;   // v145: рисунок «проявляется» из частиц фронтом с золотой кромкой
+        su.uA.value = instA*Math.min(1, rev*8)*(cmp || (bmOn && !(PAN && PAN.img)) ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*rev*.55*Math.max(0, 1 - 1.6*(I.hz || 0)); I.shd.visible = I.spr.visible; } }
       u.uC.value.set(I.X, Yb, I.Z); u.uF.value = I.F; u.uTilt.value = I.tl; u.uAct.value = I.act;
       I.o.visible = instA > .005 && !(PAN && life > .975);
       I.sx = I.X; I.sy = Yb;
@@ -18032,13 +18075,21 @@ void main(){
       <div class="bio-chips bio-grid">${L.map(k => `<button class="bio-sp${cmpK === k ? " on" : ""}" data-gk="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span><i style="--c:${BIO_ERAS[SP_ERA[k]].col}">${esc(BIO_ERAS[SP_ERA[k]].nm)}</i></button>`).join("") || `<p class="tm-pr">Ничего не нашлось — попробуйте другой фильтр.</p>`}</div>
       <p class="bio-cr">${mk("h")} Размеры — по оценкам палеонтологов; у летающих указан размах крыльев, у растений — высота. Силуэты — PhyloPic.</p>`;
   }
+  // v145: превью в галерее плавно «перелетает» в портрет карточки и обратно (View Transitions; без поддержки или при «меньше движения» — просто смена)
+  function vt(from, swap, backK){
+    if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches || !from){ swap(); return; }
+    from.style.viewTransitionName = "bio-sp";
+    const t = document.startViewTransition(() => { from.style.viewTransitionName = ""; swap();
+      const to = backK ? cardEl.querySelector(`[data-gk="${backK}"] img`) : cardEl.querySelector(".bio-port"); if (to) to.style.viewTransitionName = "bio-sp"; });
+    t.finished.finally(() => cardEl.querySelectorAll("img").forEach(i => { i.style.viewTransitionName = ""; }));
+  }
   function galBind(){
     const on = (id, f) => { const b = $(id); if (b) b.onclick = f; };
     on("bioGalX", () => galExit());
     [["bgEra", "era"], ["bgGrp", "grp"], ["bgInv", "inv"]].forEach(([id, key]) => { const el = $(id); if (el) el.onchange = () => { gal[key] = el.value; card(); }; });
     const qi = $("bgQ"); if (qi){ qi.oninput = () => { gal.q = qi.value; const p = qi.selectionStart; card(); const n = $("bgQ"); if (n){ n.focus(); try { n.setSelectionRange(p, p); } catch(e){} } }; }
     cardEl.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { gal.sort = b.dataset.sort; card(); });
-    cardEl.querySelectorAll("[data-gk]").forEach(b => b.onclick = () => { compare(b.dataset.gk); view = b.dataset.gk; jrMark("bio", "sp:" + view, BIO_SP[view].ru); card(); });
+    cardEl.querySelectorAll("[data-gk]").forEach(b => b.onclick = () => { const k = b.dataset.gk; vt(b.querySelector("img"), () => { compare(k); view = k; jrMark("bio", "sp:" + view, BIO_SP[view].ru); card(); }); });
   }
   // сцена сравнения: существо и человек в одном масштабе, линейка внизу
   let CMP_FLOOR = -3.3;
@@ -18330,7 +18381,7 @@ void main(){
     if (!mechOn) hereBind(() => bmOn ? { t:"biome", b:BIO_BIOMES[bi].id } : cur >= 0 ? { t:"era", e:BIO_ERAS[cur].id } : null);
     const on = (id, f) => { const b = $(id); if (b) b.onclick = f; };
     on("bioUp", () => go(cur < NE - 1 ? cur + 1 : -1)); on("bioDown", () => go(cur < 0 ? NE - 1 : cur - 1));
-    on("bioBack", () => { view = null; sel = -1; card(); });
+    on("bioBack", () => { const k = view; vt(cardEl.querySelector(".bio-port"), () => { view = null; sel = -1; card(); }, k); });
     on("bioGal", () => galOn());
     on("bioMech", () => mechOn_());
     on("bioBas", () => mechOn_(-1, "basics")); on("bioBm", () => bmOn_(0));
@@ -18359,17 +18410,36 @@ void main(){
   function foldBtn(){ const h = box.classList.contains("bio-hide"), m = innerWidth <= 760; fb.textContent = h ? (m ? "⌃" : "›") : (m ? "⌄" : "‹");
     fb.setAttribute("aria-pressed", String(h)); fb.title = h ? "Показать текст" : "Скрыть текст"; fb.setAttribute("aria-label", h ? "Показать текст" : "Скрыть текст и смотреть панораму"); }
   fb.onclick = () => { fold = !fold; }; foldBtn(); addEventListener("resize", foldBtn);
-  const SPV = `uniform float uT, uPh, uAn; varying vec2 vUv;
+  const SPV = `uniform float uT, uPh, uAn, uZp; varying vec2 vUv, vW;
 void main(){ vUv = uv; vec3 p = position; float sd = uv.x - 0.5, e = smoothstep(0.18, 0.5, abs(sd));
   if (uAn < 0.5){ p.y += uv.y*0.012*sin(uT*1.3 + uPh) + sin(uT*0.7 + uPh)*0.018*e*uv.y; }
   else if (uAn < 2.5){ p.y += sin(uv.x*6.5 - uT*1.9 + uPh)*0.03*(0.2 + abs(sd)*1.6) + sin(uT*0.6 + uPh)*0.035; p.x += sin(uT*0.41 + uPh)*0.025; }
   else if (uAn < 4.5){ p.y += uv.y*0.014*sin(uT*1.2 + uPh) + sin(uT*0.85 + uPh)*0.022*e*(0.3 + uv.y); }
   else if (uAn < 5.5){ p.y += sin(uT*1.5 + uPh)*0.05; p.x += sin(uT*0.47 + uPh)*0.04; }
   else { p.x += sin(uT*0.5 + uPh)*0.04*uv.y*uv.y; }
+  vec4 wp = modelMatrix*vec4(p, 1.0); float tz = (uZp - cameraPosition.z)/(wp.z - cameraPosition.z); vW = cameraPosition.xy + (wp.xy - cameraPosition.xy)*tz;   // точка на плоскости панорамы под этим пикселем
   gl_Position = projectionMatrix*modelViewMatrix*vec4(p, 1.0); }`;
   // uHz/uHc (v138): воздушная дымка для дальних существ — цвет уходит к цвету дали, как у самой картинки
-  const SPF = `uniform sampler2D uTex; uniform float uA, uHov, uWet, uHz; uniform vec3 uWc, uHc; varying vec2 vUv;
-void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) discard; vec3 col = c.rgb*(1.0 + 0.25*uHov); col = mix(col, col*uWc, uWet*0.6); col = mix(col, uHc, uHz); gl_FragColor = vec4(col, a); }`;
+  // v145: uOcc — передний план панорамы (карта глубины ближе, чем низ существа uDs) закрывает существо: папоротники — лапы, коряги — рыбу;
+  //       uAmb — средний цвет окружения: оттенок и яркость существа подстраиваются под свет места
+  const SPF = `uniform sampler2D uTex, uDep, uPan; uniform float uA, uHov, uWet, uHz, uOcc, uDs, uKp, uAmbK, uGrass, uRev, uT; uniform vec3 uWc, uHc, uAmb; uniform vec4 uRc; uniform vec2 uPar; varying vec2 vUv, vW;
+float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0 - 2.0*f); return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
+void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) discard;
+  vec3 col = c.rgb*(1.0 + 0.25*uHov); col = mix(col, col*uWc, uWet*0.6);
+  float glow = 0.0;
+  if (uRev < 0.999){ float n = 0.55*vn(vUv*vec2(11.0, 7.0)) + 0.25*vn(vUv*vec2(31.0, 23.0)) + 0.2*vUv.y, t = uRev*1.3 - 0.15;   // от лап вверх, рваным фронтом
+    float m = smoothstep(n - 0.05, n, t); glow = smoothstep(n - 0.13, n - 0.04, t) - m; a *= max(m, glow*0.9); if (a < 0.01) discard; }
+  if (uOcc > 0.5){ vec2 q = (vW - uRc.xy)/uRc.zw;
+    if (q.x > 0.0 && q.x < 1.0 && q.y > 0.0 && q.y < 1.0){ float d0 = texture2D(uDep, q).r; vec2 uv = q - uPar*(d0 - 0.3)*uKp; float dp = texture2D(uDep, uv).r;
+      a *= 1.0 - smoothstep(uDs*1.25 + 0.012, uDs*1.5 + 0.03, dp);                       // заметно ближе низа существа — закрывает
+      if (uGrass > 0.5 && vUv.y < 0.16){                                                  // трава и папоротники у лап: пиксель картинки с фактурой зелени — поверх ног
+        vec3 pc = texture2D(uPan, uv).rgb, n1 = texture2D(uPan, uv + vec2(0.0012, 0.0)).rgb, n2 = texture2D(uPan, uv + vec2(0.0, 0.0021)).rgb;
+        float tx = length(pc - n1) + length(pc - n2), band = 1.0 - smoothstep(0.015, 0.16, vUv.y);
+        col = mix(col, pc, band*smoothstep(0.05, 0.16, tx)*smoothstep(0.0, 0.05, pc.g - pc.b)); } }
+    if (a < 0.01) discard; }
+  float la = max(dot(uAmb, vec3(0.299, 0.587, 0.114)), 0.02); col *= mix(vec3(1.0), uAmb/la, 0.22*uAmbK)*mix(1.0, clamp(la/0.42, 0.55, 1.12), 0.5*uAmbK);
+  col = mix(col, uHc, uHz); col = mix(col, vec3(1.0, 0.82, 0.45)*1.35, clamp(glow*1.6, 0.0, 1.0)); gl_FragColor = vec4(col, a); }`;
   const SHF = `uniform float uA; varying vec2 vUv; void main(){ vec2 d = vUv - 0.5; float r = dot(d, d)*4.0; gl_FragColor = vec4(0.0, 0.0, 0.0, smoothstep(1.0, 0.0, r)*uA); }`;
   // силуэт без рисунка: тёмная фигура с золотым ореолом
   function silCanvas(k){
@@ -18404,12 +18474,15 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     }
   }
   const ZP = -4, PANO_BASE = "pano/";
+  const WLV = new THREE.Vector3(); let wetSnd = 0;
+  const RC = new THREE.Vector4(0, 0, 1, 1);   // прямоугольник картинки панорамы на её плоскости: x0, низ, ширина, высота — общий для всех спрайтов
   function sprite(I, wet, flatShadow){
     const A = ART[I.k]; let tex, sx = 1, sy = 1;
     if (A){ tex = new THREE.Texture(A.im); tex.needsUpdate = true; } else { const s = silCanvas(I.k); tex = new THREE.CanvasTexture(s.c); sx = s.sx; sy = s.sy; }
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 14, 6), new THREE.ShaderMaterial({ vertexShader: SPV, fragmentShader: SPF, transparent: true, depthWrite: false, depthTest: false,
-      uniforms: { uTex:{ value:tex }, uT:{ value:0 }, uA:{ value:0 }, uPh:{ value:I.ph }, uAn:{ value:ANIM[I.anim] || 0 }, uHov:{ value:0 }, uWet:{ value:wet ? 1 : 0 }, uWc:{ value:new THREE.Vector3(.55, .95, .85) }, uHz:{ value:0 }, uHc:{ value:new THREE.Vector3(.8, .82, .85) } } }));
+      uniforms: { uTex:{ value:tex }, uT:{ value:0 }, uA:{ value:0 }, uPh:{ value:I.ph }, uAn:{ value:ANIM[I.anim] || 0 }, uHov:{ value:0 }, uWet:{ value:wet ? 1 : 0 }, uWc:{ value:new THREE.Vector3(.55, .95, .85) }, uHz:{ value:0 }, uHc:{ value:new THREE.Vector3(.8, .82, .85) },
+        uZp:{ value:-4 }, uDep:{ value:null }, uOcc:{ value:0 }, uDs:{ value:2 }, uPan:{ value:null }, uGrass:{ value:0 }, uRev:{ value:1 }, uKp:{ value:.022 }, uRc:{ value:RC }, uPar:{ value:new THREE.Vector2() }, uAmb:{ value:new THREE.Vector3(.5, .5, .5) }, uAmbK:{ value:0 } } }));
     m.userData = { sx, sy }; m.visible = false; scn.add(m); I.spr = m;
     if (!wet && I.anim !== "fly" && !I.plant){ if (!SHT) SHT = new THREE.PlaneGeometry(1, 1);
       const sh = new THREE.Mesh(SHT, new THREE.ShaderMaterial({ vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }", fragmentShader: SHF, transparent: true, depthWrite: false, depthTest: false, uniforms: { uA:{ value:0 } } }));
@@ -18419,7 +18492,8 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   function panoBuildImg(E, PI){
     PAN = PIMG.build(E.id, PANO_BASE); if (!PAN) return; scn.add(PAN.grp);
     for (const I of INST){ if (I.fossilOnly || I.pu == null) continue; const m = sprite(I, I.wet, false); m.renderOrder = 100 + (I.pv + (I.anim === "fly" ? .5 : 0))*100;   // v140: летящие — перед дальними наземными
-      if (I.hz){ const su = m.material.uniforms; su.uHz.value = I.hz; if (PI && PI.hc) su.uHc.value.fromArray(PI.hc); } if (I.shd) I.shd.renderOrder = 99 + I.pv*100; }
+      const su = m.material.uniforms; su.uZp.value = ZP; su.uDep.value = PAN.dep; su.uPar.value = PAN.st.par; su.uKp.value = PAN.kPar.value; su.uOcc.value = I.anim === "fly" ? 0 : 1; su.uPan.value = PAN.tex; su.uGrass.value = !I.wet && I.anim !== "fly" && I.lane !== "water" ? 1 : 0;
+      if (I.hz){ su.uHz.value = I.hz; if (PI && PI.hc) su.uHc.value.fromArray(PI.hc); } if (I.shd) I.shd.renderOrder = 99 + I.pv*100; }
   }
   // раскладка существ по картинке: размер — доля высоты, ступни на земле картинки, сдвиг — тот же параллакс, что у её пикселей
   // окаменелость в породе: место по слоту картинки, разнесено по всему срезу; те же числа задают uFos при создании (v105: иначе все окаменелости — в одной точке)
@@ -18433,8 +18507,12 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
       const land = !I.wet && I.anim !== "fly" && I.lane !== "water";
       const PX = wx + dx, PY = (land ? wy + sh/2 : wy) + dy, PZ = ZP + .5 + q*.01, mixF = (a, b) => a + (b - a)*kF;
       I.h = mixF(F[3], hs); I.U.uS.value = I.h; I.X = mixF(F[0], PX); I.Y = mixF(F[1], PY); I.Z = mixF(F[2], PZ);
-      if (I.spr){ const u = I.spr.userData; I.spr.scale.set(sw*u.sx*I.F, sh*u.sy, 1); I.spr.position.set(PX, PY, PZ); }
+      if (I.spr){ const u = I.spr.userData; I.spr.scale.set(sw*u.sx*I.F, sh*u.sy, 1); I.spr.position.set(PX, PY, PZ);
+        const su = I.spr.material.uniforms;
+        if (su.uOcc.value) su.uDs.value = PAN.depthAt(I.pu, land ? I.pv : I.pv + sh*.5/r.H);   // глубина низа существа: лапы — или нижний край пловца
+        if (!I.amb){ const cA = PAN.colorAt(I.pu, land ? I.pv - sh*.3/r.H : I.pv, .05); if (cA){ su.uAmb.value.fromArray(cA); su.uAmbK.value = 1; I.amb = true; } } }
       if (I.shd){ I.shd.scale.set(sw*.9, sw*.09, 1); I.shd.position.set(PX, wy + dy + sw*.01, PZ - .005); } });
+    if (r) RC.set(r.x0, r.y1 - r.H, r.W, r.H);
   }
   function panoClear(){
     for (const I of INST){ if (I.spr){ scn.remove(I.spr); I.spr.geometry.dispose(); I.spr.material.uniforms.uTex.value.dispose(); I.spr.material.dispose(); I.spr = null; } if (I.shd){ scn.remove(I.shd); I.shd.material.dispose(); I.shd = null; } }
@@ -18456,7 +18534,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   function reviveStone(){
     if (!ST){ lifeT = 1; lifeAt = 0; hint(); return; }
     if (cur < 0 || !BIO_ERAS[cur].ready || !ST.revive()) return;
-    life = lifeT = 1; lifeAt = 0; hint(); Music.voice("bio:" + BIO_ERAS[cur].world, false);
+    life = lifeT = 1; lifeAt = 0; hint(); Music.crack(); Music.voice("bio:" + BIO_ERAS[cur].world, false);
   }
   function toStone(){
     if (!ST){ lifeT = 0; lifeAt = 0; hint(); return; }
