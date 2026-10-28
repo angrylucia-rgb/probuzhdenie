@@ -21,7 +21,7 @@ def sil(k):   # силуэт из маски частиц (для существ
     for r in runs: m[p:p + r] = cur; p += r; cur = not cur
     a = np.zeros((h, w, 4), np.uint8); a[..., :3] = 60; a[..., 3] = m.reshape(h, w)*235
     return Image.fromarray(a, "RGBA")
-for k, u, v, sz, d in S:
+for k, u, v, sz, d, *_ in S:
     try: im = Image.open(f"/home/claude/site/art/img/{k}.webp").convert("RGBA")
     except Exception: im = sil(k)
     if im is None: print("нет рисунка", k); continue
