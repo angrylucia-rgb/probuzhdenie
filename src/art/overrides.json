@@ -250,5 +250,75 @@
  },
  "neand": {
   "face": 1
+ },
+ "acan": {
+  "face": -1
+ },
+ "clado": {
+  "face": -1
+ },
+ "eusth": {
+  "face": -1
+ },
+ "tikt": {
+  "face": -1
+ },
+ "cyano": {
+  "face": 1
+ },
+ "camel": {
+  "face": 1
+ },
+ "fenec": {
+  "face": -1
+ },
+ "jerbo": {
+  "face": -1
+ },
+ "scorp": {
+  "face": 1
+ },
+ "howl": {
+  "face": 1
+ },
+ "sloth": {
+  "face": 1
+ },
+ "jagua": {
+  "face": -1
+ },
+ "harpy": {
+  "face": -1
+ },
+ "squir": {
+  "face": 1
+ },
+ "beetl": {
+  "face": 1
+ },
+ "worm": {
+  "face": 1
+ },
+ "cow": {
+  "face": -1
+ },
+ "dodo": {
+  "face": -1
+ },
+ "dog": {
+  "face": 1
+ },
+ "sapie": {
+  "face": -1
+ },
+ "thyla": {
+  "face": -1
+ },
+ "wheat": {
+  "face": 1
+ },
+ "touca": {
+  "face": -1,
+  "anim": "fly"
  }
 }
