@@ -16540,7 +16540,7 @@ const BIO_PIMG = {
   triassic:{ wl:.6, fx:["motes", "plankton", "rays"], scale:"Горизонт ≈ .41, камера ≈ 2.5 м: размер ≈ длина·(v−.41)/2.5; мелкие — в истинном размере (v137): тринаксодон 0,45 м, эораптор 1 м; морганукодона (10 см) на панораме нет — не виден; шонизавр — далеко в глубине.",
     slots:[["eudim", .15, .22, .08, 1], ["posto", .27, .515, .19, 1], ["coelo", .45, .52, .13, -1], ["lystr", .56, .52, .066, 1],
     ["herre", .72, .47, .11, -1], ["eorap", .82, .50, .04, -1], ["thrin", .92, .52, .02, -1],
-    ["notho", .29, .76, .34, 1], ["shoni", .70, .66, .55, -1]] },   // под водой масштаб — по камням и кораллам у самого зрителя: прежние .2/.3 смотрелись игрушечными
+    ["notho", .29, .80, .30, 1], ["shoni", .70, .70, .36, -1]] },   // под водой масштаб — по камням и кораллам у самого зрителя: прежние .2/.3 смотрелись игрушечными
   // ---- v137: масштаб по перспективе. Мел: горизонт ≈ .275, камера ≈ 3,8 м (по пальмам, магнолиям и папоротникам);
   //      метр на земле ≈ (v − .275)/3,8 высоты кадра; размер = длинная сторона рисунка × это число
   //      v138: 7-й элемент слота — доля дымки дали, hc — её цвет. v139: аргентинозавр — на ближнем берегу протоки (за ней, у горизонта, он читался великаном: дальние деревья там крошечные)
@@ -17937,15 +17937,17 @@ void main(){
     const instA = trn ? Math.max(0, 1 - trT*3.2) : 1, living = (cur >= 0 || bmOn) && !trn && !cmp;
     if (living && life > .6) direct(dt, T);
     if (cmp) life = lifeT = 1;
+    // v146: сборка существ из частиц начинается, когда камень уже осыпался (раньше шла под падающей стеной и была не видна)
+    if (PAN && PAN.img && !bmOn && !cmp && ST){ const go = lifeT > .5 && !ST.busy && life > .97; asm = go ? Math.min(1, asm + dt/2.6) : (lifeT > .5 ? asm : Math.max(0, asm - dt/1.1)); } else asm = life;
     for (let q = 0; q < INST.length; q++){
-      const I = INST[q], u = I.U, lifeI = I.fossilOnly ? 0 : life;
+      const I = INST[q], u = I.U, lifeI = I.fossilOnly ? 0 : asm;
       let Yb = I.Y;
       if (PAN){}
       else if (I.anim === "fly") Yb += Math.sin(T*1.1 + I.ph)*(I.st === "go" ? .08 : .2)*lifeI;
       else if (I.anim === "swim" || I.anim === "eel") Yb += Math.sin(T*.7 + I.ph)*.1*lifeI;
       else if (I.anim === "walk") Yb += .02*I.h*Math.abs(Math.sin(T*3.4 + I.ph))*I.act;
-      u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = PAN ? instA*(1 - smooth(.8, .97, life)) : instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
-      if (I.spr){ const su = I.spr.material.uniforms, rev = smooth(.70, .98, life); su.uT.value = T; su.uRev.value = rev;   // v145: рисунок «проявляется» из частиц фронтом с золотой кромкой
+      u.uT.value = T; u.uLife.value = lifeI; u.uAl.value = PAN ? instA*(1 - smooth(.86, 1, asm)) : instA; u.uHov.value = q === hov || q === sel ? 1 : 0;
+      if (I.spr){ const su = I.spr.material.uniforms, rev = smooth(.62, .97, asm); su.uT.value = T; su.uRev.value = rev;   // v145: рисунок «проявляется» из частиц фронтом с золотой кромкой
         su.uA.value = instA*Math.min(1, rev*8)*(cmp || (bmOn && !(PAN && PAN.img)) ? 0 : 1); su.uHov.value = u.uHov.value; I.spr.visible = su.uA.value > .004; if (I.shd){ I.shd.material.uniforms.uA.value = su.uA.value*rev*.55*Math.max(0, 1 - 1.6*(I.hz || 0)); I.shd.visible = I.spr.visible; } }
       u.uC.value.set(I.X, Yb, I.Z); u.uF.value = I.F; u.uTilt.value = I.tl; u.uAct.value = I.act;
       I.o.visible = instA > .005 && !(PAN && life > .975);
@@ -18442,7 +18444,7 @@ void main(){ vUv = uv; vec3 p = position; float sd = uv.x - 0.5, e = smoothstep(
   // uHz/uHc (v138): воздушная дымка для дальних существ — цвет уходит к цвету дали, как у самой картинки
   // v145: uOcc — передний план панорамы (карта глубины ближе, чем низ существа uDs) закрывает существо: папоротники — лапы, коряги — рыбу;
   //       uAmb — средний цвет окружения: оттенок и яркость существа подстраиваются под свет места
-  const SPF = `uniform sampler2D uTex, uDep, uPan; uniform float uA, uHov, uWet, uHz, uOcc, uDs, uKp, uAmbK, uGrass, uRev, uT; uniform vec3 uWc, uHc, uAmb; uniform vec4 uRc; uniform vec2 uPar; varying vec2 vUv, vW;
+  const SPF = `uniform sampler2D uTex, uDep, uPan; uniform float uA, uHov, uWet, uHz, uOcc, uDs, uKp, uAmbK, uGrass, uRev, uT, uWlv; uniform vec3 uWc, uHc, uAmb; uniform vec4 uRc; uniform vec2 uPar; varying vec2 vUv, vW;
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0 - 2.0*f); return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
 void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) discard;
@@ -18451,6 +18453,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   if (uRev < 0.999){ float n = 0.55*vn(vUv*vec2(11.0, 7.0)) + 0.25*vn(vUv*vec2(31.0, 23.0)) + 0.2*vUv.y, t = uRev*1.3 - 0.15;   // от лап вверх, рваным фронтом
     float m = smoothstep(n - 0.05, n, t); glow = smoothstep(n - 0.13, n - 0.04, t) - m; a *= max(m, glow*0.9); if (a < 0.01) discard; }
   if (uOcc > 0.5){ vec2 q = (vW - uRc.xy)/uRc.zw;
+    if (uWet > 0.5 && uWlv > 0.0) a *= smoothstep(1.0 - uWlv + 0.003, 1.0 - uWlv - 0.002, q.y);   // v146: водное существо не высовывается над линией воды
     if (q.x > 0.0 && q.x < 1.0 && q.y > 0.0 && q.y < 1.0){ float d0 = texture2D(uDep, q).r; vec2 uv = q - uPar*(d0 - 0.3)*uKp; float dp = texture2D(uDep, uv).r;
       a *= 1.0 - smoothstep(uDs*1.25 + 0.012, uDs*1.5 + 0.03, dp);                       // заметно ближе низа существа — закрывает
       if (uGrass > 0.5 && vUv.y < 0.16){                                                  // трава и папоротники у лап: пиксель картинки с фактурой зелени — поверх ног
@@ -18494,7 +18497,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     }
   }
   const ZP = -4, PANO_BASE = "pano/";
-  const WLV = new THREE.Vector3(); let wetSnd = 0;
+  const WLV = new THREE.Vector3(); let wetSnd = 0, asm = 0;
   const RC = new THREE.Vector4(0, 0, 1, 1);   // прямоугольник картинки панорамы на её плоскости: x0, низ, ширина, высота — общий для всех спрайтов
   function sprite(I, wet, flatShadow){
     const A = ART[I.k]; let tex, sx = 1, sy = 1;
@@ -18502,7 +18505,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 14, 6), new THREE.ShaderMaterial({ vertexShader: SPV, fragmentShader: SPF, transparent: true, depthWrite: false, depthTest: false,
       uniforms: { uTex:{ value:tex }, uT:{ value:0 }, uA:{ value:0 }, uPh:{ value:I.ph }, uAn:{ value:ANIM[I.anim] || 0 }, uHov:{ value:0 }, uWet:{ value:wet ? 1 : 0 }, uWc:{ value:new THREE.Vector3(.55, .95, .85) }, uHz:{ value:0 }, uHc:{ value:new THREE.Vector3(.8, .82, .85) },
-        uZp:{ value:-4 }, uDep:{ value:null }, uOcc:{ value:0 }, uDs:{ value:2 }, uPan:{ value:null }, uGrass:{ value:0 }, uRev:{ value:1 }, uKp:{ value:.022 }, uRc:{ value:RC }, uPar:{ value:new THREE.Vector2() }, uAmb:{ value:new THREE.Vector3(.5, .5, .5) }, uAmbK:{ value:0 } } }));
+        uZp:{ value:-4 }, uDep:{ value:null }, uOcc:{ value:0 }, uDs:{ value:2 }, uPan:{ value:null }, uGrass:{ value:0 }, uRev:{ value:1 }, uWlv:{ value:0 }, uKp:{ value:.022 }, uRc:{ value:RC }, uPar:{ value:new THREE.Vector2() }, uAmb:{ value:new THREE.Vector3(.5, .5, .5) }, uAmbK:{ value:0 } } }));
     m.userData = { sx, sy }; m.visible = false; scn.add(m); I.spr = m;
     if (!wet && I.anim !== "fly" && !I.plant){ if (!SHT) SHT = new THREE.PlaneGeometry(1, 1);
       const sh = new THREE.Mesh(SHT, new THREE.ShaderMaterial({ vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }", fragmentShader: SHF, transparent: true, depthWrite: false, depthTest: false, uniforms: { uA:{ value:0 } } }));
@@ -18512,7 +18515,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   function panoBuildImg(E, PI){
     PAN = PIMG.build(E.id, PANO_BASE); if (!PAN) return; scn.add(PAN.grp);
     for (const I of INST){ if (I.fossilOnly || I.pu == null) continue; const m = sprite(I, I.wet, false); m.renderOrder = 100 + (I.pv + (I.anim === "fly" ? .5 : 0))*100;   // v140: летящие — перед дальними наземными
-      const su = m.material.uniforms; su.uZp.value = ZP; su.uDep.value = PAN.dep; su.uPar.value = PAN.st.par; su.uKp.value = PAN.kPar.value; su.uOcc.value = I.anim === "fly" ? 0 : 1; su.uPan.value = PAN.tex; su.uGrass.value = !I.wet && I.anim !== "fly" && I.lane !== "water" ? 1 : 0;
+      const su = m.material.uniforms; su.uZp.value = ZP; su.uDep.value = PAN.dep; su.uPar.value = PAN.st.par; su.uKp.value = PAN.kPar.value; su.uOcc.value = I.anim === "fly" ? 0 : 1; su.uPan.value = PAN.tex; su.uWlv.value = PAN.C.wl || 0; su.uGrass.value = !I.wet && I.anim !== "fly" && I.lane !== "water" ? 1 : 0;
       if (I.hz){ su.uHz.value = I.hz; if (PI && PI.hc) su.uHc.value.fromArray(PI.hc); } if (I.shd) I.shd.renderOrder = 99 + I.pv*100; }
   }
   // раскладка существ по картинке: размер — доля высоты, ступни на земле картинки, сдвиг — тот же параллакс, что у её пикселей
