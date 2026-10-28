@@ -17114,11 +17114,14 @@ function buildSlabs(){
   stData.fill(0); gl.bindTexture(gl.TEXTURE_2D, stTex); gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, NSL, 1, gl.RGBA, gl.UNSIGNED_BYTE, stData);
   return { slabs, region: [x0, y0, rw, rh], O };
 }
+const CRACK_DUR = 2.5;
 function breakRock(){
   const E = L[cur]; if (crk || !TX[E.id]) return false;
   const F0 = E.fos || { u:.62, v:.5 }, O = [F0.u, (cur + F0.v)*AR];
   crk = { mode: "slab", t: 0, back: 0, O, slabs: [], region: [0, 0, 1, 1] };
   Object.assign(crk, buildSlabs());
+  // v147: раскол и его пыль укладываются в 2,5 с — естественная длительность (~5 с) сжимается одним множителем времени
+  crk.lastT = Math.max(...crk.slabs.map(s => s.td)) + .4; crk.sp = Math.max(1, (crk.lastT + .6)/CRACK_DUR);
   const [fx_, fy_] = toScr(O[0], O[1]); ptr.tx = fx_; ptr.ty = fy_; hover(-1, -1);
   return true;
 }
@@ -17312,12 +17315,12 @@ function frame(now){
   if (!active){ raf = 0; return; }
   const pk = 1 - Math.exp(-dt*2); panX += ((ptr.x/W)*2 - 1 - panX)*pk; panY += ((ptr.y/H)*2 - 1 - panY)*pk;
   render();
-  effects(dt, now);
+  effects(dt*(crk && !crk.back ? Math.max(crk.sp || 1, 1) : 1), now);
   drawPins();
   raf = requestAnimationFrame(frame);
 }
 function step(dt){
-  const c = crk, sp = reduce ? 2.5 : 1;
+  const c = crk, sp = Math.max(c.sp || 1, reduce ? 2.5 : 1);
   if (c.back){                                       // назад в камень: камень проступает поверх картины
     c.back = Math.min(1, c.back + dt/2.4);
     if (c.back >= 1){ crk = null; if (cb.closed) cb.closed(); }
@@ -17328,7 +17331,7 @@ function step(dt){
     let changed = false, gone = 0;
     for (const s of c.slabs){
       if (!s.crk && c.t > s.td - (s.soft ? .35 : .6)){ s.crk = 1; changed = true; }
-      if (s.crk && s.crk < 255){ s.crk = Math.min(255, s.crk + dt*600); stData[s.id*4 + 1] = s.crk | 0; changed = true; }   // трещина проступает
+      if (s.crk && s.crk < 255){ s.crk = Math.min(255, s.crk + dt*sp*600); stData[s.id*4 + 1] = s.crk | 0; changed = true; }   // трещина проступает
       if (!s.state && c.t > s.td){ s.state = 1; stData[s.id*4] = 255; changed = true; }      // плита отделилась
       if (s.state === 1 && c.t > s.td + .12){ s.state = 2; const [x, y] = toScr(s.cx, s.cy); const P = s.poly.map(p => toScr(p[0], p[1]));
         const xs = P.map(p => p[0]), ys = P.map(p => p[1]), w = Math.max(...xs) - Math.min(...xs), dk = L[s.layer].dust || 1;
@@ -17401,7 +17404,8 @@ return {
   cb, show, go,                                       // go(k): k — номер пласта сверху (0 — наше время), −1 — поверхность
   revive: () => breakRock(), back: () => closePano(),
   get active(){ return active; },
-  get busy(){ return !!crk && (!panoOn || crk.back > 0); },   // раскол идёт или камень возвращается
+  get busy(){ return !!crk && (!panoOn || crk.back > 0); },
+  get left(){ if (!crk || crk.back || panoOn || crk.lastT == null) return 0; return Math.max(0, (crk.lastT + .6 - crk.t)/Math.max(crk.sp || 1, reduce ? 2.5 : 1)); },   // v147: сколько секунд осталось до конца раскола   // раскол идёт или камень возвращается
   get open(){ return panoOn; },
   covers: () => active && !crk,                       // стена закрывает всю сцену — её можно не рисовать
   hasFossil: k => !!(L[k] && L[k].fos),
@@ -17918,7 +17922,7 @@ void main(){
     if (living && life > .6) direct(dt, T);
     if (cmp) life = lifeT = 1;
     // v146: сборка существ из частиц начинается, когда камень уже осыпался (раньше шла под падающей стеной и была не видна)
-    if (PAN && PAN.img && !bmOn && !cmp && ST){ const go = lifeT > .5 && !ST.busy && life > .97; asm = go ? Math.min(1, asm + dt/2.6) : (lifeT > .5 ? asm : Math.max(0, asm - dt/1.1)); } else asm = life;
+    if (PAN && PAN.img && !bmOn && !cmp && ST){ const go = lifeT > .5 && life > .97 && (!ST.busy || (ST.left > 0 && ST.left < .5));   /* v147: проявление — за 0,5 с до конца раскола */ asm = go ? Math.min(1, asm + dt/2.6) : (lifeT > .5 ? asm : Math.max(0, asm - dt/1.1)); } else asm = life;
     for (let q = 0; q < INST.length; q++){
       const I = INST[q], u = I.U, lifeI = I.fossilOnly ? 0 : asm;
       let Yb = I.Y;
