@@ -105,6 +105,23 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 /* меню */
 .menu{position:fixed;inset:0;z-index:44;background:rgba(5,6,12,.93);backdrop-filter:blur(14px);padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 40px);opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s;overflow:auto}
 .menu.open{opacity:1;visibility:visible}
+/* v153: фильм эпохи — только видео, без титров */
+.film{position:fixed;inset:0;z-index:43;background:#000;opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s linear .9s}
+.film.on{opacity:1;visibility:visible;transition:opacity .9s ease,visibility 0s}
+.film video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.film-ui{position:absolute;inset:0;pointer-events:none;transition:opacity .6s}
+.film.idle .film-ui{opacity:0}
+.film.idle{cursor:none}
+.film-ui button{pointer-events:auto;position:absolute;width:44px;height:44px;border-radius:50%;border:1px solid rgba(214,172,94,.35);background:rgba(5,6,12,.45);color:var(--brass);display:grid;place-items:center;backdrop-filter:blur(6px);transition:border-color .3s,background .3s}
+.film-ui button:hover{border-color:var(--brass);background:rgba(5,6,12,.7)}
+.film-ui svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.film-x{top:calc(env(safe-area-inset-top,0px) + 20px);right:20px}
+.film-snd{bottom:calc(env(safe-area-inset-bottom,0px) + 26px);right:20px}
+.film-bar{pointer-events:auto;position:absolute;left:20px;right:80px;bottom:calc(env(safe-area-inset-bottom,0px) + 46px);height:14px;cursor:pointer}
+.film-bar::before,.film-bar i{content:"";position:absolute;left:0;top:6px;height:2px;border-radius:2px}
+.film-bar::before{right:0;background:rgba(255,255,255,.14)}
+.film-bar i{width:0;background:var(--brass)}
+.film-snd .off{display:none}.film-snd[aria-pressed="false"] .on{display:none}.film-snd[aria-pressed="false"] .off{display:inline}
 .menu-in{width:min(1100px,100%);margin:0 auto;display:grid;gap:40px}
 .chaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .chap{display:grid;gap:6px;padding:20px 22px;border:1px solid var(--line);border-radius:4px;transition:border-color .3s,background .3s}
@@ -1050,6 +1067,15 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 <button class="moonbtn" id="moonBtn" aria-label="Луна — погрузиться" tabindex="-1" data-hover><canvas id="moonCv" width="120" height="120" aria-hidden="true"></canvas><span class="mono">Луна</span></button>
 <div class="ptip" id="ptip" aria-live="polite"><span class="mono pk"></span><b></b><p class="pd"></p><p class="pn"></p></div>
 
+<div class="film" id="film" aria-hidden="true" role="dialog" aria-label="Фильм эпохи">
+  <video id="filmV" playsinline preload="none"></video>
+  <div class="film-ui">
+    <button class="film-x" id="filmX" aria-label="Закрыть фильм" data-hover><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="film-bar" id="filmBar" aria-hidden="true"><i id="filmP"></i></div>
+    <button class="film-snd" id="filmS" aria-label="Звук" aria-pressed="true" data-hover><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path class="off" d="M17 9l5 6M22 9l-5 6"/></svg></button>
+  </div>
+</div>
+
 <section class="interior" id="interior" aria-hidden="true" aria-label="Станция изнутри">
   <div class="in-panel">
     <button class="back mono" id="surface" data-hover>↑ Всплыть на кольцо</button>
@@ -1168,7 +1194,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <button class="close mono" id="bioClose" data-hover>Вернуться на кольцо ✕</button>
   <div class="time-in">
     <div class="tm-head"><span class="mono eyebrow">Биосфера<span class="tm-hide-m"> · пласты камня</span></span><button class="tm-max-btn" id="bioMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
-    <div class="tm-ctl" id="bioTools"><button class="tm-tog" id="bioGalB" aria-pressed="false" data-hover>Галерея существ</button><button class="tm-tog" id="bioMechB" aria-pressed="false" data-hover>Механизмы эволюции</button><button class="tm-tog" id="bioBasB" aria-pressed="false" data-hover>Основы биологии</button><button class="tm-tog" id="bioBmB" aria-pressed="false" data-hover>Биомы Земли</button><button class="tm-tog" id="bioLife" aria-pressed="false" hidden data-hover>Оживить окаменелости</button></div>
+    <div class="tm-ctl" id="bioTools"><button class="tm-tog" id="bioGalB" aria-pressed="false" data-hover>Галерея существ</button><button class="tm-tog" id="bioMechB" aria-pressed="false" data-hover>Механизмы эволюции</button><button class="tm-tog" id="bioBasB" aria-pressed="false" data-hover>Основы биологии</button><button class="tm-tog" id="bioBmB" aria-pressed="false" data-hover>Биомы Земли</button><button class="tm-tog" id="bioLife" aria-pressed="false" hidden data-hover>Оживить окаменелости</button><button class="tm-tog" id="bioFilm" hidden data-hover>▶ Фильм эпохи</button></div>
     <span class="mono tm-hint tr-hint" id="bioHint"></span>
     <div class="tm-scroll" id="bioScroll"><article class="tm-card" id="bioCard" aria-live="polite"></article></div>
   </div>
@@ -17421,6 +17447,73 @@ return { init(box, base){ if (API === null) API = boot(box, base || "strata/") |
    Пласт сначала показан как порода с окаменелостями; потом частицы «поднимаются» из камня и собираются в живых
    существ («окаменелость → жизнь»), вокруг проявляется среда эпохи (море, болотный лес).
    Существа строятся из масок силуэтов BIO_MASK (RLE): точки выбираются по маске, объём — по расстоянию до края. */
+/* ---------- v153: фильм эпохи ----------
+   Только видео, без надписей. Первый и последний кадр совпадают с панорамой эпохи, поэтому вход и выход — растворение.
+   Пока фильм на экране, сцены сайта не рисуются (FILM.opaque), музыка сайта молчит. */
+const BIO_FILM = {
+  cretaceous: { poster: "film/cretaceous_poster.webp", src: [
+    ["film/cretaceous_1080_av1.mp4", 'video/mp4; codecs="av01.0.08M.10"', "av1"],
+    ["film/cretaceous_1080_h264.mp4", 'video/mp4; codecs="avc1.640032"', "hd"],
+    ["film/cretaceous_720_h264.mp4", 'video/mp4; codecs="avc1.64001f"', "sd"] ] }
+};
+const FILM = (() => {
+  const box = $("film"), v = $("filmV"), snd = $("filmS"), bar = $("filmBar"), prog = $("filmP");
+  let on = false, shownAt = 0, list = [], li = 0, idleT = 0, musWas = false, onClose = null, closing = 0;
+  const small = () => Math.min(screen.width, screen.height)*(devicePixelRatio || 1) < 900 || (navigator.connection && navigator.connection.saveData);
+  async function pick(F){
+    let L = F.src.filter(([, t]) => v.canPlayType(t) !== "");
+    if (L.some(s => s[2] === "av1") && navigator.mediaCapabilities){
+      try { const r = await navigator.mediaCapabilities.decodingInfo({ type: "file", video: { contentType: 'video/mp4; codecs="av01.0.08M.10"', width: 1920, height: 1080, bitrate: 2500000, framerate: 24 } });
+        if ((!r.supported || !r.powerEfficient) && L.some(s => s[2] !== "av1")) L = L.filter(s => s[2] !== "av1"); } catch(e){}   // без аппаратного AV1 — H.264, если он есть
+    }
+    if (small()) L.sort((a, b) => (a[2] === "sd" ? -1 : 0) - (b[2] === "sd" ? -1 : 0));
+    return L.map(s => s[0]);
+  }
+  function next(){ if (li >= list.length){ close(); return; } v.src = list[li++]; v.load(); v.play().catch(() => {}); }
+  v.addEventListener("error", () => { if (on) next(); });
+  v.addEventListener("timeupdate", () => { if (v.duration) prog.style.width = (v.currentTime/v.duration*100).toFixed(2) + "%"; });
+  v.addEventListener("ended", () => close());
+  function wake(){ box.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(() => { if (on && !v.paused) box.classList.add("idle"); }, 2200); }
+  async function open(id, cb){
+    const F = BIO_FILM[id]; if (!F || on) return;
+    on = true; onClose = cb || null; clearTimeout(closing);
+    musWas = $("sound").getAttribute("aria-pressed") === "true"; if (musWas) Music.toggle(false);
+    v.poster = F.poster; v.muted = false; snd.setAttribute("aria-pressed", "true"); prog.style.width = "0";
+    box.setAttribute("aria-hidden", "false"); box.classList.add("on"); shownAt = performance.now(); wake();
+    list = await pick(F); li = 0; next();
+    setTimeout(() => $("filmX").focus({ preventScroll: true }), 50);
+  }
+  function close(){
+    if (!on) return; on = false; box.classList.remove("on", "idle"); box.setAttribute("aria-hidden", "true");
+    v.pause();
+    closing = setTimeout(() => { v.removeAttribute("src"); v.load(); }, 950);   // освобождаем память декодера после растворения
+    if (musWas) Music.toggle(true); musWas = false;
+    if (onClose) onClose();
+  }
+  $("filmX").onclick = close;
+  snd.onclick = () => { v.muted = !v.muted; snd.setAttribute("aria-pressed", String(!v.muted)); };
+  v.addEventListener("click", () => { if (v.paused) v.play().catch(() => {}); else v.pause(); wake(); });
+  bar.addEventListener("click", e => { const r = bar.getBoundingClientRect(); if (v.duration) v.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width))*v.duration; wake(); });
+  box.addEventListener("pointermove", wake);
+  v.addEventListener("pause", () => box.classList.remove("idle"));
+  addEventListener("keydown", e => {
+    if (!on) return;
+    if (e.key === "Escape"){ close(); e.preventDefault(); e.stopPropagation(); }
+    else if (e.key === " " || e.key === "k"){ if (v.paused) v.play().catch(() => {}); else v.pause(); e.preventDefault(); e.stopPropagation(); }
+    else if (e.key === "m"){ snd.click(); e.stopPropagation(); }
+    else if (e.key === "ArrowRight" || e.key === "ArrowLeft"){ if (v.duration) v.currentTime = Math.max(0, Math.min(v.duration, v.currentTime + (e.key === "ArrowRight" ? 5 : -5))); e.preventDefault(); e.stopPropagation(); }
+    else if (e.key !== "Tab") e.stopPropagation();
+    wake();
+  }, true);
+  addEventListener("wheel", e => { if (on) e.stopPropagation(); }, { capture: true, passive: true });
+  return {
+    open, close, has: id => !!BIO_FILM[id],
+    get on(){ return on; },
+    // полотно уже закрыло сайт — сцены можно не рисовать
+    get opaque(){ return on && performance.now() - shownAt > 950; }
+  };
+})();
+
 const BIO = (() => {
   const box = $("chBio"), sky = $("bioSky"), rcv = $("bioRock"), cvs = $("bioCv"), lab = $("bioLab"), cardEl = $("bioCard"), scr = $("bioScroll"), colEl = $("bioCol");
   const NE = BIO_ERAS.length;
@@ -17874,6 +17967,7 @@ void main(){
   function setEra(cu, fl, e){ if (e < 0) fl.value = 1; else { fl.value = 0; const c = ERA_C[e]; cu.value.set(c[0], c[1], c[2]); } }
   function frame(now){
     raf = open ? requestAnimationFrame(frame) : 0; fc++;
+    if (FILM.opaque){ last = now; return; }   // v153: под фильмом сцена Биосферы не рисуется
     const dt = Math.min(.1, (now - last)/1000 || 0); last = now; const T = now/1000;
     if (mechOn){ mechFrame(dt, T); return; }
     const port = W3 < 760, mx = box.classList.contains("tm-max");
@@ -17900,7 +17994,7 @@ void main(){
     RU.uOff.value = rockOff; RU.uTr.value = trn ? 1 : 0; RU.uBy.value = trn ? -7.6 + trT*15.2 : 99;
     setEra(RU.uCA, RU.uIA, trn ? trn.from : cur); setEra(RU.uCB, RU.uIB, trn ? trn.to : cur);
     RU.uLife.value = !trn && cur >= 0 ? life : 0; RU.uPort.value = port ? 1 : 0; pR.visible = !cmp && !bmOn && !(PAN && !trn && life > .9);
-    if (ST){ ST.show(open && !mechOn && !cmp && !bmOn && !gal.on && (lifeT < .5 || ST.busy)); if (ST.active !== box.classList.contains("bio-strata")) box.classList.toggle("bio-strata", ST.active); }
+    if (ST){ ST.show(open && !FILM.opaque && !mechOn && !cmp && !bmOn && !gal.on && (lifeT < .5 || ST.busy)); if (ST.active !== box.classList.contains("bio-strata")) box.classList.toggle("bio-strata", ST.active); }
     const under = ST && ST.covers();                 // стена закрывает сцену целиком — её не рисуем
     if (!under) drawRock(trT, cmp || bmOn ? 0 : trn || cur < 0 ? 1 : 1 - smooth(.05, .8, life));
     // среда
@@ -17990,6 +18084,7 @@ void main(){
     if (bb){ bb.textContent = bmOn ? "← " + backLabel(bOrigin) : "Биомы Земли"; bb.setAttribute("aria-pressed", String(bmOn)); }
     const gb = $("bioGalB"); if (gb){ gb.textContent = gal.on ? "← " + backLabel(gOrigin) : "Галерея существ"; gb.setAttribute("aria-pressed", String(gal.on)); }
     const lb = $("bioLife"); if (lb){ lb.hidden = mechOn || cmp || bmOn || !(cur >= 0 && BIO_ERAS[cur].ready); lb.textContent = lifeT > .5 ? "Вернуть в камень" : "Оживить окаменелости"; lb.setAttribute("aria-pressed", String(lifeT > .5)); }
+    const fb = $("bioFilm"); if (fb) fb.hidden = mechOn || cmp || bmOn || gal.on || !(cur >= 0 && BIO_ERAS[cur].ready && FILM.has(BIO_ERAS[cur].id));
   }
 
   // ---- глобус эпохи: положение материков (BIO_PALEO), 2D-холст в карточке, ортографическая проекция ----
@@ -18625,6 +18720,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
     else { column(); card(); }
     if (typeof target === "string" && BIO_SP[target]){ const E = BIO_ERAS.findIndex(e => e.sp && e.sp.includes(target)); if (E >= 0){ cur = E; arrive(E); column(); portrait(target); } }
     $("bioLife").onclick = () => { if (lifeT > .5) toStone(); else reviveStone(); };
+    $("bioFilm").onclick = () => { if (cur >= 0) FILM.open(BIO_ERAS[cur].id); };
     $("bioGalB").onclick = () => gal.on ? galExit() : galOn();
     $("bioMechB").onclick = () => mechOn && MK === "mech" ? goBack() : mechOn_();
     $("bioBasB").onclick = () => mechOn && MK === "basics" ? goBack() : mechOn_(-1, "basics");
@@ -19248,7 +19344,7 @@ function bhTick(dt){
 
 let last = performance.now(), T = 0;
 function loop(now){
-  if (IZ.opaque){ last = now; requestAnimationFrame(loop); return; }
+  if (IZ.opaque || FILM.opaque){ last = now; requestAnimationFrame(loop); return; }
   const dt = Math.min(.05, (now - last)/1000); last = now; T += dt; U.time.value = T;
   if (now - lastInput > 420){
     if (target > -.5){ target += (Math.round(target) - target)*Math.min(1, dt*3); if (Math.abs(target - Math.round(target)) < 1e-3) target = Math.round(target) + 0; }
