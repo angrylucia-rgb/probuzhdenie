@@ -51,7 +51,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .act:hover,.act[aria-pressed="true"]{color:var(--ink)}
 /* v158: «Разделы» — короткие входы в главы свёрнуты в одну кнопку */
 .qk{position:relative}
-.qk-list{position:absolute;top:calc(100% + 14px);right:-12px;min-width:340px;display:grid;gap:2px;padding:8px;background:rgba(8,9,18,.92);border:1px solid var(--line);border-radius:8px;backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .25s,transform .25s,visibility 0s linear .25s;z-index:30}
+.qk-list{position:absolute;top:calc(100% + 14px);right:-12px;min-width:340px;display:grid;gap:2px;padding:8px;background:rgba(8,9,18,.95);border:1px solid var(--line);border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .25s,transform .25s,visibility 0s linear .25s;z-index:30}
 .qk.open .qk-list{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s,visibility 0s}
 .qk-list .act{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;width:100%;padding:10px 12px;border-radius:6px;text-align:left;text-transform:none;letter-spacing:normal}
 .qk-list .act:hover,.qk-list .act:focus-visible{background:rgba(214,172,94,.08);color:var(--ink)}
@@ -126,8 +126,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .right{display:flex;gap:20px;align-items:flex-end}
 
 /* меню */
-.menu{position:fixed;inset:0;z-index:44;background:rgba(5,6,12,.93);backdrop-filter:blur(14px);padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 40px);opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s;overflow:auto}
-.menu.open{opacity:1;visibility:visible}
+.menu{position:fixed;inset:0;z-index:44;background:rgba(5,6,12,.93);padding:calc(env(safe-area-inset-top,0px) + 84px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 40px);opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s;overflow:auto}
+.menu.open{opacity:1;visibility:visible;backdrop-filter:blur(14px)}
 /* v153: фильм эпохи — только видео, без титров */
 .film{position:fixed;inset:0;z-index:43;background:#000;opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s linear .9s}
 .film.on{opacity:1;visibility:visible;transition:opacity .9s ease,visibility 0s}
@@ -177,7 +177,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .menu.open .mp-st{opacity:1;transform:none;transition-delay:calc(.12s + var(--i)*28ms)}
 .mp-st::before{content:"";position:absolute;left:14px;top:16px;width:9px;height:9px;border-radius:50%;background:var(--night);border:1px solid var(--brass);z-index:1;transition:background .3s,box-shadow .3s}
 .mp-st.seen::before{background:rgba(214,172,94,.75)}
-.mp-st.here::before{background:var(--brass);box-shadow:0 0 0 4px rgba(214,172,94,.18);animation:mpPulse 2.4s ease-in-out infinite}
+.mp-st.here::before{background:var(--brass);box-shadow:0 0 0 4px rgba(214,172,94,.18)}
+.menu.open .mp-st.here::before{animation:mpPulse 2.4s ease-in-out infinite}   /* v159: пульс только при открытом меню — в закрытом он заставлял перерисовывать размытый слой каждый кадр */
 @keyframes mpPulse{50%{box-shadow:0 0 0 8px rgba(214,172,94,0)}}
 .menu .mp-sb{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:baseline;gap:12px;width:100%;padding:6px 12px 6px 46px;border:0;border-radius:4px;text-align:left;transition:background .25s,color .25s,padding .25s}
 .menu .mp-sb:hover,.menu .mp-sb:focus-visible{background:rgba(214,172,94,.07);padding-left:52px}
