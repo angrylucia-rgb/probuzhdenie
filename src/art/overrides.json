@@ -393,5 +393,31 @@
  },
  "zebra": {
   "face": 1
+ },
+ "ambul": {
+  "face": -1
+ },
+ "basil": {
+  "face": -1
+ },
+ "gasto": {
+  "face": -1
+ },
+ "hyrac": {
+  "face": -1
+ },
+ "pakic": {
+  "face": -1
+ },
+ "parac": {
+  "face": -1
+ },
+ "purga": {
+  "face": -1,
+  "anim": "still"
+ },
+ "titan": {
+  "face": 1,
+  "anim": "still"
  }
 }
