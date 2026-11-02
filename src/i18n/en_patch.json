@@ -1,0 +1,66 @@
+[
+ [
+  "const SITE_LANG = \"ru\", LANG_ALT = \"en.html\";",
+  "const SITE_LANG = \"en\", LANG_ALT = \"@ru\";"
+ ],
+ [
+  ".replace(\".\", \",\")",
+  ""
+ ],
+ [
+  "S_NUM(y.toFixed(y < 100 ? 1 : 0)).replace(/,0$/, \"\")",
+  "S_NUM(y.toFixed(y < 100 ? 1 : 0)).replace(/\\.0$/, \"\")"
+ ],
+ [
+  "return txt + (d10 >= 2 && d10 <= 4 && (d100 < 10 || d100 >= 20) ? \" земных года\" : \" земных лет\"); };",
+  "return txt + (txt === \"1\" ? \" Earth year\" : \" Earth years\"); };"
+ ],
+ [
+  ".replace(/0+$/, \"\").replace(/,$/, \"\")",
+  ".replace(/0+$/, \"\").replace(/\\.$/, \"\")"
+ ],
+ [
+  "\"ru-RU\"",
+  "\"en-US\""
+ ],
+ [
+  "const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; };",
+  "const plural = (n, a, b, c) => n === 1 ? a : c;"
+ ],
+ [
+  "const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return n + \" \" + (m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 10 || h >= 20) ? b : c); };",
+  "const plural = (n, a, b, c) => n + \" \" + (n === 1 ? a : c);"
+ ],
+ [
+  "plural(c, \"раз\", \"раза\", \"раз\")",
+  "plural(c, \"раз\", \"раза\", \"раза\")"
+ ],
+ [
+  "` и ${E.N} нейтронов`",
+  "` and ${E.N} neutron${E.N === 1 ? \"\" : \"s\"}`"
+ ],
+ [
+  "<title>Космолябия · Атлас пробуждения</title>",
+  "<title>Cosmolabe · Atlas of Awakening</title>"
+ ],
+ [
+  "content:\"вы здесь\"",
+  "content:\"you are here\""
+ ],
+ [
+  "content:\"Загружаем пласты…\"",
+  "content:\"Loading the layers…\""
+ ],
+ [
+  "const smMass = s => { const m = /([\\d,]+)\\s*(эВ|МэВ|ГэВ)/.exec(s); if (!m) return s === \"0\" ? 0 : .05; return parseFloat(m[1].replace(\",\", \".\"))*{ \"эВ\":1, \"МэВ\":1e6, \"ГэВ\":1e9 }[m[2]]; };",
+  "const smMass = s => { const m = /([\\d.]+)\\s*(eV|MeV|GeV)/.exec(s); if (!m) return s === \"0\" ? 0 : .05; return parseFloat(m[1])*{ \"eV\":1, \"MeV\":1e6, \"GeV\":1e9 }[m[2]]; };"
+ ],
+ [
+  "add(\"Измерение\", ",
+  "add(\"Dimension\", "
+ ],
+ [
+  "sc += { \"Станция\":8, \"Маршрут\":7, \"Глава\":6, \"Слой\":5, \"Древо\":4, \"Календарь\":4, \"Нить мысли\":4, \"Измерение\":5, \"Биосфера\":4, \"Существо\":3, \"Справочник\":2 }[d.type] || 0;",
+  "sc += { \"Station\":8, \"Tour\":7, \"Chapter\":6, \"Layer\":5, \"Tree\":4, \"Calendar\":4, \"Thread of Thought\":4, \"Dimension\":5, \"Biosphere\":4, \"Creature\":3, \"Reference\":2 }[d.type] || 0;"
+ ]
+]
