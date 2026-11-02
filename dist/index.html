@@ -49,6 +49,18 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .acts{display:flex;gap:22px;align-items:center}
 .act{display:inline-flex;align-items:center;gap:10px;color:var(--muted);transition:color .3s}
 .act:hover,.act[aria-pressed="true"]{color:var(--ink)}
+/* v158: «Разделы» — короткие входы в главы свёрнуты в одну кнопку */
+.qk{position:relative}
+.qk-list{position:absolute;top:calc(100% + 14px);right:-12px;min-width:340px;display:grid;gap:2px;padding:8px;background:rgba(8,9,18,.92);border:1px solid var(--line);border-radius:8px;backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .25s,transform .25s,visibility 0s linear .25s;z-index:30}
+.qk.open .qk-list{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s,visibility 0s}
+.qk-list .act{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;width:100%;padding:10px 12px;border-radius:6px;text-align:left;text-transform:none;letter-spacing:normal}
+.qk-list .act:hover,.qk-list .act:focus-visible{background:rgba(214,172,94,.08);color:var(--ink)}
+.qk-list .act svg{justify-self:center;color:var(--brass)}
+.qk-tx{display:grid;gap:1px}
+.qk-list .lbl{display:inline!important;font:500 11px var(--mono);letter-spacing:.18em;text-transform:uppercase}
+.qk-tx small{font:13px var(--body);color:var(--faint);letter-spacing:0}
+.qk-list .act:hover small{color:var(--muted)}
+.qk.open #qkBtn{color:var(--ink)}
 .eq{display:inline-flex;gap:2px;align-items:flex-end;height:12px}
 .eq i{width:2px;background:currentColor;height:3px}
 .on .eq i{animation:eq 1.6s ease-in-out infinite}
@@ -279,7 +291,7 @@ sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 body.j-white .ch-human{background:transparent!important;border-color:transparent!important;pointer-events:none}
 body.j-white .ch-human .back{pointer-events:auto;color:#5a4e38}
 body.j-white .hd-grid{opacity:0;visibility:hidden}
-body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white #btnSearch,body.j-white .brand{opacity:0;pointer-events:none}
+body.j-white #qkBtn,body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white #btnSearch,body.j-white .brand{opacity:0;pointer-events:none}
 body.j-white .act{color:#5a4e38}
 body.j-white .vign,body.j-white .grain,body.j-white .shade,body.j-white .foot,body.j-white .gauge{opacity:0!important;pointer-events:none}
 body.j-white .st,body.j-white .portal,body.j-white .intro{opacity:0!important;visibility:hidden!important}
@@ -927,6 +939,7 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
   .count{font-size:30px}
   .acts{gap:16px}
   .acts .lbl{display:none}
+  .qk-list{position:fixed;left:16px;right:16px;top:calc(env(safe-area-inset-top,0px) + 64px);min-width:0}
   .ch-human{top:auto;height:58%;width:100%;padding:16px var(--pad) calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(0deg,rgba(5,6,12,.97) 82%,rgba(5,6,12,.75));border-top:1px solid var(--line);transform:translateY(30px)}
   .ch-human .back{margin-bottom:8px}
   .ch-human h2{font-size:32px}
@@ -1070,12 +1083,17 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <div class="bar">
     <div class="brand">Космолябия<small>Атлас пробуждения</small></div>
     <div class="acts">
-      <button class="act mono" id="btnHuman" aria-pressed="false" data-hover><span class="lbl">Человек</span><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="6" cy="3" r="2"/><path d="M1 13c0-4 2-6 5-6s5 2 5 6"/></svg></button>
-      <button class="act mono" id="btnEarth" aria-pressed="false" data-hover><span class="lbl">Земля</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M1.5 5.5h11M1.5 8.5h11M7 1c-2.4 3.4-2.4 8.6 0 12M7 1c2.4 3.4 2.4 8.6 0 12"/></svg></button>
-      <button class="act mono" id="btnIz" data-hover><span class="lbl">Изнанка</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="2.2" fill="currentColor"/><path d="M1.2 7c1.6-3.4 10-3.4 11.6 0M1.2 7c1.6 3.4 10 3.4 11.6 0"/></svg></button>
-      <button class="act mono" id="btnPath" aria-pressed="false" data-hover><span class="lbl">Путь</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M7 1v6l4 2"/></svg></button>
-      <button class="act mono" id="btnTime" aria-pressed="false" data-hover><span class="lbl">Время</span><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 1h9M1.5 13h9M2.5 1c0 3.5 3.5 4 3.5 6s-3.5 2.5-3.5 6M9.5 1c0 3.5-3.5 4-3.5 6s3.5 2.5 3.5 6"/></svg></button>
-      <button class="act mono" id="btnTree" aria-pressed="false" data-hover><span class="lbl">Древо</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.4" fill="currentColor"/><path d="M7 7L3 3M7 7l4-4M7 7v6M3 3L1.5 4.5M3 3l.5-2M11 3l1.5 1.5M11 3l-.5-2M7 13l-2 .5M7 13l2 .5"/></svg></button>
+      <div class="qk" id="qk">
+        <button class="act mono" id="qkBtn" aria-haspopup="true" aria-expanded="false" aria-controls="qkList" data-hover><span class="lbl">Разделы</span><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.4"/><circle cx="11" cy="3" r="1.4"/><circle cx="3" cy="11" r="1.4"/><circle cx="11" cy="11" r="1.4"/><circle cx="7" cy="7" r="1.4"/></svg></button>
+        <div class="qk-list" id="qkList" role="menu" aria-label="Разделы">
+          <button class="act mono qk-it" role="menuitem" id="btnHuman" aria-pressed="false" data-hover><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="6" cy="3" r="2"/><path d="M1 13c0-4 2-6 5-6s5 2 5 6"/></svg><span class="qk-tx"><span class="lbl">Человек</span><small>от тонких тел — к органам и скелету</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnEarth" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M1.5 5.5h11M1.5 8.5h11M7 1c-2.4 3.4-2.4 8.6 0 12M7 1c2.4 3.4 2.4 8.6 0 12"/></svg><span class="qk-tx"><span class="lbl">Земля</span><small>сквозь стихии и камень — к ядру</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnIz" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="2.2" fill="currentColor"/><path d="M1.2 7c1.6-3.4 10-3.4 11.6 0M1.2 7c1.6 3.4 10 3.4 11.6 0"/></svg><span class="qk-tx"><span class="lbl">Изнанка</span><small>мир за горизонтом чёрной дыры</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnPath" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M7 1v6l4 2"/></svg><span class="qk-tx"><span class="lbl">Путь</span><small>восемь этапов: узнать, прожить, осмыслить</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnTime" aria-pressed="false" data-hover><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 1h9M1.5 13h9M2.5 1c0 3.5 3.5 4 3.5 6s-3.5 2.5-3.5 6M9.5 1c0 3.5-3.5 4-3.5 6s3.5 2.5 3.5 6"/></svg><span class="qk-tx"><span class="lbl">Время</span><small>космический календарь</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnTree" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.4" fill="currentColor"/><path d="M7 7L3 3M7 7l4-4M7 7v6M3 3L1.5 4.5M3 3l.5-2M11 3l1.5 1.5M11 3l-.5-2M7 13l-2 .5M7 13l2 .5"/></svg><span class="qk-tx"><span class="lbl">Древо</span><small>древо жизни: родство всего живого</small></span></button>
+        </div>
+      </div>
       <button class="act mono" id="btnSearch" aria-label="Поиск по сайту (Ctrl+K)" data-hover><span class="lbl">Поиск</span><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.3"/><path d="M8.7 8.7L12 12"/></svg></button>
       <button class="act mono" id="sound" aria-pressed="false" data-hover><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="lbl">Музыка</span></button>
       <button class="act mono" id="menuBtn" data-hover><span class="lbl">Станции</span><span class="burger" aria-hidden="true"><i></i><i></i></span></button>
@@ -9662,13 +9680,24 @@ function mpHere(){ if (typeof insideOpen !== "undefined" && insideOpen && diveSt
 function mpMarks(){ const db = jrLoad(), h = mpHere();
   list.querySelectorAll(".mp-st").forEach(li => { const i = +li.dataset.i; li.classList.toggle("seen", !!db.seen["st:" + i]); li.classList.toggle("here", i === h); });
   return h; }
+// v158: «Разделы» — выпадающая колонка коротких входов в главы
+const QK = (() => { const box = $("qk"), btn = $("qkBtn"), lst = $("qkList");
+  const set = v => { box.classList.toggle("open", v); btn.setAttribute("aria-expanded", String(v)); if (v) setTimeout(() => lst.querySelector(".act").focus({ preventScroll: true }), 30); };
+  btn.onclick = e => { e.stopPropagation(); set(!box.classList.contains("open")); };
+  lst.addEventListener("click", () => set(false));
+  document.addEventListener("pointerdown", e => { if (box.classList.contains("open") && !box.contains(e.target)) set(false); }, true);
+  addEventListener("keydown", e => { if (!box.classList.contains("open")) return;
+    if (e.key === "Escape"){ set(false); btn.focus(); e.stopPropagation(); }
+    else if (e.key === "ArrowDown" || e.key === "ArrowUp"){ const a = [...lst.querySelectorAll(".act")], k = a.indexOf(document.activeElement); a[(k + (e.key === "ArrowDown" ? 1 : a.length - 1)) % a.length].focus(); e.preventDefault(); e.stopPropagation(); } }, true);
+  return { close: () => set(false) };
+})();
 // v157: кнопка «← Станции» видна, пока открыта любая глава; ведёт обратно в меню (глава остаётся под ним)
 const toMenu = $("toMenu");
 function syncToMenu(){ toMenu.hidden = menuOpen || !document.querySelector(".chapter.open"); }
 toMenu.onclick = () => toggleMenu(true);
 { const mo = new MutationObserver(syncToMenu); document.querySelectorAll(".chapter").forEach(el => mo.observe(el, { attributes: true, attributeFilter: ["class"] })); }
 let menuOpen = false;
-function toggleMenu(on){ menuOpen = on; menu.classList.toggle("open", on); menu.setAttribute("aria-hidden", String(!on));
+function toggleMenu(on){ menuOpen = on; if (on) QK.close(); menu.classList.toggle("open", on); menu.setAttribute("aria-hidden", String(!on));
   if (on){ let h = -1; try { h = mpMarks(); } catch(e){} const f = h >= 0 ? list.querySelector(`.mp-st[data-i="${h}"] .mp-sb`) : $("mCompass"); menu.scrollTop = 0; if (f) setTimeout(() => { if (menuOpen) f.focus({ preventScroll: true }); }, 60); }   // меню ещё скрыто visibility в первый кадр — фокус после
   else { mpSpine.classList.remove("hl"); }
   syncToMenu(); }
