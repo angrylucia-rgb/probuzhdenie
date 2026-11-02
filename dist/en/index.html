@@ -170,6 +170,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .mp-lang a{font:500 11px/1 var(--mono);letter-spacing:.16em;padding:7px 11px;border-radius:999px;color:var(--faint);text-decoration:none;transition:color .3s,background .3s}
 .mp-lang a[href]:hover,.mp-lang a[href]:focus-visible{color:var(--ink);background:rgba(214,172,94,.1)}
 .mp-lang a[aria-current]{color:var(--night);background:var(--brass)}
+.tlang{display:inline-flex;align-items:center;gap:7px;color:var(--faint)}
+.tlang a{color:var(--muted);text-decoration:none;transition:color .3s}
+.tlang a[href]:hover,.tlang a[href]:focus-visible{color:var(--ink)}
+.tlang a[aria-current]{color:var(--brass)}
+.tlang i{font-style:normal;opacity:.6}
+@media (max-width:480px){.tlang{display:none}} /* на узком экране язык — только в меню “Станции”: панель и так заполнена */
 .lang-tip{position:fixed;left:50%;bottom:22px;z-index:60;transform:translate(-50%,12px);display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px);padding:10px 12px 10px 18px;background:rgba(8,9,18,.95);border:1px solid var(--line);border-radius:999px;box-shadow:0 14px 34px rgba(0,0,0,.45);font-size:14px;color:var(--muted);opacity:0;transition:opacity .4s,transform .4s}
 .lang-tip.on{opacity:1;transform:translate(-50%,0)}
 .lang-tip a{color:var(--brass);text-decoration:none;white-space:nowrap}
@@ -313,7 +319,7 @@ sup.pw{font-size:.66em;line-height:0;vertical-align:.45em;letter-spacing:.02em}
 body.j-white .ch-human{background:transparent!important;border-color:transparent!important;pointer-events:none}
 body.j-white .ch-human .back{pointer-events:auto;color:#5a4e38}
 body.j-white .hd-grid{opacity:0;visibility:hidden}
-body.j-white #qkBtn,body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white #btnSearch,body.j-white .brand{opacity:0;pointer-events:none}
+body.j-white #tLang,body.j-white #qkBtn,body.j-white #btnHuman,body.j-white #btnEarth,body.j-white #btnIz,body.j-white #btnPath,body.j-white #btnTime,body.j-white #btnTree,body.j-white #btnSearch,body.j-white .brand{opacity:0;pointer-events:none}
 body.j-white .act{color:#5a4e38}
 body.j-white .vign,body.j-white .grain,body.j-white .shade,body.j-white .foot,body.j-white .gauge{opacity:0!important;pointer-events:none}
 body.j-white .st,body.j-white .portal,body.j-white .intro{opacity:0!important;visibility:hidden!important}
@@ -961,6 +967,7 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
   .count{font-size:30px}
   .acts{gap:16px}
   .acts .lbl{display:none}
+  .tlang a[aria-current],.tlang i{display:none}
   .qk-list{position:fixed;left:16px;right:16px;top:calc(env(safe-area-inset-top,0px) + 64px);min-width:0}
   .ch-human{top:auto;height:58%;width:100%;padding:16px var(--pad) calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(0deg,rgba(5,6,12,.97) 82%,rgba(5,6,12,.75));border-top:1px solid var(--line);transform:translateY(30px)}
   .ch-human .back{margin-bottom:8px}
@@ -1105,6 +1112,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <div class="bar">
     <div class="brand">Cosmolabe<small>Atlas of Awakening</small></div>
     <div class="acts">
+      <nav class="tlang mono" id="tLang" aria-label="Site language"><a data-l="ru" lang="ru" hreflang="ru" title="Русский" data-hover>RU</a><i aria-hidden="true">·</i><a data-l="en" lang="en" hreflang="en" title="English" data-hover>EN</a></nav>
       <div class="qk" id="qk">
         <button class="act mono" id="qkBtn" aria-haspopup="true" aria-expanded="false" aria-controls="qkList" data-hover><span class="lbl">Sections</span><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.4"/><circle cx="11" cy="3" r="1.4"/><circle cx="3" cy="11" r="1.4"/><circle cx="11" cy="11" r="1.4"/><circle cx="7" cy="7" r="1.4"/></svg></button>
         <div class="qk-list" id="qkList" role="menu" aria-label="Sections">
@@ -9707,9 +9715,9 @@ const LANGS = (() => {
   const altHref = () => LANG_ALT === "@ru" ? location.href.replace(/en\.html([?#].*)?$/, "index.html") : LANG_ALT;
   const get = () => { try { return localStorage.getItem(KEY); } catch(e){ return null; } };
   const set = v => { try { localStorage.setItem(KEY, v); } catch(e){} };
-  const cur = document.querySelector(`.mp-lang a[data-l="${SITE_LANG}"]`), alt = document.querySelector(`.mp-lang a[data-l="${other}"]`);
-  if (cur) cur.setAttribute("aria-current", "page");
-  if (alt){ alt.href = altHref(); alt.addEventListener("click", () => set(other)); }
+  // два переключателя: в верхней панели (#tLang) и в шапке меню “Станции”
+  document.querySelectorAll(`.mp-lang a[data-l="${SITE_LANG}"], .tlang a[data-l="${SITE_LANG}"]`).forEach(a => a.setAttribute("aria-current", "page"));
+  document.querySelectorAll(`.mp-lang a[data-l="${other}"], .tlang a[data-l="${other}"]`).forEach(a => { a.href = altHref(); a.addEventListener("click", () => set(other)); });
   // на сайте (не в артефакте) запомненный выбор возвращает на свою версию при новом заходе
   const site = LANG_ALT.charAt(0) === "/", pref = get();
   let sameSite = false; try { sameSite = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch(e){}
