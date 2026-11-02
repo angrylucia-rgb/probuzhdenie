@@ -320,5 +320,78 @@
  "touca": {
   "face": -1,
   "anim": "fly"
+ },
+ "afox": {
+  "face": 1
+ },
+ "astra": {
+  "face": -1
+ },
+ "bear": {
+  "face": -1
+ },
+ "capce": {
+  "face": -1
+ },
+ "charn": {
+  "face": 1
+ },
+ "cooks": {
+  "face": 1
+ },
+ "dick": {
+  "face": 1
+ },
+ "eleph": {
+  "face": 1
+ },
+ "euryp": {
+  "face": -1
+ },
+ "giraf": {
+  "face": -1
+ },
+ "guiyu": {
+  "face": -1
+ },
+ "isot": {
+  "face": -1
+ },
+ "kimb": {
+  "face": 1
+ },
+ "lemm": {
+  "face": 1
+ },
+ "lion": {
+  "face": 1
+ },
+ "lynx": {
+  "face": -1
+ },
+ "moose": {
+  "face": -1
+ },
+ "ortho": {
+  "face": -1
+ },
+ "ptery": {
+  "face": -1
+ },
+ "reind": {
+  "face": 1
+ },
+ "sacab": {
+  "face": -1
+ },
+ "sowl": {
+  "face": -1,
+  "anim": "fly"
+ },
+ "sprig": {
+  "face": -1
+ },
+ "zebra": {
+  "face": 1
  }
 }
