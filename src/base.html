@@ -122,19 +122,78 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .film-bar::before{right:0;background:rgba(255,255,255,.14)}
 .film-bar i{width:0;background:var(--brass)}
 .film-snd .off{display:none}.film-snd[aria-pressed="false"] .on{display:none}.film-snd[aria-pressed="false"] .off{display:inline}
-.menu-in{width:min(1100px,100%);margin:0 auto;display:grid;gap:40px}
-.chaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.chap{display:grid;gap:6px;padding:20px 22px;border:1px solid var(--line);border-radius:4px;transition:border-color .3s,background .3s}
-.chap:hover{border-color:var(--brass);background:rgba(214,172,94,.06)}
-.chap b{font:400 30px/1.05 var(--display)}
-.chap span:last-child{color:var(--muted);font-size:14px}
-.menu ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 64px}
-.menu li button{display:grid;grid-template-columns:52px 1fr auto;align-items:baseline;gap:14px;width:100%;padding:10px 0;border-bottom:1px solid rgba(214,172,94,.12);transition:padding .3s,color .3s}
-.menu li button:hover{padding-left:12px;color:var(--brass)}
-.menu .n{font:500 11px var(--mono);color:var(--brass);letter-spacing:.14em}
-.menu .t{font:400 clamp(26px,3.4vw,42px)/1.05 var(--display)}
-.menu .s{font:11px var(--mono);color:var(--faint)}
-.menu li.arc{grid-column:1/-1;display:flex;justify-content:space-between;color:var(--faint);margin-bottom:10px}
+/* v156: меню «Станции» — шкала масштабов */
+.mp{width:min(1180px,100%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);gap:28px 64px;align-items:start}
+.mp-head{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:6px 32px}
+.mp-head .eyebrow{grid-column:1/-1;font-size:11px;letter-spacing:.24em;text-transform:uppercase}
+.menu:has(.mp){padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+.mp-lead{margin:0;font:400 clamp(17px,1.35vw,20px)/1.4 var(--display);color:var(--ink);max-width:86ch}
+.mp-m{display:none}
+.mp-lead span{color:var(--muted)}
+.mp-srch{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:14px;white-space:nowrap;transition:border-color .3s,color .3s}
+.mp-srch:hover{border-color:var(--brass);color:var(--ink)}
+.mp-srch svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6}
+.mp-srch kbd{font-size:10px;letter-spacing:.08em;color:var(--faint);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:2px 5px}
+.mp-cap{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);padding:0 0 10px 46px}
+.mp-abs{display:grid;gap:1px;width:100%;text-align:left;margin:0 0 4px;padding:6px 14px 6px 46px;position:relative;border-radius:4px;transition:background .3s}
+.mp-abs::before{content:"";position:absolute;left:14px;top:14px;bottom:14px;width:9px;border:1px solid var(--brass);border-right:0;border-radius:6px 0 0 6px;opacity:.7}
+.mp-abs span:first-child{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+.mp-abs b{font:400 22px/1.1 var(--display)}
+.mp-abs span:last-child{color:var(--muted);font-size:13px}
+.mp-abs:hover{background:rgba(214,172,94,.06)}
+.menu .mp-list{list-style:none;margin:0;padding:0;display:block;position:relative}
+.mp-list::before{content:"";position:absolute;left:18px;top:14px;bottom:14px;width:1px;background:linear-gradient(var(--brass),rgba(214,172,94,.35) 50%,var(--brass));transform:scaleY(0);transform-origin:top;transition:transform .7s cubic-bezier(.6,0,.2,1)}
+.menu.open .mp-list::before{transform:scaleY(1)}
+.mp-st{position:relative;opacity:0;transform:translateX(-8px);transition:opacity .45s,transform .45s}
+.menu.open .mp-st{opacity:1;transform:none;transition-delay:calc(.12s + var(--i)*28ms)}
+.mp-st::before{content:"";position:absolute;left:14px;top:16px;width:9px;height:9px;border-radius:50%;background:var(--night);border:1px solid var(--brass);z-index:1;transition:background .3s,box-shadow .3s}
+.mp-st.seen::before{background:rgba(214,172,94,.75)}
+.mp-st.here::before{background:var(--brass);box-shadow:0 0 0 4px rgba(214,172,94,.18);animation:mpPulse 2.4s ease-in-out infinite}
+@keyframes mpPulse{50%{box-shadow:0 0 0 8px rgba(214,172,94,0)}}
+.menu .mp-sb{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:baseline;gap:12px;width:100%;padding:6px 12px 6px 46px;border:0;border-radius:4px;text-align:left;transition:background .25s,color .25s,padding .25s}
+.menu .mp-sb:hover,.menu .mp-sb:focus-visible{background:rgba(214,172,94,.07);padding-left:52px}
+.menu .mp-sb .n{font:500 11px var(--mono);color:var(--brass);letter-spacing:.12em}
+.menu .mp-sb .t{font:400 clamp(20px,1.7vw,24px)/1.1 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-sb .t small{font:13px var(--body);color:var(--faint);margin-left:10px;transition:color .25s}
+.mp-sb:hover .t small{color:var(--muted)}
+.menu .mp-sb .s{font:10.5px var(--mono);color:var(--faint);white-space:nowrap}
+.mp-sb:hover .t{color:var(--brass)}
+.mp-st.here .mp-sb .t::after{content:"вы здесь";font:9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin-left:10px;vertical-align:middle}
+.mp-br{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 4px 88px;margin-top:-1px}
+.mp-chip{display:inline-flex;gap:8px;align-items:baseline;padding:3px 12px;border:1px solid rgba(214,172,94,.3);border-radius:999px;font-size:13px;color:var(--ink);background:rgba(214,172,94,.04);opacity:0;transform:translateX(-6px);transition:opacity .4s,transform .4s,border-color .25s,background .25s}
+.menu.open .mp-chip{opacity:1;transform:none;transition-delay:.55s}
+.mp-chip span{color:var(--brass)}
+.mp-chip:hover{border-color:var(--brass);background:rgba(214,172,94,.12)}
+.menu.open .mp-spine.hl .mp-st:not(.on){opacity:.3;transition-delay:0s}
+.mp-spine.hl .mp-st.on{opacity:1}
+.mp-spine.hl .mp-st.on::before{background:var(--sci);border-color:var(--sci)}
+.mp-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:12px 0 0 46px;font-size:10.5px;color:var(--faint)}
+.mp-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;border:1px solid var(--brass);margin-right:6px;vertical-align:-1px}
+.mp-legend .lg-here{background:var(--brass)}.mp-legend .lg-seen{background:rgba(214,172,94,.75)}
+.mp-side{display:grid;gap:22px}
+.mp-grp{display:grid;gap:4px}
+.mp-h{margin:0 0 6px;font-size:10.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.mp-atl .mp-h{color:var(--sci)}
+.mp-note{margin:-4px 0 6px;font-size:12.5px;color:var(--faint)}
+.mp-it{display:grid;gap:2px;width:100%;text-align:left;padding:7px 12px;border-radius:4px;border:1px solid transparent;position:relative;transition:background .25s,border-color .25s}
+.mp-it b{font:400 21px/1.1 var(--display)}
+.mp-it>span:not(.mp-k):not(.mp-badge){color:var(--muted);font-size:13.5px;line-height:1.4}
+.mp-it:hover,.mp-it:focus-visible{background:rgba(214,172,94,.06);border-color:rgba(214,172,94,.22)}
+.mp-it:hover b{color:var(--brass)}
+.mp-atl .mp-it:hover b{color:var(--sci)}
+.mp-k{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--sci);opacity:.8}
+.mp-first{border-color:rgba(214,172,94,.45);background:rgba(214,172,94,.07);padding:12px 16px}
+.mp-first b{font-size:28px;color:#ffe2a8}
+.mp-badge{justify-self:start;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--night);background:var(--brass);padding:2px 7px;border-radius:3px;margin-bottom:4px}
+.mp-rng{display:flex;gap:3px;margin-top:6px}
+.mp-rng b{width:14px;height:3px;border-radius:2px;background:rgba(255,255,255,.12)}
+.mp-rng b.on{background:var(--sci)}
+@media (max-height:820px) and (min-width:761px){.menu .mp-sb{padding-top:6px;padding-bottom:6px}.mp-st::before{top:16px}.mp-lead{font-size:18px}.mp-side{gap:18px}.mp-it{padding:6px 12px}}
+@media (max-width:1000px){.mp{grid-template-columns:1fr}.mp-side{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
+@media (max-width:760px){.mp-d,.mp-srch kbd,.mp-cap span:last-child{display:none}.mp-m{display:inline}.mp-head{grid-template-columns:1fr}.mp-srch{justify-self:start}.mp-lead{font-size:18px}.mp-lead span{display:block;margin-top:6px;font-size:15px}.mp-lead .mp-d{display:none}
+  .mp-side{display:contents}.mp-head{order:0}.mp-start{order:1}.mp-spine{order:2}.mp-side>.mp-grp:not(.mp-start){order:3}
+  .mp-sb .t small{display:block;margin:2px 0 0}.menu .mp-sb{grid-template-columns:30px minmax(0,1fr)}.menu .mp-sb .t{white-space:normal}.menu .mp-sb .s{display:none}.mp-br{padding-left:46px}}
+@media (prefers-reduced-motion:reduce){.mp-st,.mp-chip,.mp-list::before{transition:none!important;opacity:1!important;transform:none!important}.mp-st.here::before{animation:none}}
 .close{position:fixed;top:calc(env(safe-area-inset-top,0px) + var(--pad));right:var(--pad);color:var(--muted);z-index:2}
 
 /* панель станции */
@@ -849,7 +908,6 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
   .st-lede{font-size:14px}
   .mini{width:96px;height:96px}
   .count{font-size:30px}
-  .menu ol{grid-template-columns:1fr;gap:0}
   .acts{gap:16px}
   .acts .lbl{display:none}
   .ch-human{top:auto;height:58%;width:100%;padding:16px var(--pad) calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(0deg,rgba(5,6,12,.97) 82%,rgba(5,6,12,.75));border-top:1px solid var(--line);transform:translateY(30px)}
@@ -1038,25 +1096,49 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 
 <nav class="menu" id="menu" aria-label="Навигация" aria-hidden="true">
   <button class="close mono" id="menuClose" data-hover>Закрыть ✕</button>
-  <div class="menu-in">
-    <div class="chaps">
-      <button class="chap chap-rt" id="mRoutes" data-hover><span class="mono eyebrow">Экскурсии</span><b>Маршруты</b><span>«Откуда я?», «Из чего я сделан?», «Свет»… — сквозь кольцо, календарь и Древо</span></button>
-      <button class="chap chap-cp" id="mCompass" data-hover><span class="mono eyebrow">Минута вопросов</span><b>Компас пути</b><span>С чего начать сегодня — маршрут под ваш интерес, время и состояние</span></button>
-      <button class="chap chap-mn" id="mMine" data-hover><span class="mono eyebrow">Личная карта</span><b>Моя астролябия</b><span>Что вы уже прошли: станции, слои, практики, дневник — только в этом браузере</span></button>
-      <button class="chap" id="mHuman" data-hover><span class="mono eyebrow">Глава</span><b>Погружение в человека</b><span>От тонких тел — через центры — к мышцам, органам и скелету</span></button>
-      <button class="chap" id="mAbs" data-hover><span class="mono eyebrow">Глава</span><b>Сквозной путь</b><span>От Абсолюта вглубь всех станций по кругу — с развилками</span></button>
-      <button class="chap" id="mEarth" data-hover><span class="mono eyebrow">Глава</span><b>Погружение в Землю</b><span>Сквозь поля, воздух, воду и камень — к железному сердцу планеты</span></button>
-      <button class="chap" id="mBH" data-hover><span class="mono eyebrow">Ответвление</span><b>К центру Галактики</b><span>Чёрная дыра Стрелец A* и проход за горизонт — в Изнанку</span></button>
-      <button class="chap" id="mTime" data-hover><span class="mono eyebrow">Ось времени</span><b>Космический календарь</b><span>13,8 млрд лет в одном году: от Большого взрыва до последней секунды</span></button>
-      <button class="chap" id="mTree" data-hover><span class="mono eyebrow">Родство всего живого</span><b>Древо жизни</b><span>От LUCA — через бактерии, растения, грибы и животных — к человеку</span></button>
-      <button class="chap" id="mThought" data-hover><span class="mono eyebrow">История идей</span><b>Нить мысли</b><span>Два берега одной реки: опыт традиций и измерение науки — от Ригведы до LIGO</span></button>
-      <button class="chap" id="mBio" data-hover><span class="mono eyebrow">Учебник жизни</span><b>Биосфера</b><span>Пласты камня: 4,5 млрд лет жизни, больше 140 существ, механизмы эволюции, основы биологии и биомы Земли</span></button>
-      <button class="chap" id="mJournal" data-hover><span class="mono eyebrow">Опыты своими руками</span><b>Журнал натуралиста</b><span>Тетрадь Дарвина на столе: отбор, дрейф генов, коэволюция, клетка и фотосинтез — каждый опыт на фото места, где это видно</span></button>
-      <button class="chap" id="mDims" data-hover><span class="mono eyebrow">Модели пространства</span><b>Лестница измерений</b><span>Точка, линия, плоскость, наш мир — и как заглянуть в четвёртое, пятое, шестое</span></button>
-      <button class="chap" id="mPath" data-hover><span class="mono eyebrow">Глава</span><b>Путь из восьми этапов</b><span>Узнать, почувствовать, прожить, осмыслить</span></button>
-      <button class="chap" id="mRef" data-hover><span class="mono eyebrow">Справочник</span><b>Как пользоваться · сравнение традиций</b><span>Инструкция, Розеттский камень, десять принципов, источники</span></button>
+  <div class="menu-in mp">
+    <header class="mp-head">
+      <span class="mono eyebrow">Карта Космолябии</span>
+      <p class="mp-lead">Сайт устроен как спуск по масштабам: от Абсолюта — через Вселенную, Солнце, Землю и человека — к атому и Пустоте. <span class="mp-d">Слева — 12 станций по порядку, справа — с чего начать и темы, которые проходят через многие станции.</span><span class="mp-m">Ниже — с чего начать, 12 станций по порядку и темы, которые проходят через многие станции.</span></p>
+      <button class="mp-srch" id="mSrch" data-hover><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Поиск по сайту</span><kbd class="mono">Ctrl K</kbd></button>
+    </header>
+    <section class="mp-spine" aria-label="Станции кольца">
+      <div class="mp-cap mono"><span>Станции · от большого к малому</span><span>масштаб</span></div>
+      <button class="mp-abs" id="mAbs" data-hover><span class="mono">Погружение · все станции</span><b>Сквозной путь</b><span>пройти все 12 станций подряд, с развилками →</span></button>
+      <ol id="menuList" class="mp-list"></ol>
+      <p class="mp-legend mono"><span><i class="lg-here"></i>вы здесь</span><span><i class="lg-seen"></i>уже были</span><span>↳ — погружение вглубь станции</span></p>
+    </section>
+    <aside class="mp-side">
+      <section class="mp-grp mp-start">
+        <h3 class="mono mp-h">С чего начать</h3>
+        <button class="mp-it mp-first" id="mCompass" data-hover><span class="mp-badge mono">впервые здесь?</span><b>Компас пути</b><span>Минута вопросов — и маршрут под ваш интерес, время и состояние</span></button>
+        <button class="mp-it" id="mRoutes" data-hover><b>Маршруты</b><span>Готовые экскурсии: «Откуда я?», «Из чего я сделан?», «Свет»…</span></button>
+        <button class="mp-it" id="mRef" data-hover><b>Как пользоваться</b><span>Короткая инструкция, сравнение традиций, принципы, источники</span></button>
+      </section>
+      <section class="mp-grp mp-atl">
+        <h3 class="mono mp-h">Сквозные темы</h3>
+        <p class="mp-note">Проходят через несколько станций — при наведении они подсвечиваются слева</p>
+        <button class="mp-it" id="mTime" data-span="1-6" data-hover><span class="mp-k mono">время</span><b>Космический календарь</b><span>13,8 млрд лет в одном году</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mTree" data-span="5-7" data-hover><span class="mp-k mono">родство</span><b>Древо жизни</b><span>От общего предка — к растениям, грибам, животным и человеку</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mBio" data-span="5" data-hover><span class="mp-k mono">жизнь в камне</span><b>Биосфера</b><span>4,5 млрд лет жизни в пластах, больше 140 существ, биомы Земли</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mThought" data-span="0-11" data-hover><span class="mp-k mono">идеи</span><b>Нить мысли</b><span>Традиции и наука — от Ригведы до LIGO</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mDims" data-span="2,10" data-hover><span class="mp-k mono">пространство</span><b>Лестница измерений</b><span>Точка, линия, плоскость, наш мир — и что за ним</span><i class="mp-rng"></i></button>
+      </section>
+      <section class="mp-grp">
+        <h3 class="mono mp-h">Практика</h3>
+        <button class="mp-it" id="mPath" data-span="6" data-hover><b>Путь из восьми этапов</b><span>Узнать, почувствовать, прожить, осмыслить</span></button>
+        <button class="mp-it" id="mJournal" data-span="5-7" data-hover><b>Журнал натуралиста</b><span>Опыты своими руками: отбор, клетка, фотосинтез</span></button>
+      </section>
+      <section class="mp-grp">
+        <h3 class="mono mp-h">Моё</h3>
+        <button class="mp-it" id="mMine" data-hover><b>Моя астролябия</b><span>Что вы уже прошли — хранится только в этом браузере</span></button>
+      </section>
+    </aside>
+    <div class="mp-hold" hidden>
+      <button class="mp-chip" id="mBH" data-hover><span class="mono">↳</span>К центру Галактики · в Изнанку</button>
+      <button class="mp-chip" id="mEarth" data-hover><span class="mono">↳</span>Погружение в Землю — к ядру</button>
+      <button class="mp-chip" id="mHuman" data-hover><span class="mono">↳</span>Погружение в человека — от тонких тел к скелету</button>
     </div>
-    <ol id="menuList"><li class="arc mono"><span>→ Нисхождение · макрокосм</span><span>Возвращение · микрокосм ←</span></li></ol>
   </div>
 </nav>
 
@@ -9532,9 +9614,35 @@ miniMarks();
 
 // меню
 const menu = $("menu"), list = $("menuList");
-ST.forEach((s, i) => { const li = document.createElement("li"); li.innerHTML = `<button data-hover><span class="n">${s.n}</span><span class="t">${esc(s.name)}</span><span class="s">${esc(s.sc)}</span></button>`; li.querySelector("button").onclick = () => { toggleMenu(false); closeChapters(); goTo(i); }; list.appendChild(li); });
+// v156: меню — шкала масштабов. Станции сверху вниз, погружения веточками у своей станции, сквозные темы подсвечивают свой диапазон
+const MP_BR = { 3: ["mBH"], 5: ["mEarth"], 6: ["mHuman"] };
+ST.forEach((s, i) => { const li = document.createElement("li"); li.className = "mp-st"; li.dataset.i = i; li.style.setProperty("--i", i);
+  li.innerHTML = `<button class="mp-sb" data-hover><span class="n">${s.n}</span><span class="t">${esc(s.name)}<small>${esc(s.sub || "")}</small></span><span class="s">${esc(s.sc)}</span></button>`;
+  li.querySelector("button").onclick = () => { toggleMenu(false); closeChapters(); goTo(i); };
+  if (MP_BR[i]){ const br = document.createElement("div"); br.className = "mp-br"; MP_BR[i].forEach(id => br.appendChild($(id))); li.appendChild(br); }
+  list.appendChild(li); });
+const mpSpine = menu.querySelector(".mp-spine");
+const mpSpan = el => { const s = el.dataset.span; if (!s) return []; const out = []; s.split(",").forEach(p => { const [a, z] = p.split("-").map(Number); for (let k = a; k <= (isNaN(z) ? a : z); k++) out.push(k); }); return out; };
+menu.querySelectorAll(".mp-it[data-span]").forEach(el => {
+  const on = new Set(mpSpan(el)), rng = el.querySelector(".mp-rng");
+  if (rng) rng.innerHTML = ST.map((_, k) => `<b class="${on.has(k) ? "on" : ""}" title="${esc(ST[k].name)}"></b>`).join("");
+  const hl = v => { mpSpine.classList.toggle("hl", v); list.querySelectorAll(".mp-st").forEach(li => li.classList.toggle("on", v && on.has(+li.dataset.i))); };
+  el.addEventListener("pointerenter", () => hl(true)); el.addEventListener("pointerleave", () => hl(false));
+  el.addEventListener("focus", () => hl(true)); el.addEventListener("blur", () => hl(false));
+});
+$("mSrch").onclick = () => SRCH.open();
+function mpHere(){ if (typeof insideOpen !== "undefined" && insideOpen && diveSt >= 0) return diveSt; if (pos < -.5) return -1; const m = mod(Math.round(pos), 14); return m <= 6 ? m : m >= 8 && m <= 12 ? m - 1 : -1; }
+function mpMarks(){ const db = jrLoad(), h = mpHere();
+  list.querySelectorAll(".mp-st").forEach(li => { const i = +li.dataset.i; li.classList.toggle("seen", !!db.seen["st:" + i]); li.classList.toggle("here", i === h); });
+  return h; }
 let menuOpen = false;
-function toggleMenu(on){ menuOpen = on; menu.classList.toggle("open", on); menu.setAttribute("aria-hidden", String(!on)); if (on) $("mHuman").focus(); }
+function toggleMenu(on){ menuOpen = on; menu.classList.toggle("open", on); menu.setAttribute("aria-hidden", String(!on));
+  if (on){ let h = -1; try { h = mpMarks(); } catch(e){} const f = h >= 0 ? list.querySelector(`.mp-st[data-i="${h}"] .mp-sb`) : $("mCompass"); menu.scrollTop = 0; if (f) setTimeout(() => { if (menuOpen) f.focus({ preventScroll: true }); }, 60); }   // меню ещё скрыто visibility в первый кадр — фокус после
+  else { mpSpine.classList.remove("hl"); } }
+// стрелки ↑/↓ — по пунктам меню в порядке чтения
+menu.addEventListener("keydown", e => { if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+  const all = [...menu.querySelectorAll(".mp-srch, .mp-abs, .mp-sb, .mp-chip, .mp-it")].filter(x => x.offsetParent); const k = all.indexOf(document.activeElement);
+  const n = all[Math.max(0, Math.min(all.length - 1, k + (e.key === "ArrowDown" ? 1 : -1)))]; if (n){ n.focus(); e.preventDefault(); } });
 $("menuBtn").onclick = () => toggleMenu(true);
 $("menuClose").onclick = () => toggleMenu(false);
 $("mHuman").onclick = () => { toggleMenu(false); openHuman(); };
