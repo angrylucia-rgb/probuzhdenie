@@ -122,12 +122,18 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .film-bar::before{right:0;background:rgba(255,255,255,.14)}
 .film-bar i{width:0;background:var(--brass)}
 .film-snd .off{display:none}.film-snd[aria-pressed="false"] .on{display:none}.film-snd[aria-pressed="false"] .off{display:inline}
+/* v157: из любой главы — назад в меню «Станции» */
+.tomenu{position:fixed;top:calc(env(safe-area-inset-top,0px) + var(--pad));left:var(--pad);z-index:42;color:var(--muted);font-size:11px;letter-spacing:.2em;text-transform:uppercase;display:flex;gap:8px;align-items:center;transition:color .3s,opacity .4s}
+.tomenu:hover{color:var(--brass)}
+.tomenu span{font-size:14px;letter-spacing:0;transition:transform .3s}
+.tomenu:hover span{transform:translateX(-3px)}
+.tomenu[hidden]{display:none}
 /* v156: меню «Станции» — шкала масштабов */
 .mp{width:min(1180px,100%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);gap:28px 64px;align-items:start}
 .mp-head{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:6px 32px}
 .mp-head .eyebrow{grid-column:1/-1;font-size:11px;letter-spacing:.24em;text-transform:uppercase}
 .menu:has(.mp){padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
-.mp-lead{margin:0;font:400 clamp(17px,1.35vw,20px)/1.4 var(--display);color:var(--ink);max-width:86ch}
+.mp-lead{margin:0;font:400 clamp(15.5px,1.15vw,17px)/1.6 var(--body);color:var(--ink);max-width:78ch}
 .mp-m{display:none}
 .mp-lead span{color:var(--muted)}
 .mp-srch{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:14px;white-space:nowrap;transition:border-color .3s,color .3s}
@@ -188,9 +194,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .mp-rng{display:flex;gap:3px;margin-top:6px}
 .mp-rng b{width:14px;height:3px;border-radius:2px;background:rgba(255,255,255,.12)}
 .mp-rng b.on{background:var(--sci)}
-@media (max-height:820px) and (min-width:761px){.menu .mp-sb{padding-top:6px;padding-bottom:6px}.mp-st::before{top:16px}.mp-lead{font-size:18px}.mp-side{gap:18px}.mp-it{padding:6px 12px}}
+@media (max-height:820px) and (min-width:761px){.menu .mp-sb{padding-top:6px;padding-bottom:6px}.mp-st::before{top:16px}.mp-side{gap:18px}.mp-it{padding:6px 12px}}
 @media (max-width:1000px){.mp{grid-template-columns:1fr}.mp-side{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
-@media (max-width:760px){.mp-d,.mp-srch kbd,.mp-cap span:last-child{display:none}.mp-m{display:inline}.mp-head{grid-template-columns:1fr}.mp-srch{justify-self:start}.mp-lead{font-size:18px}.mp-lead span{display:block;margin-top:6px;font-size:15px}.mp-lead .mp-d{display:none}
+@media (max-width:760px){.mp-d,.mp-srch kbd,.mp-cap span:last-child{display:none}.mp-m{display:inline}.mp-head{grid-template-columns:1fr}.mp-srch{justify-self:start}.mp-lead span{display:block;margin-top:6px;font-size:14.5px}.mp-lead .mp-d{display:none}
   .mp-side{display:contents}.mp-head{order:0}.mp-start{order:1}.mp-spine{order:2}.mp-side>.mp-grp:not(.mp-start){order:3}
   .mp-sb .t small{display:block;margin:2px 0 0}.menu .mp-sb{grid-template-columns:30px minmax(0,1fr)}.menu .mp-sb .t{white-space:normal}.menu .mp-sb .s{display:none}.mp-br{padding-left:46px}}
 @media (prefers-reduced-motion:reduce){.mp-st,.mp-chip,.mp-list::before{transition:none!important;opacity:1!important;transform:none!important}.mp-st.here::before{animation:none}}
@@ -1142,6 +1148,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   </div>
 </nav>
 
+<button class="tomenu mono" id="toMenu" data-hover hidden><span aria-hidden="true">←</span> Станции</button>
 <div class="reticle" id="reticle" aria-hidden="true"><svg viewBox="-100 -100 200 200"><circle class="r1" r="96"/><circle class="r2" r="84"/><g class="ticks" id="rticks"></g></svg><span class="rlab mono" id="rlab">Погрузиться</span></div>
 <div class="reveal" id="reveal" aria-hidden="true"></div>
 <div class="loopfx" id="loopFx" aria-hidden="true"></div>
@@ -9635,10 +9642,16 @@ function mpHere(){ if (typeof insideOpen !== "undefined" && insideOpen && diveSt
 function mpMarks(){ const db = jrLoad(), h = mpHere();
   list.querySelectorAll(".mp-st").forEach(li => { const i = +li.dataset.i; li.classList.toggle("seen", !!db.seen["st:" + i]); li.classList.toggle("here", i === h); });
   return h; }
+// v157: кнопка «← Станции» видна, пока открыта любая глава; ведёт обратно в меню (глава остаётся под ним)
+const toMenu = $("toMenu");
+function syncToMenu(){ toMenu.hidden = menuOpen || !document.querySelector(".chapter.open"); }
+toMenu.onclick = () => toggleMenu(true);
+{ const mo = new MutationObserver(syncToMenu); document.querySelectorAll(".chapter").forEach(el => mo.observe(el, { attributes: true, attributeFilter: ["class"] })); }
 let menuOpen = false;
 function toggleMenu(on){ menuOpen = on; menu.classList.toggle("open", on); menu.setAttribute("aria-hidden", String(!on));
   if (on){ let h = -1; try { h = mpMarks(); } catch(e){} const f = h >= 0 ? list.querySelector(`.mp-st[data-i="${h}"] .mp-sb`) : $("mCompass"); menu.scrollTop = 0; if (f) setTimeout(() => { if (menuOpen) f.focus({ preventScroll: true }); }, 60); }   // меню ещё скрыто visibility в первый кадр — фокус после
-  else { mpSpine.classList.remove("hl"); } }
+  else { mpSpine.classList.remove("hl"); }
+  syncToMenu(); }
 // стрелки ↑/↓ — по пунктам меню в порядке чтения
 menu.addEventListener("keydown", e => { if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
   const all = [...menu.querySelectorAll(".mp-srch, .mp-abs, .mp-sb, .mp-chip, .mp-it")].filter(x => x.offsetParent); const k = all.indexOf(document.activeElement);
