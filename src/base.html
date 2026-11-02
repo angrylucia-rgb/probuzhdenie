@@ -152,7 +152,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .mp-lang a[href]:hover,.mp-lang a[href]:focus-visible{color:var(--ink);background:rgba(214,172,94,.1)}
 .mp-lang a[aria-current]{color:var(--night);background:var(--brass)}
 .tlang{display:inline-flex;align-items:center;gap:7px;color:var(--faint)}
-.tlang a{color:var(--muted);text-decoration:none;transition:color .3s}
+.tlang a{color:var(--muted);text-decoration:none;transition:color .3s;pointer-events:auto;padding:6px 2px}  /* .ui пропускает клики насквозь — ссылкам нужно явно */
 .tlang a[href]:hover,.tlang a[href]:focus-visible{color:var(--ink)}
 .tlang a[aria-current]{color:var(--brass)}
 .tlang i{font-style:normal;opacity:.6}
