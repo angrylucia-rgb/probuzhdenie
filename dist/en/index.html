@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-9jqeOYN9ZydPvgI8eLYlgy1Xx3m2G9H8O5cn42pUBFw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ptFinVMgSQQ8c4IoKQkW8VROZvGFcHDeOyAghwtGV04='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -7373,8 +7373,9 @@ void main(){
   float side = smoothstep(-0.012, 0.012, qw.y);
   float rr = length(qw);
   float fade = exp(-rr*1.5)*(0.35 + 0.65*smoothstep(0.0, 0.08, abs(qw.y)));
-  vec3 up = vec3(1.0, 0.86, 0.55)*pow(I, 1.8)*0.55 + vec3(0.05, 0.03, 0.0);
-  vec3 dn = mix(vec3(0.26, 0.36, 0.85), vec3(0.015, 0.02, 0.07), pow(I, 0.7))*0.5;
+  // v171: полюса — розово-коралловый и бирюзовый (по просьбе Люсии вместо золотого и синего)
+  vec3 up = vec3(1.0, 0.56, 0.64)*pow(I, 1.8)*0.6 + vec3(0.05, 0.012, 0.02);
+  vec3 dn = mix(vec3(0.16, 0.74, 0.70), vec3(0.008, 0.035, 0.04), pow(I, 0.7))*0.5;
   // конфликт нарастает (te), затем разрешается: интерференция гаснет по мере сборки треугольника
   vec3 pol = mix(dn, up, side)*fade*c*(1.0 + te*0.3)*(1.0 - smoothstep(0.15, 0.75, triT));
   // 4 · катарсис и триединство: линия стягивается и замыкается в равносторонний треугольник фиксированного,
@@ -7455,7 +7456,7 @@ void main(){
     transparent:true, depthTest:false, depthWrite:false });
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; quad.renderOrder = -97; root.add(quad);
   // пары частиц: материя вверх, антиматерия вниз — затем, обретя третью точку, ложатся на орбиту треугольника
-  const pairs = pts(2600*Q, (i, o) => { o.p = [rn(), 0, 0]; o.rnd = [i % 2 ? 1 : -1, Math.random(), Math.random()]; o.c = i % 2 ? C(0xffe0a0) : C(0x8fa8ff); o.s = .7 + Math.random()*.9; },
+  const pairs = pts(2600*Q, (i, o) => { o.p = [rn(), 0, 0]; o.rnd = [i % 2 ? 1 : -1, Math.random(), Math.random()]; o.c = i % 2 ? C(0xffa3b4) : C(0x6fe6d6); o.s = .7 + Math.random()*.9; },
     `float life = fract(aRnd.y + uTime*(0.05 + aRnd.z*0.05));
      vec3 flight = vec3(position.x*uProg, aRnd.x*(0.04 + life*life*3.4), (aRnd.z - 0.5)*0.6);
      flight.x += sin(life*9.0 + aSeed*40.0)*life*0.35;
@@ -17003,9 +17004,10 @@ const BIO_PIMG = {
 const PIMG = (() => {
   const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }`;
   const FI = `uniform sampler2D uTex, uDep; uniform vec2 uPar; uniform vec4 uR; uniform float uA, uT, uWl, uK, uAR; varying vec2 vUv;
-void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float out_ = max(abs(q.y - qc.y)*uR.w/uR.z*uAR, abs(q.x - qc.x)*uAR);
+void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float outY = abs(q.y - qc.y)*uR.w/uR.z*uAR, outX = abs(q.x - qc.x)*uAR, out_ = max(outY, outX);
   float d = texture2D(uDep, qc).r; vec2 uv = qc - uPar*(d - 0.3)*uK;
-  if (out_ > 0.002){ uv = vec2(qc.x, clamp(qc.y, 0.004, 0.996)); vec3 e = vec3(0.0); for (int i = -4; i <= 4; i++) e += texture2D(uTex, vec2(uv.x + float(i)*0.03, uv.y + (uv.y > 0.5 ? -0.03 : 0.03))).rgb; e /= 9.0;
+  if (outX > 0.3){ gl_FragColor = vec4(0.02, 0.024, 0.047, uA); return; }
+  if (outY > 0.002 && outX < 0.002){ uv = vec2(qc.x, clamp(qc.y, 0.004, 0.996)); vec3 e = vec3(0.0); for (int i = -4; i <= 4; i++) e += texture2D(uTex, vec2(uv.x + float(i)*0.03, uv.y + (uv.y > 0.5 ? -0.03 : 0.03))).rgb; e /= 9.0;
     gl_FragColor = vec4(mix(e*0.8, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.055, out_)), uA); return; }
   if (uWl > 0.0 && uv.y < 1.0 - uWl){ float w = (1.0 - uWl - uv.y); uv.x += sin(uv.y*140.0 + uT*1.3)*0.00045*smoothstep(0.0, 0.05, w); uv.y += sin(uv.x*90.0 + uT*0.9)*0.0003*smoothstep(0.0, 0.05, w); }
   // v145 “живая панорама”: облака (самое дальнее — небо) чуть плывут; у кромки воды — рябь; ближняя зелень колышется
@@ -17020,7 +17022,12 @@ void main(){ vec2 q = (vUv - uR.xy)/uR.zw, qc = clamp(q, 0.0, 1.0); float out_ =
   c += surf*vec3(1.0, 0.97, 0.9)*pow(max(0.0, sin(uv.x*900.0 + uT*2.1)*sin(uv.y*700.0 - uT*1.4)), 12.0)*0.35*smoothstep(0.35, 0.8, dot(c, vec3(0.33)));   // блики на воде
   if (uWl > 0.0 && uv.y < 1.0 - uWl){ vec2 p = uv*vec2(26.0, 18.0); float k = abs(sin(p.x + sin(p.y*1.3 + uT*0.7)*1.6 + uT*0.4))*abs(sin(p.y*0.9 + sin(p.x*1.1 - uT*0.5)*1.4));
     c += vec3(0.75, 1.0, 0.95)*pow(1.0 - k, 6.0)*0.07*smoothstep(0.55, 0.0, (1.0 - uWl) - uv.y); }                                                       // каустика у поверхности
-  c = mix(c, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.16, out_));
+  // v171: боковые края — плавное размытие (диск из 16 выборок, радиус растёт к краю) и уход в темноту, без полос растяжения
+  float ex = min(q.x, 1.0 - q.x)*uAR, bl = smoothstep(0.12, -0.04, ex);
+  if (bl > 0.001){ float rad = 0.006 + 0.06*bl, rx = rad/uAR; vec2 bc = vec2(clamp(uv.x, rx + 0.002, 0.998 - rx), clamp(uv.y, 0.002, 0.998)); vec3 acc = vec3(0.0);
+    for (int i = 0; i < 16; i++){ float fi = float(i), an = fi*2.39996 + uT*0.0, rr = sqrt((fi + 0.5)/16.0); acc += texture2D(uTex, clamp(bc + vec2(cos(an)*rx, sin(an)*rad)*rr, 0.001, 0.999)).rgb; }
+    c = mix(c, acc/16.0, smoothstep(0.0, 0.55, bl)); c *= 1.0 - 0.22*smoothstep(0.07, -0.02, ex); }
+  c = mix(c, vec3(0.02, 0.024, 0.047), smoothstep(0.0, 0.2, outX) + (1.0 - smoothstep(0.0, 0.2, outX))*smoothstep(0.0, 0.16, outY));
   gl_FragColor = vec4(c, uA); }`;
   const VP = `attribute float aS, aPh; uniform float uT, uPR, uK, uY0, uY1; varying float vA;
 void main(){ vec3 p = position; float h = uY1 - uY0, t = 0.0;
@@ -19257,7 +19264,7 @@ void main(){
   float day = 1. - smoothstep(.05, .55, uSun);
   float ray = (sin(uv.x*26. - uv.y*14. + uT*.25)*.5 + .5)*(sin(uv.x*9. - uv.y*5. - uT*.17)*.5 + .5);
   c += day*vec3(1., .96, .85)*ray*ray*.07*smoothstep(.04, .14, uv.y)*(1. - smoothstep(.36, .62, uv.y))*(1. - texture2D(uM, clamp(uv, .001, .999)).b);
-  float edge = smoothstep(-.02, .02, uv0.x)*smoothstep(1.02, .98, uv0.x);
+  float edge = smoothstep(-.06, .05, uv0.x)*smoothstep(1.06, .95, uv0.x);   // v171: мягче край
   c *= .06 + .94*edge;
   c *= 1. - .5*(1. - smoothstep(0., 130.*uRes.y/900., px.y));
   c *= 1. - .55*smoothstep(.90, 1., uv0.y);
