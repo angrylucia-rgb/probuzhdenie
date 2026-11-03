@@ -4,7 +4,7 @@ libs=['shaders/CopyShader.js','shaders/LuminosityHighPassShader.js','postprocess
 def scripts(threep, exp): return '\n'.join([f'<script src="{threep}"></script>']+[f'<script src="{exp}{l}"></script>' for l in libs])
 ORIGIN = 'https://probuzhdenie-pied.vercel.app'  # при покупке домена — поменять здесь (и в vercel.json не нужно)
 # Правообладатель и адрес для обращений — подставляются в «Правовую информацию», подвал меню и знак ©
-OWNER = {'ru': '[ФИО правообладателя]', 'en': '[owner’s full name]'}
+OWNER = {'ru': 'Шатров Владимир Игоревич', 'en': 'Vladimir Igorevich Shatrov'}
 MAIL = {'ru': '[e-mail для обращений]', 'en': '[contact e-mail]'}
 GFONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
