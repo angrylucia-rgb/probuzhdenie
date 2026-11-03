@@ -12,6 +12,24 @@ GFONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
 LEGAL_CSS = ':root{--night:#05060C;--ink:#EFE7D4;--muted:#A9A7BD;--faint:#6D6F90;--line:rgba(214,172,94,.28);--brass:#D6AC5E;--display:"Forum",Georgia,serif;--body:"Golos Text",system-ui,sans-serif;--mono:"JetBrains Mono",monospace}body{margin:0;background:var(--night);color:var(--ink);font:16px/1.6 var(--body)}main{max-width:800px;margin:0 auto;padding:48px 20px 80px}.back{font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--brass);text-decoration:none}'
 LEGAL_CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'none\'; style-src \'self\' \'unsafe-inline\'; '
              'img-src \'self\' data:; font-src \'self\'; object-src \'none\'; base-uri \'self\'; form-action \'none\'">\n')
+ASSET_DIRS = ('art/img', 'bsc', 'mbg', 'pano', 'strata', 'film', 'data')
+def asset_version(root):
+    import hashlib
+    h = hashlib.sha1()
+    for d in ASSET_DIRS:
+        src = d if d == 'data' else os.path.join(root, d)   # data/bio.json берётся из исходников (в dist копируется позже)
+        for dp, dn, fn in sorted(os.walk(src)):
+            dn.sort()
+            for f in sorted(fn):
+                fp = os.path.join(dp, f); h.update(os.path.relpath(fp, src).encode()); h.update(open(fp, 'rb').read())
+    return h.hexdigest()[:10]
+def _re_assets(page, v):
+    import re
+    n = [0]
+    def sub(m): n[0] += 1; return m.group(1) + 'v/' + v + '/' + m.group(2) + '/'
+    out = re.sub(r'(["\'])(' + '|'.join(re.escape(d) for d in ASSET_DIRS) + r')/', sub, page)
+    assert n[0] > 140, n[0]
+    return out
 def legal_page(base, lang):
     # статическая страница «Правовая информация» из того же <template id="tplLegal">, что и в приложении
     i = base.index('<template id="tplLegal">'); j = base.index('</template>', i)
@@ -51,6 +69,9 @@ def build(base, art, prevf, lang):
     os.makedirs(DIST + '/legal', exist_ok=True); open(DIST + '/legal/index.html', 'w').write(legal_page(base, lang))
     i = body.index('<style>')
     page = head + body[:i] + body[i:body.index('</style>')+8] + "\n</head>\n<body>\n" + body[body.index('</style>')+8:] + "\n</body>\n</html>\n"
+    # v167: адреса картинок, панорам, пластов, фильмов и данных получают версию: v/<хеш>/pano/… (на Vercel — rewrite на /pano/…).
+    # Браузер хранит их год и не перезапрашивает; при любой замене файла хеш меняется и все адреса обновляются.
+    page = _re_assets(page, asset_version(os.path.dirname(DIST) if lang == 'en' else DIST))
     # v166: политика безопасности (CSP). Разрешён только наш встроенный скрипт (по его хешу) и файлы с нашего сервера:
     # чужой код, внедрённый в страницу, браузер не выполнит. Хеш считается при каждой сборке — рассинхрона нет.
     import hashlib, base64, re as _re
