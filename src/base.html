@@ -1013,6 +1013,21 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
 .bsc-sun-l i{font-style:normal;cursor:none}
 .bsc-lab{position:fixed;left:0;top:0;z-index:6;pointer-events:none;translate:-50% 0;white-space:nowrap;font:500 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:#fff3dc;text-shadow:0 1px 6px rgba(0,0,0,.95);opacity:0;transition:opacity .3s}
 .bsc-lab.on{opacity:.92}
+/* v170: обитатели сейбы на картине */
+.bsc-sp{filter:brightness(var(--lum,1));opacity:var(--spo,1)}
+.bsc-b image{transform-box:fill-box;transform-origin:50% 100%;transition:filter .35s}
+.bsc-b.hot image{filter:drop-shadow(0 0 5px rgba(255,226,170,.95)) drop-shadow(0 0 14px rgba(255,200,120,.45))}
+.bsc-perch{animation:bscPerch 4.2s ease-in-out infinite}
+.bsc-climb{animation:bscClimb 11s ease-in-out infinite}
+.bsc-crawl{animation:bscCrawl 16s linear infinite}
+.bsc-wriggle{transform-origin:50% 50%;animation:bscWrig 3.4s ease-in-out infinite alternate}
+@keyframes bscPerch{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.014)}}
+@keyframes bscClimb{0%,18%{transform:translateY(0)}45%,62%{transform:translateY(-34%)}88%,100%{transform:translateY(0)}}
+@keyframes bscCrawl{0%{transform:translateX(-45%);opacity:0}7%{opacity:1}82%{transform:translateX(70%);opacity:1}90%,100%{transform:translateX(70%);opacity:0}}
+@keyframes bscWrig{0%{transform:skewX(-4deg) scaleX(.97)}100%{transform:skewX(4deg) scaleX(1.03)}}
+@media (prefers-reduced-motion:reduce){.bsc-b image{animation:none}}
+.bsc-spc .bsc-sp-l{font:italic 400 14px Forum,serif;color:#e9c98d}
+.bsc-spc .bsc-sp-b{margin-top:-4px;color:#cfc4ad}
 body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
 .bsc-dive{position:fixed;z-index:6;left:calc(min(640px,50vw) + 28px);right:28px;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);max-width:620px;margin-left:auto;margin-right:auto;padding:14px 18px 14px;border:1px solid rgba(214,172,94,.3);border-radius:14px;background:rgba(5,6,10,.78);backdrop-filter:blur(8px);color:#efe4cc;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .5s,visibility .5s,transform .5s}
 .bsc-dive.on{opacity:1;visibility:visible;transform:none}
@@ -10219,7 +10234,7 @@ const ELV = [
 ];
 
 const BIO_LV = { short:"Крона", cat:"биосфера · свет", name:"Биосфера · крона", sub:"Живое вещество планеты: здесь свет становится веществом", scale:"от 1 нм до 60 м", bsc:0,
-  hint:"Лупа — ведите по листьям · клик — нырок до молекулы · справа вверху — время суток",
+  hint:"Лупа — ведите по листьям · клик — нырок до молекулы · на ветке — гарпия · справа вверху — время суток",
   lead:"Из атмосферы — в крону сейбы, «мирового древа» майя. Здесь свет становится веществом: лист ловит фотон, расщепляет воду и строит сахар из углекислого газа. Этим светом в конце концов питается всё живое на суше.",
   sci:[["s","В живых организмах около 550 млрд т углерода; ≈ 80 % — в растениях, у животных — меньше 0,5 %, у людей — около 0,01 % (Бар-Он и соавт., 2018)"],["s","Сейба (Ceiba pentandra) поднимается на 60–70 м — выше полога леса; у основания — досковидные корни-контрфорсы"],["s","Фотосинтез: 6 CO₂ + 6 H₂O + свет → C₆H₁₂O₆ + 6 O₂. Кислород берётся из воды, а не из CO₂ — это показали опыты с изотопом ¹⁸O (1941)"],["s","Хлорофилл поглощает красный и синий свет, а зелёный отражает — поэтому лес зелёный"],["h","Около половины кислорода планеты дают не леса, а морской фитопланктон; оценки — от 50 до 80 %"]],
   trad:["Майя — сейба, мировое древо: корни в подземном мире Шибальбе, крона — в небесах","Вернадский — свет Солнца, превращённый в живое вещество","Каббала — Эц Хаим, Древо жизни","Скандинавия — ясень Иггдрасиль соединяет миры"],
@@ -10227,21 +10242,21 @@ const BIO_LV = { short:"Крона", cat:"биосфера · свет", name:"�
   prac:["Дыхание с деревом: вдох — кислород, отданный листьями; выдох — углекислый газ, который они возьмут"] };
 const BIO_LVS = [BIO_LV,
   { short:"Ствол", cat:"биосфера · на дереве", name:"Ствол · дом для жизни", sub:"Эпифиты, мхи и лишайники", scale:"от 10 мкм до 60 м", bsc:1,
-    hint:"Лупа: бромелия и кора · клик — ближе",
+    hint:"Лупа: бромелия и кора · клик — ближе · на стволе — белка",
     lead:"Ствол сейбы — вертикальный мир эпифитов: бромелий, орхидей, папоротников, мхов. Они не паразиты — просто поднялись к свету и пьют дождь. В розетке бромелии стоит лужица — крошечный пруд высоко над землёй.",
     sci:[["s","Лишайник — союз гриба и водоросли или цианобактерии: гриб даёт дом и воду, его партнёр — сахар от фотосинтеза"],["s","В воде одной бромелии живут десятки видов — от бактерий и личинок комаров до головастиков древесных лягушек"],["s","Эпифиты не берут сок у дерева: воду и минералы они получают из дождя, тумана и пыли"],["h","Тропические леса занимают около 6–7 % суши, но в них, по оценкам, живёт больше половины наземных видов"]],
     trad:["Вернадский — «живое вещество» как геологическая сила","Закон Одного — вторая плотность: растения и животные растут и тянутся к свету"],
     par:"Мы тоже «многоэтажны»: на коже и в кишечнике живут триллионы микробов — свой лес на нашем стволе.",
     prac:["Найти дерево и минуту рассматривать кору вблизи: мох, лишайник, муравьи"] },
   { short:"Подстилка", cat:"биосфера · круговорот", name:"Подстилка · круговорот", sub:"Где лист снова становится землёй", scale:"от 1 мкм до 1 м", bsc:2,
-    hint:"Лупа: подстилка · клик — ближе",
+    hint:"Лупа: подстилка · клик — ближе · в листьях — жук",
     lead:"Секрет тропического леса: почва здесь бедная. Всё богатство — в живом и в тонком слое опавших листьев. Грибы и бактерии разбирают лист за месяцы, и корни тут же забирают освободившееся.",
     sci:[["s","Опавший лист в тропическом лесу разлагается за месяцы, в тайге — за годы"],["s","Красный цвет латеритной почвы — оксиды железа: ливни миллионы лет вымывали из почвы почти всё, кроме железа и алюминия"],["s","В грамме почвы — до миллиарда бактерий"],["s","Разложители дышат и возвращают углерод в воздух — так замыкается круговорот: свет → сахар → лист → почва → CO₂ → снова в лист"]],
     trad:["Экклезиаст 3:20 — «всё произошло из праха и всё возвратится в прах»","Китайская натурфилософия у-син — круговорот пяти стихий: дерево рождает огонь, огонь — землю, земля — металл, металл — воду, вода — дерево"],
     par:"В нашем кишечнике около 40 трлн бактерий — свой «почвенный» мир: они разбирают то, с чем не справляются наши ферменты.",
     prac:["Подержать в ладони горсть лесной земли и вдохнуть: запах «после дождя» — геосмин, его выделяют почвенные бактерии"] },
   { short:"Корни", cat:"биосфера · союз", name:"Корни · грибница", sub:"Под землёй — союз дерева и гриба", scale:"от 1 мкм до 10 м", bsc:3, bioFork:true,
-    hint:"Лупа: кончик корня · клик — внутрь корня",
+    hint:"Лупа: кончик корня · клик — внутрь корня · в почве — червь",
     lead:"Корни держат великана и пьют воду, но тончайшую работу делает гриб: микориза приносит дереву фосфор и воду, а получает сахар. Ниже корней — камень, а в камне — время. Отсюда два пути.",
     sci:[["s","Микоризу образуют 80–90 % видов наземных растений; этому союзу больше 400 млн лет — его видно в окаменелостях Райни (Шотландия)"],["s","Воду корень берёт в основном кончиками с корневыми волосками; в сухой сезон сейба сбрасывает листья, чтобы не терять влагу"],["h","«Лесной интернет» — обмен веществами и сигналами между деревьями по общей грибнице: перенос показан в опытах, но его роль в природе, вероятно, преувеличена (Karst и соавт., 2023)"],["s","Хлорофилл и гем — родственные тетрапирролы: их строят одни и те же ферменты до общего предшественника — протопорфирина IX; в центре хлорофилла магний, в центре гема железо"]],
     trad:["Бхагавад-гита 15.1 — ашваттха: корни вверху, ветви внизу; кто знает это дерево, знает Веды","Скандинавия — у корней Иггдрасиля источник мудрости Мимира"],
@@ -16660,7 +16675,12 @@ const BIO_BSP = {
   angle:{ face:-1, ru:"Удильщик", lat:"Melanocetus johnsonii", grp:"Рыбы · удильщикообразные", len:.18, lenT:"самка до 18 см, самец ≈ 3 см", anim:"swim", inv:"Светящаяся «удочка» на голове — в ней живут светящиеся бактерии.", wow:"У некоторых удильщиков крошечный самец прирастает к самке навсегда.", legacy:"Глубоководный траловый промысел разрушает места обитания." },
   gsquid:{ face:-1, ru:"Гигантский кальмар", lat:"Architeuthis dux", grp:"Моллюски · головоногие", len:12, lenT:"≈ 12–13 м с щупальцами", anim:"swim", inv:"Глаза до 25–27 см — самые большие в животном мире.", wow:"Живого гигантского кальмара впервые сняли в природе только в 2004 году.", legacy:"Главный враг — кашалот; на кашалотах находят шрамы от присосок." },
   riftia:{ ru:"Рифтия", lat:"Riftia pachyptila", grp:"Кольчатые черви", len:2, lenT:"трубка до 2 м", anim:"sway", inv:"Нет рта и кишечника: внутри живут бактерии, получающие энергию из сероводорода.", wow:"Красные «перья» — от гемоглобина, который несёт и кислород, и сероводород.", legacy:"Открыты в 1977 году у горячих источников; угроза — глубоководная добыча металлов." },
-  dumbo:{ ru:"Осьминог-дамбо", lat:"Grimpoteuthis", grp:"Моллюски · головоногие", len:.3, lenT:"длина ≈ 20–30 см", anim:"swim", sci:[["h","Силуэт — родственный осьминог того же семейства (опистотевтис)"]], inv:"Плавает, взмахивая плавниками-«ушами», как крыльями.", wow:"Живёт глубже всех известных осьминогов — до 7 км.", legacy:"Почти ничего не известно о численности: глубины изучены хуже Луны." }
+  dumbo:{ ru:"Осьминог-дамбо", lat:"Grimpoteuthis", grp:"Моллюски · головоногие", len:.3, lenT:"длина ≈ 20–30 см", anim:"swim", sci:[["h","Силуэт — родственный осьминог того же семейства (опистотевтис)"]], inv:"Плавает, взмахивая плавниками-«ушами», как крыльями.", wow:"Живёт глубже всех известных осьминогов — до 7 км.", legacy:"Почти ничего не известно о численности: глубины изучены хуже Луны." },
+  // v170: обитатели слоя сейбы (рисунки Люсии) — живут на картине слоя «Биосфера», не в биомах
+  harpy:{ face:-1, ru:"Гарпия", lat:"Harpia harpyja", grp:"Птицы · ястребиные", len:1, lenT:"≈ 0,9–1 м, размах крыльев до 2 м", anim:"still", inv:"Задние когти длиной до 12 см — как у медведя гризли: ими гарпия снимает с ветвей ленивцев и обезьян.", wow:"Гнездо из толстых веток — на высоте 30–50 м, часто в развилке сейбы, которая поднимается над пологом леса. Птенца родители опекают больше года.", legacy:"Одной паре нужны десятки квадратных километров нетронутого леса. Где рубят высокие деревья, гарпии негде гнездиться." },
+  squir:{ ru:"Белка", lat:"Hadrosciurus spadiceus", grp:"Млекопитающие · беличьи", len:.55, lenT:"тело ≈ 25–30 см, хвост такой же", anim:"still", inv:"Резцы растут всю жизнь: белка разгрызает твёрдые орехи пальм, которые не по зубам большинству зверей.", wow:"Часть орехов белки прячут в землю и забывают — так грызуны сажают лес.", legacy:"Амазонских белок недавно (2015) выделили в отдельный род: они оказались не так близки к европейским, как думали." },
+  beetl:{ ru:"Жук-копрофанеус", lat:"Coprophanaeus lancifer", grp:"Насекомые · скарабеи", len:.05, lenT:"≈ 4–5 см", anim:"crawl", inv:"Закапывает падаль под землю: питательные вещества сразу возвращаются в бедную почву тропического леса.", wow:"Рог на голове есть и у самцов, и у самок. Сине-фиолетовый блеск дают не пигменты, а строение панциря.", legacy:"Такие жуки — санитары леса. На вырубках, где исчезли крупные звери, их становится в разы меньше." },
+  worm:{ ru:"Дождевой червь", lat:"Pontoscolex corethrurus", grp:"Кольчатые черви · малощетинковые", len:.1, lenT:"≈ 6–12 см", anim:"crawl", inv:"Глотает почву, переваривает из неё остатки растений и оставляет рыхлые комочки, в которых растениям легче брать пищу.", wow:"Ещё Дарвин в 1881 году показал, что черви год за годом перемешивают верхний слой почвы — «живой плуг» Земли.", legacy:"Родом с Гвианского нагорья, а теперь живёт по всем тропикам: его разнесли вместе с землёй и рассадой." },
 };
 for (const k in BIO_BSP) BIO_SP[k] = Object.assign({ rot:0, face:1, bio:1, sci:[] }, BIO_BSP[k]);
 // сцены биомов: [код, x, y, высота, z, скорость]
@@ -16946,7 +16966,7 @@ const BIO_PIMG = {
   // скорпион немного увеличен, иначе его не видно. Правая половина переднего плана — свободная равнина
   bm_desert:{ ar:2752/1536, wl:null, fx:["dust", "haze"], slots:[["camel", .60, .60, .23, -1], ["fenec", .43, .80, .12, 1], ["jerbo", .52, .89, .07, 1], ["scorp", .66, .93, .05, -1]] },
   bm_reef:{ ar:2752/1536, wl:.2, fx:["plankton", "rays"], slots:[["turtl", .32, .44, .2, 1], ["manta", .62, .32, .3, -1], ["clown", .82, .60, .05, -1], ["parro", .45, .62, .1, 1], ["octo", .58, .86, .12, -1]] },
-  bm_ocean:{ ar:2752/1536, wl:.31, fx:["plankton", "rays"], slots:[["albat", .70, .10, .12, -1], ["bwhale", .42, .72, .55, 1], ["tuna", .74, .47, .12, -1], ["bshark", .16, .52, .17, 1], ["jelly", .88, .64, .07, -1]] },
+  bm_ocean:{ ar:2752/1536, wl:.31, fx:["plankton", "rays"], slots:[["albat", .70, .18, .12, -1], ["bwhale", .42, .72, .55, 1], ["tuna", .74, .47, .12, -1], ["bshark", .16, .52, .17, 1], ["jelly", .88, .64, .07, -1]] },
   bm_deep:{ ar:2752/1536, wl:.005, fx:["plankton"], slots:[["riftia", .30, .86, .12, 1], ["angle", .62, .45, .08, -1], ["gsquid", .78, .34, .3, -1], ["dumbo", .45, .30, .07, 1], ["coela", .20, .55, .14, 1], ["nauti", .88, .62, .05, -1]] },
   jurassic:{ wl:.625, fx:["motes", "plankton", "rays"], scale:"Крупные динозавры — в одном масштабе (как будто на одном расстоянии); юрамайю (10 см) и анхиорниса (40 см) в истинном размере не видно — они только в карточках (v137).",
     slots:[["brach", .14, .53, .30, 1], ["diplo", .31, .525, .34, 1], ["stego", .45, .548, .14, -1], ["allo", .76, .53, .118, -1],
@@ -19157,6 +19177,13 @@ const BSC = (() => {
       { img:"lens_myco", t:"Микориза внутри корня", s:"≈ 100 мкм", tx:"Окрашенный срез корня: внутри клеток — ветвистые арбускулы гриба, здесь дерево и гриб меняют сахар на фосфор. Круглые пузырьки — запасы гриба ●" } ] },
     { id:"down", u:.53, v:.955, r:.05, lv:3, act:"strata", t:"Вниз в прошлое" }
   ];
+  // v170: обитатели сейбы — рисунки Люсии на картине (u, v — центр; w — ширина в долях картины; масштаб увеличен, как у лупы натуралиста)
+  const BEINGS = [
+    { k:"harpy", u:.40, v:.1746, w:.06, lv:0, an:"perch", z:"Крона" },
+    { k:"squir", u:.465, v:.585, w:.085, lv:1, an:"climb", z:"Ствол" },
+    { k:"beetl", u:.665, v:.673, w:.036, lv:2, an:"crawl", z:"Подстилка" },
+    { k:"worm", u:.22, v:.79, w:.075, lv:3, an:"wriggle", z:"Почва" }
+  ];
   // золотая схема родства на ветвях кроны (u, v) — упрощено ◐
   const TOL = [
     { p:[[.515,.655],[.515,.42],[.515,.19]], l:"LUCA — общий предок · ≈ 4 млрд лет", at:[.535,.40], a:"start" },
@@ -19174,7 +19201,7 @@ const BSC = (() => {
   let px = -1e4, py = -1e4, over = false, lastMove = 0, spd = 0, lensA = 0, hot = null, hotMix = 0, lensImg = null, lensImgPrev = null;
   let rect = [0, 0, 1, 1], free = [0, 0, 1, 1], W = 1, H = 1, DPR = 1, lv = 0;
   let dive = null, tolOn = false, tolA = 0;
-  let ov, sunEl, lab, dv;
+  let ov, sunEl, lab, dv, spc, spB = null, hb = null;
   let fromRoots = false, riseWait = false;
   const cb = { toStrata: () => { closeHuman(); openBio("now"); fromRoots = true; }, toHuman: () => { depthT = DMAX; lastDepthInput = performance.now(); } };
   const VS = "attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }";
@@ -19262,7 +19289,7 @@ void main(){
     ["uD", "uS", "uN", "uM", "uL", "uA", "uB"].forEach((n, i) => gl.uniform1i(U[n], i));
     cv.addEventListener("webglcontextlost", e => { e.preventDefault(); failed = true; });
     ui();
-    document.body.append(cv, ov, sunEl, lab, dv);
+    document.body.append(cv, ov, sunEl, lab, dv, spc);
     return true;
   }
   function blank(){ const c = document.createElement("canvas"); c.width = c.height = 2; const x = c.getContext("2d"); x.fillStyle = "#000"; x.fillRect(0, 0, 2, 2); return c; }
@@ -19290,6 +19317,10 @@ void main(){
     s += `<circle class="bsc-tol-h" cx="${X(.56)}" cy="${Y(.035)}" r="6"/><text class="bsc-tol-hl" x="${X(.548)}" y="${Y(.031)}" text-anchor="end">Человек · 300 тыс. лет</text></g>`;
     HOT.forEach(h => { s += `<circle class="bsc-hs" data-h="${h.id}" cx="${X(h.u)}" cy="${Y(h.v)}" r="${(h.r*1000*.45).toFixed(1)}"/>`; });
     s += `<text class="bsc-down" x="${X(.53)}" y="${Y(.93)}" text-anchor="middle">↓ вниз в прошлое</text>`;
+    // обитатели: SVG-картинки поверх полотна, движутся вместе с картиной; ночью темнеют вместе с ней
+    const AD = typeof BIO_ART !== "undefined" ? BIO_ART : {};
+    s += `<g class="bsc-sp">` + BEINGS.filter(b => AD[b.k]).map(b => { const ar = b.k === "harpy" ? 1.094 : b.k === "squir" ? .631 : b.k === "beetl" ? .584 : .25, w = b.w*1000, h = w*ar;
+      b.ar = ar; return `<g class="bsc-b" data-b="${b.k}"><image class="bsc-bi bsc-${b.an}" href="${AD[b.k].img}" x="${(b.u*1000 - w/2).toFixed(1)}" y="${(b.v*1000*AR - h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/></g>`; }).join("") + `</g>`;
     ov.innerHTML = s;
     sunEl = document.createElement("div"); sunEl.className = "bsc-sun";
     sunEl.innerHTML = `<span class="mono">☀ время суток</span><input type="range" min="0" max="100" value="0" aria-label="Время суток: день, закат, ночь"><span class="mono bsc-sun-l"><i>день</i><i>закат</i><i>ночь</i></span>`;
@@ -19297,15 +19328,20 @@ void main(){
     rg.addEventListener("input", () => { sunAim = rg.value/100; co2(); });
     sunEl.querySelectorAll("i").forEach((el, k) => el.onclick = () => { rg.value = k*50; sunAim = k*.5; co2(); });
     lab = document.createElement("div"); lab.className = "bsc-lab"; lab.setAttribute("aria-hidden", "true");
+    spc = document.createElement("div"); spc.className = "bsc-dive bsc-spc"; spc.setAttribute("role", "dialog"); spc.setAttribute("aria-label", "Обитатель сейбы");
+    spc.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b><i class="bsc-sp-l"></i></div><p class="bsc-dv-x bsc-sp-a"></p><p class="bsc-dv-x bsc-sp-b"></p><div class="bsc-dv-b"><button data-a="bio" data-hover>Портрет в Биосфере →</button><button data-a="x" data-hover>✕ закрыть</button></div>`;
+    spc.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const k = spB && spB.k; closeSp(); if (bt.dataset.a === "bio" && k && typeof RT !== "undefined") RT.go({ t:"bio", sp:k }); });
     dv = document.createElement("div"); dv.className = "bsc-dive"; dv.setAttribute("role", "dialog"); dv.setAttribute("aria-label", "Нырок сквозь масштабы");
     dv.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b></div><p class="bsc-dv-x"></p><div class="bsc-dv-b"><button data-a="up" data-hover>↑ крупнее</button><button data-a="dn" data-hover>глубже ↓</button><button data-a="mol" data-hover>Mg → Fe: гем крови</button><button data-a="mech" data-hover>⚙ опыт</button><button data-a="x" data-hover>✕ закрыть</button></div>`;
     dv.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const a = bt.dataset.a; if (a === "up") step(-1); else if (a === "dn") step(1); else if (a === "x") closeDive(); else if (a === "mol") morph(); else if (a === "mech"){ const it = dive.h.chain[dive.i]; if (it.m){ closeDive(); bscMech(it.m); } } });
     cv.addEventListener("pointermove", e => { const t = performance.now(); spd = Math.min(1, spd + Math.hypot(e.clientX - px, e.clientY - py)/180); px = e.clientX; py = e.clientY; over = true; lastMove = t; });
     cv.addEventListener("pointerleave", () => { over = false; });
     cv.addEventListener("pointerdown", e => { px = e.clientX; py = e.clientY; over = e.pointerType !== "touch"; });
-    cv.addEventListener("click", e => { if (dive){ if (!dive.closing && dive.t >= 1) step(1); return; } px = e.clientX; py = e.clientY; const h = hitAt(px, py, e.pointerType === "touch" || mob ? 46 : 0); if (h) act(h, true); });
+    cv.addEventListener("click", e => { if (dive){ if (!dive.closing && dive.t >= 1) step(1); return; } px = e.clientX; py = e.clientY;
+      const tch = e.pointerType === "touch" || mob, b = beingAt(px, py, tch ? 22 : 4); if (b){ openSp(b); return; } if (spB){ closeSp(); return; }
+      const h = hitAt(px, py, tch ? 46 : 0); if (h) act(h, true); });
     addEventListener("wheel", e => { if (!dive || dive.closing) return; e.preventDefault(); e.stopImmediatePropagation(); const t = performance.now(); if (t - (dive.wl || 0) < 650) return; dive.wl = t; step(e.deltaY > 0 ? 1 : -1); }, { capture:true, passive:false });
-    addEventListener("keydown", e => { if (dive && e.key === "Escape"){ e.stopImmediatePropagation(); closeDive(); } }, true);
+    addEventListener("keydown", e => { if (dive && e.key === "Escape"){ e.stopImmediatePropagation(); closeDive(); } else if (spB && e.key === "Escape"){ e.stopImmediatePropagation(); closeSp(); } }, true);
   }
   function co2(){
     const el = document.getElementById("bscCO2"); if (!el) return;
@@ -19315,6 +19351,23 @@ void main(){
     el.querySelector(".bsc-co2-p").style.width = (ph*100).toFixed(0) + "%";
     el.querySelector(".bsc-co2-r").style.width = (rs*100).toFixed(0) + "%";
   }
+  // обитатель под курсором: прямоугольник рисунка на экране (+ запас)
+  function beingAt(x, y, extra){
+    if (!ov || A < .5) return null; let best = null, bd = 1e9;
+    for (const b of BEINGS){ if (!b.ar) continue;
+      const cx = rect[0] + b.u*rect[2], cy = rect[1] + b.v*rect[3], w = b.w*rect[2]/2 + extra, h = b.w*rect[2]*b.ar/2 + extra;
+      if (cy < free[1] || cy > free[1] + free[3] || cx < free[0]) continue;
+      if (Math.abs(x - cx) < w && Math.abs(y - cy) < h){ const d = Math.hypot(x - cx, y - cy); if (d < bd){ bd = d; best = b; } } }
+    return best;
+  }
+  function openSp(b){
+    const S = typeof BIO_SP !== "undefined" ? BIO_SP[b.k] : null; if (!S) return;
+    spB = b; lab.classList.remove("on");
+    spc.querySelector(".bsc-dv-s").textContent = b.z + " · " + S.lenT; spc.querySelector(".bsc-dv-t").textContent = S.ru; spc.querySelector(".bsc-sp-l").textContent = S.lat;
+    spc.querySelector(".bsc-sp-a").textContent = S.inv; spc.querySelector(".bsc-sp-b").textContent = S.wow;
+    spc.classList.add("on"); if (typeof jrMark === "function") jrMark("bio", "sp:" + b.k, S.ru);
+  }
+  function closeSp(){ spB = null; if (spc) spc.classList.remove("on"); }
   function hitAt(x, y, extra){
     let best = null, bd = 1e9;
     for (const h of HOT){ if (h.lv > lv + .6 || h.lv < lv - 1.6) continue;
@@ -19403,24 +19456,32 @@ void main(){
     spd *= Math.exp(-dt*1.6); sway = .35 + spd*1.8;
     dark += (darkAim - dark)*Math.min(1, dt*2.6);
     // лупа
-    const lensOn = over && !mob && !dive && A > .5 && px > free[0] && now - lastMove < 6000;
+    // над обитателем лупа гаснет: рисунок поверх картины, увеличивать под ним нечего
+    hb = over && !mob && !dive && A > .5 && px > free[0] && now - lastMove < 6000 ? beingAt(px, py, 4) : null;
+    const lensOn = over && !mob && !dive && !hb && A > .5 && px > free[0] && now - lastMove < 6000;
     lensA += ((lensOn ? 1 : 0) - lensA)*Math.min(1, dt*8);
     document.body.classList.toggle("bsc-lens", lensA > .3);
-    const h = lensOn ? hitAt(px, py, 30) : null;
+    const h = lensOn && !hb ? hitAt(px, py, 30) : null;
     if (h !== hot){ hot = h; if (h && h.chain) h.chain.forEach(c => { lensTex(c.img); if (c.alt) lensTex(c.alt.img); }); }
     const img0 = hot && hot.chain ? hot.chain[0].img : null;
     if (img0){ lensImg = img0; lensTex(img0); }
     hotMix += (((img0 && L[img0] && L[img0].t) ? 1 : 0) - hotMix)*Math.min(1, dt*6);
-    if (lensA > .02){
-      const tl = hot ? (hot.act ? hot.t + " · клик" : hot.chain[0].t + (hot.chain.length > 1 ? " · клик — глубже" : " · клик — ближе")) : "";
+    if (lensA > .02 || hb){
+      const tl = hb ? BIO_SP[hb.k].ru + " · клик — знакомство" : hot ? (hot.act ? hot.t + " · клик" : hot.chain[0].t + (hot.chain.length > 1 ? " · клик — глубже" : " · клик — ближе")) : "";
       if (lab.textContent !== tl) lab.textContent = tl;
-      lab.classList.toggle("on", !!tl && lensA > .5);
-      lab.style.transform = `translate(${px.toFixed(0)}px,${(py + 104).toFixed(0)}px)`;
+      lab.classList.toggle("on", !!tl && (lensA > .5 || !!hb) && !spB);
+      lab.style.transform = `translate(${px.toFixed(0)}px,${(py + (hb ? 26 : 104)).toFixed(0)}px)`;
     } else lab.classList.remove("on");
     if (!ov._hs) ov._hs = [...ov.querySelectorAll(".bsc-hs")].map(c => [c, HOT.find(h => h.id === c.dataset.h)]);
     ov._hs.forEach(([c, h]) => { const sy = rect[1] + h.v*rect[3], sx = rect[0] + h.u*rect[2], vis = sy > free[1] + 20 && sy < free[1] + free[3] - 20 && sx > free[0] + 10 && Math.abs(h.lv - lv) < 1.3 && !tolA;
       c.classList.toggle("hot", !!hot && h === hot); c.classList.toggle("off", !vis); });
     ov.style.setProperty("--tol", tolA.toFixed(3));
+    // обитатели: подсветка под курсором, ночью темнеют вместе с картиной; карточка закрывается при уходе со слоя
+    if (!ov._bs) ov._bs = [...ov.querySelectorAll(".bsc-b")].map(g => [g, BEINGS.find(b => b.k === g.dataset.b)]);
+    ov._bs.forEach(([g, b]) => g.classList.toggle("hot", b === hb || b === spB));
+    ov.style.setProperty("--lum", (1 - .25*Math.min(1, sun*2) - .42*Math.max(0, sun*2 - 1)).toFixed(3));
+    ov.style.setProperty("--spo", (1 - dark).toFixed(3));
+    if (spB && (A < .5 || dive || Math.abs(spB.lv - lv) > 1.4)) closeSp();
     // нырок
     let dz = [1, 1], dmix = 0, dA = null, dB = null, molA = 0, molB = 0, dr = 0, dcx = 0, dcy = 0, dsz = 1;
     if (dive){

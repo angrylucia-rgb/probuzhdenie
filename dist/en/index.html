@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-yXp/j+T7V/N+kOlaqpGbFN2sd0mh5R1XZys5BK3LIm4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-9jqeOYN9ZydPvgI8eLYlgy1Xx3m2G9H8O5cn42pUBFw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -1031,6 +1031,21 @@ table.rtable th[scope="row"]{color:#FBEFD2;font-weight:500;position:sticky;left:
 .bsc-sun-l i{font-style:normal;cursor:none}
 .bsc-lab{position:fixed;left:0;top:0;z-index:6;pointer-events:none;translate:-50% 0;white-space:nowrap;font:500 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:#fff3dc;text-shadow:0 1px 6px rgba(0,0,0,.95);opacity:0;transition:opacity .3s}
 .bsc-lab.on{opacity:.92}
+/* v170: обитатели сейбы на картине */
+.bsc-sp{filter:brightness(var(--lum,1));opacity:var(--spo,1)}
+.bsc-b image{transform-box:fill-box;transform-origin:50% 100%;transition:filter .35s}
+.bsc-b.hot image{filter:drop-shadow(0 0 5px rgba(255,226,170,.95)) drop-shadow(0 0 14px rgba(255,200,120,.45))}
+.bsc-perch{animation:bscPerch 4.2s ease-in-out infinite}
+.bsc-climb{animation:bscClimb 11s ease-in-out infinite}
+.bsc-crawl{animation:bscCrawl 16s linear infinite}
+.bsc-wriggle{transform-origin:50% 50%;animation:bscWrig 3.4s ease-in-out infinite alternate}
+@keyframes bscPerch{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.014)}}
+@keyframes bscClimb{0%,18%{transform:translateY(0)}45%,62%{transform:translateY(-34%)}88%,100%{transform:translateY(0)}}
+@keyframes bscCrawl{0%{transform:translateX(-45%);opacity:0}7%{opacity:1}82%{transform:translateX(70%);opacity:1}90%,100%{transform:translateX(70%);opacity:0}}
+@keyframes bscWrig{0%{transform:skewX(-4deg) scaleX(.97)}100%{transform:skewX(4deg) scaleX(1.03)}}
+@media (prefers-reduced-motion:reduce){.bsc-b image{animation:none}}
+.bsc-spc .bsc-sp-l{font:italic 400 14px Forum,serif;color:#e9c98d}
+.bsc-spc .bsc-sp-b{margin-top:-4px;color:#cfc4ad}
 body.bsc-lens .cur,body.bsc-lens .dot{opacity:0}
 .bsc-dive{position:fixed;z-index:6;left:calc(min(640px,50vw) + 28px);right:28px;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);max-width:620px;margin-left:auto;margin-right:auto;padding:14px 18px 14px;border:1px solid rgba(214,172,94,.3);border-radius:14px;background:rgba(5,6,10,.78);backdrop-filter:blur(8px);color:#efe4cc;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .5s,visibility .5s,transform .5s}
 .bsc-dive.on{opacity:1;visibility:visible;transform:none}
@@ -10246,7 +10261,7 @@ const ELV = [
 ];
 
 const BIO_LV = { short:"Canopy", cat:"biosphere · light", name:"Biosphere · canopy", sub:"The living matter of the planet: here light becomes matter", scale:"from 1 nm to 60 m", bsc:0,
-  hint:"Magnifier: move it over the leaves · click to dive down to the molecule · top right: time of day",
+  hint:"Magnifier: move it over the leaves · click to dive down to a molecule · a harpy eagle on the branch · time of day at top right",
   lead:"From the atmosphere into the crown of a ceiba, the Maya “world tree”. Here light becomes matter: a leaf catches a photon, splits water and builds sugar out of carbon dioxide. In the end, all life on land feeds on this light.",
   sci:[["s","Living organisms hold about 550 billion tons of carbon; ≈80% is in plants, less than 0.5% in animals, and about 0.01% in humans (Bar-On et al., 2018)"],["s","The ceiba (Ceiba pentandra) rises to 60–70 m, above the forest canopy; at its base are plank-like buttress roots"],["s","Photosynthesis: 6 CO₂ + 6 H₂O + light → C₆H₁₂O₆ + 6 O₂. The oxygen comes from water, not from CO₂, as experiments with the isotope ¹⁸O showed (1941)"],["s","Chlorophyll absorbs red and blue light and reflects green, which is why the forest is green"],["h","About half of the planet’s oxygen comes not from forests but from marine phytoplankton; estimates range from 50 to 80%"]],
   trad:["The Maya — the ceiba, the world tree: its roots in the underworld of Xibalba, its crown in the heavens","Vernadsky — sunlight turned into living matter","Kabbalah — Etz Chaim, the Tree of Life","Scandinavia — the ash Yggdrasil connects the worlds"],
@@ -10254,21 +10269,21 @@ const BIO_LV = { short:"Canopy", cat:"biosphere · light", name:"Biosphere · ca
   prac:["Breathing with a tree: the in-breath is the oxygen given by the leaves; the out-breath is the carbon dioxide they will take"] };
 const BIO_LVS = [BIO_LV,
   { short:"Trunk", cat:"biosphere · on the tree", name:"Trunk · a home for life", sub:"Epiphytes, mosses and lichens", scale:"from 10 μm to 60 m", bsc:1,
-    hint:"Magnifier: bromeliad and bark · click to come closer",
+    hint:"Magnifier: bromeliad and bark · click to look closer · a squirrel on the trunk",
     lead:"The ceiba trunk is a vertical world of epiphytes: bromeliads, orchids, ferns, mosses. They are not parasites: they have simply climbed toward the light and drink the rain. In the rosette of a bromeliad stands a puddle, a tiny pond high above the ground.",
     sci:[["s","A lichen is a partnership of a fungus and an alga or cyanobacterium: the fungus provides a home and water, its partner provides sugar from photosynthesis"],["s","The water of a single bromeliad holds dozens of species, from bacteria and mosquito larvae to tree-frog tadpoles"],["s","Epiphytes do not take sap from the tree: they get water and minerals from rain, mist and dust"],["h","Tropical forests cover about 6–7% of the land but are estimated to hold more than half of all land species"]],
     trad:["Vernadsky — “living matter” as a geological force","The Law of One — the second density: plants and animals grow and reach toward the light"],
     par:"We are “multistoried” too: trillions of microbes live on our skin and in our gut, a forest of their own on our trunk.",
     prac:["Find a tree and spend a minute looking closely at its bark: moss, lichen, ants"] },
   { short:"Leaf litter", cat:"biosphere · cycle", name:"Leaf litter · the cycle", sub:"Where a leaf becomes soil again", scale:"from 1 μm to 1 m", bsc:2,
-    hint:"Magnifier: leaf litter · click to come closer",
+    hint:"Magnifier: leaf litter · click to look closer · a beetle among the leaves",
     lead:"The secret of the rainforest: the soil here is poor. All the wealth is in living things and in the thin layer of fallen leaves. Fungi and bacteria take a leaf apart in months, and the roots immediately take up what is released.",
     sci:[["s","A fallen leaf decomposes in months in a rainforest, in years in the taiga"],["s","The red color of laterite soil comes from iron oxides: over millions of years downpours washed almost everything out of the soil except iron and aluminum"],["s","A gram of soil holds up to a billion bacteria"],["s","Decomposers breathe and return carbon to the air, and so the cycle closes: light → sugar → leaf → soil → CO₂ → back into a leaf"]],
     trad:["Ecclesiastes 3:20 — “all are of the dust, and all turn to dust again”","The Chinese natural philosophy of Wu Xing — the cycle of the five elements: wood gives birth to fire, fire to earth, earth to metal, metal to water, water to wood"],
     par:"Our gut holds about 40 trillion bacteria, a “soil” world of its own: they break down what our enzymes cannot handle.",
     prac:["Hold a handful of forest soil and breathe in: the smell “after rain” is geosmin, released by soil bacteria"] },
   { short:"Roots", cat:"biosphere · alliance", name:"Roots · mycelium", sub:"Underground: an alliance of tree and fungus", scale:"from 1 μm to 10 m", bsc:3, bioFork:true,
-    hint:"Magnifier: root tip · click to go inside the root",
+    hint:"Magnifier: root tip · click to go inside the root · an earthworm in the soil",
     lead:"The roots hold up the giant and drink water, but the finest work is done by a fungus: mycorrhiza brings the tree phosphorus and water and gets sugar in return. Below the roots is stone, and in the stone is time. From here, two paths lead on.",
     sci:[["s","80–90% of land plant species form mycorrhizae; this alliance is more than 400 million years old and can be seen in the Rhynie fossils (Scotland)"],["s","A root takes up water mostly through its tips with root hairs; in the dry season the ceiba sheds its leaves so as not to lose moisture"],["h","The “wood wide web”, an exchange of substances and signals between trees through a shared mycelium: transfer has been shown in experiments, but its role in nature is probably exaggerated (Karst et al., 2023)"],["s","Chlorophyll and heme are related tetrapyrroles: the same enzymes build them up to a common precursor, protoporphyrin IX; chlorophyll has magnesium at its center, heme has iron"]],
     trad:["Bhagavad Gita 15.1 — the ashvattha: roots above, branches below; whoever knows this tree knows the Vedas","Scandinavia — at the roots of Yggdrasil is Mimir’s well of wisdom"],
@@ -16687,7 +16702,12 @@ const BIO_BSP = {
   angle:{ face:-1, ru:"Anglerfish", lat:"Melanocetus johnsonii", grp:"Fish · anglerfishes", len:.18, lenT:"female up to 18 cm, male ≈3 cm", anim:"swim", inv:"A glowing “fishing rod” on its head, home to luminous bacteria.", wow:"In some anglerfish the tiny male fuses to the female for life.", legacy:"Deep-sea trawling destroys their habitats." },
   gsquid:{ face:-1, ru:"Giant squid", lat:"Architeuthis dux", grp:"Mollusks · cephalopods", len:12, lenT:"≈12–13 m with tentacles", anim:"swim", inv:"Eyes up to 25–27 cm, the largest in the animal kingdom.", wow:"A live giant squid was first filmed in the wild only in 2004.", legacy:"Its main enemy is the sperm whale; sucker scars are found on sperm whales." },
   riftia:{ ru:"Giant tube worm", lat:"Riftia pachyptila", grp:"Segmented worms", len:2, lenT:"tube up to 2 m", anim:"sway", inv:"No mouth or gut: inside live bacteria that get energy from hydrogen sulfide.", wow:"The red “plumes” come from hemoglobin, which carries both oxygen and hydrogen sulfide.", legacy:"Discovered in 1977 at hot springs; the threat is deep-sea mining for metals." },
-  dumbo:{ ru:"Dumbo octopus", lat:"Grimpoteuthis", grp:"Mollusks · cephalopods", len:.3, lenT:"length ≈20–30 cm", anim:"swim", sci:[["h","The silhouette is a related octopus of the same family (Opisthoteuthis)"]], inv:"It swims by flapping its ear-like fins like wings.", wow:"It lives deeper than any other known octopus, down to 7 km.", legacy:"Almost nothing is known about its numbers: the depths are less explored than the Moon." }
+  dumbo:{ ru:"Dumbo octopus", lat:"Grimpoteuthis", grp:"Mollusks · cephalopods", len:.3, lenT:"length ≈20–30 cm", anim:"swim", sci:[["h","The silhouette is a related octopus of the same family (Opisthoteuthis)"]], inv:"It swims by flapping its ear-like fins like wings.", wow:"It lives deeper than any other known octopus, down to 7 km.", legacy:"Almost nothing is known about its numbers: the depths are less explored than the Moon." },
+  // v170: обитатели слоя сейбы (рисунки Люсии) — живут на картине слоя “Биосфера”, не в биомах
+  harpy:{ face:-1, ru:"Harpy eagle", lat:"Harpia harpyja", grp:"Birds · hawks and eagles", len:1, lenT:"≈ 0.9–1 m, wingspan up to 2 m", anim:"still", inv:"Its hind talons are up to 12 cm long, like a grizzly bear’s claws: with them the harpy plucks sloths and monkeys from the branches.", wow:"The nest of thick sticks sits 30–50 m up, often in the fork of a kapok tree that rises above the forest canopy. The parents look after the chick for more than a year.", legacy:"One pair needs tens of square kilometres of untouched forest. Where tall trees are cut down, harpies have nowhere to nest." },
+  squir:{ ru:"Squirrel", lat:"Hadrosciurus spadiceus", grp:"Mammals · squirrels", len:.55, lenT:"body ≈ 25–30 cm, tail just as long", anim:"still", inv:"Its incisors grow throughout life: the squirrel cracks hard palm nuts that most animals cannot open.", wow:"Squirrels bury some of the nuts and forget them, and so rodents plant the forest.", legacy:"Amazonian squirrels were recently (2015) placed in a genus of their own: they turned out to be less closely related to European squirrels than once thought." },
+  beetl:{ ru:"Coprophanaeus beetle", lat:"Coprophanaeus lancifer", grp:"Insects · scarabs", len:.05, lenT:"≈ 4–5 cm", anim:"crawl", inv:"It buries carrion underground, so nutrients go straight back into the poor soil of the rainforest.", wow:"Both males and females have a horn on the head. The blue-violet sheen comes not from pigments but from the structure of the shell.", legacy:"Beetles like this are the forest’s clean-up crew. In clearings where large animals have vanished, there are several times fewer of them." },
+  worm:{ ru:"Earthworm", lat:"Pontoscolex corethrurus", grp:"Annelids · oligochaetes", len:.1, lenT:"≈ 6–12 cm", anim:"crawl", inv:"It swallows soil, digests the plant remains in it and leaves loose crumbs from which plants can take up nutrients more easily.", wow:"As early as 1881 Darwin showed that worms mix the topsoil year after year, the Earth’s “living plough”.", legacy:"Native to the Guiana Highlands, it now lives throughout the tropics: it has been spread with soil and seedlings." },
 };
 for (const k in BIO_BSP) BIO_SP[k] = Object.assign({ rot:0, face:1, bio:1, sci:[] }, BIO_BSP[k]);
 // сцены биомов: [код, x, y, высота, z, скорость]
@@ -16973,7 +16993,7 @@ const BIO_PIMG = {
   // скорпион немного увеличен, иначе его не видно. Правая половина переднего плана — свободная равнина
   bm_desert:{ ar:2752/1536, wl:null, fx:["dust", "haze"], slots:[["camel", .60, .60, .23, -1], ["fenec", .43, .80, .12, 1], ["jerbo", .52, .89, .07, 1], ["scorp", .66, .93, .05, -1]] },
   bm_reef:{ ar:2752/1536, wl:.2, fx:["plankton", "rays"], slots:[["turtl", .32, .44, .2, 1], ["manta", .62, .32, .3, -1], ["clown", .82, .60, .05, -1], ["parro", .45, .62, .1, 1], ["octo", .58, .86, .12, -1]] },
-  bm_ocean:{ ar:2752/1536, wl:.31, fx:["plankton", "rays"], slots:[["albat", .70, .10, .12, -1], ["bwhale", .42, .72, .55, 1], ["tuna", .74, .47, .12, -1], ["bshark", .16, .52, .17, 1], ["jelly", .88, .64, .07, -1]] },
+  bm_ocean:{ ar:2752/1536, wl:.31, fx:["plankton", "rays"], slots:[["albat", .70, .18, .12, -1], ["bwhale", .42, .72, .55, 1], ["tuna", .74, .47, .12, -1], ["bshark", .16, .52, .17, 1], ["jelly", .88, .64, .07, -1]] },
   bm_deep:{ ar:2752/1536, wl:.005, fx:["plankton"], slots:[["riftia", .30, .86, .12, 1], ["angle", .62, .45, .08, -1], ["gsquid", .78, .34, .3, -1], ["dumbo", .45, .30, .07, 1], ["coela", .20, .55, .14, 1], ["nauti", .88, .62, .05, -1]] },
   jurassic:{ wl:.625, fx:["motes", "plankton", "rays"], scale:"The large dinosaurs are at one scale (as if at the same distance); Juramaia (10 cm) and Anchiornis (40 cm) would not be visible at true size, so they appear only in the cards (v137).",
     slots:[["brach", .14, .53, .30, 1], ["diplo", .31, .525, .34, 1], ["stego", .45, .548, .14, -1], ["allo", .76, .53, .118, -1],
@@ -19184,6 +19204,13 @@ const BSC = (() => {
       { img:"lens_myco", t:"Mycorrhiza inside the root", s:"≈100 μm", tx:"A stained section of a root: inside the cells are the branching arbuscules of the fungus, where tree and fungus trade sugar for phosphorus. The round vesicles are the fungus’s stores ●" } ] },
     { id:"down", u:.53, v:.955, r:.05, lv:3, act:"strata", t:"Down into the past" }
   ];
+  // v170: обитатели сейбы — рисунки Люсии на картине (u, v — центр; w — ширина в долях картины; масштаб увеличен, как у лупы натуралиста)
+  const BEINGS = [
+    { k:"harpy", u:.40, v:.1746, w:.06, lv:0, an:"perch", z:"Canopy" },
+    { k:"squir", u:.465, v:.585, w:.085, lv:1, an:"climb", z:"Trunk" },
+    { k:"beetl", u:.665, v:.673, w:.036, lv:2, an:"crawl", z:"Leaf litter" },
+    { k:"worm", u:.22, v:.79, w:.075, lv:3, an:"wriggle", z:"Soil" }
+  ];
   // золотая схема родства на ветвях кроны (u, v) — упрощено ◐
   const TOL = [
     { p:[[.515,.655],[.515,.42],[.515,.19]], l:"LUCA, the common ancestor · ≈4 billion years", at:[.535,.40], a:"start" },
@@ -19201,7 +19228,7 @@ const BSC = (() => {
   let px = -1e4, py = -1e4, over = false, lastMove = 0, spd = 0, lensA = 0, hot = null, hotMix = 0, lensImg = null, lensImgPrev = null;
   let rect = [0, 0, 1, 1], free = [0, 0, 1, 1], W = 1, H = 1, DPR = 1, lv = 0;
   let dive = null, tolOn = false, tolA = 0;
-  let ov, sunEl, lab, dv;
+  let ov, sunEl, lab, dv, spc, spB = null, hb = null;
   let fromRoots = false, riseWait = false;
   const cb = { toStrata: () => { closeHuman(); openBio("now"); fromRoots = true; }, toHuman: () => { depthT = DMAX; lastDepthInput = performance.now(); } };
   const VS = "attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }";
@@ -19289,7 +19316,7 @@ void main(){
     ["uD", "uS", "uN", "uM", "uL", "uA", "uB"].forEach((n, i) => gl.uniform1i(U[n], i));
     cv.addEventListener("webglcontextlost", e => { e.preventDefault(); failed = true; });
     ui();
-    document.body.append(cv, ov, sunEl, lab, dv);
+    document.body.append(cv, ov, sunEl, lab, dv, spc);
     return true;
   }
   function blank(){ const c = document.createElement("canvas"); c.width = c.height = 2; const x = c.getContext("2d"); x.fillStyle = "#000"; x.fillRect(0, 0, 2, 2); return c; }
@@ -19317,6 +19344,10 @@ void main(){
     s += `<circle class="bsc-tol-h" cx="${X(.56)}" cy="${Y(.035)}" r="6"/><text class="bsc-tol-hl" x="${X(.548)}" y="${Y(.031)}" text-anchor="end">Humans · 300,000 years</text></g>`;
     HOT.forEach(h => { s += `<circle class="bsc-hs" data-h="${h.id}" cx="${X(h.u)}" cy="${Y(h.v)}" r="${(h.r*1000*.45).toFixed(1)}"/>`; });
     s += `<text class="bsc-down" x="${X(.53)}" y="${Y(.93)}" text-anchor="middle">↓ down into the past</text>`;
+    // обитатели: SVG-картинки поверх полотна, движутся вместе с картиной; ночью темнеют вместе с ней
+    const AD = typeof BIO_ART !== "undefined" ? BIO_ART : {};
+    s += `<g class="bsc-sp">` + BEINGS.filter(b => AD[b.k]).map(b => { const ar = b.k === "harpy" ? 1.094 : b.k === "squir" ? .631 : b.k === "beetl" ? .584 : .25, w = b.w*1000, h = w*ar;
+      b.ar = ar; return `<g class="bsc-b" data-b="${b.k}"><image class="bsc-bi bsc-${b.an}" href="${AD[b.k].img}" x="${(b.u*1000 - w/2).toFixed(1)}" y="${(b.v*1000*AR - h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/></g>`; }).join("") + `</g>`;
     ov.innerHTML = s;
     sunEl = document.createElement("div"); sunEl.className = "bsc-sun";
     sunEl.innerHTML = `<span class="mono">☀ time of day</span><input type="range" min="0" max="100" value="0" aria-label="Time of day: day, sunset, night"><span class="mono bsc-sun-l"><i>day</i><i>sunset</i><i>night</i></span>`;
@@ -19324,15 +19355,20 @@ void main(){
     rg.addEventListener("input", () => { sunAim = rg.value/100; co2(); });
     sunEl.querySelectorAll("i").forEach((el, k) => el.onclick = () => { rg.value = k*50; sunAim = k*.5; co2(); });
     lab = document.createElement("div"); lab.className = "bsc-lab"; lab.setAttribute("aria-hidden", "true");
+    spc = document.createElement("div"); spc.className = "bsc-dive bsc-spc"; spc.setAttribute("role", "dialog"); spc.setAttribute("aria-label", "Inhabitant of the kapok tree");
+    spc.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b><i class="bsc-sp-l"></i></div><p class="bsc-dv-x bsc-sp-a"></p><p class="bsc-dv-x bsc-sp-b"></p><div class="bsc-dv-b"><button data-a="bio" data-hover>Portrait in the Biosphere →</button><button data-a="x" data-hover>✕ close</button></div>`;
+    spc.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const k = spB && spB.k; closeSp(); if (bt.dataset.a === "bio" && k && typeof RT !== "undefined") RT.go({ t:"bio", sp:k }); });
     dv = document.createElement("div"); dv.className = "bsc-dive"; dv.setAttribute("role", "dialog"); dv.setAttribute("aria-label", "A dive through scales");
     dv.innerHTML = `<div class="bsc-dv-h"><span class="mono bsc-dv-s"></span><b class="bsc-dv-t"></b></div><p class="bsc-dv-x"></p><div class="bsc-dv-b"><button data-a="up" data-hover>↑ larger</button><button data-a="dn" data-hover>deeper ↓</button><button data-a="mol" data-hover>Mg → Fe: blood heme</button><button data-a="mech" data-hover>⚙ experiment</button><button data-a="x" data-hover>✕ close</button></div>`;
     dv.querySelectorAll("button").forEach(bt => bt.onclick = e => { e.stopPropagation(); const a = bt.dataset.a; if (a === "up") step(-1); else if (a === "dn") step(1); else if (a === "x") closeDive(); else if (a === "mol") morph(); else if (a === "mech"){ const it = dive.h.chain[dive.i]; if (it.m){ closeDive(); bscMech(it.m); } } });
     cv.addEventListener("pointermove", e => { const t = performance.now(); spd = Math.min(1, spd + Math.hypot(e.clientX - px, e.clientY - py)/180); px = e.clientX; py = e.clientY; over = true; lastMove = t; });
     cv.addEventListener("pointerleave", () => { over = false; });
     cv.addEventListener("pointerdown", e => { px = e.clientX; py = e.clientY; over = e.pointerType !== "touch"; });
-    cv.addEventListener("click", e => { if (dive){ if (!dive.closing && dive.t >= 1) step(1); return; } px = e.clientX; py = e.clientY; const h = hitAt(px, py, e.pointerType === "touch" || mob ? 46 : 0); if (h) act(h, true); });
+    cv.addEventListener("click", e => { if (dive){ if (!dive.closing && dive.t >= 1) step(1); return; } px = e.clientX; py = e.clientY;
+      const tch = e.pointerType === "touch" || mob, b = beingAt(px, py, tch ? 22 : 4); if (b){ openSp(b); return; } if (spB){ closeSp(); return; }
+      const h = hitAt(px, py, tch ? 46 : 0); if (h) act(h, true); });
     addEventListener("wheel", e => { if (!dive || dive.closing) return; e.preventDefault(); e.stopImmediatePropagation(); const t = performance.now(); if (t - (dive.wl || 0) < 650) return; dive.wl = t; step(e.deltaY > 0 ? 1 : -1); }, { capture:true, passive:false });
-    addEventListener("keydown", e => { if (dive && e.key === "Escape"){ e.stopImmediatePropagation(); closeDive(); } }, true);
+    addEventListener("keydown", e => { if (dive && e.key === "Escape"){ e.stopImmediatePropagation(); closeDive(); } else if (spB && e.key === "Escape"){ e.stopImmediatePropagation(); closeSp(); } }, true);
   }
   function co2(){
     const el = document.getElementById("bscCO2"); if (!el) return;
@@ -19342,6 +19378,23 @@ void main(){
     el.querySelector(".bsc-co2-p").style.width = (ph*100).toFixed(0) + "%";
     el.querySelector(".bsc-co2-r").style.width = (rs*100).toFixed(0) + "%";
   }
+  // обитатель под курсором: прямоугольник рисунка на экране (+ запас)
+  function beingAt(x, y, extra){
+    if (!ov || A < .5) return null; let best = null, bd = 1e9;
+    for (const b of BEINGS){ if (!b.ar) continue;
+      const cx = rect[0] + b.u*rect[2], cy = rect[1] + b.v*rect[3], w = b.w*rect[2]/2 + extra, h = b.w*rect[2]*b.ar/2 + extra;
+      if (cy < free[1] || cy > free[1] + free[3] || cx < free[0]) continue;
+      if (Math.abs(x - cx) < w && Math.abs(y - cy) < h){ const d = Math.hypot(x - cx, y - cy); if (d < bd){ bd = d; best = b; } } }
+    return best;
+  }
+  function openSp(b){
+    const S = typeof BIO_SP !== "undefined" ? BIO_SP[b.k] : null; if (!S) return;
+    spB = b; lab.classList.remove("on");
+    spc.querySelector(".bsc-dv-s").textContent = b.z + " · " + S.lenT; spc.querySelector(".bsc-dv-t").textContent = S.ru; spc.querySelector(".bsc-sp-l").textContent = S.lat;
+    spc.querySelector(".bsc-sp-a").textContent = S.inv; spc.querySelector(".bsc-sp-b").textContent = S.wow;
+    spc.classList.add("on"); if (typeof jrMark === "function") jrMark("bio", "sp:" + b.k, S.ru);
+  }
+  function closeSp(){ spB = null; if (spc) spc.classList.remove("on"); }
   function hitAt(x, y, extra){
     let best = null, bd = 1e9;
     for (const h of HOT){ if (h.lv > lv + .6 || h.lv < lv - 1.6) continue;
@@ -19430,24 +19483,32 @@ void main(){
     spd *= Math.exp(-dt*1.6); sway = .35 + spd*1.8;
     dark += (darkAim - dark)*Math.min(1, dt*2.6);
     // лупа
-    const lensOn = over && !mob && !dive && A > .5 && px > free[0] && now - lastMove < 6000;
+    // над обитателем лупа гаснет: рисунок поверх картины, увеличивать под ним нечего
+    hb = over && !mob && !dive && A > .5 && px > free[0] && now - lastMove < 6000 ? beingAt(px, py, 4) : null;
+    const lensOn = over && !mob && !dive && !hb && A > .5 && px > free[0] && now - lastMove < 6000;
     lensA += ((lensOn ? 1 : 0) - lensA)*Math.min(1, dt*8);
     document.body.classList.toggle("bsc-lens", lensA > .3);
-    const h = lensOn ? hitAt(px, py, 30) : null;
+    const h = lensOn && !hb ? hitAt(px, py, 30) : null;
     if (h !== hot){ hot = h; if (h && h.chain) h.chain.forEach(c => { lensTex(c.img); if (c.alt) lensTex(c.alt.img); }); }
     const img0 = hot && hot.chain ? hot.chain[0].img : null;
     if (img0){ lensImg = img0; lensTex(img0); }
     hotMix += (((img0 && L[img0] && L[img0].t) ? 1 : 0) - hotMix)*Math.min(1, dt*6);
-    if (lensA > .02){
-      const tl = hot ? (hot.act ? hot.t + " · click" : hot.chain[0].t + (hot.chain.length > 1 ? " · click to go deeper" : " · click to come closer")) : "";
+    if (lensA > .02 || hb){
+      const tl = hb ? BIO_SP[hb.k].ru + " · click to meet it" : hot ? (hot.act ? hot.t + " · click" : hot.chain[0].t + (hot.chain.length > 1 ? " · click to go deeper" : " · click to come closer")) : "";
       if (lab.textContent !== tl) lab.textContent = tl;
-      lab.classList.toggle("on", !!tl && lensA > .5);
-      lab.style.transform = `translate(${px.toFixed(0)}px,${(py + 104).toFixed(0)}px)`;
+      lab.classList.toggle("on", !!tl && (lensA > .5 || !!hb) && !spB);
+      lab.style.transform = `translate(${px.toFixed(0)}px,${(py + (hb ? 26 : 104)).toFixed(0)}px)`;
     } else lab.classList.remove("on");
     if (!ov._hs) ov._hs = [...ov.querySelectorAll(".bsc-hs")].map(c => [c, HOT.find(h => h.id === c.dataset.h)]);
     ov._hs.forEach(([c, h]) => { const sy = rect[1] + h.v*rect[3], sx = rect[0] + h.u*rect[2], vis = sy > free[1] + 20 && sy < free[1] + free[3] - 20 && sx > free[0] + 10 && Math.abs(h.lv - lv) < 1.3 && !tolA;
       c.classList.toggle("hot", !!hot && h === hot); c.classList.toggle("off", !vis); });
     ov.style.setProperty("--tol", tolA.toFixed(3));
+    // обитатели: подсветка под курсором, ночью темнеют вместе с картиной; карточка закрывается при уходе со слоя
+    if (!ov._bs) ov._bs = [...ov.querySelectorAll(".bsc-b")].map(g => [g, BEINGS.find(b => b.k === g.dataset.b)]);
+    ov._bs.forEach(([g, b]) => g.classList.toggle("hot", b === hb || b === spB));
+    ov.style.setProperty("--lum", (1 - .25*Math.min(1, sun*2) - .42*Math.max(0, sun*2 - 1)).toFixed(3));
+    ov.style.setProperty("--spo", (1 - dark).toFixed(3));
+    if (spB && (A < .5 || dive || Math.abs(spB.lv - lv) > 1.4)) closeSp();
     // нырок
     let dz = [1, 1], dmix = 0, dA = null, dB = null, molA = 0, molB = 0, dr = 0, dcx = 0, dcy = 0, dsz = 1;
     if (dive){
