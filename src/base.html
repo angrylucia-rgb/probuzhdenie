@@ -19024,7 +19024,11 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   if (uOcc > 0.5){ vec2 q = (vW - uRc.xy)/uRc.zw;
     if (uWet > 0.5 && uWlv > 0.0) a *= smoothstep(1.0 - uWlv + 0.003, 1.0 - uWlv - 0.002, q.y);   // v146: водное существо не высовывается над линией воды
     if (q.x > 0.0 && q.x < 1.0 && q.y > 0.0 && q.y < 1.0){ float d0 = texture2D(uDep, q).r; vec2 uv = q - uPar*(d0 - 0.3)*uKp; float dp = texture2D(uDep, uv).r;
-      a *= 1.0 - smoothstep(uDs*1.25 + 0.012, uDs*1.5 + 0.03, dp);                       // заметно ближе низа существа — закрывает
+      float occ = 1.0 - smoothstep(uDs*1.25 + 0.012, uDs*1.5 + 0.03, dp);                // заметно ближе низа существа — закрывает
+      // v176: в толще воды карта глубины ненадёжна (поверхность и блики снизу «ближе» пловца) — там, где у картинки
+      // была бы только вода, она давала полупрозрачные квадраты. Под водой заслоняет лишь нижняя треть толщи: кораллы, камни, дно
+      if (uWet > 0.5 && uWlv > 0.0) occ = mix(1.0, occ, 1.0 - smoothstep(0.30, 0.48, q.y/max(1.0 - uWlv, 0.05)));
+      a *= occ;
       if (uGrass > 0.5 && vUv.y < 0.16){                                                  // трава и папоротники у лап: пиксель картинки с фактурой зелени — поверх ног
         vec3 pc = texture2D(uPan, uv).rgb, n1 = texture2D(uPan, uv + vec2(0.0012, 0.0)).rgb, n2 = texture2D(uPan, uv + vec2(0.0, 0.0021)).rgb;
         float tx = length(pc - n1) + length(pc - n2), band = 1.0 - smoothstep(0.015, 0.16, vUv.y);
