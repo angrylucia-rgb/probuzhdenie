@@ -9,6 +9,12 @@
 <meta property="og:title" content="Cosmolabe · Atlas of Awakening">
 <meta property="og:description" content="An interactive dive through 12 stations: from the Absolute, through the Earth and the Human, to the quantum vacuum.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="__ORIGIN__/og/og-en.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cosmolabe — a ring of 12 stations around a golden axis">
+<meta property="og:site_name" content="Cosmolabe">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="__ORIGIN__/en/">
 <link rel="alternate" hreflang="ru" href="__ORIGIN__/">
 <link rel="alternate" hreflang="en" href="__ORIGIN__/en/">
@@ -17,3 +23,4 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="ru_RU">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2305060C'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23D6AC5E' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23D6AC5E'/%3E%3Cpath d='M32 6v52M6 32h52' stroke='%23D6AC5E' stroke-width='1' opacity='.5'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/og/icon-180.png">

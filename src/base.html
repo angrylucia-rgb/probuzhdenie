@@ -1694,6 +1694,10 @@ try { renderer = new THREE.WebGLRenderer({canvas:$("gl"), antialias:!mobile, pow
 catch(e){ $("loader").classList.add("done"); $("nogl").style.display = "grid"; return; }
 const PR = Math.min(devicePixelRatio || 1, mobile ? 1.25 : 1.5);
 renderer.setPixelRatio(PR);
+// v180: потеря контекста WebGL (сбой драйвера, сон ноутбука, нехватка памяти на телефоне). Без обработчика экран просто чернел.
+// Показываем «Нужен WebGL» с пояснением; если браузер вернул контекст — перезагружаем страницу (отметки и журнал в localStorage сохранятся).
+$("gl").addEventListener("webglcontextlost", e => { e.preventDefault(); const n = $("nogl"); if (n){ n.querySelector("p").textContent = "Видеокарта сбросила трёхмерную сцену. Страница перезапустится сама; если нет — обновите её."; n.style.display = "grid"; } }, false);
+$("gl").addEventListener("webglcontextrestored", () => location.reload(), false);
 renderer.setClearColor(0x05060c, 1);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(48, innerWidth/innerHeight, 0.1, 3000);
@@ -2190,7 +2194,7 @@ function makeRefs(g, plx, SZ){
     im.onload = () => {
       try {
         const c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
-        const x = c.getContext("2d"); x.drawImage(im, 0, 0);
+        const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0);
         const d = x.getImageData(0, 0, im.width, im.height).data;
         R.W = im.width; R.ids = new Uint8Array(im.width*im.height);
         for (let i = 0; i < R.ids.length; i++) R.ids[i] = Math.round(d[i*4]/10);
@@ -17193,9 +17197,9 @@ void main(){ float x = vUv.x*7.0 - vUv.y*1.8; float s = pow(max(0.0, sin(x + sin
     const ld = new THREE.TextureLoader(), tI = ld.load(base + id + ".webp", () => { st.ok = true; amb(); }), tD = ld.load(base + id + "_d.webp");
     // v145: уменьшенная копия картинки 64 px — средний цвет вокруг существа (подстройка его света под окружение)
     function amb(){ try { const im = tI.image, w = 64, h = Math.max(8, Math.round(64*im.height/im.width)), c = document.createElement("canvas"); c.width = w; c.height = h;
-      const x = c.getContext("2d"); x.drawImage(im, 0, 0, w, h); st.col = x.getImageData(0, 0, w, h).data; st.cw = w; st.ch = h; } catch (e){} }
+      const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0, w, h); st.col = x.getImageData(0, 0, w, h).data; st.cw = w; st.ch = h; } catch (e){} }
     [tI, tD].forEach(t => { t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; disp.push(t); });
-    const di = new Image(); di.onload = () => { const c = document.createElement("canvas"); c.width = di.naturalWidth; c.height = di.naturalHeight; const x = c.getContext("2d"); x.drawImage(di, 0, 0); st.dep = x.getImageData(0, 0, c.width, c.height).data; st.dw = c.width; st.dh = c.height; }; di.src = base + id + "_d.webp";
+    const di = new Image(); di.onload = () => { const c = document.createElement("canvas"); c.width = di.naturalWidth; c.height = di.naturalHeight; const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(di, 0, 0); st.dep = x.getImageData(0, 0, c.width, c.height).data; st.dw = c.width; st.dh = c.height; }; di.src = base + id + "_d.webp";
     const IU = { uTex:{ value:tI }, uDep:{ value:tD }, uPar:{ value:st.par }, uWl:{ value:C.wl || 0 }, uK:{ value:.022 }, uAR:{ value:C.ar || 3168/1344 }, uR:{ value:new THREE.Vector4(0, 0, 1, 1) } };
     const img = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mk(VS, FI, IU)); img.renderOrder = -20; grp.add(img); disp.push(img.geometry);
     const R = (s => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; })(id.length*97);
@@ -17610,7 +17614,7 @@ function fosScreen(){
 const IMG = {}, PIX = {};
 function pix(id){ if (PIX[id]) return PIX[id];
   if (!IMG[id]) return { d: new Uint8ClampedArray(256*143*4).fill(128), Lm: new Float32Array(256*143).fill(128), med: 128 };   // ещё не загружен
-  const c = document.createElement("canvas"); c.width = 256; c.height = 143; const x = c.getContext("2d");
+  const c = document.createElement("canvas"); c.width = 256; c.height = 143; const x = c.getContext("2d", { willReadFrequently: true });
   x.drawImage(IMG[id], 0, 0, 256, 143); const d = x.getImageData(0, 0, 256, 143).data; const Lm = new Float32Array(256*143);
   for (let i = 0; i < Lm.length; i++) Lm[i] = d[i*4]*.3 + d[i*4 + 1]*.55 + d[i*4 + 2]*.15;
   const srt = [...Lm].sort((a, b) => a - b); return PIX[id] = { d, Lm, med: srt[srt.length >> 1] }; }
@@ -17621,7 +17625,7 @@ function avgRgb(id, cu, cv){ const P = pix(id), k = pAt(id, cu, cv)*4; return [P
 function bedding(id){
   // где в картинке границы слоёв: строки с самым сильным перепадом рельефа
   const im = IMG[id + "_h"], c = document.createElement("canvas"); c.width = 320; c.height = 179;
-  const x = c.getContext("2d"); x.drawImage(im, 0, 0, 320, 179); const d = x.getImageData(0, 0, 320, 179).data;
+  const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0, 320, 179); const d = x.getImageData(0, 0, 320, 179).data;
   const prof = new Float32Array(179);
   for (let y = 1; y < 178; y++){ let s = 0; for (let i = 0; i < 320; i++){ s += Math.abs(d[((y + 1)*320 + i)*4] - d[((y - 1)*320 + i)*4]); } prof[y] = s/320; }
   const sm = prof.map((v, i) => (prof[i - 1] || v)*.25 + v*.5 + (prof[i + 1] || v)*.25);
@@ -17686,7 +17690,7 @@ function buildSlabs(){
     s.state = 0; });
   // растр номеров плит: заливка цветом-номером, края — чёрной линией скола
   const rw = x1 - x0, rh = y1 - y0, MW = 1600, MH = Math.round(MW*rh/rw);
-  const c = document.createElement("canvas"); c.width = MW; c.height = MH; const g = c.getContext("2d");
+  const c = document.createElement("canvas"); c.width = MW; c.height = MH; const g = c.getContext("2d", { willReadFrequently: true });
   g.fillStyle = "#000"; g.fillRect(0, 0, MW, MH);
   const mx = p => [(p[0] - x0)/rw*MW, (p[1] - y0)/rh*MH];
   for (const s of slabs){ g.fillStyle = `rgb(${s.id % 256},${s.id >> 8},${(s.id*37 + 11) % 256})`; g.beginPath(); s.poly.forEach((p, i) => { const [X, Y] = mx(p); i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); g.closePath(); g.fill(); }
@@ -18134,7 +18138,7 @@ const BIO = (() => {
     if (ART[k] || ARTX[k] || !ARTD[k]){ if (cb) cb(); return; }
     if (ARTW[k]){ if (cb) ARTW[k].push(cb); return; }
     ARTW[k] = cb ? [cb] : []; const im = new Image(), done = () => { const L = ARTW[k]; delete ARTW[k]; L.forEach(f => f()); };
-    im.onload = () => { const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext("2d"); x.drawImage(im, 0, 0);
+    im.onload = () => { const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0);
       ART[k] = { im, w: c.width, h: c.height, d: x.getImageData(0, 0, c.width, c.height).data }; Object.keys(THUMB).forEach(t => { if (new RegExp("^" + k + "\\d").test(t)) delete THUMB[t]; }); done(); };
     im.onerror = () => { ARTX[k] = 1; done(); };
     im.src = ARTD[k].img; }
@@ -18737,7 +18741,7 @@ void main(){
         <div class="bio-sort"><button class="tm-tog" data-sort="time" aria-pressed="${gal.sort === "time"}" data-hover>По времени</button><button class="tm-tog" data-sort="size" aria-pressed="${gal.sort === "size"}" data-hover>По размеру</button></div>
       </div>
       <p class="bio-gn mono">найдено: ${L.length}</p>
-      <div class="bio-chips bio-grid">${L.map(k => `<button class="bio-sp${cmpK === k ? " on" : ""}" data-gk="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span><i style="--c:${BIO_ERAS[SP_ERA[k]].col}">${esc(BIO_ERAS[SP_ERA[k]].nm)}</i></button>`).join("") || `<p class="tm-pr">Ничего не нашлось — попробуйте другой фильтр.</p>`}</div>
+      <div class="bio-chips bio-grid">${L.map(k => `<button class="bio-sp${cmpK === k ? " on" : ""}" data-gk="${k}" data-hover><img ${"src"}="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span><i style="--c:${BIO_ERAS[SP_ERA[k]].col}">${esc(BIO_ERAS[SP_ERA[k]].nm)}</i></button>`).join("") || `<p class="tm-pr">Ничего не нашлось — попробуйте другой фильтр.</p>`}</div>
       <p class="bio-cr">${mk("h")} Размеры — по оценкам палеонтологов; у летающих указан размах крыльев, у растений — высота. Силуэты — PhyloPic.</p>`;
   }
   // v145: превью в галерее плавно «перелетает» в портрет карточки и обратно (View Transitions; без поддержки или при «меньше движения» — просто смена)
@@ -18969,7 +18973,7 @@ void main(){
         ${bmBar("°C", (B.t[0] + 20)/50, B.t[1])}${bmBar("осадки", B.p[0] == null ? 0 : B.p[0]/4000, B.p[0] == null ? "под водой — не важны" : B.p[1], B.p[0] == null)}${bmBar("жизнь", B.npp[0]/2500, B.npp[1] + (B.npp[0] > 20 ? " г/м² в год" : ""))}
         <p class="bio-gn mono">«жизнь» — продуктивность: сколько граммов сухого вещества создают за год растения и водоросли на квадратном метре</p></div>
       <h4>Кто живёт</h4><p class="tm-pr bio-p">${esc(B.who)}</p>
-      ${L.length ? `<div class="bio-chips">${L.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>` : ""}
+      ${L.length ? `<div class="bio-chips">${L.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img ${"src"}="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>` : ""}
       ${hereHTML(BM_MECH[B.id])}
       <h4>Удивительное</h4><p class="tm-pr bio-p">${esc(B.wow)}</p>
       <h4>Что ему грозит</h4><p class="tm-pr bio-p">${esc(B.threat)}</p>
@@ -19016,7 +19020,7 @@ void main(){
       const mxL = Math.max(1.7, S.len), wH = 1.7/mxL*100, wS = S.len/mxL*100;
       const SE = BIO_ERAS[SP_ERA[k]];
       h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(gal.on ? "Галерея" : bmOn ? BIO_BIOMES[bi].nm : E ? E.nm : "")} · портрет</span><span class="tm-nav"><button id="bioBack" title="${esc(gal.on ? "В галерею" : bmOn ? "К биому «" + BIO_BIOMES[bi].nm + "»" : E ? "К пласту «" + E.nm + "»" : "")}" data-hover>← Назад</button></span></div>
-        <img class="bio-port" src="${thumb(k, 520, 240)}" alt="${ARTD[k] ? "Рисунок" : "Силуэт"}: ${esc(S.ru)}">
+        <img class="bio-port" ${"src"}="${thumb(k, 520, 240)}" alt="${ARTD[k] ? "Рисунок" : "Силуэт"}: ${esc(S.ru)}">
         <h3>${esc(S.ru)}</h3><p class="tm-ago2"><i>${esc(S.lat)}</i></p><p class="bio-grp mono">${esc(S.grp)}</p>
         <div class="bio-size" aria-label="Сравнение размера с человеком"><div><span>Человек · рост 1,7 м</span><i style="width:${Math.max(.6, wH).toFixed(2)}%"></i></div><div><span>${esc(S.ru)} · ${esc(S.lenT)}</span><i class="s" style="width:${Math.max(.6, wS).toFixed(2)}%"></i></div></div>
         <h4>${S.bio ? "Как приспособлен" : "Главное изобретение"}</h4><p class="tm-pr bio-p">${esc(S.inv)}</p>
@@ -19055,7 +19059,7 @@ void main(){
           <p class="bio-gn mono">светлая метка — сегодня: 21 % · ≈ 427 ppm · ≈ 15 °C</p></div>
         <div class="tm-art">${E.what.split("\n\n").map(p => `<p>${esc(p)}</p>`).join("")}</div>
         ${globeHTML(E)}
-        ${E.sp.length ? `<h4>Кто жил</h4>` : ""}<div class="bio-chips">${E.sp.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img src="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>
+        ${E.sp.length ? `<h4>Кто жил</h4>` : ""}<div class="bio-chips">${E.sp.map(k => `<button class="bio-sp" data-sp="${k}" data-hover><img ${"src"}="${thumb(k, 84, 44)}" alt=""><span>${esc(BIO_SP[k].ru)}</span></button>`).join("")}</div>
         <h4>Изобретение эпохи</h4><p class="tm-pr bio-p">${esc(E.inv)}</p>
         <h4>Что досталось нам</h4><p class="tm-pr bio-p">${esc(E.legacy)}</p>
         ${hereHTML(ERA_MECH[E.id])}
