@@ -10,6 +10,8 @@ GFONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=Golos+Text:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">'''
 LEGAL_CSS = ':root{--night:#05060C;--ink:#EFE7D4;--muted:#A9A7BD;--faint:#6D6F90;--line:rgba(214,172,94,.28);--brass:#D6AC5E;--display:"Forum",Georgia,serif;--body:"Golos Text",system-ui,sans-serif;--mono:"JetBrains Mono",monospace}body{margin:0;background:var(--night);color:var(--ink);font:16px/1.6 var(--body)}main{max-width:800px;margin:0 auto;padding:48px 20px 80px}.back{font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--brass);text-decoration:none}'
+LEGAL_CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'none\'; style-src \'self\' \'unsafe-inline\'; '
+             'img-src \'self\' data:; font-src \'self\'; object-src \'none\'; base-uri \'self\'; form-action \'none\'">\n')
 def legal_page(base, lang):
     # статическая страница «Правовая информация» из того же <template id="tplLegal">, что и в приложении
     i = base.index('<template id="tplLegal">'); j = base.index('</template>', i)
@@ -18,7 +20,8 @@ def legal_page(base, lang):
     lg = '\n'.join(l for l in css.split('\n') if l.startswith('.lg'))
     back = ('/en/', '← Back to the atlas', 'Legal information · Cosmolabe') if lang == 'en' else ('/', '← К атласу', 'Правовая информация · Космолябия')
     return (f'<!doctype html>\n<html lang="{lang}">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n'
-            f'<title>{back[2]}</title>\n<meta name="robots" content="index,follow">\n<link rel="stylesheet" href="/fonts/fonts.css">\n'
+            f'<title>{back[2]}</title>\n<meta name="robots" content="index,follow">\n' + LEGAL_CSP +
+            f'<link rel="stylesheet" href="/fonts/fonts.css">\n'
             f'<style>{LEGAL_CSS}\n{lg}</style>\n</head>\n<body><main><a class="back" href="{back[0]}">{back[1]}</a>\n{body}\n</main></body>\n</html>\n')
 def build(base, art, prevf, lang):
     base = base.replace('__OWNER__', OWNER[lang]).replace('__MAIL__', MAIL[lang])
@@ -48,6 +51,16 @@ def build(base, art, prevf, lang):
     os.makedirs(DIST + '/legal', exist_ok=True); open(DIST + '/legal/index.html', 'w').write(legal_page(base, lang))
     i = body.index('<style>')
     page = head + body[:i] + body[i:body.index('</style>')+8] + "\n</head>\n<body>\n" + body[body.index('</style>')+8:] + "\n</body>\n</html>\n"
+    # v166: политика безопасности (CSP). Разрешён только наш встроенный скрипт (по его хешу) и файлы с нашего сервера:
+    # чужой код, внедрённый в страницу, браузер не выполнит. Хеш считается при каждой сборке — рассинхрона нет.
+    import hashlib, base64, re as _re
+    hs = ["'sha256-" + base64.b64encode(hashlib.sha256(m.encode('utf-8')).digest()).decode() + "'" for m in _re.findall(r'<script>(.*?)</script>', page, _re.S)]
+    assert hs, 'no inline script'
+    csp = ("default-src 'self'; script-src 'self' " + ' '.join(hs) + "; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
+           "media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; "
+           "object-src 'none'; base-uri 'self'; form-action 'none'")
+    assert page.count('<meta charset="utf-8">') == 1
+    page = page.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="' + csp + '">', 1)
     open(DIST + '/index.html','w').write(page)
     # данные, вынесенные из страницы (силуэты и материки «Биосферы»), — рядом с index.html
     import shutil
@@ -57,7 +70,9 @@ def build(base, art, prevf, lang):
     # sitemap и robots с парами языков (hreflang); адрес — ORIGIN выше
     alt = ''.join(f'    <xhtml:link rel="alternate" hreflang="{h}" href="{ORIGIN}{u}"/>\n' for h, u in (('ru', '/'), ('en', '/en/'), ('x-default', '/')))
     open(DIST + '/sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' + ''.join(f'  <url>\n    <loc>{ORIGIN}{u}</loc>\n{alt}  </url>\n' for u in ('/', '/en/')) + '</urlset>\n')
-    open(DIST + '/robots.txt', 'w').write(f'User-agent: *\nAllow: /\nSitemap: {ORIGIN}/sitemap.xml\n')
+    # v166: поиск разрешён, сбор материалов для обучения ИИ — нет (как и в пользовательском соглашении)
+    AI = ['GPTBot', 'CCBot', 'Google-Extended', 'anthropic-ai', 'ClaudeBot', 'Claude-Web', 'Applebot-Extended', 'Bytespider', 'meta-externalagent', 'FacebookBot', 'Diffbot', 'omgili', 'Amazonbot', 'cohere-ai', 'Timpibot', 'ImagesiftBot', 'img2dataset']
+    open(DIST + '/robots.txt', 'w').write(''.join(f'User-agent: {a}\n' for a in AI) + 'Disallow: /\n\nUser-agent: *\nAllow: /\n\nSitemap: ' + ORIGIN + '/sitemap.xml\n')
 
 
 import subprocess
