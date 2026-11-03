@@ -7415,5 +7415,15 @@
 "Синяя толща: тунцы, акулы, киты, альбатросы": "The blue open water: tuna, sharks, whales, albatrosses",
 "Тьма и давление: удильщики, кальмары, рифтии у горячих источников": "Darkness and pressure: anglerfish, giant squid, tube worms at hot vents",
 "<section><h3>Морские биомы</h3><div class=\"hd-fork\">": "<section><h3>Marine biomes</h3><div class=\"hd-fork\">",
-"<section><h3>Летопись в камне</h3><div class=\"hd-fork\"><button data-strata=\"1\" data-hover><b>Пласты камня</b><span>20 слоёв осадочных пород — 4,5 млрд лет истории жизни: от раскалённого гадея до наших дней</span></button></div></section>": "<section><h3>A chronicle in stone</h3><div class=\"hd-fork\"><button data-strata=\"1\" data-hover><b>Layers of stone</b><span>20 layers of sedimentary rock: 4.5 billion years of the history of life, from the molten Hadean to the present day</span></button></div></section>"
+"<section><h3>Летопись в камне</h3><div class=\"hd-fork\"><button data-strata=\"1\" data-hover><b>Пласты камня</b><span>20 слоёв осадочных пород — 4,5 млрд лет истории жизни: от раскалённого гадея до наших дней</span></button></div></section>": "<section><h3>A chronicle in stone</h3><div class=\"hd-fork\"><button data-strata=\"1\" data-hover><b>Layers of stone</b><span>20 layers of sedimentary rock: 4.5 billion years of the history of life, from the molten Hadean to the present day</span></button></div></section>",
+"<div class=\"tm-bar\"><span class=\"mono eyebrow tm-cat\">Биосфера · галерея</span><span class=\"tm-nav\"><button id=\"bioGalX\" title=\"": "<div class=\"tm-bar\"><span class=\"mono eyebrow tm-cat\">Biosphere · gallery</span><span class=\"tm-nav\"><button id=\"bioGalX\" title=\"",
+"\" data-hover>← Назад</button></span></div>\n      <h3>Галерея существ</h3><p class=\"tm-ago2\">": "\" data-hover>← Back</button></span></div>\n      <h3>Gallery of creatures</h3><p class=\"tm-ago2\">",
+"\" data-hover>← Назад</button></span></div>\n      <h3>": "\" data-hover>← Back</button></span></div>\n      <h3>",
+"<button id=\"bioMBack\" data-hover><b>← Назад</b><span>": "<button id=\"bioMBack\" data-hover><b>← Back</b><span>",
+"Вернуться: ": "Return to: ",
+"Вернуться": "Return",
+"<span>Цифры приборов — типичные значения; внутри биома разброс большой</span></li></ul>\n      <div class=\"tm-gos\"><button class=\"btn tm-go\" id=\"bioBmX\" title=\"": "<span>The gauge values are typical; within a biome the spread is large</span></li></ul>\n      <div class=\"tm-gos\"><button class=\"btn tm-go\" id=\"bioBmX\" title=\"",
+"\" data-hover>← Назад</button><button class=\"btn tm-go\" id=\"bioBas2\" data-hover>Основы биологии →</button></div>": "\" data-hover>← Back</button><button class=\"btn tm-go\" id=\"bioBas2\" data-hover>Basics of biology →</button></div>",
+" · портрет</span><span class=\"tm-nav\"><button id=\"bioBack\" title=\"": " · portrait</span><span class=\"tm-nav\"><button id=\"bioBack\" title=\"",
+"\" data-hover>← Назад</button></span></div>\n        <img class=\"bio-port\" src=\"": "\" data-hover>← Back</button></span></div>\n        <img class=\"bio-port\" src=\""
 }
