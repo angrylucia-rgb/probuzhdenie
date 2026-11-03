@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Rmr8lv8xUDgS8K3gKIxsu1vLb8c+F2twe3iB/sRXxvk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-HDPIa1rmgTtLmvNp6gOF/TuO1JyjRtkcFHqADIaayxk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -10234,7 +10234,7 @@ const ELV = [
     trad:["Genesis 2:7 — “breathed into his nostrils the breath of life”","Greece — pneuma: breath, air and spirit are named by one word","India — Vayu, the god of wind, and prana","Taoism — the character for qi originally meant vapor and air"],
     par:"Breathing: the oxygen we breathe was breathed out by plants and plankton.",
     prac:["4–6 breathing: breathe in for 4 counts, out for 6, for 5 minutes","Nadi Shodhana, alternate-nostril breathing"] },
-  { short:"Ocean", cat:"envelope · water", name:"Ocean", sub:"The blood of the planet", scale:"0–≈11 km",
+  { short:"Ocean", cat:"envelope · water", name:"Ocean", sub:"The blood of the planet", scale:"0–≈11 km", sea:1,
     lead:"We have dived through the clouds and the surface of the water. The ocean holds the planet’s heat and gives half of its oxygen. Below 1,000 meters darkness reigns, but many creatures make their own light.",
     sci:[["s","The ocean covers ≈71% of the Earth’s surface; its average depth is ≈3.7 km"],["s","Phytoplankton accounts for about half of the planet’s photosynthesis"],["s","Sunlight almost fades out by 200 m; about three quarters of the animals of the water column can glow"],["s","The Challenger Deep in the Mariana Trench is about 10.9 km deep"],["s","The ocean has absorbed about 90% of the excess heat from global warming"],["s","The nautilus shell is close to a logarithmic spiral: each new chamber repeats the shape of the one before"]],
     trad:["Genesis 1:2 — “the Spirit of God moved upon the face of the waters”","Hinduism — the churning of the Ocean of Milk: amrita is born from the depths","Tao Te Ching, 8 — “The highest good is like water”","Thales — water as the first principle of everything"],
@@ -10619,6 +10619,14 @@ function renderLevel(L){
   if (jKind === "h" && L <= 4) h += `<section><h3>Side branch</h3><div class="hd-fork"><button data-go="dream" data-hover><b>Sleep and altered states</b><span>Falling asleep · dreams · lucid dreaming · deep sleep and turiya</span></button></div></section>`;
   // “Лестница измерений” — с первого слоя “Абсолюта”: из точки-бинду
   if (jId === "abs" && L === 0) h += `<section><h3>Side branch</h3><div class="hd-fork"><button data-dims="0" data-hover><b>Ladder of Dimensions</b><span>From a point to a line, a plane, space and beyond: 0D → 6D</span></button></div></section>`;
+  // v174: со слоя “Океан” — три морских биома Биосферы (фото, существа, приборы)
+  if (jKind === "e" && v && v.sea){
+    const SB = [["reef", "Warm shallows: corals, turtles, mantas, clownfish"], ["ocean", "The blue open water: tuna, sharks, whales, albatrosses"], ["deep", "Darkness and pressure: anglerfish, giant squid, tube worms at hot vents"]];
+    const sea = `<section><h3>Marine biomes</h3><div class="hd-fork">` + SB.map(([id, tx]) => { const i = BIO_BIOMES.findIndex(b => b.id === id); return i < 0 ? "" : `<button data-sbm="${i}" data-hover><b>${esc(BIO_BIOMES[i].nm)}</b><span>${esc(tx)}</span></button>`; }).join("") + `</div></section>`;
+    // сразу под масштабом, до науки — чтобы кнопки были видны без прокрутки
+    const k = h.indexOf('<p class="mono hd-scale">'), e = k < 0 ? -1 : h.indexOf("</p>", k);
+    h = e < 0 ? h + sea : h.slice(0, e + 4) + sea + h.slice(e + 4);
+  }
   // голос станции
   { const lk = lvVoiceKey(jId, L), vi = lk ? LV_VOICE[lk] : VOICE_INFO[jSt]; if (vi) h += `<section class="hd-snd"><h3>What you hear${lk ? " · voice of the layer" : ""}</h3><p class="hd-par">${mk(vi.m)} <b>${esc(vi.h)}.</b> ${esc(vi.tx)}${$("sound").getAttribute("aria-pressed") === "true" ? "" : " <span class=\"hd-snd-off\">Turn on “Music” to hear it.</span>"}</p></section>`; }
   { const lk = lvVoiceKey(jId, L); Music.voice(lk ? "lv:" + (lk === "bh" ? "bh:0" : lk) : "st:" + jSt, false); }
@@ -10671,6 +10679,7 @@ function renderLevel(L){
   hdBody.querySelectorAll("button[data-go]").forEach(bt => bt.onclick = () => jGo(bt.dataset.go));
   hdBody.querySelectorAll("button[data-tree]").forEach(bt => bt.onclick = () => openTree());
   hdBody.querySelectorAll("button[data-biob]").forEach(bt => bt.onclick = () => { closeHuman(); openBio(); });
+  hdBody.querySelectorAll("button[data-sbm]").forEach(bt => bt.onclick = () => RT.go({ t:"bio", bm:+bt.dataset.sbm }));
   if (typeof BSC !== "undefined"){
     hdBody.querySelectorAll("button[data-bsctree]").forEach(bt => bt.onclick = () => BSC.setTol(!BSC.tol));
     hdBody.querySelectorAll("button[data-bscgo]").forEach(bt => bt.onclick = () => bt.dataset.bscgo === "strata" ? BSC.goStrata() : BSC.goHuman());

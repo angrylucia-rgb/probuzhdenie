@@ -7410,5 +7410,9 @@
 "Почва": "Soil",
 "Обитатель сейбы": "Inhabitant of the kapok tree",
 "<div class=\"bsc-dv-h\"><span class=\"mono bsc-dv-s\"></span><b class=\"bsc-dv-t\"></b><i class=\"bsc-sp-l\"></i></div><p class=\"bsc-dv-x bsc-sp-a\"></p><p class=\"bsc-dv-x bsc-sp-b\"></p><div class=\"bsc-dv-b\"><button data-a=\"bio\" data-hover>Портрет в Биосфере →</button><button data-a=\"x\" data-hover>✕ закрыть</button></div>": "<div class=\"bsc-dv-h\"><span class=\"mono bsc-dv-s\"></span><b class=\"bsc-dv-t\"></b><i class=\"bsc-sp-l\"></i></div><p class=\"bsc-dv-x bsc-sp-a\"></p><p class=\"bsc-dv-x bsc-sp-b\"></p><div class=\"bsc-dv-b\"><button data-a=\"bio\" data-hover>Portrait in the Biosphere →</button><button data-a=\"x\" data-hover>✕ close</button></div>",
-" · клик — знакомство": " · click to meet it"
+" · клик — знакомство": " · click to meet it",
+"Тёплое мелководье: кораллы, черепахи, манты, рыбы-клоуны": "Warm shallows: corals, turtles, mantas, clownfish",
+"Синяя толща: тунцы, акулы, киты, альбатросы": "The blue open water: tuna, sharks, whales, albatrosses",
+"Тьма и давление: удильщики, кальмары, рифтии у горячих источников": "Darkness and pressure: anglerfish, giant squid, tube worms at hot vents",
+"<section><h3>Морские биомы</h3><div class=\"hd-fork\">": "<section><h3>Marine biomes</h3><div class=\"hd-fork\">"
 }
