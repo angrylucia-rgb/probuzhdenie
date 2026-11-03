@@ -7432,5 +7432,11 @@
 "Слои станции «": "Layers of the station “",
 "слои · ": "layers ·",
 "Видеокарта сбросила трёхмерную сцену. Страница перезапустится сама; если нет — обновите её.": "The graphics card dropped the 3D scene. The page will restart by itself; if it does not, reload it.",
-"\" data-hover>← Назад</button></span></div>\n        <img class=\"bio-port\" ": "\" data-hover>← Back</button></span></div>\n        <img class=\"bio-port\" "
+"\" data-hover>← Назад</button></span></div>\n        <img class=\"bio-port\" ": "\" data-hover>← Back</button></span></div>\n        <img class=\"bio-port\" ",
+"Скопировать ссылку на место, где вы сейчас": "Copy a link to where you are now",
+"Ссылка на это место": "Link to this place",
+"Скопировано ✓": "Copied ✓",
+"Ссылка": "Link",
+"на это место": "to this place",
+"Адрес — в строке браузера": "The address is in the browser bar"
 }

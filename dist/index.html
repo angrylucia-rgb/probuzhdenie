@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-wJoast3Bj1Z+9n1gF+PUEVATZ5GLFUnG7f/nhN3WQlo='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bNfZXH/G/DQgF3cqKNnTdMs1mKRGNwx96KQRlsI/G38='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Космолябия — интерактивный атлас пробуждения: путь сквозь 12 станций от Абсолюта до квантового вакуума, где духовные учения встречаются с наукой.">
 <meta name="theme-color" content="#05060C">
@@ -171,6 +171,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:none
 .menu:has(.mp){padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
 /* v160: язык сайта — переключатель в шапке меню и мягкая подсказка */
 .mp-top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mp-tr{display:flex;align-items:center;gap:10px}
+.mp-share{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--muted);cursor:pointer;transition:color .3s,background .3s,border-color .3s}
+.mp-share:hover,.mp-share:focus-visible{color:var(--ink);background:rgba(214,172,94,.1)}
+.mp-share.ok{color:var(--night);background:var(--brass);border-color:var(--brass)}
+.mp-share{white-space:nowrap}
+@media (max-width:560px){.mp-share{padding:8px 11px;letter-spacing:.08em}.mp-shx{display:none}}
 .mp-lang{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px}
 .mp-lang a{font:500 11px/1 var(--mono);letter-spacing:.16em;padding:7px 11px;border-radius:999px;color:var(--faint);text-decoration:none;transition:color .3s,background .3s}
 .mp-lang a[href]:hover,.mp-lang a[href]:focus-visible{color:var(--ink);background:rgba(214,172,94,.1)}
@@ -1237,7 +1243,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   <button class="close mono" id="menuClose" data-hover>Закрыть ✕</button>
   <div class="menu-in mp">
     <header class="mp-head">
-      <div class="mp-top"><span class="mono eyebrow">Карта Космолябии</span><nav class="mp-lang" aria-label="Язык сайта"><a data-l="ru" lang="ru" hreflang="ru" title="Русский" data-hover>RU</a><a data-l="en" lang="en" hreflang="en" title="English" data-hover>EN</a></nav></div>
+      <div class="mp-top"><span class="mono eyebrow">Карта Космолябии</span><span class="mp-tr"><button type="button" class="mp-share" id="mpShare" title="Скопировать ссылку на место, где вы сейчас" data-hover><span>Ссылка</span><span class="mp-shx"> на это место</span></button><nav class="mp-lang" aria-label="Язык сайта"><a data-l="ru" lang="ru" hreflang="ru" title="Русский" data-hover>RU</a><a data-l="en" lang="en" hreflang="en" title="English" data-hover>EN</a></nav></span></div>
       <p class="mp-lead">Сайт устроен как спуск по масштабам: от Абсолюта — через Вселенную, Солнце, Землю и человека — к атому и Пустоте. <span class="mp-d">Слева — 12 станций по порядку, справа — с чего начать и темы, которые проходят через многие станции.</span><span class="mp-m">Ниже — с чего начать, 12 станций по порядку и темы, которые проходят через многие станции.</span></p>
       <button class="mp-srch" id="mSrch" data-hover><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Поиск по сайту</span><kbd class="mono">Ctrl K</kbd></button>
     </header>
@@ -9976,11 +9982,11 @@ const LANGS = (() => {
   const set = v => { try { localStorage.setItem(KEY, v); } catch(e){} };
   // два переключателя: в верхней панели (#tLang) и в шапке меню «Станции»
   document.querySelectorAll(`.mp-lang a[data-l="${SITE_LANG}"], .tlang a[data-l="${SITE_LANG}"]`).forEach(a => a.setAttribute("aria-current", "page"));
-  document.querySelectorAll(`.mp-lang a[data-l="${other}"], .tlang a[data-l="${other}"]`).forEach(a => { a.href = altHref(); a.addEventListener("click", () => set(other)); });
+  document.querySelectorAll(`.mp-lang a[data-l="${other}"], .tlang a[data-l="${other}"]`).forEach(a => { a.href = altHref(); a.addEventListener("click", () => { set(other); a.href = altHref().split("#")[0] + location.hash; }); });
   // на сайте (не в артефакте) запомненный выбор возвращает на свою версию при новом заходе
   const site = LANG_ALT.charAt(0) === "/", pref = get();
   let sameSite = false; try { sameSite = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch(e){}
-  if (site && pref === other && !sameSite){ location.replace(altHref()); return { lang:SITE_LANG }; }
+  if (site && pref === other && !sameSite){ location.replace(altHref() + location.hash); return { lang:SITE_LANG }; }
   // подсказка один раз: язык браузера не совпадает с языком страницы и выбора ещё не было
   if (!pref){
     const nav = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]).map(s => String(s).toLowerCase().slice(0, 2));
@@ -9991,7 +9997,7 @@ const LANGS = (() => {
       t.innerHTML = SITE_LANG === "ru" ? `<span lang="en">This atlas is also in English</span><a lang="en" href="${altHref()}">English version →</a><button type="button" aria-label="Close" data-hover>×</button>` : `<span lang="ru">Есть русская версия атласа</span><a lang="ru" href="${altHref()}">Читать по-русски →</a><button type="button" aria-label="Закрыть" data-hover>×</button>`;
       document.body.appendChild(t); requestAnimationFrame(() => t.classList.add("on"));
       const bye = keep => { t.classList.remove("on"); setTimeout(() => t.remove(), 450); if (keep) set(SITE_LANG); };
-      t.querySelector("a").addEventListener("click", () => set(other));
+      t.querySelector("a").addEventListener("click", e => { set(other); e.currentTarget.href = altHref().split("#")[0] + location.hash; });
       t.querySelector("button").addEventListener("click", () => bye(true));
       setTimeout(() => { if (t.isConnected) bye(false); }, 14000);
     }, 1500));
@@ -20474,6 +20480,132 @@ function loop(now){
   else { renderer.clear(); renderer.render(scene, camera); if (mscene.visible){ renderer.clearDepth(); renderer.render(mscene, mcam); } if (k > .01){ renderer.clearDepth(); renderer.render(tscene, tcam); } }
   requestAnimationFrame(loop);
 }
+// v181: адреса мест. Где мы — пишется в адрес после «#»: #/j/earth/4 (слой станции), #/j/earth/9?br=litho (ветка),
+// #/bio?bm=2 (биом), #/cal/66000000 (календарь), #/tree/<id>, #/th/<id>, #/dm/3, #/s/5 (станция на кольце), #/in/5 (текст станции).
+// Ссылкой можно поделиться; кнопка «Назад» браузера и жест «назад» на телефоне ходят по местам, а не уводят с сайта.
+// Новое место (другая глава, станция-погружение, кольцо) — новая запись истории; смена слоя или события внутри — замена записи.
+// Адрес разбирается строго: только известные виды мест, ключи и значения из списков сайта — иначе адрес игнорируется.
+const NAVH = (() => {
+  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[] };
+  const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  const ID = v => typeof v === "string" && /^[\w>.-]{1,48}$/.test(v) && !(v in Object.prototype);
+  const INT = (v, a, b) => { const n = Number(v); return v !== "" && Number.isInteger(n) && n >= a && n <= b ? n : null; };
+  let framed = true; try { framed = window.top !== window.self; } catch(e){}
+  const tabs = () => [...document.querySelectorAll(".reftab[data-tab]")].map(b => b.dataset.tab);
+  function here(){
+    if (IZ.active) return { t:"iz" };
+    if (CP.on) return { t:"compass" };
+    if (MINE.on) return { t:"mine" };
+    if (chRoutes.classList.contains("open")) return { t:"routes" };
+    if (refOpen){ const b = document.querySelector(".reftab.on"); return { t:"ref", tab: b ? b.dataset.tab : "guide" }; }
+    const o = navHere();
+    if (o){ const r = {}; for (const k in o) if (k !== "k" && k !== "nm" && o[k] != null) r[k] = o[k];
+      if (r.t === "cal") r.ago = Number(Math.max(0, r.ago).toPrecision(4));
+      if (r.t === "j" && r.id === "earth" && r.d < 7) delete r.br;   // до развилки ветка не важна
+      return r; }
+    if (insideOpen && diveSt >= 0) return { t:"in", i: diveSt };
+    const r = Math.round(target); if (r < 0) return null;
+    const so = stopOf(mod(r, 14)); return so.st != null ? { t:"s", i: so.st } : { t:"po", i: so.po };
+  }
+  function enc(o){
+    if (!o || !POS[o.t]) return "";
+    const P = POS[o.t]; let h = "#/" + o.t, gap = false;
+    for (const k of P){ if (o[k] == null){ gap = true; continue; } if (gap) break; h += "/" + encodeURIComponent(o[k]); }
+    const q = Object.keys(o).filter(k => k !== "t" && o[k] != null && (!P.includes(k) || gap && h.split("/").length - 2 <= P.indexOf(k))).map(k => k + "=" + encodeURIComponent(o[k]));
+    return q.length ? h + "?" + q.join("&") : h;
+  }
+  function check(o){
+    const t = o.t, r = { t };
+    if (t === "j"){
+      if (!ID(o.id) || !own(JOURNEYS, o.id)) return null; r.id = o.id;
+      if (o.br != null){ if (o.id !== "earth" || !["litho", "bio"].includes(o.br)) return null; r.br = o.br; }
+      const n = o.id === "earth" ? (r.br === "bio" ? 7 + BIO_LVS.length : ELV.length) : JOURNEYS[o.id].levels().length;
+      r.d = o.d == null ? (JOURNEYS[o.id].start || 0) : INT(o.d, 0, n - 1); if (r.d == null) return null;
+      if (o.id === "earth" && r.d >= 7 && !r.br) r.br = "litho";
+    }
+    else if (t === "cal"){ const a = Number(o.ago); if (o.ago == null || o.ago === "" || !isFinite(a) || a < 0 || a > 2e10) return null; r.ago = a; }
+    else if (t === "tree"){ if (o.id != null){ if (!ID(o.id)) return null; r.id = o.id; } }
+    else if (t === "th"){ if (o.id != null){ if (!ID(o.id)) return null; r.id = o.id; } if (o.br != null){ if (!ID(o.br) || !o.br.includes(">")) return null; r.br = o.br; } }
+    else if (t === "dm"){ r.n = INT(o.n, 0, DIM_STEPS.length - 1); if (r.n == null) return null; }
+    else if (t === "bio"){
+      if (o.bm != null){ r.bm = INT(o.bm, 0, BIO_BIOMES.length - 1); if (r.bm == null) return null; }
+      else if (o.e != null){ if (!ID(o.e) || !BIO_ERAS.some(x => x.id === o.e)) return null; r.e = o.e; } }
+    else if (t === "s" || t === "in"){ r.i = INT(o.i, 0, ST.length - 1); if (r.i == null) return null; }
+    else if (t === "po"){ r.i = INT(o.i, 0, 1); if (r.i == null) return null; }
+    else if (t === "ref"){ const tb = o.tab == null ? "guide" : o.tab; if (!tabs().includes(tb)) return null; r.tab = tb; }
+    else if (!["path", "compass", "mine", "routes", "iz"].includes(t)) return null;
+    return r;
+  }
+  function dec(h){
+    try {
+      const m = /^#\/([a-z]{1,8})((?:\/[^/?#]*)*)\/?(?:\?([^#]*))?$/.exec(h || ""); if (!m || !own(POS, m[1])) return null;
+      const P = POS[m[1]], o = { t: m[1] }, parts = m[2] ? m[2].split("/").slice(1) : [];
+      if (parts.length > P.length) return null;
+      parts.forEach((v, i) => { o[P[i]] = decodeURIComponent(v); });
+      if (m[3]) for (const kv of m[3].split("&")){ const j = kv.indexOf("="), k = j < 0 ? kv : kv.slice(0, j); if (!/^[a-z]{1,4}$/.test(k) || own(o, k)) return null; o[k] = j < 0 ? "" : decodeURIComponent(kv.slice(j + 1)); }
+      return check(o);
+    } catch(e){ return null; }
+  }
+  const kind = h => { const m = /^#\/([a-z]+)(?:\/([^/?]*))?/.exec(h); if (!m) return "ring"; return m[1] === "s" || m[1] === "po" ? "ring" : m[1] === "j" ? "j/" + m[2] : m[1]; };
+  let lastH = location.hash || "", cand = null, candN = 0, hold = 0, softNext = false;
+  function write(h, push){
+    const url = location.pathname + location.search + h;   // полный путь: на /en/ стоит <base href="/">, относительный «#…» увёл бы на русскую версию
+    try { if (push && !framed) history.pushState({ cosmo: 1 }, "", url); else history.replaceState(history.state, "", url); } catch(e){}
+  }
+  function sync(force){
+    if (!force && (performance.now() < hold || tr || zm || bhDv)) return;   // идёт переход
+    const o = here();
+    if (!force && (!o || o.t === "s" || o.t === "po") && (pendingDive || Math.abs(pos - target) > .03)) return;   // кольцо ещё крутится
+    const h = enc(o);
+    if (!force){ if (h !== cand){ cand = h; candN = 0; return; } if (++candN < 1) return; }   // место устоялось ≈0,7 с — без промежуточных кадров переходов
+    if (h === lastH) return;
+    const push = !softNext && kind(h) !== kind(lastH);
+    softNext = false; lastH = h; write(h, push);
+  }
+  function apply(o){
+    hold = performance.now() + 1500; softNext = true; cand = null;
+    if (IZ.active){ dispatchEvent(new KeyboardEvent("keydown", { key:"Escape" })); return; }   // «Назад» в Изнанке — выход, как по Esc
+    NAV_SKIP = true;
+    if (!o || o.t !== "in") pendingDive = null;   // отложенный «нырок» к станции из прежнего места больше не нужен
+    try {
+      if (!o || o.t === "s" || o.t === "po"){
+        surface(); toggleMenu(false); closeChapters();
+        if (!o){ target = -1; travel = true; lastInput = performance.now(); }
+        else if (o.t === "s") goTo(o.i);
+        else { const u = o.i ? 13 : 7, r = Math.round(Math.max(0, pos)), d0 = mod(u - mod(r, 14), 14); target = r + (d0 > 7 ? d0 - 14 : d0); travel = true; lastInput = performance.now(); }
+      }
+      else if (o.t === "ref") openRef(o.tab);
+      else if (o.t === "compass") openCompass();
+      else if (o.t === "mine") openMine();
+      else if (o.t === "routes") openRouteList();
+      else if (o.t === "iz") RT.go({ t:"j", id:"bh", d:0, now:true });   // в Изнанку по ссылке не бросаем: вспышки — только по собственному шагу
+      else RT.go(Object.assign({ now:true }, o));
+    } catch(e){ console.warn("[nav]", e); }
+    finally { NAV_SKIP = false; }
+  }
+  addEventListener("popstate", () => { if (location.hash === lastH) return; const o = dec(location.hash); lastH = o ? location.hash : ""; if (!o && location.hash) write("", false); apply(o); });
+  // кнопка «Ссылка на это место» в шапке меню (в артефакте её нет: там адрес — внутренний адрес рамки)
+  const sb = $("mpShare");
+  if (framed){ if (sb) sb.remove(); }
+  else if (sb) sb.onclick = async () => {
+    sync(true); const url = location.href, lbl = sb.innerHTML;
+    let ok = false;
+    try { await navigator.clipboard.writeText(url); ok = true; } catch(e){}
+    if (!ok && navigator.share){ try { await navigator.share({ url, title: document.title }); return; } catch(e){ return; } }
+    sb.textContent = ok ? "Скопировано ✓" : "Адрес — в строке браузера"; sb.classList.toggle("ok", ok);
+    setTimeout(() => { sb.innerHTML = lbl; sb.classList.remove("ok"); }, 1800);
+  };
+  return {
+    start(){
+      const o = dec(location.hash);
+      if (location.hash && !o){ write("", false); lastH = ""; }
+      if (o) setTimeout(() => apply(o), 700);   // после заставки: станции уже построены
+      setInterval(sync, 350);
+    },
+    dbg: { here, enc, dec, sync }
+  };
+})();
+NAVH.start();
 requestAnimationFrame(t => { last = t; loop(t); });
 setTimeout(() => $("loader").classList.add("done"), 250);
 })();
