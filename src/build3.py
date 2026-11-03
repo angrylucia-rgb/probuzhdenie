@@ -3,7 +3,25 @@ import os, json, shutil
 libs=['shaders/CopyShader.js','shaders/LuminosityHighPassShader.js','postprocessing/EffectComposer.js','postprocessing/RenderPass.js','postprocessing/ShaderPass.js','postprocessing/UnrealBloomPass.js']
 def scripts(threep, exp): return '\n'.join([f'<script src="{threep}"></script>']+[f'<script src="{exp}{l}"></script>' for l in libs])
 ORIGIN = 'https://probuzhdenie-pied.vercel.app'  # при покупке домена — поменять здесь (и в vercel.json не нужно)
+# Правообладатель и адрес для обращений — подставляются в «Правовую информацию», подвал меню и знак ©
+OWNER = {'ru': '[ФИО правообладателя]', 'en': '[owner’s full name]'}
+MAIL = {'ru': '[e-mail для обращений]', 'en': '[contact e-mail]'}
+GFONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=Golos+Text:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">'''
+LEGAL_CSS = ':root{--night:#05060C;--ink:#EFE7D4;--muted:#A9A7BD;--faint:#6D6F90;--line:rgba(214,172,94,.28);--brass:#D6AC5E;--display:"Forum",Georgia,serif;--body:"Golos Text",system-ui,sans-serif;--mono:"JetBrains Mono",monospace}body{margin:0;background:var(--night);color:var(--ink);font:16px/1.6 var(--body)}main{max-width:800px;margin:0 auto;padding:48px 20px 80px}.back{font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--brass);text-decoration:none}'
+def legal_page(base, lang):
+    # статическая страница «Правовая информация» из того же <template id="tplLegal">, что и в приложении
+    i = base.index('<template id="tplLegal">'); j = base.index('</template>', i)
+    body = base[i + len('<template id="tplLegal">'):j]
+    k = base.index('<style>'); css = base[k + 7:base.index('</style>', k)]
+    lg = '\n'.join(l for l in css.split('\n') if l.startswith('.lg'))
+    back = ('/en/', '← Back to the atlas', 'Legal information · Cosmolabe') if lang == 'en' else ('/', '← К атласу', 'Правовая информация · Космолябия')
+    return (f'<!doctype html>\n<html lang="{lang}">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+            f'<title>{back[2]}</title>\n<meta name="robots" content="index,follow">\n<link rel="stylesheet" href="/fonts/fonts.css">\n'
+            f'<style>{LEGAL_CSS}\n{lg}</style>\n</head>\n<body><main><a class="back" href="{back[0]}">{back[1]}</a>\n{body}\n</main></body>\n</html>\n')
 def build(base, art, prevf, lang):
+    base = base.replace('__OWNER__', OWNER[lang]).replace('__MAIL__', MAIL[lang])
     pub=base.replace('__SCRIPTS__',scripts('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/'))
     if lang == 'en':  # en.html в артефакте — отдельная страница: ей нужен свой каркас документа
         i = pub.index('<style>'); j = pub.index('</style>') + 8
@@ -25,6 +43,9 @@ def build(base, art, prevf, lang):
         base = base.replace('LANG_ALT = "en.html"', 'LANG_ALT = "/en/"')
     head = open('head.txt' if lang == 'ru' else 'i18n/head_en.txt').read().replace('__ORIGIN__', ORIGIN)
     body = base.replace('__SCRIPTS__', scripts('/vendor/three.min.js', '/vendor/'))
+    # на сайте шрифты — свои (/fonts), без обращений к серверам Google: посетители не передают им IP-адрес
+    assert GFONTS in body; body = body.replace(GFONTS, '<link rel="stylesheet" href="/fonts/fonts.css">')
+    os.makedirs(DIST + '/legal', exist_ok=True); open(DIST + '/legal/index.html', 'w').write(legal_page(base, lang))
     i = body.index('<style>')
     page = head + body[:i] + body[i:body.index('</style>')+8] + "\n</head>\n<body>\n" + body[body.index('</style>')+8:] + "\n</body>\n</html>\n"
     open(DIST + '/index.html','w').write(page)
