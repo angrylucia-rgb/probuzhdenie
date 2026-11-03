@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-1laPkg7A9LJbwTyrU9adzGNFOnprTlz25m4xNH19lps='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-QfP3IEQpRRlnld0avGe4jeZmisevSrbDVqJMeNWRc34='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -11102,9 +11102,9 @@ $("stages").innerHTML = DATA.stages.map((s, k) => `
     <dl><dt>Learn</dt><dd>${esc(s.know)}</dd><dt>Feel</dt><dd>${esc(s.prac)}</dd><dt>Live it</dt><dd>${esc(s.life)}</dd><dt>Reflect</dt><dd class="qq">${esc(s.q)}</dd></dl>
   </article>`).join("");
 $("stages").querySelectorAll(".go").forEach(b => b.onclick = () => { const k = +b.dataset.k; closePath(); if (k === 4) openHuman(); else pendingDive = {i:STAGE_ST[k], moved:false}; });
-function openPath(){ closeChapters(); toggleMenu(false); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
+function openPath(){ chFrom("path"); closeChapters(); toggleMenu(false); surface(); pathOpen = true; chPath.classList.add("open"); chPath.setAttribute("aria-hidden","false"); $("btnPath").setAttribute("aria-pressed","true"); $("pathClose").focus(); }
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
-$("pathClose").onclick = closePath;
+$("pathClose").onclick = () => { if (!chBack("path")) closePath(); };
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
 function closeSide(){ closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeRouteList(); }   // все главы, кроме погружения
 function closeChapters(){ closeHuman(); closeSide(); }
@@ -12034,9 +12034,9 @@ const CHR = (() => {
     box.classList.remove("swap"); void box.offsetWidth; box.classList.add("swap");
     if (!cycOn) $("tmScroll").scrollTop = 0;
     const go = box.querySelector(".tm-go[data-st]"); if (go) go.onclick = () => { const id = go.dataset.st; close(); openJourney(id); };
-    const gth = box.querySelector(".tm-th"); if (gth) gth.onclick = () => { const id = gth.dataset.th; close(); openThought(id); };
-    const gb = box.querySelector(".tm-bio"); if (gb) gb.onclick = () => { const id = gb.dataset.bio; close(); openBio(id); };
-    const gt = box.querySelector(".tm-tree"); if (gt) gt.onclick = () => { const id = gt.dataset.tr; close(); openTree(id); };
+    const gth = box.querySelector(".tm-th"); if (gth) gth.onclick = () => { const id = gth.dataset.th; navMark(); close(); openThought(id); };
+    const gb = box.querySelector(".tm-bio"); if (gb) gb.onclick = () => { const id = gb.dataset.bio; navMark(); close(); openBio(id); };
+    const gt = box.querySelector(".tm-tree"); if (gt) gt.onclick = () => { const id = gt.dataset.tr; navMark(); close(); openTree(id); };
     box.querySelectorAll("[data-nv]").forEach(b => b.onclick = () => goEv(idx + +b.dataset.nv));
   }
   // перейти к событию по номеру: стрелка встаёт на него (как учебник — листать событие за событием)
@@ -12075,13 +12075,13 @@ const CHR = (() => {
   }
   function close(){ if (!open) return; open = timeOn = false; play = false; chTime.classList.remove("open"); chTime.setAttribute("aria-hidden", "true"); $("btnTime").setAttribute("aria-pressed", "false"); }
   addEventListener("resize", () => { if (open) size(); });
-  return { open: openT, close, get on(){ return open; }, goAgo: y => { play = false; syncPlay(); s = sT = sOf(YS*(1 - clamp(y, 0, AGE)/AGE)) + 1e-7; }, dbg: { set: v => { s = sT = v; }, time: () => timeOf(s), ago: () => agoStr(timeOf(s)) } };
+  return { open: openT, close, get on(){ return open; }, get ago(){ return AGE*(1 - timeOf(s)/YS); }, goAgo: y => { play = false; syncPlay(); s = sT = sOf(YS*(1 - clamp(y, 0, AGE)/AGE)) + 1e-7; }, dbg: { set: v => { s = sT = v; }, time: () => timeOf(s), ago: () => agoStr(timeOf(s)) } };
 })();
 const chTime = $("chTime");
 function closeTime(){ CHR.close(); }
-function openTime(){ closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
+function openTime(){ chFrom("time"); closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
 $("btnTime").onclick = () => CHR.on ? closeTime() : openTime();
-$("timeClose").onclick = closeTime;
+$("timeClose").onclick = () => { if (!chBack("time")) closeTime(); };
 $("mTime").onclick = openTime;
 
 /* ---------- Древо жизни: карточки групп (итерация 8б) ----------
@@ -12728,8 +12728,8 @@ const CHT = (() => {
     box.classList.remove("swap"); void box.offsetWidth; box.classList.add("swap");
     box.querySelectorAll("[data-n]").forEach(b => b.onclick = () => { stopWalk(); select(BY[b.dataset.n]); });
     box.querySelectorAll("[data-st]").forEach(b => b.onclick = () => { stopWalk(); step(+b.dataset.st); });
-    box.querySelectorAll("[data-cal]").forEach(b => b.onclick = () => { const y = +b.dataset.cal*1e6; close(); openTime(); CHR.goAgo(y); });
-    box.querySelectorAll("[data-bio]").forEach(b => b.onclick = () => { const id = b.dataset.bio; close(); openBio(id); });
+    box.querySelectorAll("[data-cal]").forEach(b => b.onclick = () => { const y = +b.dataset.cal*1e6; navMark(); close(); openTime(); CHR.goAgo(y); });
+    box.querySelectorAll("[data-bio]").forEach(b => b.onclick = () => { const id = b.dataset.bio; navMark(); close(); openBio(id); });
     box.querySelectorAll("[data-js]").forEach(b => b.onclick = () => { const id = b.dataset.js; close(); openJourney(id); });
     $("trScroll").scrollTop = 0;
     const sb = $("trStep"); if (sb) sb.textContent = si >= 0 ? `${si + 1}/${TREE_STEPS.length}` : "—";
@@ -12840,10 +12840,10 @@ const CHT = (() => {
   return { open: openT, close, get on(){ return open; }, select: id => BY[id] && select(BY[id]), nodes: NODES, dbg: { sel: () => sel.id, n: NODES.length } };
 })();
 const chTree = $("chTree");
-function openTree(id){ closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
+function openTree(id){ chFrom("tree"); closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
 function closeTree(){ CHT.close(); }
 $("btnTree").onclick = () => CHT.on ? closeTree() : openTree();
-$("treeClose").onclick = closeTree;
+$("treeClose").onclick = () => { if (!chBack("tree")) closeTree(); };
 $("mTree").onclick = () => openTree();
 
 /* ---------- “Нить мысли” — данные (новый блок, этап 2, подэтап 9а) ----------
@@ -13910,9 +13910,9 @@ const CTH = (() => {
            dbg: { view: () => [v0, v1], sel: () => sel ? sel.id : selB ? "br:" + selB.a + ">" + selB.b : null, labeled: () => F.filter(f => f.g && f.g.style.display !== "none" && !f.g.classList.contains("nolab")).length, n: F.length } };
 })();
 const chThought = $("chThought");
-function openThought(id){ closeCompass(); closeMine(); closeDims(); closeBio(); closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeRouteList(); toggleMenu(false); surface(); chThought.classList.add("open"); chThought.setAttribute("aria-hidden", "false"); CTH.open(); if (id) CTH.select(id); $("thClose").focus({preventScroll:true}); }
+function openThought(id){ chFrom("th"); closeCompass(); closeMine(); closeDims(); closeBio(); closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeRouteList(); toggleMenu(false); surface(); chThought.classList.add("open"); chThought.setAttribute("aria-hidden", "false"); CTH.open(); if (id) CTH.select(id); $("thClose").focus({preventScroll:true}); }
 function closeThought(){ CTH.close(); }
-$("thClose").onclick = closeThought;
+$("thClose").onclick = () => { if (!chBack("th")) closeThought(); };
 $("mThought").onclick = () => openThought();
 
 /* ---------- Маршруты (новый блок, этап 1) ----------
@@ -14025,25 +14025,51 @@ const ROUTES = [
 ];
 // v177: где мы сейчас — для кнопок “Назад” в главах (только погружения: слой станции, ветки)
 function navHere(){
+  // v178: открытая глава — тоже место, куда можно вернуться
+  try {
+    if (CHR.on) return { t:"cal", ago: Math.max(0, CHR.ago), k:"time", nm:"Cosmic Calendar" };
+    if (CHT.on){ const id = CHT.dbg.sel(); return id ? { t:"tree", id, k:"tree", nm:"Tree of Life" } : { t:"tree", k:"tree", nm:"Tree of Life" }; }
+    if (CTH.on){ const id = CTH.dbg.sel(); return id && id.startsWith("br:") ? { t:"th", br:id.slice(3), k:"th", nm:"Thread of Thought" } : { t:"th", id, k:"th", nm:"Thread of Thought" }; }
+    if (DIMS.on) return { t:"dm", n:DIMS.n, k:"dm", nm:"Ladder of Dimensions" };
+    if (BIO.on) return Object.assign({ t:"bio", k:"bio", nm:"Biosphere" }, BIO.place());
+    if (pathOpen) return { t:"path", k:"path", nm:"The Eight-Stage Path" };
+  } catch(e){}
   if (typeof humanOpen === "undefined" || !humanOpen || !jId) return null;
   const d = Math.max(0, Math.min(DMAX - 1, Math.round(depth))), v = JL && JL[d], o = { t:"j", id:jId, d };
   if (jId === "earth") o.br = earthBranch;
   o.nm = v ? (v.name || v.short || "") : "";
   return o;
 }
+// v178: “Назад” у глав. Глава запоминает, откуда её открыли (слой станции или другая глава); тогда её верхняя
+// кнопка называется “← Назад” и возвращает туда. Открыта с кольца или из меню без источника — “Вернуться на кольцо ✕”.
+let NAV_SKIP = false, NAV_PENDING;
+const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose" };
+function navMark(){ NAV_PENDING = navHere(); setTimeout(() => { NAV_PENDING = undefined; }, 0); }   // перед закрытием главы ради ссылки в другую
+function chFrom(key){
+  if (NAV_SKIP) return;
+  const o = NAV_PENDING !== undefined ? NAV_PENDING : navHere();
+  if (o && o.k === key) return;          // глава уже открыта — источник не меняется
+  CH_BACK[key] = o || null; chBackUI(key);
+}
+function chBackUI(key){ const b = $(CH_CLOSE[key]); if (!b) return; const o = CH_BACK[key];
+  b.textContent = o ? "← Back" : "Back to the ring ✕"; if (o) b.title = o.nm ? "Return to: " + o.nm : "Return"; else b.removeAttribute("title"); }
+function chBack(key){ const o = CH_BACK[key]; if (!o) return false;
+  NAV_SKIP = true; try { RT.go(Object.assign({ now:true }, o)); } finally { NAV_SKIP = false; } return true; }
 const RT = (() => {
   let cur = null, k = 0;
   const bar = $("routeBar");
   // переход к месту шага; прежние главы закрываются, путешествие начинается с нуля
   function go(s){
-    const from = s.t !== "j" ? navHere() : null, ext = from ? { t:"ext", go:from, nm:from.nm } : null;
+    const from = s.t !== "j" && !NAV_SKIP ? navHere() : null, ext = from ? { t:"ext", go:from, nm:from.nm } : null;
+    NAV_PENDING = from; setTimeout(() => { NAV_PENDING = undefined; }, 0);
     closeThought(); closeCompass(); closeMine(); closeDims(); closeBio();
     if (s.t === "cal"){ closeTree(); openTime(); CHR.goAgo(s.ago); }
     else if (s.t === "tree"){ openTree(s.id); }
-    else if (s.t === "th"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openThought(); if (s.br) CTH.bridgeBy(s.br); else CTH.select(s.id); }
+    else if (s.t === "th"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openThought(); if (s.br) CTH.bridgeBy(s.br); else if (s.id) CTH.select(s.id); }
     else if (s.t === "in"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); travelDive(s.i); }
     else if (s.t === "dm"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openDims(s.n); if (s.lens) DIMS.lens(s.lens); if (s.m) DIMS.mode(s.m); }
     else if (s.t === "path"){ closeTime(); closeTree(); openPath(); }
+    else if (s.t === "bio" && s.m == null && s.b == null && s.bm == null && !s.sp && !s.e && NAV_SKIP){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openBio(); }
     else if (s.t === "bio"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman();
       if (s.m != null) openBio(undefined, () => BIO.mech(s.m, ext)); else if (s.b != null) openBio(undefined, () => BIO.basics(s.b, ext)); else if (s.bm != null) openBio(undefined, () => BIO.biome(s.bm, ext)); else openBio(s.sp || s.e, () => BIO.from(ext)); }
     else if (s.t === "iz"){ closeTime(); closeTree(); closeHuman(); closePath(); izEnter(false); }
@@ -15477,12 +15503,12 @@ const DIMS = (() => {
   addEventListener("resize", () => { if (open) size(); });
   const mxb = $("dmMax");
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Scene" : "⤢ Read"; };
-  return { open: openD, close, get on(){ return open; }, go, mode: m => { if (step === 4){ if (lens4 === "time") setLens("space"); setMode4(m); } else if (step === 5) setMode5(m); else if (step === 6) setMode6(m); else if (step === 7) setMode7(m); }, lens: setLens, dbg: { m6: () => mode6, setM6: m => setMode6(m), m7: () => mode7, setM7: m => setMode7(m), melt: v => { meltM = v; meltUser = performance.now(); }, m5: () => mode5, setM5: m => setMode5(m), hz: v => { hoseZ = v; hoseUser = performance.now(); }, lens: () => lens4, tNow: v => { if (v != null) tNow = v; return tNow; }, tView: v => { if (v) tView = v; return tView; }, tTilt: v => { tTilt = !!v; }, setKn: v => { knT = v; }, setGl: v => { glT = v; }, setHy: v => { hyT = v; }, m4: () => mode4, setM4: setMode4, fold: () => fold, slice: () => sliceW, knPh: () => knPh, glTh: () => glTh, step: () => step, ext: () => ext, dw: () => dweller, sph: () => sphereT } };
+  return { open: openD, close, get on(){ return open; }, get n(){ return step; }, go, mode: m => { if (step === 4){ if (lens4 === "time") setLens("space"); setMode4(m); } else if (step === 5) setMode5(m); else if (step === 6) setMode6(m); else if (step === 7) setMode7(m); }, lens: setLens, dbg: { m6: () => mode6, setM6: m => setMode6(m), m7: () => mode7, setM7: m => setMode7(m), melt: v => { meltM = v; meltUser = performance.now(); }, m5: () => mode5, setM5: m => setMode5(m), hz: v => { hoseZ = v; hoseUser = performance.now(); }, lens: () => lens4, tNow: v => { if (v != null) tNow = v; return tNow; }, tView: v => { if (v) tView = v; return tView; }, tTilt: v => { tTilt = !!v; }, setKn: v => { knT = v; }, setGl: v => { glT = v; }, setHy: v => { hyT = v; }, m4: () => mode4, setM4: setMode4, fold: () => fold, slice: () => sliceW, knPh: () => knPh, glTh: () => glTh, step: () => step, ext: () => ext, dw: () => dweller, sph: () => sphereT } };
 })();
 const chDims = $("chDims");
-function openDims(n){ closeChapters(); toggleMenu(false); surface(); chDims.classList.add("open"); chDims.setAttribute("aria-hidden", "false"); DIMS.open(n); $("dmClose").focus({ preventScroll:true }); }
+function openDims(n){ chFrom("dm"); closeChapters(); toggleMenu(false); surface(); chDims.classList.add("open"); chDims.setAttribute("aria-hidden", "false"); DIMS.open(n); $("dmClose").focus({ preventScroll:true }); }
 function closeDims(){ DIMS.close(); }
-$("dmClose").onclick = closeDims;
+$("dmClose").onclick = () => { if (!chBack("dm")) closeDims(); };
 $("mDims").onclick = () => openDims();
 
 // Маски силуэтов “Биосферы”: PhyloPic (CC0 / PDM / CC BY), см. BIO_CREDITS. [ширина, высота, RLE-варинты в base64]
@@ -19024,8 +19050,8 @@ void main(){
     if (gal.on && !view && !mechOn) galBind();
     if (mechOn) mechBind();
     if (bmOn && !view) bmBind();
-    on("bioCal", () => { const y = E.cal; close(); openTime(); CHR.goAgo(y); });
-    on("bioTree", () => { const id = view ? BIO_SP[view].tree : E.tree; close(); openTree(id); });
+    on("bioCal", () => { const y = E.cal; navMark(); close(); openTime(); CHR.goAgo(y); });
+    on("bioTree", () => { const id = view ? BIO_SP[view].tree : E.tree; navMark(); close(); openTree(id); });
     cardEl.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(+b.dataset.go));
     cardEl.querySelectorAll("[data-sp]").forEach(b => b.onclick = () => portrait(b.dataset.sp));
     if (E && E.ready && !view && E.map != null) globeStart(E.map, mixc(ERA_C[cur], [1, .86, .55], .55));
@@ -19253,6 +19279,7 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
   const mxb = $("bioMax");
   mxb.onclick = () => { const on = !box.classList.contains("tm-max"); box.classList.toggle("tm-max", on); mxb.setAttribute("aria-pressed", String(on)); mxb.textContent = on ? "⤡ Scene" : "⤢ Read"; };
   return { open: openB, close, get on(){ return open; }, go, portrait,
+    place: () => bmOn ? { bm: bi } : !mechOn && !gal.on && cur >= 0 ? { e: BIO_ERAS[cur].id } : {},
     gallery: k => galOn(k), journal: () => { mechOn_(-1, "mech"); }, mech: (i, ext) => { mechOn_(i); if (ext) mOrigin = ext; card(); hint(); }, basics: (i, ext) => { mechOn_(i, "basics"); if (ext) mOrigin = ext; card(); hint(); },
     // откуда пришли в главу (v177): ext = { t:"ext", go:<шаг RT>, nm }
     from: ext => { xOrigin = ext || null; hint(); },
@@ -19261,11 +19288,11 @@ void main(){ vec4 c = texture2D(uTex, vUv); float a = c.a*uA; if (a < 0.01) disc
 })();
 const chBio = $("chBio");
 // then — что сделать сразу после открытия (журнал, механизм, биом): глава может ждать файл силуэтов
-function openBio(t, then){ closeChapters(); toggleMenu(false); surface(); chBio.classList.add("open"); chBio.setAttribute("aria-hidden", "false");
+function openBio(t, then){ chFrom("bio"); closeChapters(); toggleMenu(false); surface(); chBio.classList.add("open"); chBio.setAttribute("aria-hidden", "false");
   const go = () => { if (!chBio.classList.contains("open")) return; BIO.open(t); if (then) then(); $("bioClose").focus({ preventScroll:true }); };
   if (bioDataOk) go(); else { chBio.classList.add("bio-wait"); bioData().then(() => { chBio.classList.remove("bio-wait"); go(); }); } }
 function closeBio(){ BIO.close(); }
-$("bioClose").onclick = closeBio;
+$("bioClose").onclick = () => { if (!chBack("bio")) closeBio(); };
 $("mBio").onclick = () => openBio();
 $("mJournal").onclick = () => openBio(undefined, () => BIO.journal());
 // ---- 13ж · связи: из Древа и Календаря — в “Биосферу” ----
