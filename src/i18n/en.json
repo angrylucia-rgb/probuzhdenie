@@ -7425,5 +7425,10 @@
 "<span>Цифры приборов — типичные значения; внутри биома разброс большой</span></li></ul>\n      <div class=\"tm-gos\"><button class=\"btn tm-go\" id=\"bioBmX\" title=\"": "<span>The gauge values are typical; within a biome the spread is large</span></li></ul>\n      <div class=\"tm-gos\"><button class=\"btn tm-go\" id=\"bioBmX\" title=\"",
 "\" data-hover>← Назад</button><button class=\"btn tm-go\" id=\"bioBas2\" data-hover>Основы биологии →</button></div>": "\" data-hover>← Back</button><button class=\"btn tm-go\" id=\"bioBas2\" data-hover>Basics of biology →</button></div>",
 " · портрет</span><span class=\"tm-nav\"><button id=\"bioBack\" title=\"": " · portrait</span><span class=\"tm-nav\"><button id=\"bioBack\" title=\"",
-"\" data-hover>← Назад</button></span></div>\n        <img class=\"bio-port\" src=\"": "\" data-hover>← Back</button></span></div>\n        <img class=\"bio-port\" src=\""
+"\" data-hover>← Назад</button></span></div>\n        <img class=\"bio-port\" src=\"": "\" data-hover>← Back</button></span></div>\n        <img class=\"bio-port\" src=\"",
+"Литосфера — к ядру": "Lithosphere: to the core",
+"Биосфера — сейба": "Biosphere: the kapok tree",
+"Центр Галактики": "Centre of the Galaxy",
+"Слои станции «": "Layers of the station “",
+"слои · ": "layers ·"
 }
