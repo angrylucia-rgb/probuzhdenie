@@ -10219,7 +10219,7 @@ const ELV = [
     trad:["Шумеры — Абзу, подземные воды, откуда исходит мудрость бога Энки","Бытие 7:11 — «разверзлись все источники великой бездны»","Индуизм — наги, хранители подводных сокровищ"],
     par:"Микробиом кишечника: жизнь в темноте, которая питается химией, а не светом.",
     prac:["Медитация глубины: с каждым выдохом опускаться ниже волн, к тишине"] },
-  { short:"Кора", cat:"недра · камень", name:"Земная кора", sub:"Кости планеты", scale:"5–70 км",
+  { short:"Кора", cat:"недра · камень", name:"Земная кора", sub:"Кости планеты", scale:"5–70 км", strata:1,
     lead:"Сквозь осадки и базальт мы входим в камень. Кора — тонкая скорлупа планеты, но в её трещинах живёт огромная глубинная биосфера, а узор разломов и жил повторяет себя на всех масштабах.",
     sci:[["s","Океаническая кора — 5–10 км, континентальная — в среднем 30–50 км, под горами до 70 км"],["s","Граница Мохоровичича открыта в 1909 году по сейсмическим волнам"],["s","Кольская сверхглубокая скважина — 12 262 м; на забое около 180 °C"],["s","Больше всего в коре кислорода (≈46%) и кремния (≈28%)"],["s","Глубинная биосфера содержит 15–23 млрд тонн углерода — в сотни раз больше, чем все люди (Deep Carbon Observatory, 2018)"],["s","Сети трещин, горные хребты и речные системы — фракталы"]],
     trad:["Бытие 2:7 — Адам сотворён из «адамы», земли","Каббала — Малхут, Царство: сфира, где свет становится материей","Йога — притхви-таттва, стихия земли, связана с Муладхарой","У-син — стихия Земля занимает центр и даёт устойчивость"],
@@ -10600,6 +10600,12 @@ function renderLevel(L){
     const k = h.indexOf('<p class="mono hd-scale">'), e = k < 0 ? -1 : h.indexOf("</p>", k);
     h = e < 0 ? h + sea : h.slice(0, e + 4) + sea + h.slice(e + 4);
   }
+  // v175: со слоя «Кора» — в «Пласты камня» Биосферы (колонна 20 эпох)
+  if (jKind === "e" && v && v.strata){
+    const st = `<section><h3>Летопись в камне</h3><div class="hd-fork"><button data-strata="1" data-hover><b>Пласты камня</b><span>20 слоёв осадочных пород — 4,5 млрд лет истории жизни: от раскалённого гадея до наших дней</span></button></div></section>`;
+    const k = h.indexOf('<p class="mono hd-scale">'), e = k < 0 ? -1 : h.indexOf("</p>", k);
+    h = e < 0 ? h + st : h.slice(0, e + 4) + st + h.slice(e + 4);
+  }
   // голос станции
   { const lk = lvVoiceKey(jId, L), vi = lk ? LV_VOICE[lk] : VOICE_INFO[jSt]; if (vi) h += `<section class="hd-snd"><h3>Что вы слышите${lk ? " · голос слоя" : ""}</h3><p class="hd-par">${mk(vi.m)} <b>${esc(vi.h)}.</b> ${esc(vi.tx)}${$("sound").getAttribute("aria-pressed") === "true" ? "" : " <span class=\"hd-snd-off\">Включите «Музыку», чтобы услышать.</span>"}</p></section>`; }
   { const lk = lvVoiceKey(jId, L); Music.voice(lk ? "lv:" + (lk === "bh" ? "bh:0" : lk) : "st:" + jSt, false); }
@@ -10653,6 +10659,7 @@ function renderLevel(L){
   hdBody.querySelectorAll("button[data-tree]").forEach(bt => bt.onclick = () => openTree());
   hdBody.querySelectorAll("button[data-biob]").forEach(bt => bt.onclick = () => { closeHuman(); openBio(); });
   hdBody.querySelectorAll("button[data-sbm]").forEach(bt => bt.onclick = () => RT.go({ t:"bio", bm:+bt.dataset.sbm }));
+  hdBody.querySelectorAll("button[data-strata]").forEach(bt => bt.onclick = () => RT.go({ t:"bio" }));
   if (typeof BSC !== "undefined"){
     hdBody.querySelectorAll("button[data-bsctree]").forEach(bt => bt.onclick = () => BSC.setTol(!BSC.tol));
     hdBody.querySelectorAll("button[data-bscgo]").forEach(bt => bt.onclick = () => bt.dataset.bscgo === "strata" ? BSC.goStrata() : BSC.goHuman());

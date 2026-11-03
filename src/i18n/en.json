@@ -7414,5 +7414,6 @@
 "Тёплое мелководье: кораллы, черепахи, манты, рыбы-клоуны": "Warm shallows: corals, turtles, mantas, clownfish",
 "Синяя толща: тунцы, акулы, киты, альбатросы": "The blue open water: tuna, sharks, whales, albatrosses",
 "Тьма и давление: удильщики, кальмары, рифтии у горячих источников": "Darkness and pressure: anglerfish, giant squid, tube worms at hot vents",
-"<section><h3>Морские биомы</h3><div class=\"hd-fork\">": "<section><h3>Marine biomes</h3><div class=\"hd-fork\">"
+"<section><h3>Морские биомы</h3><div class=\"hd-fork\">": "<section><h3>Marine biomes</h3><div class=\"hd-fork\">",
+"<section><h3>Летопись в камне</h3><div class=\"hd-fork\"><button data-strata=\"1\" data-hover><b>Пласты камня</b><span>20 слоёв осадочных пород — 4,5 млрд лет истории жизни: от раскалённого гадея до наших дней</span></button></div></section>": "<section><h3>A chronicle in stone</h3><div class=\"hd-fork\"><button data-strata=\"1\" data-hover><b>Layers of stone</b><span>20 layers of sedimentary rock: 4.5 billion years of the history of life, from the molten Hadean to the present day</span></button></div></section>"
 }

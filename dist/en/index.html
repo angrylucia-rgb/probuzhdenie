@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-HDPIa1rmgTtLmvNp6gOF/TuO1JyjRtkcFHqADIaayxk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-VhcRhU0mqtwZJvJeEDkReAH28fG52KOer+DHzM1KA7c='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -10246,7 +10246,7 @@ const ELV = [
     trad:["The Sumerians — the Abzu, the underground waters from which flows the wisdom of the god Enki","Genesis 7:11 — “all the fountains of the great deep were broken up”","Hinduism — the nagas, guardians of undersea treasures"],
     par:"The gut microbiome: life in the dark that feeds on chemistry, not light.",
     prac:["A depth meditation: with each out-breath sink lower beneath the waves, toward silence"] },
-  { short:"Crust", cat:"interior · stone", name:"The Earth’s crust", sub:"The bones of the planet", scale:"5–70 km",
+  { short:"Crust", cat:"interior · stone", name:"The Earth’s crust", sub:"The bones of the planet", scale:"5–70 km", strata:1,
     lead:"Through sediment and basalt we enter the stone. The crust is the planet’s thin shell, but a huge deep biosphere lives in its cracks, and the pattern of faults and veins repeats itself at every scale.",
     sci:[["s","Oceanic crust is 5–10 km thick, continental crust 30–50 km on average, up to 70 km under mountains"],["s","The Mohorovičić discontinuity was discovered in 1909 from seismic waves"],["s","The Kola Superdeep Borehole is 12,262 m deep; at the bottom it is about 180 °C"],["s","The most abundant elements in the crust are oxygen (≈46%) and silicon (≈28%)"],["s","The deep biosphere holds 15–23 billion tons of carbon, hundreds of times more than all humans (Deep Carbon Observatory, 2018)"],["s","Networks of cracks, mountain ranges and river systems are fractals"]],
     trad:["Genesis 2:7 — Adam is made from the “adamah”, the earth","Kabbalah — Malkuth, the Kingdom: the sefirah where light becomes matter","Yoga — prithvi tattva, the element of earth, is linked to Muladhara","Wu Xing — the element Earth holds the center and gives stability"],
@@ -10627,6 +10627,12 @@ function renderLevel(L){
     const k = h.indexOf('<p class="mono hd-scale">'), e = k < 0 ? -1 : h.indexOf("</p>", k);
     h = e < 0 ? h + sea : h.slice(0, e + 4) + sea + h.slice(e + 4);
   }
+  // v175: со слоя “Кора” — в “Пласты камня” Биосферы (колонна 20 эпох)
+  if (jKind === "e" && v && v.strata){
+    const st = `<section><h3>A chronicle in stone</h3><div class="hd-fork"><button data-strata="1" data-hover><b>Layers of stone</b><span>20 layers of sedimentary rock: 4.5 billion years of the history of life, from the molten Hadean to the present day</span></button></div></section>`;
+    const k = h.indexOf('<p class="mono hd-scale">'), e = k < 0 ? -1 : h.indexOf("</p>", k);
+    h = e < 0 ? h + st : h.slice(0, e + 4) + st + h.slice(e + 4);
+  }
   // голос станции
   { const lk = lvVoiceKey(jId, L), vi = lk ? LV_VOICE[lk] : VOICE_INFO[jSt]; if (vi) h += `<section class="hd-snd"><h3>What you hear${lk ? " · voice of the layer" : ""}</h3><p class="hd-par">${mk(vi.m)} <b>${esc(vi.h)}.</b> ${esc(vi.tx)}${$("sound").getAttribute("aria-pressed") === "true" ? "" : " <span class=\"hd-snd-off\">Turn on “Music” to hear it.</span>"}</p></section>`; }
   { const lk = lvVoiceKey(jId, L); Music.voice(lk ? "lv:" + (lk === "bh" ? "bh:0" : lk) : "st:" + jSt, false); }
@@ -10680,6 +10686,7 @@ function renderLevel(L){
   hdBody.querySelectorAll("button[data-tree]").forEach(bt => bt.onclick = () => openTree());
   hdBody.querySelectorAll("button[data-biob]").forEach(bt => bt.onclick = () => { closeHuman(); openBio(); });
   hdBody.querySelectorAll("button[data-sbm]").forEach(bt => bt.onclick = () => RT.go({ t:"bio", bm:+bt.dataset.sbm }));
+  hdBody.querySelectorAll("button[data-strata]").forEach(bt => bt.onclick = () => RT.go({ t:"bio" }));
   if (typeof BSC !== "undefined"){
     hdBody.querySelectorAll("button[data-bsctree]").forEach(bt => bt.onclick = () => BSC.setTol(!BSC.tol));
     hdBody.querySelectorAll("button[data-bscgo]").forEach(bt => bt.onclick = () => bt.dataset.bscgo === "strata" ? BSC.goStrata() : BSC.goHuman());
