@@ -419,5 +419,45 @@
  "titan": {
   "face": 1,
   "anim": "still"
+ },
+ "albat": {
+  "face": -1,
+  "anim": "fly"
+ },
+ "angle": {
+  "face": -1
+ },
+ "bshark": {
+  "face": -1
+ },
+ "clown": {
+  "face": -1
+ },
+ "dumbo": {
+  "face": 1
+ },
+ "gsquid": {
+  "face": -1
+ },
+ "jelly": {
+  "face": 1
+ },
+ "manta": {
+  "face": 1
+ },
+ "parro": {
+  "face": -1
+ },
+ "riftia": {
+  "face": 1
+ },
+ "tuna": {
+  "face": -1
+ },
+ "turtl": {
+  "face": -1
+ },
+ "sapieR": {
+  "face": -1
  }
 }
