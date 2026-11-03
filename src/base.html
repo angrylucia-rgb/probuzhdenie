@@ -11668,6 +11668,9 @@ const CHR = (() => {
   // прокрутка, при которой стрелка стоит на моменте t (обратная к timeOf)
   function sOf(t){ const k = ringOfT(t), R = RINGS[k], span = k < NR - 1 ? R.S - RINGS[k + 1].S : R.S, u = clamp((t - R.A)/span, 0, 1); return k + (k < NR - 1 ? u*ZF : u); }
   const lastEv = t => { let r = null; for (const e of EV) if (e.t <= t + 1e-9) r = e; return r; };
+  // выбранное кликом или стрелками событие остаётся в карточке, пока стрелка стоит на его моменте (у нескольких событий может быть одна дата)
+  let pinEv = null;
+  const evAt = t => { const e = lastEv(t); return pinEv && e && e.t === pinEv.t ? pinEv : e; };
   let hits = [], hovEv = null, ageY = 0;
   // ---- циклы традиций (7в): дуги на дорожках внутри колец; to < 0 — цикл продолжается в будущее ----
   const CYC = [
@@ -11725,7 +11728,7 @@ const CHR = (() => {
       c.fillStyle = `rgba(${INK},${.08 + .25*m*m})`; c.fillRect(x, y, 1 + m, 1 + m);
     }
     const z = zoomOf(s), t = timeOf(s), ka = Math.min(NR - 1, Math.floor(clamp(s, 0, SMAX)));
-    hits = []; const cur = lastEv(t); const LB = [];
+    hits = []; const cur = evAt(t); const LB = [];
     for (let k = 0; k < NR; k++){
       const r = ringR(k, z, Rm), rel = r/Rm;
       const al = smooth(.14, .34, rel)*(1 - smooth(1.22, 1.7, rel));
@@ -11881,13 +11884,14 @@ const CHR = (() => {
   function panel(){
     const t = timeOf(s), k = Math.min(NR - 1, Math.floor(clamp(s, 0, SMAX))), d = dateStr(t, k);
     const txt = d.day + d.tm + k;
+    // v168: карточка обновляется всегда — на дальних кольцах в одну «секунду» попадает несколько событий, и по одной строке часов её не отследить
+    card(evAt(t));
     if (txt === lastTxt) return; lastTxt = txt;
     $("tmDay").textContent = d.day; $("tmClock").textContent = d.tm;
     $("tmAgo").textContent = agoStr(t);
     $("tmRing").textContent = `Кольцо ${k + 1} из ${NR} · ${RINGS[k].name} · листайте`;
     $("tmUnit").textContent = RINGS[k].unit;
     $("tmBar").style.width = (clamp(s, 0, SMAX)/SMAX*100).toFixed(2) + "%";
-    card(lastEv(t));
   }
   // карточка события: последнее, которое прошла стрелка
   let cardEv = null;
@@ -11919,7 +11923,7 @@ const CHR = (() => {
     box.querySelectorAll("[data-nv]").forEach(b => b.onclick = () => goEv(idx + +b.dataset.nv));
   }
   // перейти к событию по номеру: стрелка встаёт на него (как учебник — листать событие за событием)
-  function goEv(i){ const e = EV[clamp(i, 0, EV.length - 1)]; if (!e) return; play = false; syncPlay(); setS(sOf(e.t) + 1e-7); }
+  function goEv(i){ const e = EV[clamp(i, 0, EV.length - 1)]; if (!e) return; pinEv = e; play = false; syncPlay(); setS(sOf(e.t) + 1e-7); }
   // режим чтения
   const mx = $("tmMax");
   mx.onclick = () => { const on = !chTime.classList.contains("tm-max"); chTime.classList.toggle("tm-max", on); mx.setAttribute("aria-pressed", String(on)); mx.textContent = on ? "⤡ Циферблат" : "⤢ Читать"; };
@@ -11927,7 +11931,7 @@ const CHR = (() => {
   const pick = (x, y) => { let best = null, bd = W2 < 760 ? 22 : 16; for (const [hx, hy, e] of hits){ const d = Math.hypot(hx - x, hy - y); if (d < bd){ bd = d; best = e; } } return best; };
   cv.addEventListener("pointermove", e => { const r = cv.getBoundingClientRect(); hovEv = pick(e.clientX - r.left, e.clientY - r.top); cv.style.cursor = hovEv ? "pointer" : ""; });
   cv.addEventListener("click", e => { const r = cv.getBoundingClientRect(), ev = pick(e.clientX - r.left, e.clientY - r.top); if (!ev) return;
-    play = false; syncPlay(); setS(sOf(ev.t) + 1e-6); if (typeof Music !== "undefined" && Music.hover) Music.hover(); });
+    pinEv = ev; play = false; syncPlay(); setS(sOf(ev.t) + 1e-6); if (typeof Music !== "undefined" && Music.hover) Music.hover(); });
   // переключатель слоя циклов и его пояснения в панели
   const cb = $("tmCycBtn"), cl = $("tmCyc");
   cl.innerHTML = `<h4>Циклы традиций</h4><p class="tm-pr">Циклическое время традиций, наложенное на линейную шкалу: сутки Брахмы — на кольце года, юги — на 31 декабря, Великий год, Длинный счёт майя и Кали-юга — на последней минуте и последних 10 секундах.</p><ul class="list">`
