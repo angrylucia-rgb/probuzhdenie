@@ -258,7 +258,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 #atlCv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #atlCv:active{cursor:grabbing}
 .ch-atl .time-in{display:flex;flex-direction:column}.ch-atl .time-in>.tm-scroll{flex:1 1 0;min-height:0}
-.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid var(--line);padding-top:10px}
+.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid var(--line);padding-top:10px;max-height:min(260px,32vh);overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent;padding-right:4px}
 .at-c{display:grid;gap:1px;text-align:left;padding:5px 8px;border:1px solid var(--line);border-radius:10px;transition:border-color .3s,background .3s}
 .at-c span{font-size:9px;letter-spacing:.14em;color:var(--faint)}.at-c b{font:400 12.5px/1.12 var(--display);color:var(--ink)}
 .at-hit{animation:atHit .5s}@keyframes atHit{0%{transform:scale(.94)}100%{transform:none}}

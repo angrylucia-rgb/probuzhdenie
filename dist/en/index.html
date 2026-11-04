@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-etQvDVRKikzxhnLl2ZiFZU2F6mD+pefpGDTGRQqsSoc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-vPBuL5GPUtN0vibCPQ5WYGk7iXW21xxfwwGobp6FkAw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -1196,7 +1196,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 #atlCv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #atlCv:active{cursor:grabbing}
 .ch-atl .time-in{display:flex;flex-direction:column}.ch-atl .time-in>.tm-scroll{flex:1 1 0;min-height:0}
-.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid var(--line);padding-top:10px}
+.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid var(--line);padding-top:10px;max-height:min(260px,32vh);overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent;padding-right:4px}
 .at-c{display:grid;gap:1px;text-align:left;padding:5px 8px;border:1px solid var(--line);border-radius:10px;transition:border-color .3s,background .3s}
 .at-c span{font-size:9px;letter-spacing:.14em;color:var(--faint)}.at-c b{font:400 12.5px/1.12 var(--display);color:var(--ink)}
 .at-hit{animation:atHit .5s}@keyframes atHit{0%{transform:scale(.94)}100%{transform:none}}
@@ -16215,7 +16215,108 @@ const ATL_OBJ = [
     tr:"\"In the beginning was the Word\"; in the Indian tradition the world is born from sound — from the syllable Om, the first vibration. The cosmic microwave background is almost literally the first echo of the world, still sounding from every direction.",
     hum:"● We are always bathing in the first light: in every cubic centimetre around you there are about 400 of its photons.",
     pr:"Listening to the first sound. Turn on the sound, close your eyes and listen to the hum falling. Let your out-breath go with the sound — long, even, right to the end.",
-    toy:{ kind:"cmb", lab:"Contrast ×100,000", lab2:"♪ Sound of the early Universe", hint:"Without enhancement the sky is even: 2.725 K in every direction ●. Raise the contrast a hundred thousand times — and the seeds of future galaxies appear" } }
+    toy:{ kind:"two", snd:"cmb", lab:"Contrast ×100,000", lab2:"♪ Sound of the early Universe", hint:"Without enhancement the sky is even: 2.725 K in every direction ●. Raise the contrast a hundred thousand times — and the seeds of future galaxies appear" } },
+  // ---------- v191: вторая очередь атласа ----------
+  { id:"w76", fly:null, nm:"WASP-76 b", sub:"The planet where it rains iron", ly:634, size:"1.8 times wider than Jupiter ◐",
+    sci:[
+      "● A hot gas giant: a year there lasts 1.8 Earth days — the planet almost grazes its star.",
+      "● It always keeps one face to its star, as the Moon does to the Earth. The day side is about 2,400 °C: even iron evaporates there.",
+      "◐ The wind carries iron vapour to the night side; it is cooler there, the iron condenses and, apparently, falls as droplets. That is how the spectra of the ESPRESSO spectrograph were read in 2020.",
+      "● One example of how starlight passing through the atmosphere of an alien planet reveals what it is made of."
+    ],
+    tr:"In myth, heavenly smiths — Hephaestus among the Greeks, Tvashtar in the Rigveda, Ilmarinen in the Kalevala — forge the sky and wondrous things out of metal. On WASP-76 b metal really does fall from the sky: such is a world where day is eternal and night never ends.",
+    hum:"One side always on fire, the other in darkness, and an eternal wind between them. Inner balance is also born on the border of day and night — where heat cools and turns into drops.",
+    pr:"The border of light. Sit so that the light from a window falls on one half of your face. For a minute feel the difference in warmth — and the line where one passes into the other.",
+    toy:{ kind:"toggle", lab:"Show the night side", alt:"Show the day side", hint:"On the night side ◐ the iron vapour cools and falls as rain" } },
+  { id:"hd189", fly:null, nm:"HD 189733 b", sub:"A blue world with sideways glass rain", ly:64.5, size:"a little larger than Jupiter ●",
+    sci:[
+      "● In 2013 Hubble measured its colour: a deep azure blue, like the Earth from space. But it is not an ocean — it is a scorching atmosphere of about 1,000 °C.",
+      "● The winds blow at about 8,700 km/h — seven times the speed of sound on Earth.",
+      "◐ The atmosphere apparently contains silicate particles — that is, glass. In such a wind the glass \"rain\" flies not down but sideways.",
+      "● In 2024 the James Webb telescope found hydrogen sulphide there: the planet would smell of rotten eggs."
+    ],
+    tr:"In many traditions blue is the colour of the sky and of peace. Here it deceives: behind the calm blue lies one of the most violent weathers known.",
+    hum:"What is beautiful from afar is not always what it seems. The blue of HD 189733 b is a reminder to look deeper than the first impression.",
+    pr:"Looking twice. Choose an object nearby and describe it to yourself in two words. Then look again — for a minute — and find three things you did not notice at first.",
+    toy:{ kind:"toggle", lab:"Show the glass rain", alt:"Hide the rain", hint:"A wind of about 8,700 km/h ● carries drops of glass along the equator ◐" } },
+  { id:"trap", fly:null, nm:"TRAPPIST-1", sub:"Seven Earth-sized planets around a small red star", ly:40.7, size:"the whole system is smaller than Mercury's orbit ●",
+    sci:[
+      "● In 2017 it was announced: the red dwarf TRAPPIST-1 has seven planets of roughly Earth size — more than any other known star.",
+      "● All seven orbit closer to their star than Mercury does to the Sun: a year on the nearest lasts a day and a half, on the farthest 19 days.",
+      "● Their periods are linked by resonances — simple ratios such as 8 : 5, 5 : 3, 3 : 2. Turn the orbits into sounds and you get a rhythm.",
+      "◐ Three or four planets are in the zone where liquid water is possible. The James Webb telescope is checking whether they have atmospheres; the two innermost seem to have no thick atmosphere."
+    ],
+    tr:"The Pythagoreans believed in the \"music of the spheres\" — that the planets sound according to numbers. At TRAPPIST-1 this ancient thought is almost literal: the orbits are arranged in simple ratios, like the notes of a chord.",
+    hum:"Seven worlds hold each other in a common rhythm — none falls out of step, because all hear all. That is how a good choir sounds, and a good family.",
+    pr:"The rhythm of seven. Turn on the music of resonances and listen to one planet — the lowest note. Then add, with your attention, a second and a third. Notice how a pattern forms from the separate beats.",
+    toy:{ kind:"two", snd:"trap", lab:"Compare with Mercury", alt:"Remove Mercury", lab2:"♪ Music of resonances", hint:"Each planet chimes as it passes in front of the star. The period ratios are real ●; time is sped up" } },
+  { id:"mag", fly:null, nm:"Magnetar", sub:"A neutron star with the strongest magnetic field in the Universe", ly:4.2e4, size:"about 20 km ●",
+    sci:[
+      "● A neutron star: more than the Sun's mass squeezed into a ball the size of a city. A teaspoon of its matter would weigh about two billion tonnes.",
+      "● Magnetars have magnetic fields a thousand trillion times stronger than the Earth's. ◐ A magnetar halfway to the Moon would wipe the data from every bank card on Earth, and up close it deforms atoms themselves.",
+      "● On 27 December 2004 the magnetar SGR 1806-20, on the far side of the Galaxy ◐, flared so strongly that its light shook the Earth's upper atmosphere.",
+      "◐ In tenths of a second that flare released more energy than the Sun radiates in hundreds of thousands of years. The cause was a \"starquake\": the star's crust cracked."
+    ],
+    tr:"In antiquity the magnet seemed alive: Thales said the lodestone has a soul, since it moves iron. A magnetar is a magnet so powerful that it reshapes matter itself around it.",
+    hum:"Enormous pressure has made the star incredibly dense — and incredibly tense. Tension that finds no outlet one day bursts out as a flare. Better to let go little by little.",
+    pr:"Letting go of tension. Clench your fists and shoulders as you breathe in, hold for a count of three — and let go all at once as you breathe out. Three times. Feel the \"field lines\" in your body straighten.",
+    toy:{ kind:"toggle", lab:"Flare", alt:"Calm it", hint:"◐ A starquake: the crust cracks, the field lines snap together — a flash of gamma rays" } },
+  { id:"ome", fly:null, nm:"Omega Centauri", sub:"A globular cluster of ten million stars", ly:17000, size:"about 150 light-years ●",
+    sci:[
+      "● The largest globular cluster of the Milky Way: about 10 million stars in a ball about 150 light-years across. Visible to the eye as a hazy \"star\".",
+      "● Its stars are old — about 12 billion years — and include several generations. ◐ Most likely it is the core of a dwarf galaxy that the Milky Way once swallowed.",
+      "● In 2024 the motions of stars at its centre revealed an intermediate-mass black hole — at least 8,200 solar masses.",
+      "◐ At the centre the stars are hundreds of times more crowded than around the Sun. The night sky of a planet there would shine with thousands of stars brighter than Sirius."
+    ],
+    tr:"Ptolemy catalogued it as a single star of the constellation Centaurus — hence the letter-name \"Omega\". Only in 1677 did Edmond Halley see that it is a nebula, and later it was found to be a swarm of stars ●.",
+    hum:"Millions of stars born together have held on to one another for twelve billion years. A shared history is a strong attraction.",
+    pr:"A sky full of light. Imagine a night without darkness: thousands of bright stars, as light as twilight. Breathe for a minute, imagining that this light is in you too.",
+    toy:{ kind:"toggle", lab:"The sky from a planet inside", alt:"The cluster from outside", hint:"◐ Night inside the cluster: thousands of stars brighter than Sirius — it is never dark" } },
+  { id:"void", fly:null, nm:"The Boötes Void", sub:"An almost empty sphere hundreds of millions of light-years across", ly:7e8, size:"≈330 million light-years ◐",
+    sci:[
+      "● Discovered in 1981. The Universe is built like a sponge — the \"cosmic web\": galaxies gather into filaments and walls, with huge voids between them.",
+      "◐ The Boötes Void is one of the largest: about 330 million light-years across, hundreds of times wider than the Milky Way.",
+      "◐ About 60 galaxies have been found inside — where at normal density there would be thousands.",
+      "◐ If the Milky Way were at its centre, other galaxies would be visible only in large telescopes: humanity would have learned of them decades later."
+    ],
+    tr:"The Tao Te Ching speaks of the vessel and the wheel: what makes them useful is the emptiness within. The cosmic web needs its voids just as it needs its knots: without them there would be no filaments.",
+    hum:"Emptiness is not absence but space. In a schedule, in a room, in the mind, empty places give the rest its shape.",
+    pr:"A pause. Breathe in, breathe out — and after the out-breath, do not hurry with the next in-breath. Stay a few seconds in that emptiness. Repeat five times.",
+    toy:{ kind:"toggle", lab:"How many galaxies there should be", alt:"How many there are", hint:"About 60 galaxies inside — against thousands at normal density ◐" } },
+  { id:"gw", fly:null, nm:"GW150914 — the first gravitational waves", sub:"The merger of two black holes that the Earth heard", ly:1.3e9, size:"horizon of the final black hole ≈370 km across ◐",
+    sci:[
+      "● On 14 September 2015 the LIGO detectors first caught a ripple of space itself — gravitational waves, predicted by Einstein a hundred years earlier. Nobel Prize — 2017.",
+      "● Two black holes of 36 and 29 solar masses merged into one of 62 — three solar masses turned into the energy of waves in a fraction of a second.",
+      "● The signal is a \"chirp\": in 0.2 seconds the frequency rose from 35 to 250 Hz — within the range of hearing.",
+      "● The detector's four-kilometre arms changed by a thousandth of the size of a proton."
+    ],
+    tr:"\"Nada Brahma\": in Indian thought the world is sound. Gravitational waves are the first sound the Universe has sent us not as light but as a shaking of space itself.",
+    hum:"An event at the edge of the world reached us as a tremor a thousandth of a proton wide — and it was noticed all the same. Fine attention hears what is very far away.",
+    pr:"Hearing the subtle. Close your eyes and find the quietest sound around you. Then a quieter one. For a minute, search for the quietest thing you can make out.",
+    toy:{ kind:"two", snd:"gw", lab:"Spacetime grid", alt:"Hide the grid", lab2:"♪ The chirp", hint:"The merger repeats. The sound is the real \"chirp\" ●, raised two octaves so that it can be heard ◐" } },
+  { id:"vis", fly:null, nm:"Interstellar visitors", sub:"ʻOumuamua, Borisov and 3I/ATLAS — newcomers from other star systems", ly:0, size:"from hundreds of metres to a few kilometres ◐",
+    tiles:[["first", "1I/ʻOumuamua — 2017 ●"], ["second", "2I/Borisov — 2019 ●"], ["third", "3I/ATLAS — 2025 ●"], ["speed", "up to ≈58 km/s far from the Sun ●"]],
+    sci:[
+      "● In 2017 a telescope in Hawaii spotted the first object from another star system — ʻOumuamua (\"a messenger from afar\"). It swept past the Sun on an open orbit and left for ever.",
+      "● ʻOumuamua was elongated or flat and had no tail, yet it accelerated more than the Sun's gravity alone would explain ◐ — why is still debated.",
+      "● In 2019 Gennady Borisov, an amateur astronomer from Crimea, discovered the second visitor — a real comet with a tail.",
+      "● On 1 July 2025 the third was found — 3I/ATLAS, the fastest: about 58 km/s. ◐ It may be older than the Solar System."
+    ],
+    tr:"Among many peoples a guest is sacred: hospitality was seen as a meeting with the unknown. Interstellar visitors ask for nothing and do not linger — but they bring the matter of alien suns.",
+    hum:"A guest comes in for a short while and leaves for ever. Meetings that will not be repeated are worth noticing while they are near.",
+    pr:"Meeting a guest. Remember someone you met once and never saw again. What did they leave you? Thank them in your mind.",
+    toy:{ kind:"toggle", lab:"View from the side", alt:"View from above", hint:"The visitors fly on open orbits — at various angles to the planets ●; 3I/ATLAS almost in their plane, but head-on" } },
+  { id:"gold", fly:"voy", nm:"The Voyager Golden Record", sub:"What we told the Universe about ourselves", ly:2.74e-3, size:"a 30 cm disc ●", flat:true,
+    sci:[
+      "● In 1977 gold-plated copper records were mounted on the Voyagers: 115 images, greetings in 55 languages, sounds of the Earth and 90 minutes of music from many peoples. The selection was led by Carl Sagan.",
+      "● On the cover are instructions for playing the record and a map: the Sun's position given by 14 pulsars. The unit of time is a transition in the hydrogen atom.",
+      "● On 18 November 2026 Voyager 1 will be one light-day from the Earth. In space the record may last about a billion years ◐.",
+      "◐ Whether anyone will ever find it is unknown. But it has already done the main thing: it made people think about what to say about themselves to the whole world."
+    ],
+    tr:"Messages to the future have always been left — inscriptions in stone, hoards, \"time capsules\". The Golden Record is the most distant of them: a message with no addressee, only hope.",
+    hum:"If you were given one record to tell about yourself to those who have never seen you — what would you put on it?",
+    pr:"Your own message. Choose three sounds, three images and one phrase that would say the essential about you. Write them down — for example, in the journal of the \"Human\" station.",
+    toy:{ kind:"toggle", lab:"Pulsar map", alt:"Record", hint:"A diagram of the cover: the Sun at the centre, lines to 14 pulsars, their lengths showing distance ●" } }
 ];
 ATL_OBJ.forEach(o => { o.km = o.ly*FLY_LY; });
 
@@ -16244,6 +16345,14 @@ const ATL = (() => {
   const A = (o, a) => { o.material.uniforms ? o.material.uniforms.uA.value = a : o.material.opacity = a; };
   const sm = (a, b, x) => { const t = clamp((x - a)/(b - a), 0, 1); return t*t*(3 - 2*t); };
 
+  // экзопланета: шар со своим цветом (GLSL задаёт c по ns — точке поверхности, mu — освещённости); L — направление на звезду
+  function planet(col, L){
+    const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: 0 }, uL: { value: L.clone().normalize() } },
+      vertexShader: `varying vec3 vO; varying vec3 vNv; void main(){ vO = normalize(position); vNv = normalize(normalMatrix*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }`,
+      fragmentShader: `uniform float uT; uniform vec3 uL; varying vec3 vO; varying vec3 vNv; ${S_DECL}
+        void main(){ vec3 ns = normalize(vO); float mu = dot(ns, uL); vec3 c = vec3(0.0); ${col} gl_FragColor = vec4(c, 1.0); }` });
+    return new THREE.Mesh(new THREE.SphereGeometry(1, 96, 48), m);
+  }
   /* ---------- сцены: build() → { g, upd(t, dt, v, b) } ---------- */
   const SCENE = {
     // квазар: тусклая эллиптическая галактика-хозяйка, раскалённый диск, односторонний джет с узлами
@@ -16488,6 +16597,182 @@ const ATL = (() => {
       let k = 0;
       return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.4); mat.uniforms.uK.value = k; sph.rotation.y = t*.04; A(halo, .18*(1 - k)); } };
     }
+    ,
+    // WASP-76 b: дневная сторона раскалена, ночная тлеет; на ночной — капли железа падают в атмосферу
+    w76(){
+      const g = new THREE.Group(), pl = planet(`float d = smoothstep(-0.25, 0.35, mu);
+          float cl = fbm(ns*3.0 + vec3(uT*0.05, 0.0, 0.0)), st = fbm(ns*vec3(4.0, 14.0, 4.0) + vec3(uT*0.08, 0.0, 0.0));
+          vec3 day = mix(vec3(1.0, 0.62, 0.28), vec3(1.0, 0.92, 0.75), cl)*(0.8 + 0.3*st);
+          vec3 night = mix(vec3(0.16, 0.03, 0.02), vec3(0.42, 0.10, 0.04), st)*(0.6 + 0.6*cl);
+          c = mix(night, day, d); c += vec3(1.0, 0.5, 0.2)*0.35*exp(-pow(mu*7.0, 2.0));`, new THREE.Vector3(-1, .15, .35));
+      pl.scale.setScalar(3); g.add(pl);
+      const star = glow(0xfff0c8, 22, .9); star.position.set(-26, 2, -6); g.add(star);
+      const N = Math.round(2600*Q), rain = cloud(2600, (i, o) => o.splice(0, 7, 0, 0, 0, .75, .78, .85, 1.1 + Math.random()), 0, true); g.add(rain);
+      const P = rain.userData.P, D = new Float32Array(N*4);
+      for (let i = 0; i < N; i++){ const v = dir(); if (v[0] < 0) v[0] = -v[0]; D.set([v[0], v[1], v[2], Math.random()], i*4); }   // ночная сторона — +x (звезда слева)
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.5);
+        pl.material.uniforms.uT.value = t; g.rotation.y = -1.9*sm(0, 1, k);
+        for (let i = 0; i < N; i++){ const f = (D[i*4 + 3] + t*.18) % 1, r = 3*(1.22 - .22*f); P[i*3] = D[i*4]*r; P[i*3 + 1] = D[i*4 + 1]*r; P[i*3 + 2] = D[i*4 + 2]*r; }
+        rain.geometry.attributes.position.needsUpdate = true; A(rain, .25 + .75*k); } };
+    },
+    // HD 189733 b: синие полосы атмосферы, быстрый ветер; стеклянный дождь вдоль широт
+    hd189(){
+      const g = new THREE.Group(), pl = planet(`float lon = atan(ns.x, ns.z) + uT*0.25;
+          vec3 q = vec3(cos(lon), ns.y, sin(lon));
+          float b1 = fbm(q*vec3(3.0, 16.0, 3.0)), b2 = fbm(q*vec3(7.0, 30.0, 7.0) + vec3(4.0));
+          c = mix(vec3(0.05, 0.16, 0.55), vec3(0.25, 0.55, 1.0), b1*0.8 + b2*0.3);
+          c *= 0.35 + 0.95*smoothstep(-0.2, 0.6, mu); c += vec3(0.3, 0.6, 1.0)*pow(1.0 - abs(dot(normalize(vNv), vec3(0.0, 0.0, 1.0))), 3.0)*0.5;`, new THREE.Vector3(-.8, .2, .6));
+      pl.scale.setScalar(3); g.add(pl);
+      const star = glow(0xffd6a0, 16, .8); star.position.set(-22, 3, -4); g.add(star);
+      const N = Math.round(3000*Q), glass = cloud(3000, (i, o) => o.splice(0, 7, 0, 0, 0, .8, .92, 1, .8 + Math.random()*.9), 0, true); g.add(glass);
+      const P = glass.userData.P, D = new Float32Array(N*3);
+      for (let i = 0; i < N; i++){ D[i*3] = Math.asin(Math.random()*2 - 1)*.8; D[i*3 + 1] = Math.random()*TAU; D[i*3 + 2] = 3.05 + Math.random()*.25; }
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.5); pl.material.uniforms.uT.value = t;
+        for (let i = 0; i < N; i++){ const la = D[i*3], lo = D[i*3 + 1] + t*(1.2 + .4*Math.cos(la*3)), r = D[i*3 + 2];
+          P[i*3] = Math.cos(la)*Math.sin(lo)*r; P[i*3 + 1] = Math.sin(la)*r; P[i*3 + 2] = Math.cos(la)*Math.cos(lo)*r; }
+        glass.geometry.attributes.position.needsUpdate = true; A(glass, .9*k); } };
+    },
+    // TRAPPIST-1: красный карлик и семь планет с настоящими периодами; звон при прохождении перед звездой
+    trap(){
+      const g = new THREE.Group();
+      const st = glow(0xff6a3a, 1.6, 1), sh = glow(0xff4020, 4, .4); g.add(st, sh);
+      const PL = [[.01154, 1.511, .35, 880], [.01580, 2.422, .34, 784], [.02227, 4.050, .24, 659], [.02925, 6.100, .28, 587], [.03849, 9.207, .32, 523], [.04683, 12.35, .34, 440], [.06189, 18.77, .26, 392]];
+      const K = 4.8/.06189, orbs = [], pls = [];
+      PL.forEach(([a, P, r]) => { const pts = []; for (let k = 0; k <= 128; k++){ const t = k/128*TAU; pts.push(new THREE.Vector3(Math.cos(t)*a*K, 0, Math.sin(t)*a*K)); }
+        const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xc0907a, transparent: true, opacity: .6 })); g.add(l);
+        const s = glow(0xffd0b8, r*2.4, 1); g.add(s); pls.push(s); });
+      const mpts = []; for (let k = 0; k <= 160; k++){ const t = k/160*TAU; mpts.push(new THREE.Vector3(Math.cos(t)*.387*K, 0, Math.sin(t)*.387*K)); }
+      const merc = new THREE.Line(new THREE.BufferGeometry().setFromPoints(mpts), new THREE.LineBasicMaterial({ color: 0x9fd0ff, transparent: true, opacity: 0 })); g.add(merc);
+      const ph = PL.map(() => Math.random()), last = PL.map(() => 0);
+      let k = 0, scale = 1;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.5); scale = 1 - .87*sm(0, 1, k); g.scale.setScalar(scale); merc.material.opacity = .8*k;
+        const days = t*1.6;   // 1,6 суток в секунду
+        PL.forEach(([a, P, r, f], j) => { const q = (days/P + ph[j]) % 1, ang = q*TAU; pls[j].position.set(Math.cos(ang)*a*K, 0, Math.sin(ang)*a*K);
+          pls[j].scale.setScalar(r*2.4/Math.max(scale, .35));
+          // перед звездой (к наблюдателю, +z) — звон
+          const cross = q >= .25 && last[j] < .25 && last[j] > .2; if (cross && audio && audio.blip) audio.blip(f); last[j] = q; });
+        st.scale.setScalar(1.6/Math.max(scale, .3)); sh.scale.setScalar(4/Math.max(scale, .3)); } };
+    },
+    // магнетар: маленькая яркая звезда, дипольные силовые линии, бегущие по ним частицы; вспышка — линии рвутся, гамма-свет
+    mag(){
+      const g = new THREE.Group();
+      const core = glow(0xeaf2ff, 1.2, 1), cg = glow(0x9fc4ff, 4, .5), fl = glow(0xd8e8ff, 40, 0); g.add(core, cg, fl);
+      const L = [];   // силовые линии r = L sin²θ
+      for (let k = 0; k < 18; k++){ const Lk = 2 + (k % 6)*1.3, ph = k/18*TAU; L.push([Lk, ph]); }
+      const lines = new THREE.Group(); g.add(lines);
+      L.forEach(([Lk, ph]) => { const pts = []; for (let i = 0; i <= 80; i++){ const th = .18 + (Math.PI - .36)*i/80, r = Lk*Math.sin(th)**2; pts.push(new THREE.Vector3(r*Math.sin(th)*Math.cos(ph), r*Math.cos(th), r*Math.sin(th)*Math.sin(ph))); }
+        lines.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x7fa8ff, transparent: true, opacity: .5, blending: THREE.AdditiveBlending }))); });
+      const N = Math.round(2400*Q), flow = cloud(2400, (i, o) => o.splice(0, 7, 0, 0, 0, .7, .85, 1, 1 + Math.random()*1.2), 0, true); g.add(flow);
+      const P = flow.userData.P, D = new Float32Array(N*2); for (let i = 0; i < N; i++){ D[i*2] = Math.floor(Math.random()*L.length); D[i*2 + 1] = Math.random(); }
+      let k = 0, f = 0, was = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*2);
+        if (b && !was) f = 1; was = b; f = Math.max(0, f - dt*.55);
+        lines.rotation.y = flow.rotation.y = t*.3;
+        for (let i = 0; i < N; i++){ const [Lk, ph] = L[D[i*2]], s = (D[i*2 + 1] + t*.12*(1 + 2*k)) % 1, th = .18 + (Math.PI - .36)*s, r = Lk*Math.sin(th)**2*(1 + .35*k*Math.sin(t*3 + D[i*2]));
+          P[i*3] = r*Math.sin(th)*Math.cos(ph); P[i*3 + 1] = r*Math.cos(th); P[i*3 + 2] = r*Math.sin(th)*Math.sin(ph); }
+        flow.geometry.attributes.position.needsUpdate = true;
+        lines.children.forEach((l, j) => { l.material.opacity = .5*(1 - .7*k) + .5*f; l.scale.setScalar(1 + .25*k*Math.sin(t*2.3 + j)); });
+        A(fl, .9*f); fl.scale.setScalar(10 + 60*(1 - f)); A(cg, .5 + .5*k); A(flow, .6 + .4*k); } };
+    },
+    // Омега Центавра: скопление по профилю Кинга; “изнутри” — небо, полное ярких звёзд, над тёмным горизонтом
+    ome(){
+      const g = new THREE.Group(), out = new THREE.Group(); g.add(out);
+      const cl = cloud(30000, (i, o) => { const v = dir(), r = 4.5*Math.pow(Math.random(), 2.2)/(1 + .5*Math.random()), w = Math.random();
+        o.splice(0, 7, v[0]*r, v[1]*r*.9, v[2]*r, 1, .85 + .1*w, .65 + .25*w, .6 + Math.pow(Math.random(), 4)*2.2); }); out.add(cl);
+      const cg = glow(0xffe8c0, 7, .5); out.add(cg);
+      const inn = new THREE.Group(); g.add(inn);
+      const skyIn = cloud(5000, (i, o) => { const x = (Math.random() - .5)*28, y = -3 + Math.pow(Math.random(), .7)*12, w = Math.random();
+        o.splice(0, 7, x, y, -1, 1, .88 + .1*w, .7 + .25*w, 1.2 + Math.pow(Math.random(), 3)*5); }); inn.add(skyIn);
+      const bright = []; for (let i = 0; i < 40; i++){ const s = glow(i % 3 ? 0xfff0d8 : 0xffd0a0, .5 + Math.random()*.9, 1); s.position.set((Math.random() - .5)*26, -2 + Math.random()*10, -.5); inn.add(s); bright.push(s); }
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 12), new THREE.MeshBasicMaterial({ color: 0x040305, transparent: true, opacity: 0, depthWrite: false })); ground.position.set(0, -9.2, 0); ground.renderOrder = 5; inn.add(ground);
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.2);
+        const a = 1 - sm(0, .5, k), c = sm(.4, 1, k); A(cl, a); A(cg, .5*a); A(skyIn, c); bright.forEach(s => A(s, c*(.85 + .15*Math.sin(t*2 + s.position.x)))); ground.material.opacity = c; } };
+    },
+    // пустота Волопаса: космическая паутина из нитей, в центре — почти пустой шар; кнопка — сколько галактик было бы при обычной плотности
+    void(){
+      const g = new THREE.Group(), RV = 3.2, nodes = [];
+      for (let i = 0; i < 60; i++){ let p; do { p = [(Math.random() - .5)*16, (Math.random() - .5)*11, (Math.random() - .5)*10]; } while (Math.hypot(...p) < RV + .8); nodes.push(p); }
+      const segs = []; nodes.forEach((a, i) => nodes.forEach((b, j) => { if (j <= i) return; const d = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); if (d > 4.6) return;
+        // нить не должна проходить сквозь пустоту
+        for (let s = 0; s <= 10; s++){ const q = s/10, x = a[0] + (b[0] - a[0])*q, y = a[1] + (b[1] - a[1])*q, z = a[2] + (b[2] - a[2])*q; if (Math.hypot(x, y, z) < RV) return; } segs.push([a, b]); }));
+      const web = cloud(24000, (i, o) => { const [a, b] = segs[i % segs.length], q = Math.random(), w = .12; const w2 = Math.random();
+        o.splice(0, 7, a[0] + (b[0] - a[0])*q + gs()*w, a[1] + (b[1] - a[1])*q + gs()*w, a[2] + (b[2] - a[2])*q + gs()*w, .75 + .25*w2, .7 + .2*w2, 1, .6 + Math.random()*1.1); });
+      g.add(web);
+      const knots = nodes.map(p => { const s = glow(0xd8e4ff, .9, .6); s.position.fromArray(p); g.add(s); return s; });
+      const few = cloud(60, (i, o) => { const v = dir(), r = Math.cbrt(Math.random())*RV*.9; o.splice(0, 7, v[0]*r, v[1]*r, v[2]*r, 1, .92, .8, 2.6); }); g.add(few);
+      const many = cloud(2400, (i, o) => { const v = dir(), r = Math.cbrt(Math.random())*RV; o.splice(0, 7, v[0]*r, v[1]*r, v[2]*r, .55, .9, 1, 1.2); }); g.add(many);
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.5); A(many, .8*k); A(few, 1); A(web, .85); } };
+    },
+    // GW150914: две чёрные дыры сближаются по спирали (частота растёт), сливаются; сетка пространства бежит волнами
+    gw(){
+      const g = new THREE.Group();
+      const mk = r => { const m = new THREE.Group(), d = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 16), new THREE.MeshBasicMaterial({ color: 0x000000 })), h = glow(0xffb070, r*3.2, .7); m.add(h, d); return m; };
+      const b1 = mk(.55), b2 = mk(.48), bf = mk(.8); g.add(b1, b2, bf);
+      const grid = new THREE.Mesh(new THREE.PlaneGeometry(26, 26, 120, 120), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { uPh: { value: 0 }, uAmp: { value: 0 }, uR: { value: 0 }, uA: { value: 1 } },
+        vertexShader: `uniform float uPh; uniform float uAmp; uniform float uR; varying vec2 vU; varying float vH;
+          void main(){ vec3 p = position; float r = length(p.xy), a = atan(p.y, p.x);
+            float w = uAmp*sin(2.0*a - 2.4*r + uPh)*exp(-0.08*r)*smoothstep(uR + 0.5, uR - 1.5, r)*smoothstep(0.6, 2.0, r);
+            p.z += w - 1.6*exp(-r*r*0.25)*0.6; vU = p.xy; vH = w; gl_Position = projectionMatrix*modelViewMatrix*vec4(p, 1.0); }`,
+        fragmentShader: `uniform float uA; varying vec2 vU; varying float vH; void main(){ vec2 f = abs(fract(vU*0.8) - 0.5); float l = smoothstep(0.47, 0.5, max(f.x, f.y));
+          gl_FragColor = vec4(vec3(0.35, 0.55, 1.0)*(l*0.5 + abs(vH)*0.6)*uA, 1.0); }` }));
+      grid.rotation.x = -Math.PI/2; grid.position.y = -.2; g.add(grid);
+      let ph = 0, T = 0, chirped = false, gridOn = 1;
+      return { g, upd(t, dt, v, b){ gridOn += ((b ? 0 : 1) - gridOn)*Math.min(1, dt*2); grid.material.uniforms.uA.value = gridOn*.9;
+        T = (T + dt) % 8;   // 5 с — сближение, 1,5 — затухание, пауза
+        const tau = Math.min(1, T/5), d = 3.2*Math.pow(Math.max(1e-3, 1 - tau), .25), om = 1.2*Math.pow(3.2/Math.max(d, .5), 1.5);
+        ph += om*dt;
+        const merged = T >= 5; b1.visible = b2.visible = !merged; bf.visible = merged;
+        b1.position.set(Math.cos(ph)*d*.45, 0, Math.sin(ph)*d*.45); b2.position.set(-Math.cos(ph)*d*.55, 0, -Math.sin(ph)*d*.55);
+        bf.scale.setScalar(merged ? 1 + .08*Math.exp(-(T - 5)*3)*Math.sin((T - 5)*40) : 1);
+        const amp = merged ? .9*Math.exp(-(T - 5)*2.5) : .25 + .65*tau*tau;
+        grid.material.uniforms.uPh.value = 2*ph; grid.material.uniforms.uAmp.value = amp; grid.material.uniforms.uR.value = Math.min(14, T*3);
+        if (T > 4.8 && !chirped){ chirped = true; if (audio && audio.chirp) audio.chirp(); } if (T < 1) chirped = false; } };
+    },
+    // межзвёздные гости: Солнце, орбиты планет до Юпитера и три незамкнутые орбиты; вид сверху или сбоку
+    vis(){
+      const g = new THREE.Group(), K = 1.6;   // единиц на а. е.
+      const sun = glow(0xffe6a8, 1.2, 1); g.add(sun);
+      [[.387, 0x9a9a9a], [.723, 0xe6c89a], [1, 0x7fb4ff], [1.524, 0xd86a40], [5.2, 0xd8b890]].forEach(([a, c]) => {
+        const pts = []; for (let k = 0; k <= 128; k++){ const t = k/128*TAU; pts.push(new THREE.Vector3(Math.cos(t)*a*K, 0, Math.sin(t)*a*K)); }
+        g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: .55 }))); });
+      // e, q (а. е.), наклон (°), долгота узла (°), цвет — по опубликованным элементам ● (округлённо)
+      const OB = [[1.20, .256, 122.7, 24.6, 0xffc08a], [3.36, 2.01, 44.1, 308.2, 0x9fe6ff], [6.14, 1.36, 175.1, 322.2, 0xb8ff9a]];
+      const objs = OB.map(([e, q, inc, Om, c]) => {
+        const a = q/(e - 1), pts = [], nu0 = Math.acos(-1/e)*.985, M = new THREE.Matrix4().makeRotationY(Om*Math.PI/180).multiply(new THREE.Matrix4().makeRotationX(inc*Math.PI/180));
+        for (let k = 0; k <= 200; k++){ const nu = -nu0 + 2*nu0*k/200, r = a*(e*e - 1)/(1 + e*Math.cos(nu)); if (r > 9) continue; pts.push(new THREE.Vector3(Math.cos(nu)*r*K, 0, Math.sin(nu)*r*K).applyMatrix4(M)); }
+        const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: .85 })); g.add(l);
+        const s = glow(c, .5, 1); g.add(s); return { pts, s }; });
+      let k = 0;
+      return { g, view(){ return .25 + 1.2*(1 - sm(0, 1, k)); }, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.5);
+        objs.forEach(({ pts, s }, j) => { const n = pts.length, q = ((t*.06 + j*.33) % 1), i = Math.min(n - 2, Math.floor(q*(n - 1))), f = q*(n - 1) - i; s.position.copy(pts[i]).lerp(pts[i + 1], f); }); } };
+    },
+    // золотая пластинка: вращающийся диск с бороздками; “пульсарная карта” — схема обложки (14 линий от Солнца)
+    gold(){
+      const g = new THREE.Group();
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(4, 128), new THREE.ShaderMaterial({ uniforms: { uT: { value: 0 }, uA: { value: 1 } },
+        vertexShader: `varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }`,
+        fragmentShader: `uniform float uT; uniform float uA; varying vec2 vP; void main(){ float r = length(vP)/4.0, a = atan(vP.y, vP.x);
+          float gr = 0.5 + 0.5*sin(r*420.0), sh = pow(0.5 + 0.5*cos(a*2.0 - uT*0.6), 6.0);
+          vec3 c = mix(vec3(0.55, 0.40, 0.14), vec3(1.0, 0.86, 0.5), 0.35*gr + 0.55*sh);
+          c = r < 0.28 ? mix(vec3(0.75, 0.6, 0.3), vec3(0.95, 0.82, 0.5), sh) : c; c *= r < 0.03 ? 0.2 : 1.0;
+          gl_FragColor = vec4(c*uA, 1.0); }` }));
+      g.add(disc);
+      const map = new THREE.Group(); g.add(map);
+      // схема: 14 линий разной длины и направления; на них — штрихи, как двоичный код периода (условно)
+      for (let i = 0; i < 14; i++){ const a = i/14*TAU + Math.sin(i*2.3)*.18, L = 1.6 + ((i*37) % 11)/11*2.2; const pts = [new THREE.Vector3(0, 0, .02), new THREE.Vector3(Math.cos(a)*L, Math.sin(a)*L, .02)];
+        map.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 })));
+        for (let k = 0; k < 6 + i % 4; k++){ const q = .3 + k*.09, x = Math.cos(a)*L*q, y = Math.sin(a)*L*q, nx = -Math.sin(a)*.08*(1 + (k + i) % 2), ny = Math.cos(a)*.08*(1 + (k + i) % 2);
+          map.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x - nx, y - ny, .02), new THREE.Vector3(x + nx, y + ny, .02)]), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 }))); } }
+      const hy = new THREE.Group(); [[-3.1, 3.1], [-2.5, 3.1]].forEach(([x, y]) => { const pts = []; for (let k = 0; k <= 48; k++){ const t = k/48*TAU; pts.push(new THREE.Vector3(x + Math.cos(t)*.22, y + Math.sin(t)*.22, .02)); }
+        hy.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 }))); }); map.add(hy);
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.6); disc.material.uniforms.uT.value = t; disc.rotation.z = -t*.15*(1 - k);
+        disc.material.uniforms.uA.value = 1 - .75*k; map.traverse(o => { if (o.material) o.material.opacity = .9*k; }); } };
+    }
   };
 
   /* ---------- интерфейс ---------- */
@@ -16501,8 +16786,8 @@ const ATL = (() => {
     const o = ATL_OBJ[oI], f = fm(), voy = o.km/17;   // “Вояджер-1”, ≈17 км/с
     let h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(EN ? "Atlas of wonders" : "Atlas of wonders")} · ${oI + 1}/${ATL_OBJ.length}</span></div>
       <h3>${esc(o.nm)}</h3><p class="tm-ago2">${esc(o.sub)}</p>
-      <div class="at-facts"><div><span class="mono">${esc(EN ? "distance" : "distance")}</span><b>${esc(f.fmtD(o.km))}</b></div><div><span class="mono">${esc(EN ? "size" : "size")}</span><b>${esc(o.size)}</b></div>
-        <div><span class="mono">${esc(EN ? "by Voyager" : "by Voyager")}</span><b>${esc(f.fmtT(voy))}</b></div><div><span class="mono">${esc(EN ? "the light travelled" : "the light travelled")}</span><b>${esc(f.agoT(o.ly))}</b></div></div>
+      <div class="at-facts">${(o.tiles || [[EN ? "distance" : "distance", f.fmtD(o.km)], [EN ? "size" : "size", o.size], [EN ? "by Voyager" : "by Voyager", f.fmtT(voy)], [EN ? "the light travelled" : "the light travelled", f.agoT(o.ly)]])
+        .map(([a, b]) => `<div><span class="mono">${esc(a)}</span><b>${esc(b)}</b></div>`).join("")}</div>
       <h4>${esc(EN ? "Science" : "Science")}</h4><ul class="list at-sci">${o.sci.map(x => `<li><span>${esc(x)}</span></li>`).join("")}</ul>
       <h4>${esc(EN ? "Traditions and myths" : "Traditions and myths")}</h4><p class="tm-pr">${esc(o.tr)}</p>
       <h4>${esc(EN ? "A parallel with the human being" : "A parallel with the human")}</h4><p class="tm-pr">${esc(o.hum)}</p>
@@ -16523,7 +16808,7 @@ const ATL = (() => {
     if (t.kind === "range") h += `<input type="range" id="atlR" min="0" max="1000" value="${v0}" aria-label="${esc(t.lab)}">${anim ? `<button class="tm-link at-play" id="atlPlay" data-hover>▶</button>` : ""}${tv ? `<span class="mono at-tv" id="atlTv"></span>` : ""}`;
     else if (t.kind === "toggle" || t.kind === "sound") h = `<button class="btn at-tb" id="atlB" aria-pressed="false" data-hover>${esc(t.lab)}</button>`;
     else if (t.kind === "catch") h = `<button class="btn at-tb" id="atlB" data-hover>${esc(t.lab)}</button><span class="mono at-tv" id="atlTv"></span><button class="tm-link" id="atlB2" aria-pressed="false" data-hover>${esc(t.lab2)}</button>`;
-    else if (t.kind === "cmb") h = `<button class="btn at-tb" id="atlB" aria-pressed="false" data-hover>${esc(t.lab)}</button><button class="tm-link" id="atlB2" aria-pressed="false" data-hover>${esc(t.lab2)}</button>`;
+    else if (t.kind === "two") h = `<button class="btn at-tb" id="atlB" aria-pressed="false" data-hover>${esc(t.lab)}</button><button class="tm-link" id="atlB2" aria-pressed="false" data-hover>${esc(t.lab2)}</button>`;
     else if (t.kind === "toggle2") h = `<button class="btn at-tb" id="atlB" aria-pressed="false" data-hover>${esc(t.lab)}</button><span class="mono at-tl">${esc(t.lab2)}</span><input type="range" id="atlR" min="0" max="1000" value="1000" aria-label="${esc(t.lab2)}">`;
     toy.innerHTML = `<div class="at-tr">${h}</div><p class="at-hint">${esc(t.hint)}</p>`;
     const r = $("atlR"); toyT = toyV = r ? +r.value/1000 : 1; toyB = 0;
@@ -16534,7 +16819,7 @@ const ATL = (() => {
       if (t.kind === "sound") toyB ? pulsarOn(29.6) : pulsarOff();
       if (t.alt) b.textContent = toyB ? t.alt : t.lab; };
     const b2 = $("atlB2"); if (b2) b2.onclick = () => { const on = b2.getAttribute("aria-pressed") !== "true"; b2.setAttribute("aria-pressed", String(on));
-      if (!on) pulsarOff(); else if (t.kind === "cmb") cmbOn(); else pulsarOn(11.19); };
+      if (!on) pulsarOff(); else if (t.snd === "cmb") cmbOn(); else if (t.snd === "trap") blipOn(); else if (t.snd === "gw") chirpOn(); else pulsarOn(11.19); };
     const pl = $("atlPlay"); if (pl) pl.onclick = () => { playing = !playing; if (playing && toyT >= .999){ toyT = 0; r.value = 0; } syncPlay(); };
   }
   let playing = false; const syncPlay = () => { const pl = $("atlPlay"); if (pl) pl.textContent = playing ? "❚❚" : "▶"; };
@@ -16567,6 +16852,27 @@ const ATL = (() => {
       audio = { ac, src: { stop(){ os.forEach(o => o.stop()); ns.stop(); } }, gn };
     } catch(e){ audio = null; }
   }
+  // TRAPPIST-1: колокольчик на каждое прохождение планеты перед звездой (вызывает сцена)
+  function blipOn(){
+    pulsarOff();
+    try { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      const ac = new AC(), gn = ac.createGain(); gn.gain.value = .0001; gn.connect(ac.destination); gn.gain.exponentialRampToValueAtTime(.35, ac.currentTime + .3);
+      audio = { ac, src: { stop(){} }, gn, blip(f){ const o = ac.createOscillator(), e = ac.createGain(), t0 = ac.currentTime; o.type = "sine"; o.frequency.value = f; e.gain.setValueAtTime(.0001, t0);
+        e.gain.exponentialRampToValueAtTime(.5, t0 + .01); e.gain.exponentialRampToValueAtTime(.0001, t0 + 1.2); o.connect(e); e.connect(gn); o.start(t0); o.stop(t0 + 1.3); } };
+    } catch(e){ audio = null; }
+  }
+  // GW150914: “чирп” за 0,2 с, 35 → 250 Гц ●, поднятый на две октавы (140 → 1000 Гц), чтобы его было слышно на любых динамиках
+  function chirpOn(){
+    pulsarOff();
+    try { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      const ac = new AC(), gn = ac.createGain(); gn.gain.value = .0001; gn.connect(ac.destination); gn.gain.exponentialRampToValueAtTime(.4, ac.currentTime + .2);
+      audio = { ac, src: { stop(){} }, gn, chirp(){ const t0 = ac.currentTime + .02, T = .2, o = ac.createOscillator(), e = ac.createGain(); o.type = "sine";
+        o.frequency.setValueAtTime(140, t0); o.frequency.exponentialRampToValueAtTime(1000, t0 + T);
+        e.gain.setValueAtTime(.0001, t0); e.gain.exponentialRampToValueAtTime(.7, t0 + T*.95); e.gain.exponentialRampToValueAtTime(.0001, t0 + T + .06);
+        o.connect(e); e.connect(gn); o.start(t0); o.stop(t0 + T + .1); } };
+      audio.chirp();
+    } catch(e){ audio = null; }
+  }
   function pulsarOff(){ if (!audio) return; const a = audio; audio = null; try { a.gn.gain.exponentialRampToValueAtTime(.0001, a.ac.currentTime + .25); setTimeout(() => { try { a.src.stop(); a.ac.close(); } catch(e){} }, 350); } catch(e){} }
   function hudTon(){
     const tv = $("atlTv"); if (!tv || !cur || cur.W == null) return; const W = cur.W;
@@ -16581,7 +16887,7 @@ const ATL = (() => {
     pulsarOff(); playing = false;
     page(); toyUI(); syncPlay();
     if (built){ if (cur){ world.remove(cur.g); cur.g.traverse(o => { if (o.geometry && !o.isSprite) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
-      cur = SCENE[ATL_OBJ[oI].id](); world.add(cur.g); yaw = yawT = ATL_OBJ[oI].id === "bet" ? 0 : .3; pitch = pitchT = .15; zoom = zoomT = ATL_OBJ[oI].id === "and" ? 1.45 : 1; }
+      cur = SCENE[ATL_OBJ[oI].id](); world.add(cur.g); const id0 = ATL_OBJ[oI].id; yaw = yawT = id0 === "bet" ? 0 : .3; pitch = pitchT = id0 === "trap" || id0 === "gw" ? .55 : id0 === "vis" ? 1.45 : .15; zoom = zoomT = ATL_OBJ[oI].id === "and" ? 1.45 : 1; }
     jrMark("atl", ATL_OBJ[oI].id, ATL_OBJ[oI].nm);
   }
   /* ---------- сцена ---------- */
@@ -16616,7 +16922,8 @@ const ATL = (() => {
     const O = ATL_OBJ[oI];
     if (!drag && !O.flat) yawT += dt*.03;
     yaw += (yawT - yaw)*Math.min(1, dt*4); pitch += (pitchT - pitch)*Math.min(1, dt*4); zoom += (zoomT - zoom)*Math.min(1, dt*4);
-    const flat = O.flat || O.id === "bet" && toyB;   // плоские сцены и небо Земли — без вращения
+    const flat = O.flat || (O.id === "bet" || O.id === "ome") && toyB;   // плоские сцены и небо Земли — без вращения
+    if (cur && cur.view && !drag) pitchT = cur.view();
     world.rotation.set(flat ? 0 : pitch, flat ? 0 : yaw, 0); world.position.z = -16*(O.still ? 1 : zoom);
     if (cur){ cur.upd(t, dt, toyV, toyB); cur.g.traverse(o => { if (o.isPoints && o.material.uniforms && o.material.uniforms.uT && o !== sky) o.material.uniforms.uT.value = t; }); }
     if (ATL_OBJ[oI].id === "and") hudAnd(); else if (ATL_OBJ[oI].id === "ton") hudTon();

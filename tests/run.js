@@ -163,7 +163,7 @@ test('fly', async () => {
 test('atlas', async () => {
   const p = await page(); await p.goto(B + '/#/atl/q3c'); await ready(p);
   let s = await until(p, s => s.open.includes('chAtl'), 60000); ok(s.open.includes('chAtl'), 'атлас не открылся по адресу');
-  await p.waitForFunction(() => /Квазар 3C 273/.test(document.getElementById('atlCard').innerText) && document.querySelectorAll('#atlGrid .at-c').length === 12, null, { timeout: 30000 });
+  await p.waitForFunction(() => /Квазар 3C 273/.test(document.getElementById('atlCard').innerText) && document.querySelectorAll('#atlGrid .at-c').length === 21, null, { timeout: 30000 });
   await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[1].click());
   s = await until(p, s => s.h === '#/atl/ori', 15000); ok(s.h === '#/atl/ori', 'адрес после выбора туманности: ' + s.h);
   await p.evaluate(() => document.getElementById('atlB').click());
@@ -185,6 +185,11 @@ test('atlas', async () => {
   await p.evaluate(() => { document.getElementById('atlB').click(); document.getElementById('atlB2').click(); }); await sleep(1500);
   await p.evaluate(() => document.getElementById('atlB2').click());
   s = await until(p, s => s.h === '#/atl/cmb', 15000); ok(s.h === '#/atl/cmb', 'адрес реликтового излучения: ' + s.h);
+  // вторая очередь: музыка резонансов TRAPPIST-1, «чирп» GW150914, вспышка магнетара, небо Омеги Центавра
+  for (const i of [14, 18]){ await p.evaluate(i => document.querySelectorAll('#atlGrid .at-c')[i].click(), i); await sleep(1500);
+    await p.evaluate(() => { document.getElementById('atlB').click(); document.getElementById('atlB2').click(); }); await sleep(2500); await p.evaluate(() => document.getElementById('atlB2').click()); }
+  for (const i of [15, 16, 20]){ await p.evaluate(i => document.querySelectorAll('#atlGrid .at-c')[i].click(), i); await sleep(1200); await p.evaluate(() => document.getElementById('atlB').click()); await sleep(1200); }
+  s = await until(p, s => s.h === '#/atl/gold', 15000); ok(s.h === '#/atl/gold', 'адрес золотой пластинки: ' + s.h);
   await p.evaluate(() => document.getElementById('atlClose').click());
   s = await until(p, s => !s.open.includes('chAtl') && !/atl/.test(s.h), 15000); ok(!s.open.includes('chAtl') && !/atl/.test(s.h), 'выход из атласа: ' + JSON.stringify(s));
   clean(p); await p.done();
