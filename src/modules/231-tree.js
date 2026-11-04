@@ -366,7 +366,7 @@ const CHT = (() => {
   return { open: openT, close, get on(){ return open; }, select: id => BY[id] && select(BY[id]), nodes: NODES, dbg: { sel: () => sel.id, n: NODES.length } };
 })();
 const chTree = $("chTree");
-function openTree(id){ chFrom("tree"); closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
+function openTree(id){ chFrom("tree"); closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeScl(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
 function closeTree(){ CHT.close(); }
 $("btnTree").onclick = () => CHT.on ? closeTree() : openTree();
 $("treeClose").onclick = () => { if (!chBack("tree")) closeTree(); };

@@ -241,5 +241,5 @@ function openPath(){ chFrom("path"); closeChapters(); toggleMenu(false); surface
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
 $("pathClose").onclick = () => { if (!chBack("path")) closePath(); };
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
-function closeSide(){ closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeRouteList(); }   // все главы, кроме погружения
+function closeSide(){ closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeScl(); closeRouteList(); }   // все главы, кроме погружения
 function closeChapters(){ closeHuman(); closeSide(); }

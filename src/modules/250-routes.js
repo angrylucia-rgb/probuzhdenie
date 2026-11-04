@@ -116,6 +116,7 @@ function navHere(){
     if (DIMS.on) return { t:"dm", n:DIMS.n, k:"dm", nm:"Лестница измерений" };
     if (BIO.on) return Object.assign({ t:"bio", k:"bio", nm:"Биосфера" }, BIO.place());
     if (pathOpen) return { t:"path", k:"path", nm:"Путь из восьми этапов" };
+    if (SCL.on) return { t:"scl", m: SCL.m, k:"scl", nm: SCL.m === "radio" ? "Наш радиопузырь" : "Размеры" };
     if (ATL.on) return { t:"atl", id: ATL.id, k:"atl", nm:"Атлас чудес" };
     if (FLY.on) return FLY.m === "fly" ? { t:"fly", d: FLY.d, v: FLY.v, k:"fly", nm:"Сколько лететь" } : { t:"sky", d: FLY.m === "born" ? "born" : FLY.d, k:"fly", nm: FLY.m === "born" ? "Звезда вашего рождения" : "Свет из прошлого" };
   } catch(e){}
@@ -128,7 +129,7 @@ function navHere(){
 // v178: «Назад» у глав. Глава запоминает, откуда её открыли (слой станции или другая глава); тогда её верхняя
 // кнопка называется «← Назад» и возвращает туда. Открыта с кольца или из меню без источника — «Вернуться на кольцо ✕».
 let NAV_SKIP = false, NAV_PENDING;
-const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose", fly:"flyClose", atl:"atlClose" };
+const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose", fly:"flyClose", atl:"atlClose", scl:"sclClose" };
 function navMark(){ NAV_PENDING = navHere(); setTimeout(() => { NAV_PENDING = undefined; }, 0); }   // перед закрытием главы ради ссылки в другую
 function chFrom(key){
   if (NAV_SKIP) return;
@@ -147,7 +148,7 @@ const RT = (() => {
   function go(s){
     const from = s.t !== "j" && !NAV_SKIP ? navHere() : null, ext = from ? { t:"ext", go:from, nm:from.nm } : null;
     NAV_PENDING = from; setTimeout(() => { NAV_PENDING = undefined; }, 0);
-    closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl();
+    closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeScl();
     if (s.t === "cal"){ closeTree(); openTime(); CHR.goAgo(s.ago); }
     else if (s.t === "tree"){ openTree(s.id); }
     else if (s.t === "th"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openThought(); if (s.br) CTH.bridgeBy(s.br); else if (s.id) CTH.select(s.id); }
@@ -155,6 +156,7 @@ const RT = (() => {
     else if (s.t === "dm"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openDims(s.n); if (s.lens) DIMS.lens(s.lens); if (s.m) DIMS.mode(s.m); }
     else if (s.t === "path"){ closeTime(); closeTree(); openPath(); }
     else if (s.t === "fly"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d, s.v, "fly"); }
+    else if (s.t === "scl"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openScl(s.m); }
     else if (s.t === "atl"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openAtl(s.id); }
     else if (s.t === "sky"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d === "born" ? null : s.d, null, s.d === "born" ? "born" : "sky"); }
     else if (s.t === "bio" && s.m == null && s.b == null && s.bm == null && !s.sp && !s.e && NAV_SKIP){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openBio(); }

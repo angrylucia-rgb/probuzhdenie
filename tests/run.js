@@ -29,7 +29,7 @@ async function page(opt = {}){
 const ready = p => p.waitForFunction(() => document.getElementById('loader').classList.contains('done'), null, { timeout: 90000 });
 const clean = p => { ok(!p.errs.length, 'ошибки JS: ' + p.errs.slice(0, 3).join(' | ')); ok(!p.csp.length, 'нарушения CSP: ' + p.csp.slice(0, 2).join(' | ')); ok(!p.fails.length, 'ответы с ошибкой: ' + p.fails.slice(0, 4).join(', ')); };
 const st = p => p.evaluate(() => ({ h: location.hash, path: location.pathname,
-  open: ['chHuman', 'chBio', 'chDims', 'chTime', 'chTree', 'chThought', 'chRef', 'chPath', 'chFly', 'chAtl'].filter(id => { const e = document.getElementById(id); return e && e.classList.contains('open'); }) }));
+  open: ['chHuman', 'chBio', 'chDims', 'chTime', 'chTree', 'chThought', 'chRef', 'chPath', 'chFly', 'chAtl', 'chScl'].filter(id => { const e = document.getElementById(id); return e && e.classList.contains('open'); }) }));
 // ждать, пока условие на состоянии не выполнится (графика программная — сцены грузятся по-разному)
 async function until(p, f, ms = 30000){ const t0 = Date.now(); let s; while (Date.now() - t0 < ms){ s = await st(p); if (f(s)) return s; await sleep(500); } return s; }
 
@@ -187,6 +187,22 @@ test('atlas', async () => {
   s = await until(p, s => s.h === '#/atl/cmb', 15000); ok(s.h === '#/atl/cmb', 'адрес реликтового излучения: ' + s.h);
   await p.evaluate(() => document.getElementById('atlClose').click());
   s = await until(p, s => !s.open.includes('chAtl') && !/atl/.test(s.h), 15000); ok(!s.open.includes('chAtl') && !/atl/.test(s.h), 'выход из атласа: ' + JSON.stringify(s));
+  clean(p); await p.done();
+});
+
+/* ---------- «Масштабы»: размеры (ползунок → Солнце, «вы здесь»), радиопузырь, адреса, выход ---------- */
+test('scales', async () => {
+  const p = await page(); await p.goto(B + '/#/scl/size'); await ready(p);
+  let s = await until(p, s => s.open.includes('chScl'), 60000); ok(s.open.includes('chScl'), '«Размеры» не открылись по адресу');
+  await p.waitForFunction(() => /Луна/.test(document.getElementById('sclCard').innerText), null, { timeout: 30000 });
+  await p.evaluate(() => { const r = document.getElementById('sclR'); r.value = 400; r.dispatchEvent(new Event('input')); });
+  await p.waitForFunction(() => /Солнце/.test(document.querySelector('#sclCard h3').textContent), null, { timeout: 30000 });
+  ok(/Земля на этом экране: [\d,]+ пикс/.test(await p.evaluate(() => document.getElementById('sclHint').textContent)), 'нет подписи «вы здесь»');
+  await p.evaluate(() => document.querySelector('#sclModes [data-m="radio"]').click());
+  s = await until(p, s => s.h === '#/scl/radio', 15000); ok(s.h === '#/scl/radio', 'адрес радиопузыря: ' + s.h);
+  ok(/Аресибо/.test(await p.evaluate(() => document.getElementById('sclCard').innerText)), 'нет посланий в радиопузыре');
+  await p.evaluate(() => document.getElementById('sclClose').click());
+  s = await until(p, s => !s.open.includes('chScl') && !/scl/.test(s.h), 15000); ok(!s.open.includes('chScl') && !/scl/.test(s.h), 'выход из «Масштабов»: ' + JSON.stringify(s));
   clean(p); await p.done();
 });
 

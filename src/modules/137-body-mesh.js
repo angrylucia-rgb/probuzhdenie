@@ -37,6 +37,13 @@ const BODY_COL = {
         c = mix(c, vec3(0.50,0.26,0.13), clamp(m.b*1.2, 0.0, 1.0));
         c = mix(c, vec3(0.72,0.54,0.42), m.a*0.6);
         rough = 0.8; bump = 2.2;`,
+  // Земля — без карты (v190, «Размеры»): океан, материки, полярные шапки, облака
+  ear:`float land = fbm(ns*2.2 + vec3(1.7)) + 0.35*fbm(ns*6.0 + vec3(5.0));
+        float l = smoothstep(0.80, 0.84, land);
+        vec3 c = mix(vec3(0.03,0.12,0.34), mix(vec3(0.16,0.34,0.12), vec3(0.60,0.50,0.30), smoothstep(0.35, 0.65, fbm(ns*5.0 + vec3(3.0)))), l);
+        c = mix(c, vec3(0.92,0.95,1.0), smoothstep(0.84, 0.9, abs(ns.y)));
+        c = mix(c, vec3(1.0), smoothstep(0.58, 0.78, fbm(ns*4.5 + vec3(uTime*0.01, 0.0, 0.0)))*0.85);
+        rough = 0.35; atm = vec3(0.35,0.6,1.0)*0.55;`,
   // Венера — без карты: верхний ярус облаков, Y-образная тёмная полоса в ультрафиолете, полярные воротники
   ven:`float lo = atan(ns.x, ns.z), y = ns.y;
         float cl = fbm(ns*3.6 + vec3(uTime*0.02, 0.0, 0.0)), st = fbm(ns*9.0 + vec3(3.0));
@@ -104,4 +111,4 @@ void main(){
 // прозрачность шара; глубину пишет только почти непрозрачный — иначе на проявлении он вырезал бы звёзды за собой
 function bodyA(o, a){ o.material.uniforms.uA.value = a; o.material.depthWrite = a > .9; }
 const BODY_TURB = { jup:1, sat:.6, ura:.3, nep:.6 };
-const BODY_SPIN = { moon:0, mer:0, ven:.05, mar:.04, jup:.12, sat:.10, ura:.08, nep:.10, eur:.03 };
+const BODY_SPIN = { moon:0, mer:0, ear:.05, ven:.05, mar:.04, jup:.12, sat:.10, ura:.08, nep:.10, eur:.03 };

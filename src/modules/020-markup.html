@@ -101,6 +101,8 @@
         <button class="mp-it" id="mFly" data-span="2-4" data-hover><span class="mp-k mono">расстояние</span><b>Сколько лететь</b><span>До Луны, звёзд и галактик — пешком, на «Вояджере», со скоростью света и на корабле 1 g</span><i class="mp-rng"></i></button>
         <button class="mp-it" id="mSky" data-hover><span class="mp-k mono">время</span><b>Свет из прошлого</b><span>Телескоп — машина времени: когда вышел свет, который мы видим, и что было тогда на Земле</span></button>
         <button class="mp-it" id="mAtl" data-hover><span class="mp-k mono">объекты</span><b>Атлас чудес</b><span>Квазар, туманность Ориона, пульсар Краба, Бетельгейзе, столкновение с Андромедой, тёмная материя</span></button>
+        <button class="mp-it" id="mSize" data-hover><span class="mp-k mono">масштаб</span><b>Размеры</b><span>Один ползунок: Луна, Земля, Солнце, Бетельгейзе — и горизонт TON 618</span></button>
+        <button class="mp-it" id="mRadio" data-hover><span class="mp-k mono">тишина</span><b>Наш радиопузырь</b><span>Всё, что люди передали по радио, — шар в сотню световых лет. Пиксель на снимке Галактики</span></button>
         <button class="mp-it" id="mBorn" data-hover><span class="mp-k mono">личное</span><b>Звезда вашего рождения</b><span>Звезда, свет которой вышел в год вашего рождения и только сейчас дошёл</span></button>
       </section>
       <section class="mp-grp mp-atl">
@@ -286,6 +288,20 @@
     <div class="tm-head"><span class="mono eyebrow">Глубокий космос · Атлас чудес</span></div>
     <div class="at-grid" id="atlGrid" role="group" aria-label="Объекты"></div>
     <div class="tm-scroll" id="atlScroll"><article class="tm-card" id="atlCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-atl ch-scl" id="chScl" aria-hidden="true" aria-label="Масштабы: размеры и наш радиопузырь">
+  <canvas id="sclCv" aria-label="Сравнение размеров и радиопузырь Земли"></canvas>
+  <button class="close mono" id="sclClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="at-toy" id="sclToy"></div>
+  <div class="time-in at-in">
+    <div class="tm-head"><span class="mono eyebrow">Глубокий космос · Масштабы</span></div>
+    <div class="fl-modes scl-modes" id="sclModes" role="tablist" aria-label="Режим">
+      <button data-m="size" role="tab" aria-selected="true" data-hover>Размеры</button><button data-m="radio" role="tab" aria-selected="false" data-hover>Наш радиопузырь</button>
+    </div>
+    <div class="at-grid" id="sclList" role="group" aria-label="Тела"></div>
+    <div class="tm-scroll" id="sclScroll"><article class="tm-card" id="sclCard" aria-live="polite"></article></div>
   </div>
 </section>
 

@@ -252,6 +252,9 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 #flyCv{position:absolute;inset:0;width:100%;height:100%;display:block}
 /* v188: «Атлас чудес» */
 .ch-atl{background:#020309}
+#sclCv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scl-modes{grid-template-columns:repeat(2,1fr)}
+.scl-radio #sclList{display:none}
 #atlCv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #atlCv:active{cursor:grabbing}
 .ch-atl .time-in{display:flex;flex-direction:column}.ch-atl .time-in>.tm-scroll{flex:1 1 0;min-height:0}
