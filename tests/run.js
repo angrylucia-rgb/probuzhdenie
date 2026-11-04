@@ -29,7 +29,7 @@ async function page(opt = {}){
 const ready = p => p.waitForFunction(() => document.getElementById('loader').classList.contains('done'), null, { timeout: 90000 });
 const clean = p => { ok(!p.errs.length, 'ошибки JS: ' + p.errs.slice(0, 3).join(' | ')); ok(!p.csp.length, 'нарушения CSP: ' + p.csp.slice(0, 2).join(' | ')); ok(!p.fails.length, 'ответы с ошибкой: ' + p.fails.slice(0, 4).join(', ')); };
 const st = p => p.evaluate(() => ({ h: location.hash, path: location.pathname,
-  open: ['chHuman', 'chBio', 'chDims', 'chTime', 'chTree', 'chThought', 'chRef', 'chPath'].filter(id => { const e = document.getElementById(id); return e && e.classList.contains('open'); }) }));
+  open: ['chHuman', 'chBio', 'chDims', 'chTime', 'chTree', 'chThought', 'chRef', 'chPath', 'chFly'].filter(id => { const e = document.getElementById(id); return e && e.classList.contains('open'); }) }));
 // ждать, пока условие на состоянии не выполнится (графика программная — сцены грузятся по-разному)
 async function until(p, f, ms = 30000){ const t0 = Date.now(); let s; while (Date.now() - t0 < ms){ s = await st(p); if (f(s)) return s; await sleep(500); } return s; }
 
@@ -121,6 +121,29 @@ test('moon-flight', async () => {
   await p.waitForFunction(() => document.getElementById('moonBtn').classList.contains('on'), null, { timeout: 60000 });
   const fx = await p.evaluate(() => window.__fx); ok(fx < .05, 'была вспышка: ' + fx);
   clean(p); await p.done();
+});
+
+/* ---------- «Сколько лететь»: адрес, расчёт, полёт, смена цели, выход; английская версия ---------- */
+test('fly', async () => {
+  const p = await page(); await p.goto(B + '/#/fly/prox?v=g1'); await ready(p);
+  let s = await until(p, s => s.open.includes('chFly'), 60000); ok(s.open.includes('chFly'), 'глава не открылась по адресу: ' + JSON.stringify(s));
+  await p.waitForFunction(() => document.getElementById('flyCard').innerText.length > 50, null, { timeout: 30000 });
+  const card = await p.evaluate(() => document.getElementById('flyCard').innerText);
+  ok(/Проксима/i.test(card) && /3,54 года/.test(card) && /5,87 года/.test(card), 'расчёт 1 g до Проксимы: ' + card.slice(0, 160));
+  await p.evaluate(() => document.getElementById('flyGo').click());
+  await p.waitForFunction(() => document.querySelector('#flyHud .fl-t1').textContent === 'Время в пути: 5,87 года', null, { timeout: 150000 });
+  const t3 = await p.evaluate(() => document.querySelector('#flyHud .fl-t3').textContent); ok(/^Пройдено: 4,25 светового года из 4,25/.test(t3), 'итог полёта: ' + t3);
+  await p.evaluate(() => [...document.querySelectorAll('#flyDest .fl-d')].find(b => /Андромеды/.test(b.textContent)).click());
+  s = await until(p, s => s.h === '#/fly/and?v=g1', 15000); ok(s.h === '#/fly/and?v=g1', 'адрес после смены цели: ' + s.h);
+  ok(/28,6 года/.test(await p.evaluate(() => document.getElementById('flyCard').innerText)), 'на борту до Андромеды не 28,6 года');
+  await p.evaluate(() => document.getElementById('flyClose').click());
+  s = await until(p, s => !s.open.includes('chFly') && !/fly/.test(s.h), 15000); ok(!s.open.includes('chFly') && !/fly/.test(s.h), 'выход из главы: ' + JSON.stringify(s));
+  clean(p); await p.done();
+  const e = await page(); await e.goto(B + '/en/#/fly/moon?v=car'); await ready(e);
+  s = await until(e, s => s.open.includes('chFly'), 60000); ok(s.open.includes('chFly'), 'EN: глава не открылась');
+  await e.waitForFunction(() => document.getElementById('flyCard').innerText.length > 50, null, { timeout: 30000 });
+  const ce = await e.evaluate(() => document.getElementById('flyCard').innerText); ok(/160 days/.test(ce) && /384,400 km/.test(ce) && !/[А-яЁё]/.test(ce), 'EN карточка: ' + ce.slice(0, 160));
+  clean(e); await e.done();
 });
 
 /* ---------- сбой видеокарты: сообщение и перезапуск ---------- */

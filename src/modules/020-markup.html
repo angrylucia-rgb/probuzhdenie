@@ -34,6 +34,7 @@
           <button class="act mono qk-it" role="menuitem" id="btnPath" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M7 1v6l4 2"/></svg><span class="qk-tx"><span class="lbl">Путь</span><small>восемь этапов: узнать, прожить, осмыслить</small></span></button>
           <button class="act mono qk-it" role="menuitem" id="btnTime" aria-pressed="false" data-hover><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 1h9M1.5 13h9M2.5 1c0 3.5 3.5 4 3.5 6s-3.5 2.5-3.5 6M9.5 1c0 3.5-3.5 4-3.5 6s3.5 2.5 3.5 6"/></svg><span class="qk-tx"><span class="lbl">Время</span><small>космический календарь</small></span></button>
           <button class="act mono qk-it" role="menuitem" id="btnTree" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.4" fill="currentColor"/><path d="M7 7L3 3M7 7l4-4M7 7v6M3 3L1.5 4.5M3 3l.5-2M11 3l1.5 1.5M11 3l-.5-2M7 13l-2 .5M7 13l2 .5"/></svg><span class="qk-tx"><span class="lbl">Древо</span><small>древо жизни: родство всего живого</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnFly" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M2 12L7 1l5 11-5-3z"/></svg><span class="qk-tx"><span class="lbl">Полёт</span><small>сколько лететь до Луны, звёзд и галактик</small></span></button>
         </div>
       </div>
       <button class="act mono" id="btnSearch" aria-label="Поиск по сайту (Ctrl+K)" data-hover><span class="lbl">Поиск</span><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.3"/><path d="M8.7 8.7L12 12"/></svg></button>
@@ -94,6 +95,10 @@
         <button class="mp-it mp-first" id="mCompass" data-hover><span class="mp-badge mono">впервые здесь?</span><b>Компас пути</b><span>Минута вопросов — и маршрут под ваш интерес, время и состояние</span></button>
         <button class="mp-it" id="mRoutes" data-hover><b>Маршруты</b><span>Готовые экскурсии: «Откуда я?», «Из чего я сделан?», «Свет»…</span></button>
         <button class="mp-it" id="mRef" data-hover><b>Как пользоваться</b><span>Короткая инструкция, сравнение традиций, принципы, источники</span></button>
+      </section>
+      <section class="mp-grp">
+        <h3 class="mono mp-h">Глубокий космос</h3>
+        <button class="mp-it" id="mFly" data-span="2-4" data-hover><span class="mp-k mono">расстояние</span><b>Сколько лететь</b><span>До Луны, звёзд и галактик — пешком, на «Вояджере», со скоростью света и на корабле 1 g</span><i class="mp-rng"></i></button>
       </section>
       <section class="mp-grp mp-atl">
         <h3 class="mono mp-h">Сквозные темы</h3>
@@ -244,6 +249,20 @@
     <div class="tm-ctl" id="dmTools"></div>
     <span class="mono tm-hint tr-hint" id="dmHint"></span>
     <div class="tm-scroll" id="dmScroll"><article class="tm-card" id="dmCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-fly" id="chFly" aria-hidden="true" aria-label="Сколько лететь">
+  <canvas id="flyCv" aria-label="Полёт к цели: звёздное небо, на подлёте — сама цель"></canvas>
+  <button class="close mono" id="flyClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="fl-hud" id="flyHud"><b class="fl-t1"></b><span class="fl-t2"></span><span class="mono fl-t3"></span><span class="mono fl-t4"></span></div>
+  <div class="fl-rul" id="flyRul" aria-hidden="true"></div>
+  <div class="time-in fl-in">
+    <div class="tm-head"><span class="mono eyebrow">Глубокий космос · Сколько лететь</span></div>
+    <div class="fl-dest" id="flyDest" role="group" aria-label="Куда лететь"></div>
+    <div class="fl-vehs" id="flyVeh" role="group" aria-label="На чём лететь"></div>
+    <div class="tm-ctl"><button class="btn" id="flyGo" data-hover>Лететь ▶</button></div>
+    <div class="tm-scroll"><article class="tm-card" id="flyCard" aria-live="polite"></article></div>
   </div>
 </section>
 

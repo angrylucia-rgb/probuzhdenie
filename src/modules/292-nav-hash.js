@@ -4,7 +4,7 @@
 // Новое место (другая глава, станция-погружение, кольцо) — новая запись истории; смена слоя или события внутри — замена записи.
 // Адрес разбирается строго: только известные виды мест, ключи и значения из списков сайта — иначе адрес игнорируется.
 const NAVH = (() => {
-  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[] };
+  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[], fly:["d"] };
   const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   const ID = v => typeof v === "string" && /^[\w>.-]{1,48}$/.test(v) && !(v in Object.prototype);
   const INT = (v, a, b) => { const n = Number(v); return v !== "" && Number.isInteger(n) && n >= a && n <= b ? n : null; };
@@ -51,6 +51,7 @@ const NAVH = (() => {
     else if (t === "s" || t === "in"){ r.i = INT(o.i, 0, ST.length - 1); if (r.i == null) return null; }
     else if (t === "po"){ r.i = INT(o.i, 0, 1); if (r.i == null) return null; }
     else if (t === "ref"){ const tb = o.tab == null ? "guide" : o.tab; if (!tabs().includes(tb)) return null; r.tab = tb; }
+    else if (t === "fly"){ if (o.d != null){ if (!ID(o.d) || FLY.idx(o.d) < 0) return null; r.d = o.d; } if (o.v != null){ if (!ID(o.v) || FLY.vdx(o.v) < 0) return null; r.v = o.v; } }
     else if (!["path", "compass", "mine", "routes", "iz"].includes(t)) return null;
     return r;
   }

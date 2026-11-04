@@ -116,6 +116,7 @@ function navHere(){
     if (DIMS.on) return { t:"dm", n:DIMS.n, k:"dm", nm:"Лестница измерений" };
     if (BIO.on) return Object.assign({ t:"bio", k:"bio", nm:"Биосфера" }, BIO.place());
     if (pathOpen) return { t:"path", k:"path", nm:"Путь из восьми этапов" };
+    if (FLY.on) return { t:"fly", d: FLY.d, v: FLY.v, k:"fly", nm:"Сколько лететь" };
   } catch(e){}
   if (typeof humanOpen === "undefined" || !humanOpen || !jId) return null;
   const d = Math.max(0, Math.min(DMAX - 1, Math.round(depth))), v = JL && JL[d], o = { t:"j", id:jId, d };
@@ -126,7 +127,7 @@ function navHere(){
 // v178: «Назад» у глав. Глава запоминает, откуда её открыли (слой станции или другая глава); тогда её верхняя
 // кнопка называется «← Назад» и возвращает туда. Открыта с кольца или из меню без источника — «Вернуться на кольцо ✕».
 let NAV_SKIP = false, NAV_PENDING;
-const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose" };
+const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose", fly:"flyClose" };
 function navMark(){ NAV_PENDING = navHere(); setTimeout(() => { NAV_PENDING = undefined; }, 0); }   // перед закрытием главы ради ссылки в другую
 function chFrom(key){
   if (NAV_SKIP) return;
@@ -145,13 +146,14 @@ const RT = (() => {
   function go(s){
     const from = s.t !== "j" && !NAV_SKIP ? navHere() : null, ext = from ? { t:"ext", go:from, nm:from.nm } : null;
     NAV_PENDING = from; setTimeout(() => { NAV_PENDING = undefined; }, 0);
-    closeThought(); closeCompass(); closeMine(); closeDims(); closeBio();
+    closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly();
     if (s.t === "cal"){ closeTree(); openTime(); CHR.goAgo(s.ago); }
     else if (s.t === "tree"){ openTree(s.id); }
     else if (s.t === "th"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openThought(); if (s.br) CTH.bridgeBy(s.br); else if (s.id) CTH.select(s.id); }
     else if (s.t === "in"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); travelDive(s.i); }
     else if (s.t === "dm"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openDims(s.n); if (s.lens) DIMS.lens(s.lens); if (s.m) DIMS.mode(s.m); }
     else if (s.t === "path"){ closeTime(); closeTree(); openPath(); }
+    else if (s.t === "fly"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d, s.v); }
     else if (s.t === "bio" && s.m == null && s.b == null && s.bm == null && !s.sp && !s.e && NAV_SKIP){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openBio(); }
     else if (s.t === "bio"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman();
       if (s.m != null) openBio(undefined, () => BIO.mech(s.m, ext)); else if (s.b != null) openBio(undefined, () => BIO.basics(s.b, ext)); else if (s.bm != null) openBio(undefined, () => BIO.biome(s.bm, ext)); else openBio(s.sp || s.e, () => BIO.from(ext)); }

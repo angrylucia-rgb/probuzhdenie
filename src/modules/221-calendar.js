@@ -371,7 +371,7 @@ const CHR = (() => {
 })();
 const chTime = $("chTime");
 function closeTime(){ CHR.close(); }
-function openTime(){ chFrom("time"); closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
+function openTime(){ chFrom("time"); closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
 $("btnTime").onclick = () => CHR.on ? closeTime() : openTime();
 $("timeClose").onclick = () => { if (!chBack("time")) closeTime(); };
 $("mTime").onclick = openTime;
