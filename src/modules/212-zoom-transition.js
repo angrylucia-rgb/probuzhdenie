@@ -146,7 +146,7 @@ let moonDots = null;
   // R — радиус диска в пикселях холста; размеры точек и ореола пропорциональны R (у значка R = 0,4 ширины)
   moonDots = (c, cx, cy, R, t, h, warm = 0, al = 1) => {
     // крупно (полёт): точки мельче относительно диска, под ними — мягкая подложка с терминатором, без ореола
-    const big = smooth(60, 200, R), a = t/1000*.08, ca = Math.cos(a), sa = Math.sin(a), u = R/48*(1 - .4*big), hw = 1 - warm;
+    const big = smooth(60, 200, R), a = real ? 0 : t/1000*.08, ca = Math.cos(a), sa = Math.sin(a), u = R/48*(1 - .4*big), hw = 1 - warm;
     if (big > 0){ const f = big*al, gr = c.createLinearGradient(cx - R*.35, 0, cx + R, 0);
       gr.addColorStop(0, "rgba(60,34,22,0)"); gr.addColorStop(.3, `rgba(150,100,78,${.3*f})`); gr.addColorStop(1, `rgba(245,205,180,${.5*f})`);
       c.fillStyle = gr; c.beginPath(); c.arc(cx, cy, R, 0, 6.2832); c.fill(); }
@@ -163,8 +163,14 @@ let moonDots = null;
       c.beginPath(); c.arc(cx + x*R, cy - y*R, rr, 0, 6.2832); c.fill(); }
   };
   moonDots.hov = () => h;
+  // v184: когда готова карта Луны (BMAP), значок и полёт рисуют настоящие моря и кратеры, а вращение
+  // замирает: к Земле Луна всегда обращена одной стороной — той же, что у подробной Луны на её странице
+  let real = false;
+  moonDots.remap = () => { if (real || !BMAP.has("moon")) return; real = true;
+    for (const p of P){ const a = BMAP.albedo("moon", [p.x, p.y, p.z]); if (a != null) p.alb = (.18 + 1.05*a)*(.85 + .3*Math.random()); } };
   (function draw(t){ requestAnimationFrame(draw);
     if (!mb.classList.contains("on")) return;
+    if (!real){ BMAP.want("moon"); moonDots.remap(); }   // на слоях Земли с Луной в углу карта строится заранее
     const dt = Math.min(.1, (t - last)/1000 || 0); last = t; h += (hov - h)*Math.min(1, dt*4);
     const W = cv.width; c.clearRect(0, 0, W, W); moonDots(c, W/2, W/2, W*.4, t, h);
   })(0);

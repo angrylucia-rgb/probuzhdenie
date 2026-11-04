@@ -6,6 +6,8 @@ const LAND_TEX = (() => { const t = new THREE.DataTexture(EARTH_LAND, 360, 180, 
 function landAt(d){ const l = Math.hypot(d[0], d[1], d[2]) || 1, lon = Math.atan2(d[0]/l, d[2]/l), lat = Math.asin(clamp(d[1]/l, -1, 1));
   const x = clamp(Math.floor((lon/TAU + .5)*360), 0, 359), y = clamp(Math.floor((lat/Math.PI + .5)*180), 0, 179); return (EARTH_LAND[y*360 + x]/255 - .5)*2 + .18; }
 const U = { time:{value:0}, pr:{value:PR}, land:{value:LAND_TEX} };
+// v184: карта поверхности тела (136-body-maps.js) — у каждого материала своя; по умолчанию серый пиксель
+const MAP0 = (() => { const t = new THREE.DataTexture(new Uint8Array([128, 128, 0, 0]), 1, 1, THREE.RGBAFormat, THREE.UnsignedByteType); t.needsUpdate = true; return t; })();
 
 /* ---------- частицы ---------- */
 const HEAD = `
@@ -13,8 +15,9 @@ uniform float uTime; uniform float uPR; uniform float uOpacity; uniform float uS
 attribute float aSeed; attribute vec3 aRnd; attribute vec3 aColor; attribute float aSize;
 varying vec3 vColor; varying float vAlpha;
 uniform vec3 uCur; uniform float uHov; uniform float uPush; uniform float uRad; uniform float uDive; uniform float uSharp; uniform float uSolid;
-uniform sampler2D uLand;
+uniform sampler2D uLand; uniform sampler2D uMap;
 float landT(vec3 q){ vec3 n = normalize(q); vec2 uv = vec2(atan(n.x, n.z)/6.2831853 + 0.5, asin(clamp(n.y, -1.0, 1.0))/3.1415927 + 0.5); return (texture2D(uLand, uv).r - 0.5)*2.0 + 0.18; }
+vec4 mapT(vec3 q){ vec3 n = normalize(q); return texture2D(uMap, vec2(atan(n.x, n.z)/6.2831853 + 0.5, asin(clamp(n.y, -1.0, 1.0))/3.1415927 + 0.5)); }
 float iceT(vec3 q, float land){ vec3 n = normalize(q); float la = asin(clamp(n.y, -1.0, 1.0))*57.29578, lo = atan(n.x, n.z)*57.29578;
   float grl = step(0.18, land)*step(59.5, la)*step(-74.0, lo)*step(lo, -11.0);
   return max(max(smoothstep(74.0, 78.0, la), smoothstep(-61.0, -65.0, la)), grl); }
@@ -25,7 +28,7 @@ const FRAG = `varying vec3 vColor; varying float vAlpha;
 void main(){ float r = length(gl_PointCoord - 0.5); float g = smoothstep(0.5, 0.0, r); g *= g; float al = g * vAlpha; if (al < 0.002) discard; gl_FragColor = vec4(vColor, al); }`;
 function pmat(chunk, size, decl){
   return new THREE.ShaderMaterial({
-    uniforms: { uTime:U.time, uPR:U.pr, uLand:U.land, uOpacity:{value:1}, uSize:{value:size||1}, uFocus:{value:-1}, uSpeed:{value:1}, uProg:{value:0}, uCur:{value:new THREE.Vector3(999,999,999)}, uHov:{value:0}, uPush:{value:.5}, uRad:{value:2}, uDive:{value:0}, uSharp:{value:1}, uSolid:{value:0} },
+    uniforms: { uTime:U.time, uPR:U.pr, uLand:U.land, uMap:{value:MAP0}, uOpacity:{value:1}, uSize:{value:size||1}, uFocus:{value:-1}, uSpeed:{value:1}, uProg:{value:0}, uCur:{value:new THREE.Vector3(999,999,999)}, uHov:{value:0}, uPush:{value:.5}, uRad:{value:2}, uDive:{value:0}, uSharp:{value:1}, uSolid:{value:0} },
     vertexShader: HEAD + (decl || "") + `void main(){
       vec3 p = position; vec3 col = aColor; float a = 1.0; float s = aSize;
       ${chunk}

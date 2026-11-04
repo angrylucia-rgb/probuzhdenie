@@ -22,6 +22,35 @@ const B_MOON = `vec3 q = position; q.xz = rot(uTime*0.025)*q.xz; vec3 nq = norma
   col = mix(col, vec3(1.0,0.99,0.96), clamp(tr, 0.0, 1.0)*0.7);
   p = q;`;
 
+// v184: подробная Луна — по карте BMAP «moon»: моря и кратеры на своих местах (видимая сторона смотрит на Землю, к зрителю).
+// Ось не крутим: Луна всегда повёрнута к Земле одной стороной. Рельеф карты освещён с востока — как и здесь Солнце справа.
+const B_MOON_HD = `vec3 q = position; vec3 nq = normalize(q);
+  vec4 m = mapT(nq);
+  float sh = m.g*2.0 - 1.0;
+  col = vec3(0.95,0.93,0.88)*(0.05 + 1.08*m.r);
+  col *= mix(vec3(1.0), vec3(0.86,0.91,1.03), m.b*0.55);     // моря — базальт, чуть холоднее
+  col *= 1.0 + 1.25*sh;                                       // валы и чаши кратеров в свете Солнца
+  col += vec3(0.08,0.08,0.07)*m.a;                            // лучи и выбросы молодых кратеров
+  col *= 0.9 + 0.2*h31(nq*311.0);
+  p = q;`;
+// шар высокой плотности для страницы тела: точки мельче, их больше — яркость та же, деталей вчетверо больше
+// К краю диска точки ложатся гуще (проекция сферы), и при сложении света край выгорает в белое кольцо —
+// у плотного шара это заметно. Яркость точки домножаем на «косинус к зрителю», плотность на экране выравнивается.
+const B_LIMB = `a *= 0.5 + 0.5*clamp(normalize((modelViewMatrix*vec4(normalize(p), 0.0)).xyz).z, 0.0, 1.0);`;
+function hdSphere(n, R, chunk, tex, k){
+  const o = pts(n*Q, (i, o, nn) => {
+      const v = fib(i, nn), j = .012;
+      const x = v[0] + gauss()*j, y = v[1] + gauss()*j, z = v[2] + gauss()*j, L = Math.hypot(x, y, z) || 1;
+      o.p = [x/L, y/L, z/L]; o.s = .7 + Math.random()*.55; },
+    `vec3 nrm = normalize(position); float lat = nrm.y; float night = 0.0;
+     ${chunk}
+     ${B_TAIL}
+     ${B_LIMB}`, 1, S_DECL);
+  o.scale.setScalar(R);
+  const u = o.material.uniforms; u.uSolid.value = B_SA; u.uFocus.value = 1; u.uSize.value = (k || .85); u.uMap.value = tex;
+  return o;
+}
+
 // протоЗемля и Тейя: расплав
 const B_MOLT = `vec3 q = position; q.xz = rot(uTime*0.2)*q.xz; vec3 nq = normalize(q);
   float f = fbm(nq*3.2 + vec3(0.0, uTime*0.15, 0.0));
@@ -242,7 +271,7 @@ const makeBodyDive = g => {
 
   const LAYERS = { moon:[m0, m1, m2, m3], jup:[j0, j1, j2, j3] };
   const EXT = { moon:[[2.6, 2.6], [4.0, 2.4], [4.4, 3.0], [3.4, 3.6]], jup:[[5.2, 2.4], [5.4, 4.2], [3.4, 4.0], [2.9, 2.8]] };
-  let cur = null, curD = 0, theiaPh = 0;
+  let cur = null, curD = 0, theiaPh = 0, moonHD = null, hdK = 0, jupHD = null, eurHD = null;
   const tv = new THREE.Vector3();
 
   const ws = new THREE.Vector3();
@@ -268,6 +297,12 @@ const makeBodyDive = g => {
         });
       });
       if (kind === "moon"){
+        // подробная Луна: карта строится при первом входе на страницу (кусками, без подвисания), затем шар проявляется
+        const mt = BMAP.get("moon");
+        if (mt && !moonHD){ moonHD = P(hdSphere(120000, 2.3, B_MOON_HD, mt)); moonHD.material.uniforms.uSolid.value = .7; m0.add(moonHD); moonDots && moonDots.remap && moonDots.remap(); }
+        if (moonHD){ hdK = Math.min(1, hdK + dt*1.6);
+          moonHD.material.uniforms.uSharp.value = (m0.userData.w || 0)*hdK*.6;   // точек впятеро больше — каждая тусклее, иначе свет выгорает в белое
+          moon0.material.uniforms.uSharp.value *= 1 - hdK; moon0.visible = hdK < 1; }
         // Тейя: цикл 16 с — подлёт (0…0,3), удар, диск обломков, сборка Луны, пауза
         theiaPh = B_DBG_PH !== null ? B_DBG_PH : (t/16) % 1;
         for (const o of [proto, debris]) o.material.uniforms.uProg.value = theiaPh;
@@ -281,6 +316,13 @@ const makeBodyDive = g => {
         face.position.set(-Math.cos(ma)*.52, 0, -Math.sin(ma)*.52);
       }
       if (kind === "jup"){
+        // v184: подробные Юпитер (слой 0) и Европа (слой 2) — карты строятся при входе в ветку
+        const jt = BMAP.get("jup"), et = BMAP.get("eur");
+        if (jt && !jupHD){ jupHD = P(hdBall(100000, "jup", jt)); jupHD.scale.setScalar(2.0); jupHD.material.uniforms.uSolid.value = B_SA; j0.add(jupHD); }
+        if (et && !eurHD){ eurHD = P(hdBall(100000, "eur", et)); eurHD.scale.setScalar(2.15); eurHD.material.uniforms.uSolid.value = B_SA; j2.add(eurHD); }
+        for (const [hd, lo, G] of [[jupHD, jup0, j0], [eurHD, eur, j2]]) if (hd){ hd.userData.k = Math.min(1, (hd.userData.k || 0) + dt*1.6);
+          const k2 = hd.userData.k; hd.material.uniforms.uSharp.value = (G.userData.w || 0)*k2*.7; hd.material.uniforms.uSize.value = 1.0;
+          lo.material.uniforms.uSharp.value *= 1 - k2; lo.visible = k2 < 1; }
         for (const m of GM){ const a = m.a0 + t*TAU/m.T, x = Math.cos(a)*m.r, z = Math.sin(a)*m.r;
           m.sp.position.set(x, 0, z); m.lb.position.set(x, -.42, z);
           // спутник за диском планеты не виден — и подпись его тоже (подписи рисуются поверх всего)
