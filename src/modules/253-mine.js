@@ -95,7 +95,7 @@ const MINE = (() => {
     return out;
   }
   function compassRuns(){ try { return JSON.parse(localStorage.getItem("astro-compass") || "[]"); } catch(e){ return []; } }
-  const KN = { st:["станция","станции","станций"], lv:["слой","слоя","слоёв"], ev:["событие","события","событий"], tr:["группа Древа","группы Древа","групп Древа"], fg:["фигура","фигуры","фигур"], br:["мост","моста","мостов"], bio:["страница «Биосферы»","страницы «Биосферы»","страниц «Биосферы»"], fly:["полёт","полёта","полётов"], sky:["взгляд в прошлое","взгляда в прошлое","взглядов в прошлое"] };
+  const KN = { st:["станция","станции","станций"], lv:["слой","слоя","слоёв"], ev:["событие","события","событий"], tr:["группа Древа","группы Древа","групп Древа"], fg:["фигура","фигуры","фигур"], br:["мост","моста","мостов"], bio:["страница «Биосферы»","страницы «Биосферы»","страниц «Биосферы»"], fly:["полёт","полёта","полётов"], sky:["взгляд в прошлое","взгляда в прошлое","взглядов в прошлое"], atl:["страница атласа","страницы атласа","страниц атласа"] };
   function feed(db){
     const days = {}, add = (d, it) => (days[d] = days[d] || []).push(it);
     db.prac.forEach(p => add(jrDay(p.t), { t: p.t, h: `<span class="mn-ic">◎</span> ${esc(p.n)} — до конца` }));
@@ -141,10 +141,12 @@ const MINE = (() => {
     const S = db.seen, b = db.born, ids = new Set(), fl = Object.keys(S).filter(k => k.startsWith("fly:")), sk = Object.keys(S).filter(k => k.startsWith("sky:"));
     fl.forEach(k => ids.add(k.split(":")[1])); sk.forEach(k => ids.add(k.split(":")[1]));
     const ly = [...new Set(fl.map(k => k.split(":")[1]))].reduce((a, id) => { const d = FLY_DEST.find(x => x.id === id); return a + (d && d.kind !== "edge" ? d.km/FLY_LY : 0); }, 0);
-    if (!b && !ids.size) return "";
+    const at = Object.keys(S).filter(k => k.startsWith("atl:")).length;
+    if (!b && !ids.size && !at) return "";
     let h = `<div class="mn-sky"><h4>Глубокий космос</h4>`;
     if (b) h += `<p class="mn-sm">Звезда вашего рождения: <button class="tm-link" id="mnBorn" data-hover>${esc(b.s)} →</button> — её свет вышел, когда вы родились, и дошёл только сейчас.</p>`;
     if (ids.size) h += `<p class="mn-sm">Целей: ${ids.size} из ${FLY_DEST.length}${fl.length ? " · полётов: " + fl.length : ""}${sk.length ? " · взглядов в прошлое: " + sk.length : ""}${ly >= .01 ? " · световых лет в полётах: " + (ly < 100 ? ly.toLocaleString("ru-RU", { maximumSignificantDigits: 3 }) : Math.round(ly).toLocaleString("ru-RU")) : ""}</p>`;
+    if (at) h += `<p class="mn-sm">«Атлас чудес»: ${at} из ${ATL_OBJ.length} страниц</p>`;
     return h + `</div>`;
   }
   // ---- экран ----

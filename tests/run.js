@@ -29,7 +29,7 @@ async function page(opt = {}){
 const ready = p => p.waitForFunction(() => document.getElementById('loader').classList.contains('done'), null, { timeout: 90000 });
 const clean = p => { ok(!p.errs.length, 'ошибки JS: ' + p.errs.slice(0, 3).join(' | ')); ok(!p.csp.length, 'нарушения CSP: ' + p.csp.slice(0, 2).join(' | ')); ok(!p.fails.length, 'ответы с ошибкой: ' + p.fails.slice(0, 4).join(', ')); };
 const st = p => p.evaluate(() => ({ h: location.hash, path: location.pathname,
-  open: ['chHuman', 'chBio', 'chDims', 'chTime', 'chTree', 'chThought', 'chRef', 'chPath', 'chFly'].filter(id => { const e = document.getElementById(id); return e && e.classList.contains('open'); }) }));
+  open: ['chHuman', 'chBio', 'chDims', 'chTime', 'chTree', 'chThought', 'chRef', 'chPath', 'chFly', 'chAtl'].filter(id => { const e = document.getElementById(id); return e && e.classList.contains('open'); }) }));
 // ждать, пока условие на состоянии не выполнится (графика программная — сцены грузятся по-разному)
 async function until(p, f, ms = 30000){ const t0 = Date.now(); let s; while (Date.now() - t0 < ms){ s = await st(p); if (f(s)) return s; await sleep(500); } return s; }
 
@@ -157,6 +157,27 @@ test('fly', async () => {
   await e.waitForFunction(() => document.getElementById('flyCard').innerText.length > 50, null, { timeout: 30000 });
   const ce = await e.evaluate(() => document.getElementById('flyCard').innerText); ok(/160 days/.test(ce) && /384,400 km/.test(ce) && !/[А-яЁё]/.test(ce), 'EN карточка: ' + ce.slice(0, 160));
   clean(e); await e.done();
+});
+
+/* ---------- «Атлас чудес»: адрес страницы, смена объекта, игрушки, выход ---------- */
+test('atlas', async () => {
+  const p = await page(); await p.goto(B + '/#/atl/q3c'); await ready(p);
+  let s = await until(p, s => s.open.includes('chAtl'), 60000); ok(s.open.includes('chAtl'), 'атлас не открылся по адресу');
+  await p.waitForFunction(() => /Квазар 3C 273/.test(document.getElementById('atlCard').innerText) && document.querySelectorAll('#atlGrid .at-c').length === 6, null, { timeout: 30000 });
+  await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[1].click());
+  s = await until(p, s => s.h === '#/atl/ori', 15000); ok(s.h === '#/atl/ori', 'адрес после выбора туманности: ' + s.h);
+  await p.evaluate(() => document.getElementById('atlB').click());
+  ok(await p.evaluate(() => document.getElementById('atlB').getAttribute('aria-pressed')) === 'true', 'инфракрасный не включился');
+  await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[2].click()); await p.evaluate(() => document.getElementById('atlB').click()); await sleep(1500);
+  await p.evaluate(() => document.getElementById('atlB').click());   // звук пульсара — включить и выключить без ошибок
+  await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[4].click()); await sleep(1500);
+  const t0 = await p.evaluate(() => document.getElementById('atlTv').textContent);
+  await p.evaluate(() => { const r = document.getElementById('atlR'); r.value = 700; r.dispatchEvent(new Event('input')); });
+  await p.waitForFunction(() => /^\+7 /.test(document.getElementById('atlTv').textContent), null, { timeout: 60000 });
+  ok(/^\+0 /.test(t0), 'начало симуляции: ' + t0);
+  await p.evaluate(() => document.getElementById('atlClose').click());
+  s = await until(p, s => !s.open.includes('chAtl') && !/atl/.test(s.h), 15000); ok(!s.open.includes('chAtl') && !/atl/.test(s.h), 'выход из атласа: ' + JSON.stringify(s));
+  clean(p); await p.done();
 });
 
 /* ---------- сбой видеокарты: сообщение и перезапуск ---------- */

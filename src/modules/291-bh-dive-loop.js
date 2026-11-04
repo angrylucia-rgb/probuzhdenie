@@ -500,7 +500,7 @@ function loop(now){
   // глава проявилась, кольцо под ней не рисуем — иначе видеокарта считает две сцены сразу, размытие фона
   // пересчитывается каждый кадр, и курсор с панорамой «тянутся». На закрытие флаг снимается сразу, и кольцо
   // снова рисуется ещё до того, как глава погаснет. Поиск полупрозрачный — под ним кольцо рисуется как обычно
-  coverT = bioOn || flyOn || timeOn || treeOn || thoughtOn || dimsOn || compassOn || mineOn || pathOpen || refOpen || menuOpen
+  coverT = bioOn || flyOn || atlOn || timeOn || treeOn || thoughtOn || dimsOn || compassOn || mineOn || pathOpen || refOpen || menuOpen
     || chRoutes.classList.contains("open") ? coverT + dt : 0;
   if (typeof BSC !== "undefined" && BSC.covers()){}
   else if (coverT > .9){}

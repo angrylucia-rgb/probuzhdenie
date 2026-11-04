@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-t8RO1iT0ax0LbsF2ZB+TEUs2owGM4/HHPkSciC1Ibag='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-zUZ+mtao0SXTdt5J7eypYRIgXFH2jAaC+F0e5ftkm7I='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -1188,6 +1188,26 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 .fl-sky .fl-ship{background:#ffe9a0;box-shadow:0 0 12px #ffd070,0 0 3px #fff}
 .fl-life{display:flex;flex-wrap:wrap;gap:6px}.fl-life span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;color:var(--ink)}.fl-life i{font-style:normal;color:var(--faint);font-size:11px;margin-left:4px}
 #flyCv{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* v188: “Атлас чудес” */
+.ch-atl{background:#020309}
+#atlCv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#atlCv:active{cursor:grabbing}
+.ch-atl .time-in{display:flex;flex-direction:column}.ch-atl .time-in>.tm-scroll{flex:1 1 0;min-height:0}
+.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border-top:1px solid var(--line);padding-top:10px}
+.at-c{display:grid;gap:2px;text-align:left;padding:7px 9px;border:1px solid var(--line);border-radius:10px;transition:border-color .3s,background .3s}
+.at-c span{font-size:9.5px;letter-spacing:.14em;color:var(--faint)}.at-c b{font:400 13.5px/1.15 var(--display);color:var(--ink)}
+.at-c:hover{border-color:var(--brass)}.at-c.on{border-color:var(--brass);background:rgba(214,172,94,.1)}
+.at-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 4px}
+.at-facts div{border:1px solid var(--line);border-radius:10px;padding:7px 11px;display:grid;gap:2px}
+.at-facts span{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}.at-facts b{font:400 15px/1.2 var(--display);color:var(--ink)}
+.at-toy{position:absolute;right:var(--pad);bottom:calc(env(safe-area-inset-bottom,0px) + 28px);left:calc(var(--pad) + min(460px,36vw) + 60px);display:grid;justify-items:center;gap:8px;pointer-events:none;text-align:center}
+.at-tr{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;pointer-events:auto;background:rgba(5,6,12,.55);border:1px solid var(--line);border-radius:999px;padding:8px 16px;backdrop-filter:blur(6px)}
+.at-tl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.at-tr input[type=range]{width:min(320px,34vw);accent-color:var(--brass)}
+.at-tb[aria-pressed="true"]{border-color:#9fd0ff;color:#cfe6ff}
+.at-tv{font-size:11px;color:var(--ink);min-width:15em;text-align:left}
+.at-play{font-size:14px}
+.at-hint{max-width:560px;font-size:12.5px;color:var(--muted);text-shadow:0 0 12px #020309}
 .fl-dest{display:grid;gap:10px;max-height:30vh;overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent;padding-right:6px;border-top:1px solid var(--line);padding-top:10px}
 .fl-g{display:grid;gap:2px}
 .fl-gh{color:var(--faint);font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:2px}
@@ -1227,6 +1247,9 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   .fl-m b{display:none}
   .fl-dest{max-height:18vh}
   .fl-ret i{left:-50px;top:-50px;width:100px;height:100px}
+  .at-toy{left:var(--pad);right:var(--pad);top:calc(env(safe-area-inset-top,0px) + 56px);bottom:auto}
+  .at-tr input[type=range]{width:46vw}.at-tv{min-width:0}.at-hint{font-size:11.5px}
+  .at-grid{grid-template-columns:repeat(3,1fr)}.at-c b{font-size:12px}
   .fl-modes button{font-size:11.5px;padding:5px 4px}
 }
 </style>
@@ -1334,6 +1357,7 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
         <h3 class="mono mp-h">Deep space</h3>
         <button class="mp-it" id="mFly" data-span="2-4" data-hover><span class="mp-k mono">distance</span><b>How long to fly</b><span>To the Moon, the stars and the galaxies — on foot, aboard Voyager, at light speed and on a 1 g ship</span><i class="mp-rng"></i></button>
         <button class="mp-it" id="mSky" data-hover><span class="mp-k mono">time</span><b>Light from the past</b><span>The telescope as a time machine: when the light we see set out, and what was happening on Earth then</span></button>
+        <button class="mp-it" id="mAtl" data-hover><span class="mp-k mono">objects</span><b>Atlas of wonders</b><span>A quasar, the Orion Nebula, the Crab pulsar, Betelgeuse, the collision with Andromeda, dark matter</span></button>
         <button class="mp-it" id="mBorn" data-hover><span class="mp-k mono">personal</span><b>The star of your birth</b><span>The star whose light set out in the year you were born and is only now arriving</span></button>
       </section>
       <section class="mp-grp mp-atl">
@@ -1508,6 +1532,17 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
     <div class="fl-vehs" id="flyVeh" role="group" aria-label="How to travel"></div>
     <div class="tm-ctl"><button class="btn" id="flyGo" data-hover>Fly ▶</button></div>
     <div class="tm-scroll"><article class="tm-card" id="flyCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-atl" id="chAtl" aria-hidden="true" aria-label="Atlas of wonders">
+  <canvas id="atlCv" aria-label="The object's scene: drag to rotate, scroll to zoom"></canvas>
+  <button class="close mono" id="atlClose" data-hover>Back to the ring ✕</button>
+  <div class="at-toy" id="atlToy"></div>
+  <div class="time-in at-in">
+    <div class="tm-head"><span class="mono eyebrow">Deep space · Atlas of wonders</span></div>
+    <div class="at-grid" id="atlGrid" role="group" aria-label="Objects"></div>
+    <div class="tm-scroll" id="atlScroll"><article class="tm-card" id="atlCard" aria-live="polite"></article></div>
   </div>
 </section>
 
@@ -11812,7 +11847,7 @@ function openPath(){ chFrom("path"); closeChapters(); toggleMenu(false); surface
 function closePath(){ if (!pathOpen) return; pathOpen = false; chPath.classList.remove("open"); chPath.setAttribute("aria-hidden","true"); $("btnPath").setAttribute("aria-pressed","false"); }
 $("pathClose").onclick = () => { if (!chBack("path")) closePath(); };
 $("btnPath").onclick = () => pathOpen ? closePath() : openPath();
-function closeSide(){ closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeRouteList(); }   // все главы, кроме погружения
+function closeSide(){ closePath(); closeRef(); closeTime(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeRouteList(); }   // все главы, кроме погружения
 function closeChapters(){ closeHuman(); closeSide(); }
 /* ---------- v183: полёт Земля ↔ Луна без вспышки ----------
    Туда (клик по Луне на “космических” слоях Земли):
@@ -12892,7 +12927,7 @@ const CHR = (() => {
 })();
 const chTime = $("chTime");
 function closeTime(){ CHR.close(); }
-function openTime(){ chFrom("time"); closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
+function openTime(){ chFrom("time"); closeHuman(); closePath(); closeRef(); closeTree(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); toggleMenu(false); surface(); chTime.classList.add("open"); chTime.setAttribute("aria-hidden", "false"); $("btnTime").setAttribute("aria-pressed", "true"); CHR.open(); $("timeClose").focus({preventScroll:true}); }
 $("btnTime").onclick = () => CHR.on ? closeTime() : openTime();
 $("timeClose").onclick = () => { if (!chBack("time")) closeTime(); };
 $("mTime").onclick = openTime;
@@ -13653,7 +13688,7 @@ const CHT = (() => {
   return { open: openT, close, get on(){ return open; }, select: id => BY[id] && select(BY[id]), nodes: NODES, dbg: { sel: () => sel.id, n: NODES.length } };
 })();
 const chTree = $("chTree");
-function openTree(id){ chFrom("tree"); closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
+function openTree(id){ chFrom("tree"); closeHuman(); closePath(); closeRef(); closeTime(); closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); toggleMenu(false); surface(); chTree.classList.add("open"); chTree.setAttribute("aria-hidden", "false"); $("btnTree").setAttribute("aria-pressed", "true"); CHT.open(); if (id) CHT.select(id); $("treeClose").focus({preventScroll:true}); }
 function closeTree(){ CHT.close(); }
 $("btnTree").onclick = () => CHT.on ? closeTree() : openTree();
 $("treeClose").onclick = () => { if (!chBack("tree")) closeTree(); };
@@ -14723,7 +14758,7 @@ const CTH = (() => {
            dbg: { view: () => [v0, v1], sel: () => sel ? sel.id : selB ? "br:" + selB.a + ">" + selB.b : null, labeled: () => F.filter(f => f.g && f.g.style.display !== "none" && !f.g.classList.contains("nolab")).length, n: F.length } };
 })();
 const chThought = $("chThought");
-function openThought(id){ chFrom("th"); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeRouteList(); toggleMenu(false); surface(); chThought.classList.add("open"); chThought.setAttribute("aria-hidden", "false"); CTH.open(); if (id) CTH.select(id); $("thClose").focus({preventScroll:true}); }
+function openThought(id){ chFrom("th"); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeRouteList(); toggleMenu(false); surface(); chThought.classList.add("open"); chThought.setAttribute("aria-hidden", "false"); CTH.open(); if (id) CTH.select(id); $("thClose").focus({preventScroll:true}); }
 function closeThought(){ CTH.close(); }
 $("thClose").onclick = () => { if (!chBack("th")) closeThought(); };
 $("mThought").onclick = () => openThought();
@@ -14846,6 +14881,7 @@ function navHere(){
     if (DIMS.on) return { t:"dm", n:DIMS.n, k:"dm", nm:"Ladder of Dimensions" };
     if (BIO.on) return Object.assign({ t:"bio", k:"bio", nm:"Biosphere" }, BIO.place());
     if (pathOpen) return { t:"path", k:"path", nm:"The Eight-Stage Path" };
+    if (ATL.on) return { t:"atl", id: ATL.id, k:"atl", nm:"Atlas of wonders" };
     if (FLY.on) return FLY.m === "fly" ? { t:"fly", d: FLY.d, v: FLY.v, k:"fly", nm:"How long to fly" } : { t:"sky", d: FLY.m === "born" ? "born" : FLY.d, k:"fly", nm: FLY.m === "born" ? "The star of your birth" : "Light from the past" };
   } catch(e){}
   if (typeof humanOpen === "undefined" || !humanOpen || !jId) return null;
@@ -14857,7 +14893,7 @@ function navHere(){
 // v178: “Назад” у глав. Глава запоминает, откуда её открыли (слой станции или другая глава); тогда её верхняя
 // кнопка называется “← Назад” и возвращает туда. Открыта с кольца или из меню без источника — “Вернуться на кольцо ✕”.
 let NAV_SKIP = false, NAV_PENDING;
-const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose", fly:"flyClose" };
+const CH_BACK = {}, CH_CLOSE = { time:"timeClose", tree:"treeClose", th:"thClose", dm:"dmClose", path:"pathClose", bio:"bioClose", fly:"flyClose", atl:"atlClose" };
 function navMark(){ NAV_PENDING = navHere(); setTimeout(() => { NAV_PENDING = undefined; }, 0); }   // перед закрытием главы ради ссылки в другую
 function chFrom(key){
   if (NAV_SKIP) return;
@@ -14876,7 +14912,7 @@ const RT = (() => {
   function go(s){
     const from = s.t !== "j" && !NAV_SKIP ? navHere() : null, ext = from ? { t:"ext", go:from, nm:from.nm } : null;
     NAV_PENDING = from; setTimeout(() => { NAV_PENDING = undefined; }, 0);
-    closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly();
+    closeThought(); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl();
     if (s.t === "cal"){ closeTree(); openTime(); CHR.goAgo(s.ago); }
     else if (s.t === "tree"){ openTree(s.id); }
     else if (s.t === "th"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openThought(); if (s.br) CTH.bridgeBy(s.br); else if (s.id) CTH.select(s.id); }
@@ -14884,6 +14920,7 @@ const RT = (() => {
     else if (s.t === "dm"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openDims(s.n); if (s.lens) DIMS.lens(s.lens); if (s.m) DIMS.mode(s.m); }
     else if (s.t === "path"){ closeTime(); closeTree(); openPath(); }
     else if (s.t === "fly"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d, s.v, "fly"); }
+    else if (s.t === "atl"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openAtl(s.id); }
     else if (s.t === "sky"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d === "born" ? null : s.d, null, s.d === "born" ? "born" : "sky"); }
     else if (s.t === "bio" && s.m == null && s.b == null && s.bm == null && !s.sp && !s.e && NAV_SKIP){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openBio(); }
     else if (s.t === "bio"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman();
@@ -14974,6 +15011,8 @@ const SRCH = (() => {
     add("Chapter", "The Eight-Stage Path", "heart breathing", "learn feel live reflect practice breathing breath", () => RT.go({ t:"path" }));
     add("Chapter", "The Underside", "the second part of the site", "experience without words sound color movement worlds", () => RT.go({ t:"iz" }));
     add("Chapter", "How long to fly", "deep space · flight to the stars", "distance speed light light-year voyager ship rocket moon mars sun proxima andromeda galaxy relativity twin paradox", () => openFly(null, null, "fly"));
+    add("Chapter", "Atlas of wonders", "deep space · object pages", "quasar nebula orion crab pulsar betelgeuse supernova andromeda collision bullet dark matter", () => RT.go({ t:"atl" }));
+    ATL_OBJ.forEach(o => add("Atlas of wonders", o.nm, o.sub, o.sci.join(" "), () => RT.go({ t:"atl", id: o.id })));
     add("Chapter", "Light from the past", "deep space · the telescope as a time machine", "light past time telescope star nebula galaxy cosmic microwave background light-year calendar", () => RT.go({ t:"sky" }));
     add("Chapter", "The star of your birth", "deep space · personal", "birth star year age light vega arcturus altair capella aldebaran", () => RT.go({ t:"sky", d:"born" }));
     FLY_DEST.forEach(d => add("Flight", "How long to fly: " + d.nm, d.ly ? "light-years: " + d.ly : "", d.note, () => RT.go({ t:"fly", d: d.id })));
@@ -15347,7 +15386,7 @@ const MINE = (() => {
     return out;
   }
   function compassRuns(){ try { return JSON.parse(localStorage.getItem("astro-compass") || "[]"); } catch(e){ return []; } }
-  const KN = { st:["station","stations","stations"], lv:["layer","layers","layers"], ev:["event","events","events"], tr:["Tree group","Tree groups","Tree groups"], fg:["figure","figures","figures"], br:["bridge","bridges","bridges"], bio:["Biosphere page","Biosphere pages","Biosphere pages"], fly:["flight","flights","flights"], sky:["look into the past","looks into the past","looks into the past"] };
+  const KN = { st:["station","stations","stations"], lv:["layer","layers","layers"], ev:["event","events","events"], tr:["Tree group","Tree groups","Tree groups"], fg:["figure","figures","figures"], br:["bridge","bridges","bridges"], bio:["Biosphere page","Biosphere pages","Biosphere pages"], fly:["flight","flights","flights"], sky:["look into the past","looks into the past","looks into the past"], atl:["atlas page","atlas pages","atlas pages"] };
   function feed(db){
     const days = {}, add = (d, it) => (days[d] = days[d] || []).push(it);
     db.prac.forEach(p => add(jrDay(p.t), { t: p.t, h: `<span class="mn-ic">◎</span> ${esc(p.n)} — to the end` }));
@@ -15393,10 +15432,12 @@ const MINE = (() => {
     const S = db.seen, b = db.born, ids = new Set(), fl = Object.keys(S).filter(k => k.startsWith("fly:")), sk = Object.keys(S).filter(k => k.startsWith("sky:"));
     fl.forEach(k => ids.add(k.split(":")[1])); sk.forEach(k => ids.add(k.split(":")[1]));
     const ly = [...new Set(fl.map(k => k.split(":")[1]))].reduce((a, id) => { const d = FLY_DEST.find(x => x.id === id); return a + (d && d.kind !== "edge" ? d.km/FLY_LY : 0); }, 0);
-    if (!b && !ids.size) return "";
+    const at = Object.keys(S).filter(k => k.startsWith("atl:")).length;
+    if (!b && !ids.size && !at) return "";
     let h = `<div class="mn-sky"><h4>Deep space</h4>`;
     if (b) h += `<p class="mn-sm">The star of your birth: <button class="tm-link" id="mnBorn" data-hover>${esc(b.s)} →</button> — its light set out when you were born and has only now arrived.</p>`;
     if (ids.size) h += `<p class="mn-sm">Destinations: ${ids.size} of ${FLY_DEST.length}${fl.length ? " · flights: " + fl.length : ""}${sk.length ? " · looks into the past: " + sk.length : ""}${ly >= .01 ? " · light-years flown: " + (ly < 100 ? ly.toLocaleString("en-US", { maximumSignificantDigits: 3 }) : Math.round(ly).toLocaleString("en-US")) : ""}</p>`;
+    if (at) h += `<p class="mn-sm">“Atlas of wonders”: ${at} of ${ATL_OBJ.length} pages</p>`;
     return h + `</div>`;
   }
   // ---- экран ----
@@ -15991,7 +16032,7 @@ const FLY = (() => {
   function close(){ if (!open) return; open = flyOn = false; box.classList.remove("open"); box.setAttribute("aria-hidden", "true"); setTimeout(() => { if (!open) teardown(); }, 900); }
   addEventListener("resize", () => { if (open) size(); });
   addEventListener("keydown", e => { if (open && e.key === "Escape"){ e.stopPropagation(); if (!chBack("fly")) closeFly(); } }, true);
-  return { open: openF, close, get on(){ return open; }, get u(){ return u; }, get m(){ return md; }, get d(){ return FLY_DEST[dI].id; }, get v(){ return FLY_VEH[vI].id; },
+  return { open: openF, close, get on(){ return open; }, get u(){ return u; }, get m(){ return md; }, get d(){ return FLY_DEST[dI].id; }, get v(){ return FLY_VEH[vI].id; }, fmt: { fmtT, fmtD, agoT, bp, big },
            idx: id => FLY_DEST.findIndex(x => x.id === id), vdx: id => FLY_VEH.findIndex(x => x.id === id), go };
 })();
 const chFly = $("chFly");
@@ -16003,6 +16044,348 @@ $("mFly").onclick = () => openFly(null, null, "fly");
 $("mSky").onclick = () => openFly(null, null, "sky");
 $("mBorn").onclick = () => openFly(null, null, "born");
 $("btnFly").onclick = () => FLY.on ? closeFly() : openFly(null, null, "fly");
+/* ---------- v188: “Атлас чудес” — страницы объектов “Глубокого космоса”, первая шестёрка ----------
+   У каждой страницы своя сцена из частиц и своя “игрушка”: приглушить квазар, включить инфракрасный взгляд,
+   услышать пульсар, взорвать Бетельгейзе, прокрутить столкновение с Андромедой, показать тёмную материю.
+   Текст — как у слоёв станций: наука ●◐, традиции и мифы, параллель с человеком, практика.
+   Сцена — свой WebGL-контекст на время главы (как “Сколько лететь”), освобождается при закрытии. */
+const ATL_OBJ = [
+  { id:"q3c", fly:"q3c", nm:"Quasar 3C 273", sub:"The brightest quasar in the sky — the first one recognised", ly:2.4e9, size:"jet ≈200,000 light-years ◐",
+    sci:[
+      "● In 1963 Maarten Schmidt realised that the \"star\" 3C 273 is receding from us at about 47,000 km/s. It is not a star but the core of a distant galaxy — that is how quasars were discovered.",
+      "● It shines about 4 trillion times brighter than the Sun — like a hundred galaxies such as ours ◐. It can be seen even in an amateur telescope: magnitude about 12.9.",
+      "◐ The light comes from gas falling onto a supermassive black hole of about a billion solar masses: the disk around it is heated to hundreds of thousands of degrees.",
+      "● A jet streams out of the core — particles moving at almost the speed of light. Its length is ◐ about 200,000 light-years, longer than the whole Milky Way."
+    ],
+    tr:"In the Bhagavad Gita, Arjuna beholds the form of Vishnu and says: if a thousand suns were to rise at once in the sky, it would resemble the splendour of the Great Soul. A quasar is almost literally such a light: thousands of billions of suns in a single point.",
+    hum:"The bright core hides its galaxy, the way a strong feeling overshadows everything else in us. Dim it a little — and the whole comes through.",
+    pr:"A minute of quiet light. Close your eyes and picture a bright point in front of you. Do not put it out — just gently lower its brightness and notice what was around it all along.",
+    toy:{ kind:"range", lab:"Quasar brightness", hint:"Dim the quasar — the galaxy it outshines about a hundredfold comes through ◐" } },
+  { id:"ori", fly:"ori", nm:"Orion Nebula", sub:"M42 — the nearest great cradle of stars", ly:1344, size:"about 24 light-years ●",
+    sci:[
+      "● Visible without a telescope: a hazy patch in Orion's \"sword\", below the three stars of the belt.",
+      "● At its centre is the Trapezium: four young hot stars. Their ultraviolet light makes the gas glow: pink is hydrogen (the H-alpha line, 656 nm), turquoise is oxygen (O III, 501 nm).",
+      "● Hubble found protoplanetary disks here — proplyds: embryos of planetary systems, like ours 4.6 billion years ago.",
+      "● Dust hides thousands of newborn stars from the eye. Infrared light passes through dust — which is why the James Webb telescope sees them clearly."
+    ],
+    tr:"◐ For the K'iche' Maya, three stars of Orion — Alnitak, Saiph and Rigel — are the three hearthstones at the centre of the world, and the nebula between them is the smoke and fire of creation. The hearth fire gives birth to the world just as stars are born here.",
+    hum:"◐ The Sun was probably born in a similar star cluster. The atoms of your body were once glowing gas like this.",
+    pr:"The breath of the hearth. As you breathe in, warmth gathers in the centre of your chest, like the light in the Trapezium. As you breathe out, it gently spreads and lights up everything around. Six to eight slow breaths.",
+    toy:{ kind:"toggle", lab:"Infrared view", hint:"Switch on the infrared — the haze becomes transparent and newborn stars come through ●" } },
+  { id:"crab", fly:"crab", nm:"Crab Nebula", sub:"M1 — the remnant of the supernova of 1054 with a pulsar at its heart", ly:6500, size:"about 11 light-years ◐",
+    sci:[
+      "● On 4 July 1054 Chinese astronomers recorded a \"guest star\": for 23 days it was visible even in daylight, and at night for almost two years.",
+      "● At the centre is a pulsar: a neutron star the size of a city (about 20 km), heavier than the Sun. It turns about 30 times a second and sends out two beams, like a lighthouse.",
+      "● The blue glow is synchrotron light: electrons accelerated by the pulsar to almost the speed of light spiral in the magnetic field.",
+      "● The nebula is still expanding — at about 1,500 km/s."
+    ],
+    tr:"● The Chinese \"History of Song\" calls the flare a \"guest star\". ◐ In Chaco Canyon (USA) a crescent, a star and a hand are painted on a rock — perhaps the Ancestral Puebloans saw this supernova too.",
+    hum:"● Many of the heavy atoms in our bodies were born in stars and scattered through the Galaxy by explosions like this one. We are, quite literally, the ash of stars.",
+    pr:"Listening to rhythm. Turn on the sound of the pulsar and find your pulse at the wrist: about one beat a second. In that time the pulsar turns 30 times.",
+    toy:{ kind:"sound", lab:"Listen to the pulsar", hint:"● The Crab pulsar turns 30 times a second: each click is a beam sweeping over the Earth. The beam on screen is slowed down" } },
+  { id:"bet", fly:"bet", nm:"Betelgeuse", sub:"A red supergiant in Orion's shoulder — a star on the eve of exploding", ly:550, size:"radius ◐ about 760 solar radii — almost to the orbit of Jupiter",
+    sci:[
+      "● One of the largest stars visible to the eye: in the Sun's place it would swallow Mercury, Venus, the Earth and Mars ◐.",
+      "● At the end of 2019 and the start of 2020 came the \"Great Dimming\": the star faded about 2.5–3 times. The cause was an ejection of matter and a cloud of dust that hid part of the star.",
+      "◐ In 2025 the Gemini North telescope first saw its small companion; it was named Siwarha.",
+      "◐ Betelgeuse will explode as a supernova — by estimates, within the next 100,000 years. It will be visible in daylight, and at night it will be brighter than a half Moon. It poses no danger to the Earth ●: it is too far away."
+    ],
+    tr:"● The name comes from the Arabic \"yad al-jauza\", \"the hand of al-Jauza\". For the Greeks Orion is a giant hunter; Betelgeuse is his shoulder, Rigel his foot.",
+    hum:"Before its end the star sheds its outer layers — for thousands of years it lets go of what it was. It is like maturity: giving away the excess so that the core remains.",
+    pr:"Contemplating colour. On a winter evening find Orion: at upper left the orange Betelgeuse, at lower right the blue Rigel. Look at each in turn for half a minute and notice how the feeling changes.",
+    toy:{ kind:"toggle", lab:"Explode it", hint:"The Earth's sky on the night of the supernova ◐: Betelgeuse brighter than a half Moon — visible by day, casting shadows at night" } },
+  { id:"and", fly:"and", nm:"Andromeda Galaxy", sub:"M31 — the neighbour we may one day merge with", ly:2.5e6, size:"disk ◐ about 150,000 light-years",
+    sci:[
+      "● In 1923 Edwin Hubble found Cepheid stars in the Andromeda \"nebula\" and measured the distance: it lies far beyond the Milky Way. That made it clear there are many galaxies.",
+      "◐ It holds about a trillion stars — more than our Galaxy.",
+      "● Andromeda is approaching us at about 110 km/s.",
+      "◐ For a long time the collision was thought inevitable in ≈4.5 billion years. Calculations from 2025 using Gaia and Hubble data give roughly 50–50 within the next 10 billion years. Shown here is the scenario in which the encounter happens."
+    ],
+    tr:"● The first record is by the Persian astronomer al-Sufi in the \"Book of Fixed Stars\" (964): \"a small cloud\". It is visible without a telescope — the most distant object the eye can reach.",
+    hum:"● When galaxies merge, the stars hardly ever collide — the distances between them are enormous. The encounter changes the shape of both, but does not destroy them.",
+    pr:"On an autumn evening, far from city lights, find a pale smudge near Cassiopeia. The light entering your eye set out when the first people of the genus Homo were just appearing on the Earth.",
+    toy:{ kind:"range", lab:"Time", hint:"Scroll forward: the first approach, tails of stars, the merger into a single elliptical galaxy ◐" } },
+  { id:"bul", fly:null, nm:"The Bullet Cluster", sub:"1E 0657-56 — where dark matter was seen almost \"directly\"", ly:3.7e9, size:"several million light-years ◐",
+    sci:[
+      "● Two galaxy clusters passed through each other about 150 million years ago ◐. The smaller one looks like a bullet: in front of it is a shock wave in the hot gas.",
+      "● The hot gas (pink — X-rays, the Chandra telescope) collided and was slowed in the middle. The galaxies passed straight through, almost without colliding.",
+      "● The mass was measured another way — by how it bends the light of distant galaxies (gravitational lensing). Most of the mass turned out to be not where the gas is but where the galaxies are: the blue clouds.",
+      "● So most of the clusters' mass is invisible matter that does not shine and passes through itself. It is one of the strongest pieces of evidence for dark matter (2006)."
+    ],
+    tr:"\"Looked at but not seen — its name is the Invisible,\" says the Tao Te Ching of the Tao. In almost every tradition the visible rests on what cannot be seen.",
+    hum:"What holds us most is what cannot be seen: bonds, meaning, attention. Like dark matter — it does not shine, yet without it no galaxy would hold together.",
+    pr:"Noticing the unseen support. Sit and feel how the chair and the floor hold you, how the air comes in by itself. For a minute just notice what holds you without showing itself.",
+    toy:{ kind:"toggle2", lab:"Show dark matter", lab2:"Time of impact", hint:"Pink is hot gas ●, blue is where the mass really is ●. Move the time: the gas brakes, while the galaxies and dark matter pass straight through" } }
+];
+ATL_OBJ.forEach(o => { o.km = o.ly*FLY_LY; });
+
+const ATL = (() => {
+  const box = $("chAtl"); let cvs = $("atlCv");
+  const EN = SITE_LANG === "en";
+  let open = false, built = false, raf = 0, last = 0, rend, scn, cam, world, sky, cur = null, oI = 0, toyV = 1, toyB = 0, toyT = 1, toyTo = 1, seen = 0;
+  let drag = null, yaw = 0, pitch = 0, yawT = 0, pitchT = 0, zoom = 1, zoomT = 1;
+  const FRAG = `varying vec3 vC; varying float vA; void main(){ float r = length(gl_PointCoord - 0.5); float g = smoothstep(0.5, 0.0, r); g *= g; if (g*vA < 0.003) discard; gl_FragColor = vec4(vC, g*vA); }`;
+  const gs = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v); };
+  const col3 = h => { const c = new THREE.Color(h); return [c.r, c.g, c.b]; };
+  // облако точек: fill(i, o) пишет в o = [x, y, z, r, g, b, размер]; spin — дифференциальное вращение в шейдере (как у галактик)
+  function cloud(n, fill, spin, dyn){
+    n = Math.max(1, Math.round(n*Q)); const P = new Float32Array(n*3), C = new Float32Array(n*3), S = new Float32Array(n), o = [0, 0, 0, 1, 1, 1, 1];
+    for (let i = 0; i < n; i++){ fill(i, o, n); P[i*3] = o[0]; P[i*3 + 1] = o[1]; P[i*3 + 2] = o[2]; C[i*3] = o[3]; C[i*3 + 1] = o[4]; C[i*3 + 2] = o[5]; S[i] = o[6]; }
+    const g = new THREE.BufferGeometry(), pa = new THREE.BufferAttribute(P, 3); if (dyn) pa.setUsage(THREE.DynamicDrawUsage);
+    g.setAttribute("position", pa); g.setAttribute("aC", new THREE.BufferAttribute(C, 3)); g.setAttribute("aS", new THREE.BufferAttribute(S, 1));
+    const m = new THREE.ShaderMaterial({ uniforms: { uA: { value: 1 }, uPR: { value: Math.min(2, devicePixelRatio || 1) }, uT: { value: 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: `attribute vec3 aC; attribute float aS; uniform float uA; uniform float uPR; uniform float uT; varying vec3 vC; varying float vA;
+      void main(){ vec3 p = position; float a = uT*${(spin || 0).toFixed(3)}/(0.3 + length(p.xz)); p.xz = mat2(cos(a), -sin(a), sin(a), cos(a))*p.xz;
+        vec4 mv = modelViewMatrix*vec4(p, 1.0); gl_Position = projectionMatrix*mv; vC = aC; vA = uA*0.6;
+        gl_PointSize = uPR*aS*clamp(60.0/max(1.0, -mv.z), 0.8, 10.0); }`, fragmentShader: FRAG });
+    const pts = new THREE.Points(g, m); pts.frustumCulled = false; pts.userData.P = P; pts.userData.n = n; return pts;
+  }
+  const A = (o, a) => { o.material.uniforms ? o.material.uniforms.uA.value = a : o.material.opacity = a; };
+  const sm = (a, b, x) => { const t = clamp((x - a)/(b - a), 0, 1); return t*t*(3 - 2*t); };
+
+  /* ---------- сцены: build() → { g, upd(t, dt, v, b) } ---------- */
+  const SCENE = {
+    // квазар: тусклая эллиптическая галактика-хозяйка, раскалённый диск, односторонний джет с узлами
+    q3c(){
+      const g = new THREE.Group();
+      const host = cloud(9000, (i, o) => { const r = Math.pow(Math.random(), 1.6)*5.5, v = dir(); o.splice(0, 7, v[0]*r*1.2, v[1]*r*.8, v[2]*r, 1, .82, .6, .7 + Math.random()*.8); }); g.add(host);
+      const disk = cloud(2500, (i, o) => { const r = .25 + Math.pow(Math.random(), .7)*1.1, a = Math.random()*TAU, w = 1 - r/1.4; o.splice(0, 7, Math.cos(a)*r, gs()*.03, Math.sin(a)*r, .7 + .3*w, .8 + .2*w, 1, .6 + .8*w); }, .9); disk.rotation.x = .5; g.add(disk);
+      const jet = cloud(3000, (i, o) => { const t = Math.pow(Math.random(), .8), x = .5 + t*9, k = Math.sin(t*38)*.5 + .5, w = .05 + t*.35; o.splice(0, 7, x, gs()*w*.6 + t*1.2, gs()*w*.6, .55 + .4*k, .7 + .25*k, 1, .5 + 1.2*k*(1 - t*.5)); });
+      jet.rotation.z = .25; g.add(jet);
+      const core = glow(0xffffff, 3, 1), halo = glow(0xcfe4ff, 14, .6), spike = glow(0xe8f0ff, 40, .25); g.add(core, halo, spike);
+      return { g, upd(t, dt, v){
+        // v — яркость квазара. Экспозиция под самое яркое: пока квазар горит, хозяйка не видна
+        const q = Math.max(.02, v); A(host, clamp(.06/q, 0, 1)*.9); A(core, .3 + .7*q); A(halo, .6*q); A(spike, .25*q*q); A(disk, .25 + .75*q); A(jet, .3 + .5*q);
+        disk.material.uniforms.uT.value = t; } };
+    },
+    // туманность Ориона: розовый водород, бирюзовый кислород в центре, тёмные прожилки; в инфракрасном — протозвёзды
+    ori(){
+      const g = new THREE.Group();
+      const n3 = (x, y, z) => Math.sin(x*1.3 + Math.sin(y*1.7)*1.4)*Math.cos(y*1.1 - z*.8) + .5*Math.sin(x*2.9 - y*2.3 + z);
+      const gas = cloud(16000, (i, o) => {
+        let x = gs()*4, y = gs()*3.2, z = gs()*1.4 - Math.hypot(x, y)*.25; const r = Math.hypot(x, y), f = n3(x, y, z);
+        if (f < -.55 && Math.random() < .8){ x *= 1.3; y *= 1.3; }   // тёмные прожилки — там, где пыль
+        const oiii = Math.random() < Math.exp(-r*.45)*.9, c = oiii ? [.35, .9, .85] : [1, .38, .55], k = .45 + .3*(f + 1)/2;
+        o.splice(0, 7, x, y, z, c[0]*k*.7, c[1]*k*.7, c[2]*k*.7, 3 + Math.random()*5); });   // крупные тусклые точки — сплошное свечение газа
+      g.add(gas);
+      const trap = [[-.18, .1], [.15, .16], [.05, -.14], [-.06, -.02]].map(([x, y]) => { const s = glow(0xeaf2ff, 1.1, 1); s.position.set(x, y, .4); g.add(s); return s; });
+      const tg = glow(0xcfe8ff, 5, .4); tg.position.z = .3; g.add(tg);
+      const ir = cloud(700, (i, o) => { const x = gs()*2.6, y = gs()*2.1, w = Math.random(); o.splice(0, 7, x, y, gs()*.6, 1, .75 + .25*w, .55 + .4*w, .9 + Math.pow(Math.random(), 3)*3); }); g.add(ir);
+      const prop = cloud(60, (i, o) => { const a = Math.random()*TAU, r = .3 + Math.random()*1.2; o.splice(0, 7, Math.cos(a)*r, Math.sin(a)*r*.8, .5, 1, .7, .4, 2.2); }); g.add(prop);
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*1.6);
+        A(gas, .6*(1 - .85*k)); A(ir, 1.4*k); A(prop, .25 + .75*k); A(tg, .4*(1 - .5*k)); } };
+    },
+    // Краб: волокна по оболочке, голубое синхротронное сияние, пульсар с двумя лучами
+    crab(){
+      const g = new THREE.Group();
+      const fil = cloud(9000, (i, o) => { const v = dir(), s = Math.sin(v[0]*7 + v[1]*5)*Math.cos(v[2]*6 - v[0]*3), r = 2.3 + .35*s + Math.random()*.25; const keep = Math.abs(s) > .35 || Math.random() < .25;
+        const R = keep ? r : r*.6; o.splice(0, 7, v[0]*R*1.35, v[1]*R, v[2]*R*.9, 1, .42 + .2*Math.random(), .2, keep ? .8 + Math.random() : .4); }); g.add(fil);
+      const syn = cloud(6000, (i, o) => { const v = dir(), r = Math.pow(Math.random(), .6)*2; o.splice(0, 7, v[0]*r*1.3, v[1]*r, v[2]*r*.85, .45, .6, 1, .9 + Math.random()*.9); }); g.add(syn);
+      const psr = glow(0xffffff, .9, 1), ps2 = glow(0xbcd8ff, 3, .5); g.add(psr, ps2);
+      const beams = new THREE.Group(); g.add(beams);
+      const beam = cloud(1600, (i, o) => { const s = i % 2 ? 1 : -1, t = Math.pow(Math.random(), .7)*5.5, w = t*.06; o.splice(0, 7, gs()*w, s*t, gs()*w, .75, .85, 1, 1.2*(1 - t/6.5) + .2); });
+      beams.add(beam); beams.rotation.z = .5;
+      return { g, upd(t, dt){ beams.rotation.y = t*TAU*.5; const f = Math.max(0, Math.cos(t*TAU*.5))**8; A(psr, .6 + .4*f); A(ps2, .3 + .4*f); A(beam, .7); } };
+    },
+    // Бетельгейзе: огромная красная звезда с конвективными ячейками, пыльная оболочка, спутник; “взрыв” — небо Ориона
+    bet(){
+      const g = new THREE.Group(), star = new THREE.Group(); g.add(star);
+      const cell = (v) => { const a = Math.sin(v[0]*4.1 + Math.sin(v[1]*3.3)*2)*Math.cos(v[2]*3.7 - v[0]*2.1); return .5 + .5*a; };
+      const surf = cloud(14000, (i, o) => { const v = dir(), c = cell(v), r = 3 + gs()*.04; o.splice(0, 7, v[0]*r, v[1]*r, v[2]*r, 1, .22 + .32*c, .08 + .12*c, .8 + 1.4*c); }, .05); star.add(surf);
+      const dust = cloud(4000, (i, o) => { const v = dir(), r = 3.3 + Math.pow(Math.random(), 2)*5; o.splice(0, 7, v[0]*r, v[1]*r, v[2]*r, .6, .32, .2, .5 + Math.random()*.6); }); star.add(dust);
+      const sg = glow(0xff7040, 12, .45); star.add(sg);
+      const comp = glow(0xdfe8ff, .7, 1); star.add(comp);
+      // небо Земли: Орион (прямое восхождение, склонение, звёздная величина)
+      const sky2 = new THREE.Group(); g.add(sky2);
+      const OR = [["bet", 5.92, 7.4, .5, 0xffa060], ["rig", 5.24, -8.2, .13, 0xbcd2ff], ["bel", 5.42, 6.35, 1.6, 0xcfe0ff], ["sai", 5.80, -9.67, 2.1, 0xcfe0ff],
+                  ["aln", 5.68, -1.94, 1.8, 0xcfe0ff], ["alm", 5.60, -1.20, 1.7, 0xcfe0ff], ["min", 5.53, -.30, 2.2, 0xcfe0ff], ["mei", 5.59, 9.93, 3.4, 0xcfe0ff]];
+      const os = {}; OR.forEach(([k, ra, de, m, c]) => { const s = glow(c, 1.6*Math.pow(10, -.12*m), 1); s.position.set(-(ra - 5.6)*15*.32, de*.32, 0); sky2.add(s); os[k] = s; });
+      const field = cloud(1500, (i, o) => o.splice(0, 7, (Math.random() - .5)*22, (Math.random() - .5)*14, -1, .8, .85, 1, .3 + Math.random()*.6)); sky2.add(field);
+      const sn = glow(0xeaf2ff, 1, 0), snh = glow(0xcfe0ff, 1, 0); sn.position.copy(os.bet.position); snh.position.copy(os.bet.position); sky2.add(sn, snh);
+      let k = 0;
+      return { g, upd(t, dt, v, b){ k += ((b ? 1 : 0) - k)*Math.min(1, dt*.9);
+        const pulse = 1 + .025*Math.sin(t*.9); star.scale.setScalar(pulse*(1 - .7*sm(0, .5, k))); comp.position.set(Math.cos(t*.25)*4.4, .5, Math.sin(t*.25)*4.4);
+        [surf, dust].forEach(o => A(o, 1 - sm(0, .5, k))); A(sg, .45*(1 - sm(0, .5, k))); A(comp, 1 - sm(0, .5, k));
+        const s2 = sm(.3, .8, k); sky2.children.forEach(c => { if (c !== sn && c !== snh) A(c, s2*(c === field ? .8 : 1)); });
+        const f = sm(.55, 1, k); A(os.bet, s2*(1 - f)); A(sn, f); A(snh, f*.55); sn.scale.setScalar(.5 + 2.6*f); snh.scale.setScalar(1 + 12*f); } };
+    },
+    // Андромеда и Млечный Путь: ограниченная задача трёх тел (две массы + пробные звёзды), трение для слияния
+    and(){
+      const g = new THREE.Group(), N1 = Math.round(3400*Q), N2 = Math.round(2800*Q), N = N1 + N2;
+      const pts = cloud(N, (i, o) => { const a = i < N1; o.splice(0, 7, 0, 0, 0, ...(a ? [1, .84, .62] : [.7, .8, 1]), .9 + Math.random()*.8); }, 0, true); g.add(pts);
+      const P = pts.userData.P, Vv = new Float32Array(N*3), G1 = glow(0xffe6c0, 2.4, .9), G2 = glow(0xdfe8ff, 2, .9); g.add(G1, G2);
+      const M1 = 1.5, M2 = 1, eps = .35, R1 = 4.2, R2 = 3.4;
+      let S = null, tNow = 0;
+      const n1 = new THREE.Vector3(.25, 1, .1).normalize(), n2 = new THREE.Vector3(-.5, .8, .35).normalize();
+      function disk(i0, i1, c, v, M, R, nrm){
+        const e1 = new THREE.Vector3(1, 0, 0).cross(nrm).normalize(), e2 = nrm.clone().cross(e1);
+        for (let i = i0; i < i1; i++){ const r = .4 + Math.pow(Math.random(), .9)*R, a = Math.random()*TAU, vc = Math.sqrt(M*r*r/Math.pow(r*r + eps*eps, 1.5));
+          const p = e1.clone().multiplyScalar(Math.cos(a)*r).add(e2.clone().multiplyScalar(Math.sin(a)*r)).add(nrm.clone().multiplyScalar(gs()*.06));
+          const w = e1.clone().multiplyScalar(-Math.sin(a)*vc).add(e2.clone().multiplyScalar(Math.cos(a)*vc));
+          P[i*3] = c[0] + p.x; P[i*3 + 1] = c[1] + p.y; P[i*3 + 2] = c[2] + p.z; Vv[i*3] = v[0] + w.x; Vv[i*3 + 1] = v[1] + w.y; Vv[i*3 + 2] = v[2] + w.z; }
+      }
+      function reset(){
+        const c1 = [-3.4, 0, -1.4], c2 = [5.1, 1.1, 2.1], v1 = [.17, 0, .035], v2 = [-.255, -.03, -.15];   // центр масс — в начале координат
+        S = { c1, c2, v1, v2 }; tNow = 0; disk(0, N1, c1, v1, M1, R1, n1); disk(N1, N, c2, v2, M2, R2, n2);
+      }
+      reset();
+      const DT = .05, T_END = 10, STEPS = 520;   // 520 шагов = 10 млрд лет
+      function step(){
+        const { c1, c2, v1, v2 } = S, dx = c2[0] - c1[0], dy = c2[1] - c1[1], dz = c2[2] - c1[2], d2 = dx*dx + dy*dy + dz*dz + eps*eps, d3 = Math.pow(d2, 1.5);
+        // динамическое трение: при сближении центры теряют относительную скорость — так галактики и сливаются
+        const fr = .022*Math.exp(-Math.sqrt(d2)/2.5), rv = [v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]];
+        for (let k = 0; k < 3; k++){ const d = [dx, dy, dz][k]; v1[k] += (M2*d/d3 + fr*rv[k]*M2/(M1 + M2))*DT; v2[k] += (-M1*d/d3 - fr*rv[k]*M1/(M1 + M2))*DT; }
+        for (let k = 0; k < 3; k++){ c1[k] += v1[k]*DT; c2[k] += v2[k]*DT; }
+        for (let i = 0; i < N; i++){ const j = i*3; let ax = 0, ay = 0, az = 0;
+          for (const [c, M] of [[c1, M1], [c2, M2]]){ const x = c[0] - P[j], y = c[1] - P[j + 1], z = c[2] - P[j + 2], q = x*x + y*y + z*z + eps*eps, f = M/(q*Math.sqrt(q)); ax += x*f; ay += y*f; az += z*f; }
+          Vv[j] += ax*DT; Vv[j + 1] += ay*DT; Vv[j + 2] += az*DT; P[j] += Vv[j]*DT; P[j + 1] += Vv[j + 1]*DT; P[j + 2] += Vv[j + 2]*DT; }
+        tNow += T_END/STEPS;
+      }
+      return { g, get t(){ return tNow; }, upd(t, dt, v){
+        const want = v*T_END; let cap = 14; if (want < tNow - 1e-6){ reset(); cap = STEPS; }   // назад — пересчёт с начала сразу до нужного момента
+        let n = 0; while (tNow < want - 1e-6 && n++ < cap) step();
+        pts.geometry.attributes.position.needsUpdate = true; G1.position.fromArray(S.c1); G2.position.fromArray(S.c2);
+        const dd = Math.hypot(S.c1[0] - S.c2[0], S.c1[1] - S.c2[1], S.c1[2] - S.c2[2]); A(G2, .9*sm(.6, 2.5, dd)); G1.scale.setScalar(2.4 + 1.6*(1 - sm(.6, 2.5, dd))); } };
+    },
+    // “Пуля”: галактики и тёмная материя проходят насквозь, горячий газ тормозит посередине и вытягивается в ударную волну
+    bul(){
+      const g = new THREE.Group();
+      const mk = (n, sx, col, sz) => cloud(n, (i, o) => o.splice(0, 7, gs()*sx, gs()*sx*.8, gs()*sx*.7, ...col, sz()), 0, false);
+      const galA = mk(500, 1.6, [1, .92, .75], () => .8 + Math.random()*1.2), galB = mk(260, .9, [1, .92, .75], () => .8 + Math.random()*1.2);
+      const dmA = mk(4000, 2.2, [.25, .45, 1], () => 1.6 + Math.random()*2), dmB = mk(2400, 1.3, [.25, .45, 1], () => 1.6 + Math.random()*2);
+      const gasA = mk(4000, 1.8, [1, .35, .62], () => 1.4 + Math.random()*1.8);
+      // газ “пули” — конус: острый нос впереди (ударная волна), хвост позади
+      const gasB = cloud(2600, (i, o) => { const t = Math.random(), x = 1.2 - t*2.6, w = .25 + t*1.1; o.splice(0, 7, x, gs()*w*.6, gs()*w*.5, 1, .38, .65, 1.4 + Math.random()*1.6); });
+      const shock = cloud(1200, (i, o) => { const a = (Math.random() - .5)*2.2, r = 1.6; o.splice(0, 7, r*Math.cos(a)*.55 + .9, r*Math.sin(a), gs()*.3, 1, .7, .85, .9); });
+      g.add(dmA, dmB, gasA, gasB, shock, galA, galB);
+      let k = 0;
+      return { g, upd(t, dt, v, b){
+        k += ((b ? 1 : 0) - k)*Math.min(1, dt*2);
+        const tau = v*2 - 1;   // −1 — до удара, 0 — встреча, 1 — сейчас
+        const xA = -2*tau - .5, xB = 4.2*tau, after = Math.max(0, tau);
+        const gA = tau < 0 ? xA : -.5 - 2*tau*.25, gB = tau < 0 ? xB : xB*.38;
+        galA.position.x = dmA.position.x = xA; galB.position.x = dmB.position.x = xB; gasA.position.x = gA; gasB.position.x = gB; shock.position.x = gB + .2;
+        gasB.scale.set(1 + .5*after, 1 - .2*after, 1); A(shock, .7*sm(.05, .5, tau)); A(gasA, .55); A(gasB, .65); A(dmA, .55*k); A(dmB, .55*k); A(galA, 1); A(galB, 1); } };
+    }
+  };
+
+  /* ---------- интерфейс ---------- */
+  const grid = $("atlGrid"), card = $("atlCard"), toy = $("atlToy");
+  const fm = () => FLY.fmt;
+  function cards(){
+    grid.innerHTML = ATL_OBJ.map((o, i) => `<button class="at-c" data-i="${i}" data-hover><span class="mono">${String(i + 1).padStart(2, "0")}</span><b>${esc(o.nm)}</b></button>`).join("");
+    grid.querySelectorAll("[data-i]").forEach(b => b.onclick = () => pick(+b.dataset.i));
+  }
+  function page(){
+    const o = ATL_OBJ[oI], f = fm(), voy = o.km/17;   // “Вояджер-1”, ≈17 км/с
+    let h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(EN ? "Atlas of wonders" : "Atlas of wonders")} · ${oI + 1}/${ATL_OBJ.length}</span></div>
+      <h3>${esc(o.nm)}</h3><p class="tm-ago2">${esc(o.sub)}</p>
+      <div class="at-facts"><div><span class="mono">${esc(EN ? "distance" : "distance")}</span><b>${esc(f.fmtD(o.km))}</b></div><div><span class="mono">${esc(EN ? "size" : "size")}</span><b>${esc(o.size)}</b></div>
+        <div><span class="mono">${esc(EN ? "by Voyager" : "by Voyager")}</span><b>${esc(f.fmtT(voy))}</b></div><div><span class="mono">${esc(EN ? "the light travelled" : "the light travelled")}</span><b>${esc(f.agoT(o.ly))}</b></div></div>
+      <h4>${esc(EN ? "Science" : "Science")}</h4><ul class="list at-sci">${o.sci.map(x => `<li><span>${esc(x)}</span></li>`).join("")}</ul>
+      <h4>${esc(EN ? "Traditions and myths" : "Traditions and myths")}</h4><p class="tm-pr">${esc(o.tr)}</p>
+      <h4>${esc(EN ? "A parallel with the human being" : "A parallel with the human")}</h4><p class="tm-pr">${esc(o.hum)}</p>
+      <h4>${esc(EN ? "Practice" : "Practice")}</h4><p class="tm-pr">${esc(o.pr)}</p>
+      <div class="tm-gos">${o.fly ? `<button class="btn tm-go at-sky" data-hover>${esc(EN ? "What the light saw →" : "What the light saw →")}</button><button class="btn tm-go at-fly" data-hover>${esc(EN ? "How long to fly →" : "How long to fly →")}</button>` : ""}
+        <button class="btn tm-go at-next" data-hover>${esc(EN ? "Next wonder →" : "Next wonder →")}</button></div>`;
+    card.innerHTML = h; $("atlScroll").scrollTop = 0;
+    const s = card.querySelector(".at-sky"); if (s) s.onclick = () => { navMark(); RT.go({ t:"sky", d: o.fly }); };
+    const fl = card.querySelector(".at-fly"); if (fl) fl.onclick = () => { navMark(); RT.go({ t:"fly", d: o.fly, v:"g1" }); };
+    card.querySelector(".at-next").onclick = () => pick((oI + 1) % ATL_OBJ.length);
+  }
+  // игрушка: ползунок, переключатель, звук
+  let audio = null;
+  function toyUI(){
+    const o = ATL_OBJ[oI], t = o.toy; let h = `<span class="mono at-tl">${esc(t.lab)}</span>`;
+    if (t.kind === "range") h += `<input type="range" id="atlR" min="0" max="1000" value="${o.id === "and" ? 0 : 1000}" aria-label="${esc(t.lab)}">${o.id === "and" ? `<button class="tm-link at-play" id="atlPlay" data-hover>▶</button><span class="mono at-tv" id="atlTv"></span>` : ""}`;
+    else if (t.kind === "toggle" || t.kind === "sound") h = `<button class="btn at-tb" id="atlB" aria-pressed="false" data-hover>${esc(t.lab)}</button>`;
+    else if (t.kind === "toggle2") h = `<button class="btn at-tb" id="atlB" aria-pressed="false" data-hover>${esc(t.lab)}</button><span class="mono at-tl">${esc(t.lab2)}</span><input type="range" id="atlR" min="0" max="1000" value="1000" aria-label="${esc(t.lab2)}">`;
+    toy.innerHTML = `<div class="at-tr">${h}</div><p class="at-hint">${esc(t.hint)}</p>`;
+    const r = $("atlR"); toyT = toyV = r ? +r.value/1000 : 1; toyB = 0;
+    if (r) r.oninput = () => { toyT = +r.value/1000; playing = false; syncPlay(); };
+    const b = $("atlB"); if (b) b.onclick = () => { toyB = toyB ? 0 : 1; b.setAttribute("aria-pressed", String(!!toyB));
+      if (t.kind === "sound") toyB ? pulsarOn() : pulsarOff();
+      if (o.id === "bet") b.textContent = toyB ? (EN ? "Back to the star" : "Back to the star") : t.lab; };
+    const pl = $("atlPlay"); if (pl) pl.onclick = () => { playing = !playing; if (playing && toyT >= .999){ toyT = 0; r.value = 0; } syncPlay(); };
+  }
+  let playing = false; const syncPlay = () => { const pl = $("atlPlay"); if (pl) pl.textContent = playing ? "❚❚" : "▶"; };
+  // звук пульсара Краба: щелчок каждые 33,7 мс (29,6 оборота в секунду ●) — короткий шумовой импульс, петля в 1 с
+  function pulsarOn(){
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      const ac = new AC(), sr = ac.sampleRate, buf = ac.createBuffer(1, sr, sr), d = buf.getChannelData(0), P = sr/29.6;
+      for (let k = 0; k*P < sr; k++){ const i0 = Math.round(k*P); for (let j = 0; j < sr*.004 && i0 + j < sr; j++) d[i0 + j] += (Math.random()*2 - 1)*Math.exp(-j/(sr*.0007)); }
+      const src = ac.createBufferSource(), gn = ac.createGain(), lp = ac.createBiquadFilter(); src.buffer = buf; src.loop = true; lp.type = "lowpass"; lp.frequency.value = 2400; gn.gain.value = .0001;
+      src.connect(lp); lp.connect(gn); gn.connect(ac.destination); src.start(); gn.gain.exponentialRampToValueAtTime(.35, ac.currentTime + .4);
+      audio = { ac, src, gn };
+    } catch(e){ audio = null; }
+  }
+  function pulsarOff(){ if (!audio) return; const a = audio; audio = null; try { a.gn.gain.exponentialRampToValueAtTime(.0001, a.ac.currentTime + .25); setTimeout(() => { try { a.src.stop(); a.ac.close(); } catch(e){} }, 350); } catch(e){} }
+  function hudAnd(){
+    const tv = $("atlTv"); if (!tv || !cur || cur.t == null) return; const t = cur.t;
+    tv.textContent = "+" + (t < .05 ? "0" : t.toLocaleString(EN ? "en-US" : "en-US", { maximumFractionDigits: 1 })) + (EN ? " bn yr" : " bn yr") + " · " + (t < 3.5 ? (EN ? "approaching" : "approaching") : t < 5 ? (EN ? "first pass ◐" : "first pass ◐") : t < 6.5 ? (EN ? "tidal tails" : "tidal tails") : (EN ? "one elliptical galaxy" : "one elliptical galaxy"));
+  }
+  function pick(i){
+    oI = i; grid.querySelectorAll("[data-i]").forEach(b => b.classList.toggle("on", +b.dataset.i === oI));
+    pulsarOff(); playing = false;
+    page(); toyUI(); syncPlay();
+    if (built){ if (cur){ world.remove(cur.g); cur.g.traverse(o => { if (o.geometry && !o.isSprite) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
+      cur = SCENE[ATL_OBJ[oI].id](); world.add(cur.g); yaw = yawT = ATL_OBJ[oI].id === "bet" ? 0 : .3; pitch = pitchT = .15; zoom = zoomT = ATL_OBJ[oI].id === "and" ? 1.45 : 1; }
+    jrMark("atl", ATL_OBJ[oI].id, ATL_OBJ[oI].nm);
+  }
+  /* ---------- сцена ---------- */
+  function build(){
+    built = true;
+    rend = new THREE.WebGLRenderer({ canvas: cvs, antialias: true, alpha: false, powerPreference: "high-performance" }); rend.setClearColor(0x020309, 1);
+    scn = new THREE.Scene(); cam = new THREE.PerspectiveCamera(50, 1, .05, 400); world = new THREE.Group(); world.position.z = -16; scn.add(world);
+    sky = cloud(2600, (i, o) => { const v = dir(), r = 120; o.splice(0, 7, v[0]*r, v[1]*r, v[2]*r, .85, .88, 1, .5 + Math.pow(Math.random(), 6)*2.5); }); scn.add(sky);
+    cvs.addEventListener("webglcontextlost", e => { e.preventDefault(); }, false);
+    cvs.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, a: yawT, b: pitchT }; try { cvs.setPointerCapture(e.pointerId); } catch(_){} });
+    cvs.addEventListener("pointermove", e => { if (!drag) return; yawT = drag.a + (e.clientX - drag.x)*.006; pitchT = clamp(drag.b + (e.clientY - drag.y)*.004, -1.2, 1.2); });
+    cvs.addEventListener("pointerup", () => { drag = null; }); cvs.addEventListener("pointercancel", () => { drag = null; });
+    cvs.addEventListener("wheel", e => { e.preventDefault(); zoomT = clamp(zoomT*Math.exp(e.deltaY*.0012), .45, 2.2); }, { passive: false });
+  }
+  function teardown(){
+    if (!built) return; pulsarOff();
+    scn.traverse(o => { if (o.geometry && !o.isSprite) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+    rend.dispose(); rend.forceContextLoss(); rend = scn = cam = world = sky = cur = null; built = false;
+    const nc = cvs.cloneNode(false); cvs.replaceWith(nc); cvs = nc;
+  }
+  function size(){ const w = cvs.clientWidth || innerWidth, h = cvs.clientHeight || innerHeight; rend.setPixelRatio(Math.min(2, devicePixelRatio || 1)); rend.setSize(w, h, false);
+    cam.aspect = w/h; const port = w < 760; cam.setViewOffset(w, h, port ? 0 : -w*.16, port ? h*.2 : 0, w, h); cam.updateProjectionMatrix(); }
+  function frame(now){
+    raf = open ? requestAnimationFrame(frame) : 0; if (!open) return;
+    const dt = Math.min(.1, (now - last)/1000 || 0), t = now/1000; last = now;
+    if (playing){ toyT = Math.min(1, toyT + dt/22); const r = $("atlR"); if (r) r.value = Math.round(toyT*1000); if (toyT >= 1){ playing = false; syncPlay(); } }
+    if (ATL_OBJ[oI].id === "and") toyV = toyT; else toyV += (toyT - toyV)*Math.min(1, dt*3);   // у симуляции — без сглаживания: шаг назад пересчитывает с начала
+    if (!drag) yawT += dt*.03;
+    yaw += (yawT - yaw)*Math.min(1, dt*4); pitch += (pitchT - pitch)*Math.min(1, dt*4); zoom += (zoomT - zoom)*Math.min(1, dt*4);
+    const flat = ATL_OBJ[oI].id === "bet" && toyB;   // небо Земли — без вращения
+    world.rotation.set(flat ? 0 : pitch, flat ? 0 : yaw, 0); world.position.z = -16*zoom;
+    if (cur){ cur.upd(t, dt, toyV, toyB); cur.g.traverse(o => { if (o.isPoints && o.material.uniforms && o.material.uniforms.uT && o !== sky) o.material.uniforms.uT.value = t; }); }
+    if (ATL_OBJ[oI].id === "and") hudAnd();
+    sky.rotation.y += dt*.002;
+    rend.render(scn, cam);
+  }
+  function openA(i){
+    if (!built) build();
+    if (!grid.children.length) cards();
+    open = atlOn = true; size();
+    pick(i != null && i >= 0 ? i : oI);
+    if (!raf){ last = performance.now(); raf = requestAnimationFrame(frame); }
+  }
+  function close(){ if (!open) return; open = atlOn = false; pulsarOff(); box.classList.remove("open"); box.setAttribute("aria-hidden", "true"); setTimeout(() => { if (!open) teardown(); }, 900); }
+  addEventListener("resize", () => { if (open) size(); });
+  addEventListener("keydown", e => { if (open && e.key === "Escape"){ e.stopPropagation(); if (!chBack("atl")) closeAtl(); } }, true);
+  return { open: openA, close, get on(){ return open; }, get id(){ return ATL_OBJ[oI].id; }, idx: id => ATL_OBJ.findIndex(o => o.id === id), get v(){ return toyV; } };
+})();
+const chAtl = $("chAtl");
+function openAtl(id){ chFrom("atl"); closeChapters(); toggleMenu(false); surface(); chAtl.classList.add("open"); chAtl.setAttribute("aria-hidden", "false");
+  ATL.open(typeof id === "string" ? ATL.idx(id) : id); $("atlClose").focus({ preventScroll:true }); }
+function closeAtl(){ ATL.close(); }
+$("atlClose").onclick = () => { if (!chBack("atl")) closeAtl(); };
+$("mAtl").onclick = () => openAtl();
 /* ---------- “Лестница измерений” — тексты ступеней (12а: 0D–3D; 4D–6D и эпилог — в 12б–12г) ----------
    m-метки: s ● установлено/математика, h ◐ гипотеза/модель, t ○ символ/учение традиции. */
 const DIM_STEPS = [
@@ -21239,8 +21622,8 @@ function ringS(u){ const cyc = Math.floor(u/14), m = u - cyc*14; let s;
 const bell = (x, c) => smooth(c - .85, c - .25, x)*(1 - smooth(c + .25, c + .85, x));
 
 let target = -1, pos = -1, vel = 0, lastInput = 0, travel = false;
-let coverT = 0, timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false, flyOn = false;                                   // открыт “Космический календарь” (chrono.js)
-const locked = () => timeOn || treeOn || thoughtOn || compassOn || mineOn || dimsOn || bioOn || flyOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
+let coverT = 0, timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false, flyOn = false, atlOn = false;                                   // открыт “Космический календарь” (chrono.js)
+const locked = () => timeOn || treeOn || thoughtOn || compassOn || mineOn || dimsOn || bioOn || flyOn || atlOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
 function goTo(i){
   const u = uOfStation(i);
   if (pos < -.5) target = u;
@@ -21807,7 +22190,7 @@ function loop(now){
   // глава проявилась, кольцо под ней не рисуем — иначе видеокарта считает две сцены сразу, размытие фона
   // пересчитывается каждый кадр, и курсор с панорамой “тянутся”. На закрытие флаг снимается сразу, и кольцо
   // снова рисуется ещё до того, как глава погаснет. Поиск полупрозрачный — под ним кольцо рисуется как обычно
-  coverT = bioOn || flyOn || timeOn || treeOn || thoughtOn || dimsOn || compassOn || mineOn || pathOpen || refOpen || menuOpen
+  coverT = bioOn || flyOn || atlOn || timeOn || treeOn || thoughtOn || dimsOn || compassOn || mineOn || pathOpen || refOpen || menuOpen
     || chRoutes.classList.contains("open") ? coverT + dt : 0;
   if (typeof BSC !== "undefined" && BSC.covers()){}
   else if (coverT > .9){}
@@ -21821,7 +22204,7 @@ function loop(now){
 // Новое место (другая глава, станция-погружение, кольцо) — новая запись истории; смена слоя или события внутри — замена записи.
 // Адрес разбирается строго: только известные виды мест, ключи и значения из списков сайта — иначе адрес игнорируется.
 const NAVH = (() => {
-  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[], fly:["d"], sky:["d"] };
+  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[], fly:["d"], sky:["d"], atl:["id"] };
   const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   const ID = v => typeof v === "string" && /^[\w>.-]{1,48}$/.test(v) && !(v in Object.prototype);
   const INT = (v, a, b) => { const n = Number(v); return v !== "" && Number.isInteger(n) && n >= a && n <= b ? n : null; };
@@ -21869,6 +22252,7 @@ const NAVH = (() => {
     else if (t === "po"){ r.i = INT(o.i, 0, 1); if (r.i == null) return null; }
     else if (t === "ref"){ const tb = o.tab == null ? "guide" : o.tab; if (!tabs().includes(tb)) return null; r.tab = tb; }
     else if (t === "fly"){ if (o.d != null){ if (!ID(o.d) || FLY.idx(o.d) < 0) return null; r.d = o.d; } if (o.v != null){ if (!ID(o.v) || FLY.vdx(o.v) < 0) return null; r.v = o.v; } }
+    else if (t === "atl"){ if (o.id != null){ if (!ID(o.id) || ATL.idx(o.id) < 0) return null; r.id = o.id; } }
     else if (t === "sky"){ if (o.d != null){ if (!ID(o.d) || o.d !== "born" && FLY.idx(o.d) < 0) return null; r.d = o.d; } }
     else if (!["path", "compass", "mine", "routes", "iz"].includes(t)) return null;
     return r;

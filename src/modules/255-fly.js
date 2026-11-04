@@ -553,7 +553,7 @@ const FLY = (() => {
   function close(){ if (!open) return; open = flyOn = false; box.classList.remove("open"); box.setAttribute("aria-hidden", "true"); setTimeout(() => { if (!open) teardown(); }, 900); }
   addEventListener("resize", () => { if (open) size(); });
   addEventListener("keydown", e => { if (open && e.key === "Escape"){ e.stopPropagation(); if (!chBack("fly")) closeFly(); } }, true);
-  return { open: openF, close, get on(){ return open; }, get u(){ return u; }, get m(){ return md; }, get d(){ return FLY_DEST[dI].id; }, get v(){ return FLY_VEH[vI].id; },
+  return { open: openF, close, get on(){ return open; }, get u(){ return u; }, get m(){ return md; }, get d(){ return FLY_DEST[dI].id; }, get v(){ return FLY_VEH[vI].id; }, fmt: { fmtT, fmtD, agoT, bp, big },
            idx: id => FLY_DEST.findIndex(x => x.id === id), vdx: id => FLY_VEH.findIndex(x => x.id === id), go };
 })();
 const chFly = $("chFly");

@@ -100,6 +100,7 @@
         <h3 class="mono mp-h">Глубокий космос</h3>
         <button class="mp-it" id="mFly" data-span="2-4" data-hover><span class="mp-k mono">расстояние</span><b>Сколько лететь</b><span>До Луны, звёзд и галактик — пешком, на «Вояджере», со скоростью света и на корабле 1 g</span><i class="mp-rng"></i></button>
         <button class="mp-it" id="mSky" data-hover><span class="mp-k mono">время</span><b>Свет из прошлого</b><span>Телескоп — машина времени: когда вышел свет, который мы видим, и что было тогда на Земле</span></button>
+        <button class="mp-it" id="mAtl" data-hover><span class="mp-k mono">объекты</span><b>Атлас чудес</b><span>Квазар, туманность Ориона, пульсар Краба, Бетельгейзе, столкновение с Андромедой, тёмная материя</span></button>
         <button class="mp-it" id="mBorn" data-hover><span class="mp-k mono">личное</span><b>Звезда вашего рождения</b><span>Звезда, свет которой вышел в год вашего рождения и только сейчас дошёл</span></button>
       </section>
       <section class="mp-grp mp-atl">
@@ -274,6 +275,17 @@
     <div class="fl-vehs" id="flyVeh" role="group" aria-label="На чём лететь"></div>
     <div class="tm-ctl"><button class="btn" id="flyGo" data-hover>Лететь ▶</button></div>
     <div class="tm-scroll"><article class="tm-card" id="flyCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-atl" id="chAtl" aria-hidden="true" aria-label="Атлас чудес">
+  <canvas id="atlCv" aria-label="Сцена объекта: потяните, чтобы повернуть, колесо — приблизить"></canvas>
+  <button class="close mono" id="atlClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="at-toy" id="atlToy"></div>
+  <div class="time-in at-in">
+    <div class="tm-head"><span class="mono eyebrow">Глубокий космос · Атлас чудес</span></div>
+    <div class="at-grid" id="atlGrid" role="group" aria-label="Объекты"></div>
+    <div class="tm-scroll" id="atlScroll"><article class="tm-card" id="atlCard" aria-live="polite"></article></div>
   </div>
 </section>
 

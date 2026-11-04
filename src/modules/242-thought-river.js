@@ -429,7 +429,7 @@ const CTH = (() => {
            dbg: { view: () => [v0, v1], sel: () => sel ? sel.id : selB ? "br:" + selB.a + ">" + selB.b : null, labeled: () => F.filter(f => f.g && f.g.style.display !== "none" && !f.g.classList.contains("nolab")).length, n: F.length } };
 })();
 const chThought = $("chThought");
-function openThought(id){ chFrom("th"); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeRouteList(); toggleMenu(false); surface(); chThought.classList.add("open"); chThought.setAttribute("aria-hidden", "false"); CTH.open(); if (id) CTH.select(id); $("thClose").focus({preventScroll:true}); }
+function openThought(id){ chFrom("th"); closeCompass(); closeMine(); closeDims(); closeBio(); closeFly(); closeAtl(); closeHuman(); closePath(); closeRef(); closeTime(); closeTree(); closeRouteList(); toggleMenu(false); surface(); chThought.classList.add("open"); chThought.setAttribute("aria-hidden", "false"); CTH.open(); if (id) CTH.select(id); $("thClose").focus({preventScroll:true}); }
 function closeThought(){ CTH.close(); }
 $("thClose").onclick = () => { if (!chBack("th")) closeThought(); };
 $("mThought").onclick = () => openThought();

@@ -8,8 +8,8 @@ function ringS(u){ const cyc = Math.floor(u/14), m = u - cyc*14; let s;
 const bell = (x, c) => smooth(c - .85, c - .25, x)*(1 - smooth(c + .25, c + .85, x));
 
 let target = -1, pos = -1, vel = 0, lastInput = 0, travel = false;
-let coverT = 0, timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false, flyOn = false;                                   // открыт «Космический календарь» (chrono.js)
-const locked = () => timeOn || treeOn || thoughtOn || compassOn || mineOn || dimsOn || bioOn || flyOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
+let coverT = 0, timeOn = false, treeOn = false, thoughtOn = false, compassOn = false, mineOn = false, dimsOn = false, bioOn = false, flyOn = false, atlOn = false;                                   // открыт «Космический календарь» (chrono.js)
+const locked = () => timeOn || treeOn || thoughtOn || compassOn || mineOn || dimsOn || bioOn || flyOn || atlOn || menuOpen || humanOpen || pathOpen || insideOpen || diveT > .02 || IZ.active || !!bhDv;
 function goTo(i){
   const u = uOfStation(i);
   if (pos < -.5) target = u;
