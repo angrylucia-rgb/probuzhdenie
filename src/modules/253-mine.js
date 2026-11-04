@@ -95,7 +95,7 @@ const MINE = (() => {
     return out;
   }
   function compassRuns(){ try { return JSON.parse(localStorage.getItem("astro-compass") || "[]"); } catch(e){ return []; } }
-  const KN = { st:["станция","станции","станций"], lv:["слой","слоя","слоёв"], ev:["событие","события","событий"], tr:["группа Древа","группы Древа","групп Древа"], fg:["фигура","фигуры","фигур"], br:["мост","моста","мостов"], bio:["страница «Биосферы»","страницы «Биосферы»","страниц «Биосферы»"] };
+  const KN = { st:["станция","станции","станций"], lv:["слой","слоя","слоёв"], ev:["событие","события","событий"], tr:["группа Древа","группы Древа","групп Древа"], fg:["фигура","фигуры","фигур"], br:["мост","моста","мостов"], bio:["страница «Биосферы»","страницы «Биосферы»","страниц «Биосферы»"], fly:["полёт","полёта","полётов"], sky:["взгляд в прошлое","взгляда в прошлое","взглядов в прошлое"] };
   function feed(db){
     const days = {}, add = (d, it) => (days[d] = days[d] || []).push(it);
     db.prac.forEach(p => add(jrDay(p.t), { t: p.t, h: `<span class="mn-ic">◎</span> ${esc(p.n)} — до конца` }));
@@ -136,6 +136,17 @@ const MINE = (() => {
     try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type:"text/plain;charset=utf-8" })); a.download = fn; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); msg.textContent = "Готово"; }
     catch(e){ msg.textContent = "Скачать здесь не получилось"; }
   }
+  // ---- «Глубокий космос»: звезда рождения, полёты, взгляды в прошлое (v187) ----
+  function skyLine(db){
+    const S = db.seen, b = db.born, ids = new Set(), fl = Object.keys(S).filter(k => k.startsWith("fly:")), sk = Object.keys(S).filter(k => k.startsWith("sky:"));
+    fl.forEach(k => ids.add(k.split(":")[1])); sk.forEach(k => ids.add(k.split(":")[1]));
+    const ly = [...new Set(fl.map(k => k.split(":")[1]))].reduce((a, id) => { const d = FLY_DEST.find(x => x.id === id); return a + (d && d.kind !== "edge" ? d.km/FLY_LY : 0); }, 0);
+    if (!b && !ids.size) return "";
+    let h = `<div class="mn-sky"><h4>Глубокий космос</h4>`;
+    if (b) h += `<p class="mn-sm">Звезда вашего рождения: <button class="tm-link" id="mnBorn" data-hover>${esc(b.s)} →</button> — её свет вышел, когда вы родились, и дошёл только сейчас.</p>`;
+    if (ids.size) h += `<p class="mn-sm">Целей: ${ids.size} из ${FLY_DEST.length}${fl.length ? " · полётов: " + fl.length : ""}${sk.length ? " · взглядов в прошлое: " + sk.length : ""}${ly >= .01 ? " · световых лет в полётах: " + (ly < 100 ? ly.toLocaleString("ru-RU", { maximumSignificantDigits: 3 }) : Math.round(ly).toLocaleString("ru-RU")) : ""}</p>`;
+    return h + `</div>`;
+  }
   // ---- экран ----
   function render(){
     const db = jrLoad(), st = stats(db), nx = nextUp(db);
@@ -146,6 +157,7 @@ const MINE = (() => {
         <div class="mn-side">
           <ul class="mn-stats">${st.rows.map(([n, a, b]) => `<li><span>${esc(n)}</span><b>${a}<small> из ${b}</small></b><i style="--w:${(b ? a/b*100 : 0).toFixed(1)}%"></i></li>`).join("")}
             <li class="mn-pr"><span>Практики до конца</span><b>${st.prac}<small>${st.pracDays ? " · " + plural(st.pracDays, "день", "дня", "дней") : ""}</small></b></li></ul>
+          ${skyLine(db)}
           ${nx.length ? `<h4>Ещё не были</h4><div class="mn-next">${nx.map((x, k) => `<button data-nx="${k}" data-hover><span class="mono">${esc(x.ty)}</span><b>${esc(x.nm)}</b></button>`).join("")}</div>` : `<h4>Вы прошли всё</h4><p class="mn-sm">Каждое место можно проходить снова — по-новому.</p>`}
         </div>
       </div>
@@ -156,6 +168,7 @@ const MINE = (() => {
     body.querySelectorAll(".mn-st").forEach(g => { const go = () => { close(); RT.go({ t:"j", id: jidOf(+g.dataset.st), d:0 }); }; g.onclick = go; g.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); go(); } }; });
     body.querySelectorAll("[data-nx]").forEach(b => b.onclick = () => { const x = nx[+b.dataset.nx]; close(); x.go(); });
     const cp = $("mnCp"); if (cp) cp.onclick = () => { close(); openCompass(); };
+    const bn = $("mnBorn"); if (bn) bn.onclick = () => { close(); RT.go({ t:"sky", d:"born" }); };
     $("mnDl").onclick = () => download(db, st);
     const cl = $("mnClear"); if (cl) cl.onclick = () => { confirmClear = true; render(); };
     const y = $("mnYes"); if (y) y.onclick = () => { jrClear(); confirmClear = false; render(); };

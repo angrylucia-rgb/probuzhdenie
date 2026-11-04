@@ -99,6 +99,8 @@
       <section class="mp-grp">
         <h3 class="mono mp-h">Глубокий космос</h3>
         <button class="mp-it" id="mFly" data-span="2-4" data-hover><span class="mp-k mono">расстояние</span><b>Сколько лететь</b><span>До Луны, звёзд и галактик — пешком, на «Вояджере», со скоростью света и на корабле 1 g</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mSky" data-hover><span class="mp-k mono">время</span><b>Свет из прошлого</b><span>Телескоп — машина времени: когда вышел свет, который мы видим, и что было тогда на Земле</span></button>
+        <button class="mp-it" id="mBorn" data-hover><span class="mp-k mono">личное</span><b>Звезда вашего рождения</b><span>Звезда, свет которой вышел в год вашего рождения и только сейчас дошёл</span></button>
       </section>
       <section class="mp-grp mp-atl">
         <h3 class="mono mp-h">Сквозные темы</h3>
@@ -252,14 +254,23 @@
   </div>
 </section>
 
-<section class="chapter ch-time ch-fly" id="chFly" aria-hidden="true" aria-label="Сколько лететь">
+<section class="chapter ch-time ch-fly" id="chFly" aria-hidden="true" aria-label="Глубокий космос: сколько лететь, свет из прошлого, звезда рождения">
   <canvas id="flyCv" aria-label="Полёт к цели: звёздное небо, на подлёте — сама цель"></canvas>
   <button class="close mono" id="flyClose" data-hover>Вернуться на кольцо ✕</button>
   <div class="fl-hud" id="flyHud"><b class="fl-t1"></b><span class="fl-t2"></span><span class="mono fl-t3"></span><span class="mono fl-t4"></span></div>
   <div class="fl-rul" id="flyRul" aria-hidden="true"></div>
+  <div class="fl-ret" id="flyRet" aria-hidden="true"><i></i></div>
   <div class="time-in fl-in">
-    <div class="tm-head"><span class="mono eyebrow">Глубокий космос · Сколько лететь</span></div>
+    <div class="tm-head"><span class="mono eyebrow">Глубокий космос</span></div>
+    <div class="fl-modes" id="flyModes" role="tablist" aria-label="Режим">
+      <button data-m="fly" role="tab" aria-selected="true" data-hover>Сколько лететь</button><button data-m="sky" role="tab" aria-selected="false" data-hover>Свет из прошлого</button><button data-m="born" role="tab" aria-selected="false" data-hover>Звезда рождения</button>
+    </div>
     <div class="fl-dest" id="flyDest" role="group" aria-label="Куда лететь"></div>
+    <div class="fl-born" id="flyBorn">
+      <label class="fl-bl"><span class="mono">Год рождения</span><input id="flyBY" type="number" inputmode="numeric" min="1900" max="2100" placeholder="1990" autocomplete="off"></label>
+      <label class="fl-bl"><span class="mono">Месяц</span><select id="flyBM"><option value="">—</option><option value="1">январь</option><option value="2">февраль</option><option value="3">март</option><option value="4">апрель</option><option value="5">май</option><option value="6">июнь</option><option value="7">июль</option><option value="8">август</option><option value="9">сентябрь</option><option value="10">октябрь</option><option value="11">ноябрь</option><option value="12">декабрь</option></select></label>
+      <button class="btn" id="flyBGo" data-hover>Найти звезду</button><span class="mono fl-bmsg" id="flyBMsg" aria-live="polite"></span>
+    </div>
     <div class="fl-vehs" id="flyVeh" role="group" aria-label="На чём лететь"></div>
     <div class="tm-ctl"><button class="btn" id="flyGo" data-hover>Лететь ▶</button></div>
     <div class="tm-scroll"><article class="tm-card" id="flyCard" aria-live="polite"></article></div>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-3CRl5ulD1TUzgzgVDxZPWKAgPhTsNEk8xR/C8YdLVPc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-t8RO1iT0ax0LbsF2ZB+TEUs2owGM4/HHPkSciC1Ibag='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <base href="/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Cosmolabe is an interactive atlas of awakening: a journey through 12 stations, from the Absolute to the quantum vacuum, where spiritual teachings meet science.">
@@ -1167,6 +1167,26 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 
 /* v186: “Сколько лететь” */
 .ch-fly{background:#020309}
+.ch-fly .time-in{display:flex;flex-direction:column}.ch-fly .time-in>.tm-scroll{flex:1 1 0;min-height:0}
+.fl-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.fl-modes button{font-size:12.5px;line-height:1.2;text-align:center;color:var(--muted);padding:6px 6px;border:1px solid transparent;border-radius:999px;transition:color .3s,border-color .3s,background .3s}
+.fl-modes button:hover{color:var(--brass)}
+.fl-modes button[aria-selected="true"]{color:var(--ink);border-color:var(--brass);background:rgba(214,172,94,.12)}
+.fl-born{display:none;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.fl-bornm .fl-born{display:flex}.fl-bornm .fl-dest,.fl-sky .fl-vehs{display:none}
+.fl-bl{display:grid;gap:4px}.fl-bl span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.fl-bl input,.fl-bl select{font:400 16px var(--display);color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:112px}
+.fl-bl select{width:auto}.fl-bl select option{background:#0a0c14;color:var(--ink)}
+.fl-bmsg{font-size:11px;color:#ffb070;align-self:center}
+#flyGo[hidden]{display:none}
+.fl-ret{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;opacity:0;will-change:transform}
+.ch-fly:not(.fl-sky) .fl-ret{display:none}
+.fl-ret i{position:absolute;left:-70px;top:-70px;width:140px;height:140px;border:1px solid rgba(159,208,255,.5);border-radius:50%}
+.fl-ret i::before,.fl-ret i::after{content:"";position:absolute;--c:rgba(159,208,255,.55)}
+.fl-ret i::before{left:-16px;right:-16px;top:50%;height:1px;background:linear-gradient(90deg,var(--c) 0 26px,transparent 26px calc(100% - 26px),var(--c) calc(100% - 26px))}
+.fl-ret i::after{top:-16px;bottom:-16px;left:50%;width:1px;background:linear-gradient(180deg,var(--c) 0 26px,transparent 26px calc(100% - 26px),var(--c) calc(100% - 26px))}
+.fl-sky .fl-ship{background:#ffe9a0;box-shadow:0 0 12px #ffd070,0 0 3px #fff}
+.fl-life{display:flex;flex-wrap:wrap;gap:6px}.fl-life span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;color:var(--ink)}.fl-life i{font-style:normal;color:var(--faint);font-size:11px;margin-left:4px}
 #flyCv{position:absolute;inset:0;width:100%;height:100%;display:block}
 .fl-dest{display:grid;gap:10px;max-height:30vh;overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent;padding-right:6px;border-top:1px solid var(--line);padding-top:10px}
 .fl-g{display:grid;gap:2px}
@@ -1206,6 +1226,8 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   .fl-rul{left:calc(var(--pad) + 6px);right:calc(var(--pad) + 6px);top:44%;bottom:auto}
   .fl-m b{display:none}
   .fl-dest{max-height:18vh}
+  .fl-ret i{left:-50px;top:-50px;width:100px;height:100px}
+  .fl-modes button{font-size:11.5px;padding:5px 4px}
 }
 </style>
 </head>
@@ -1311,6 +1333,8 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
       <section class="mp-grp">
         <h3 class="mono mp-h">Deep space</h3>
         <button class="mp-it" id="mFly" data-span="2-4" data-hover><span class="mp-k mono">distance</span><b>How long to fly</b><span>To the Moon, the stars and the galaxies — on foot, aboard Voyager, at light speed and on a 1 g ship</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mSky" data-hover><span class="mp-k mono">time</span><b>Light from the past</b><span>The telescope as a time machine: when the light we see set out, and what was happening on Earth then</span></button>
+        <button class="mp-it" id="mBorn" data-hover><span class="mp-k mono">personal</span><b>The star of your birth</b><span>The star whose light set out in the year you were born and is only now arriving</span></button>
       </section>
       <section class="mp-grp mp-atl">
         <h3 class="mono mp-h">Cross-cutting themes</h3>
@@ -1464,14 +1488,23 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   </div>
 </section>
 
-<section class="chapter ch-time ch-fly" id="chFly" aria-hidden="true" aria-label="How long to fly">
+<section class="chapter ch-time ch-fly" id="chFly" aria-hidden="true" aria-label="Deep space: how long to fly, light from the past, the star of your birth">
   <canvas id="flyCv" aria-label="Flight to the target: a starry sky, and on approach — the target itself"></canvas>
   <button class="close mono" id="flyClose" data-hover>Back to the ring ✕</button>
   <div class="fl-hud" id="flyHud"><b class="fl-t1"></b><span class="fl-t2"></span><span class="mono fl-t3"></span><span class="mono fl-t4"></span></div>
   <div class="fl-rul" id="flyRul" aria-hidden="true"></div>
+  <div class="fl-ret" id="flyRet" aria-hidden="true"><i></i></div>
   <div class="time-in fl-in">
-    <div class="tm-head"><span class="mono eyebrow">Deep space · How long to fly</span></div>
+    <div class="tm-head"><span class="mono eyebrow">Deep space</span></div>
+    <div class="fl-modes" id="flyModes" role="tablist" aria-label="Mode">
+      <button data-m="fly" role="tab" aria-selected="true" data-hover>How long to fly</button><button data-m="sky" role="tab" aria-selected="false" data-hover>Light from the past</button><button data-m="born" role="tab" aria-selected="false" data-hover>Birth star</button>
+    </div>
     <div class="fl-dest" id="flyDest" role="group" aria-label="Where to"></div>
+    <div class="fl-born" id="flyBorn">
+      <label class="fl-bl"><span class="mono">Year of birth</span><input id="flyBY" type="number" inputmode="numeric" min="1900" max="2100" placeholder="1990" autocomplete="off"></label>
+      <label class="fl-bl"><span class="mono">Month</span><select id="flyBM"><option value="">—</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></label>
+      <button class="btn" id="flyBGo" data-hover>Find the star</button><span class="mono fl-bmsg" id="flyBMsg" aria-live="polite"></span>
+    </div>
     <div class="fl-vehs" id="flyVeh" role="group" aria-label="How to travel"></div>
     <div class="tm-ctl"><button class="btn" id="flyGo" data-hover>Fly ▶</button></div>
     <div class="tm-scroll"><article class="tm-card" id="flyCard" aria-live="polite"></article></div>
@@ -12808,13 +12841,15 @@ const CHR = (() => {
       + `<div class="tm-gos">` + (e.st ? `<button class="btn tm-go" data-st="${e.st}" data-hover>Station “${STN[e.st] || e.st}” →</button>` : "")
       + (EV2TH[e.id] ? `<button class="btn tm-go tm-th" data-th="${EV2TH[e.id]}" data-hover>In the Thread of Thought: ${esc(TH_FIG.find(f => f.id === EV2TH[e.id]).nm)} →</button>` : "")
       + (EV2TREE[e.id] ? `<button class="btn tm-go tm-tree" data-tr="${EV2TREE[e.id]}" data-hover>In the Tree of Life: ${esc(TREE_NAME(EV2TREE[e.id]))} →</button>` : "")
-      + (() => { const b = (e.c === "ear" || e.c === "hum") && typeof bioOfEvent === "function" ? bioOfEvent(e) : null; return b ? `<button class="btn tm-go tm-bio" data-bio="${b.id}" data-hover>In the Biosphere: the “${esc(b.nm)}” →</button>` : ""; })() + `</div>`;
+      + (() => { const b = (e.c === "ear" || e.c === "hum") && typeof bioOfEvent === "function" ? bioOfEvent(e) : null; return b ? `<button class="btn tm-go tm-bio" data-bio="${b.id}" data-hover>In the Biosphere: the “${esc(b.nm)}” →</button>` : ""; })()
+      + (() => { const d = skyOfAgo(e.ago); return d ? `<button class="btn tm-go tm-sky" data-sky="${d.id}" data-hover>Light from that time: ${esc(d.nm)} →</button>` : ""; })() + `</div>`;
     box.classList.remove("swap"); void box.offsetWidth; box.classList.add("swap");
     if (!cycOn) $("tmScroll").scrollTop = 0;
     const go = box.querySelector(".tm-go[data-st]"); if (go) go.onclick = () => { const id = go.dataset.st; close(); openJourney(id); };
     const gth = box.querySelector(".tm-th"); if (gth) gth.onclick = () => { const id = gth.dataset.th; navMark(); close(); openThought(id); };
     const gb = box.querySelector(".tm-bio"); if (gb) gb.onclick = () => { const id = gb.dataset.bio; navMark(); close(); openBio(id); };
     const gt = box.querySelector(".tm-tree"); if (gt) gt.onclick = () => { const id = gt.dataset.tr; navMark(); close(); openTree(id); };
+    const gs = box.querySelector(".tm-sky"); if (gs) gs.onclick = () => { const id = gs.dataset.sky; navMark(); close(); RT.go({ t:"sky", d: id }); };
     box.querySelectorAll("[data-nv]").forEach(b => b.onclick = () => goEv(idx + +b.dataset.nv));
   }
   // перейти к событию по номеру: стрелка встаёт на него (как учебник — листать событие за событием)
@@ -14811,7 +14846,7 @@ function navHere(){
     if (DIMS.on) return { t:"dm", n:DIMS.n, k:"dm", nm:"Ladder of Dimensions" };
     if (BIO.on) return Object.assign({ t:"bio", k:"bio", nm:"Biosphere" }, BIO.place());
     if (pathOpen) return { t:"path", k:"path", nm:"The Eight-Stage Path" };
-    if (FLY.on) return { t:"fly", d: FLY.d, v: FLY.v, k:"fly", nm:"How long to fly" };
+    if (FLY.on) return FLY.m === "fly" ? { t:"fly", d: FLY.d, v: FLY.v, k:"fly", nm:"How long to fly" } : { t:"sky", d: FLY.m === "born" ? "born" : FLY.d, k:"fly", nm: FLY.m === "born" ? "The star of your birth" : "Light from the past" };
   } catch(e){}
   if (typeof humanOpen === "undefined" || !humanOpen || !jId) return null;
   const d = Math.max(0, Math.min(DMAX - 1, Math.round(depth))), v = JL && JL[d], o = { t:"j", id:jId, d };
@@ -14848,7 +14883,8 @@ const RT = (() => {
     else if (s.t === "in"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); travelDive(s.i); }
     else if (s.t === "dm"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openDims(s.n); if (s.lens) DIMS.lens(s.lens); if (s.m) DIMS.mode(s.m); }
     else if (s.t === "path"){ closeTime(); closeTree(); openPath(); }
-    else if (s.t === "fly"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d, s.v); }
+    else if (s.t === "fly"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d, s.v, "fly"); }
+    else if (s.t === "sky"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openFly(s.d === "born" ? null : s.d, null, s.d === "born" ? "born" : "sky"); }
     else if (s.t === "bio" && s.m == null && s.b == null && s.bm == null && !s.sp && !s.e && NAV_SKIP){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman(); openBio(); }
     else if (s.t === "bio"){ closeTime(); closeTree(); closePath(); closeRef(); if (humanOpen) closeHuman();
       if (s.m != null) openBio(undefined, () => BIO.mech(s.m, ext)); else if (s.b != null) openBio(undefined, () => BIO.basics(s.b, ext)); else if (s.bm != null) openBio(undefined, () => BIO.biome(s.bm, ext)); else openBio(s.sp || s.e, () => BIO.from(ext)); }
@@ -14937,8 +14973,11 @@ const SRCH = (() => {
     ROUTES.forEach(r => add("Tour", r.nm, `${r.steps.length} steps`, r.sub + " " + r.steps.map(s => s.h + " " + s.tx).join(" "), () => RT.start(r.id)));
     add("Chapter", "The Eight-Stage Path", "heart breathing", "learn feel live reflect practice breathing breath", () => RT.go({ t:"path" }));
     add("Chapter", "The Underside", "the second part of the site", "experience without words sound color movement worlds", () => RT.go({ t:"iz" }));
-    add("Chapter", "How long to fly", "deep space · flight to the stars", "distance speed light light-year voyager ship rocket moon mars sun proxima andromeda galaxy relativity twin paradox", () => openFly());
+    add("Chapter", "How long to fly", "deep space · flight to the stars", "distance speed light light-year voyager ship rocket moon mars sun proxima andromeda galaxy relativity twin paradox", () => openFly(null, null, "fly"));
+    add("Chapter", "Light from the past", "deep space · the telescope as a time machine", "light past time telescope star nebula galaxy cosmic microwave background light-year calendar", () => RT.go({ t:"sky" }));
+    add("Chapter", "The star of your birth", "deep space · personal", "birth star year age light vega arcturus altair capella aldebaran", () => RT.go({ t:"sky", d:"born" }));
     FLY_DEST.forEach(d => add("Flight", "How long to fly: " + d.nm, d.ly ? "light-years: " + d.ly : "", d.note, () => RT.go({ t:"fly", d: d.id })));
+    FLY_DEST.forEach(d => add("Light from the past", "When its light set out: " + d.nm, "", FLY_THEN[d.id] || d.note, () => RT.go({ t:"sky", d: d.id })));
     add("Chapter", "Cosmic Calendar", "13.8 billion years in one year", "calendar Sagan time history", () => openTime());
     add("Chapter", "Tree of Life", "4 billion years of kinship", "evolution kinship phylogeny species", () => openTree());
     add("Chapter", "My Astrolabe", "personal map", "completed visited journal practices my path history", () => openMine());
@@ -15308,7 +15347,7 @@ const MINE = (() => {
     return out;
   }
   function compassRuns(){ try { return JSON.parse(localStorage.getItem("astro-compass") || "[]"); } catch(e){ return []; } }
-  const KN = { st:["station","stations","stations"], lv:["layer","layers","layers"], ev:["event","events","events"], tr:["Tree group","Tree groups","Tree groups"], fg:["figure","figures","figures"], br:["bridge","bridges","bridges"], bio:["Biosphere page","Biosphere pages","Biosphere pages"] };
+  const KN = { st:["station","stations","stations"], lv:["layer","layers","layers"], ev:["event","events","events"], tr:["Tree group","Tree groups","Tree groups"], fg:["figure","figures","figures"], br:["bridge","bridges","bridges"], bio:["Biosphere page","Biosphere pages","Biosphere pages"], fly:["flight","flights","flights"], sky:["look into the past","looks into the past","looks into the past"] };
   function feed(db){
     const days = {}, add = (d, it) => (days[d] = days[d] || []).push(it);
     db.prac.forEach(p => add(jrDay(p.t), { t: p.t, h: `<span class="mn-ic">◎</span> ${esc(p.n)} — to the end` }));
@@ -15349,6 +15388,17 @@ const MINE = (() => {
     try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type:"text/plain;charset=utf-8" })); a.download = fn; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); msg.textContent = "Done"; }
     catch(e){ msg.textContent = "The download did not work here"; }
   }
+  // ---- “Глубокий космос”: звезда рождения, полёты, взгляды в прошлое (v187) ----
+  function skyLine(db){
+    const S = db.seen, b = db.born, ids = new Set(), fl = Object.keys(S).filter(k => k.startsWith("fly:")), sk = Object.keys(S).filter(k => k.startsWith("sky:"));
+    fl.forEach(k => ids.add(k.split(":")[1])); sk.forEach(k => ids.add(k.split(":")[1]));
+    const ly = [...new Set(fl.map(k => k.split(":")[1]))].reduce((a, id) => { const d = FLY_DEST.find(x => x.id === id); return a + (d && d.kind !== "edge" ? d.km/FLY_LY : 0); }, 0);
+    if (!b && !ids.size) return "";
+    let h = `<div class="mn-sky"><h4>Deep space</h4>`;
+    if (b) h += `<p class="mn-sm">The star of your birth: <button class="tm-link" id="mnBorn" data-hover>${esc(b.s)} →</button> — its light set out when you were born and has only now arrived.</p>`;
+    if (ids.size) h += `<p class="mn-sm">Destinations: ${ids.size} of ${FLY_DEST.length}${fl.length ? " · flights: " + fl.length : ""}${sk.length ? " · looks into the past: " + sk.length : ""}${ly >= .01 ? " · light-years flown: " + (ly < 100 ? ly.toLocaleString("en-US", { maximumSignificantDigits: 3 }) : Math.round(ly).toLocaleString("en-US")) : ""}</p>`;
+    return h + `</div>`;
+  }
   // ---- экран ----
   function render(){
     const db = jrLoad(), st = stats(db), nx = nextUp(db);
@@ -15359,6 +15409,7 @@ const MINE = (() => {
         <div class="mn-side">
           <ul class="mn-stats">${st.rows.map(([n, a, b]) => `<li><span>${esc(n)}</span><b>${a}<small> of ${b}</small></b><i style="--w:${(b ? a/b*100 : 0).toFixed(1)}%"></i></li>`).join("")}
             <li class="mn-pr"><span>Practices to the end</span><b>${st.prac}<small>${st.pracDays ? " · " + plural(st.pracDays, "day", "days", "days") : ""}</small></b></li></ul>
+          ${skyLine(db)}
           ${nx.length ? `<h4>Not visited yet</h4><div class="mn-next">${nx.map((x, k) => `<button data-nx="${k}" data-hover><span class="mono">${esc(x.ty)}</span><b>${esc(x.nm)}</b></button>`).join("")}</div>` : `<h4>You have been everywhere</h4><p class="mn-sm">Every place can be walked again, in a new way.</p>`}
         </div>
       </div>
@@ -15369,6 +15420,7 @@ const MINE = (() => {
     body.querySelectorAll(".mn-st").forEach(g => { const go = () => { close(); RT.go({ t:"j", id: jidOf(+g.dataset.st), d:0 }); }; g.onclick = go; g.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); go(); } }; });
     body.querySelectorAll("[data-nx]").forEach(b => b.onclick = () => { const x = nx[+b.dataset.nx]; close(); x.go(); });
     const cp = $("mnCp"); if (cp) cp.onclick = () => { close(); openCompass(); };
+    const bn = $("mnBorn"); if (bn) bn.onclick = () => { close(); RT.go({ t:"sky", d:"born" }); };
     $("mnDl").onclick = () => download(db, st);
     const cl = $("mnClear"); if (cl) cl.onclick = () => { confirmClear = true; render(); };
     const y = $("mnYes"); if (y) y.onclick = () => { jrClear(); confirmClear = false; render(); };
@@ -15430,7 +15482,7 @@ const FLY_DEST = [
     note:"● About 2.5 million light-years. The most distant object visible without a telescope." },
   { id:"q3c", g:2, nm:"Quasar 3C 273", ly:2.4e9, kind:"qso", col:0xcfe8ff,
     note:"◐ Its light travelled 2.4 billion years. The expansion of the Universe is ignored here — the path is by light-travel time only." },
-  { id:"edge", g:2, nm:"Edge of the observable Universe", ly:4.65e10, kind:"edge", col:0xffa060,
+  { id:"edge", g:2, nm:"Edge of the observable Universe", ly:4.65e10, lb:1.38e10, kind:"edge", col:0xffa060,
     note:"● Now about 46.5 billion light-years. Unreachable even at light speed: the Universe is expanding at an accelerating rate." }
 ];
 FLY_DEST.forEach(d => { if (d.ly) d.km = d.ly*FLY_LY; });
@@ -15446,6 +15498,41 @@ const FLY_VEH = [
   { id:"light", nm:"Light", beta:1, note:"● 299,792 km/s — nothing moves faster." },
   { id:"g1", nm:"1 g ship", acc:true, note:"Accelerating at Earth's gravity the whole way: speeding up for half the trip, braking for the other half. Normal weight on board." }
 ];
+
+/* ---------- v187: “Свет — машина времени” и “Звезда вашего рождения” — общий каталог с полётами ----------
+   Свет от цели идёт к нам столько лет, сколько до неё световых лет (lb — если иначе: от края Вселенной свет шёл
+   13,8 млрд лет, а сама та область сейчас в 46,5 млрд св. лет — расширение). Глядя на небо, мы смотрим в прошлое. */
+const FLY_THEN = {
+  moon:"The moonlight you see left the Moon 1.3 seconds ago — a single breath ●.",
+  mars:"◐ From 3 to 22 minutes, depending on where Mars is in its orbit. That is why a Mars rover cannot be driven \"live\": every command arrives late.",
+  sun:"The Sun in the sky is always the Sun of 8 minutes 19 seconds ago ●. If it went out, we would learn of it only 8 minutes later.",
+  jup:"◐ From 33 to 53 minutes. From the delays in the eclipses of Jupiter's moons, Ole Rømer first measured the speed of light in 1676 ●.",
+  nep:"● About 4 hours. In 1989 each of Voyager 2's pictures of Neptune took 4 hours to reach the Earth.",
+  voy:"● On 18 November 2026 — exactly one day: a signal from Voyager sent today will arrive only tomorrow.",
+  oort:"◐ From the outer edge of the cloud, light takes about a year.",
+  ple:"◐ Around 1582 — when Europe adopted the Gregorian calendar ●, the one we still live by.",
+  bet:"◐ Around the 1470s, give or take a century — the Age of Discovery. If Betelgeuse has already exploded, we will learn of it only centuries from now.",
+  crab:"◐ Chinese astronomers saw the flare in 1054, but the explosion itself happened about 6,500 years earlier — before the first cities.",
+  edge:"● This is the cosmic microwave background: light that set out 380,000 years after the Big Bang, when the Universe first became transparent. There is no Earth yet — it will appear 9 billion years later."
+};
+// яркие звёзды для “Звезды вашего рождения”: расстояния по параллаксам ● (Hipparcos, Gaia); цвет — по спектральному классу
+const FLY_BORN = [
+  ["Alpha Centauri", 4.37, 0xffe9b0], ["Sirius", 8.6, 0xdfe8ff], ["Epsilon Eridani", 10.5, 0xffc080], ["Procyon", 11.46, 0xfff4e0],
+  ["Tau Ceti", 11.9, 0xffe9b0], ["Altair", 16.7, 0xe6eeff], ["Vega", 25.0, 0xdfe8ff], ["Fomalhaut", 25.1, 0xe6eeff],
+  ["Pollux", 33.8, 0xffc080], ["Denebola", 35.9, 0xe6eeff], ["Arcturus", 36.7, 0xffb070], ["Capella", 42.9, 0xffe2a0],
+  ["Rasalhague", 48.6, 0xe6eeff], ["Castor", 51, 0xe6eeff], ["Caph", 54.7, 0xfff4e0], ["Aldebaran", 65, 0xffa060],
+  ["Hamal", 66, 0xffb070], ["Alphecca", 75, 0xe6eeff], ["Regulus", 79.3, 0xcfe0ff], ["Merak", 79.7, 0xe6eeff],
+  ["Alioth", 82.6, 0xe6eeff], ["Algol", 90, 0xcfe0ff], ["Alpheratz", 97, 0xcfe0ff], ["Alkaid", 104, 0xcfe0ff],
+  ["Dubhe", 123, 0xffc080], ["Kochab", 131, 0xffb070]
+].map(([nm, ly, col], i) => ({ id:"b" + i, nm, ly, km: ly*FLY_LY, col, kind:"star", r:4 }));
+// время в пути света от цели, лет
+const flyLt = d => d.lb || d.km/FLY_C/FLY_YR;
+// цель, свет которой вышел примерно тогда (для карточки календаря): в пределах ×1,4
+function skyOfAgo(ago){
+  if (!(ago >= 4)) return null; let best = null, bd = Math.log(1.4);
+  for (const d of FLY_DEST){ const k = Math.abs(Math.log(flyLt(d)/ago)); if (k < bd){ bd = k; best = d; } }
+  return best;
+}
 
 const FLY = (() => {
   const box = $("chFly"); let cvs = $("flyCv");
@@ -15632,30 +15719,56 @@ const FLY = (() => {
     cam.aspect = w/h; const port = w < 760; cam.setViewOffset(w, h, port ? 0 : -w*.16, port ? h*.18 : 0, w, h); cam.updateProjectionMatrix(); if (lst.children.length) rulLab(); }
 
   /* ---------- интерфейс ---------- */
-  const lst = $("flyDest"), vbox = $("flyVeh"), card = $("flyCard"), hud = $("flyHud"), rul = $("flyRul");
+  const lst = $("flyDest"), vbox = $("flyVeh"), card = $("flyCard"), hud = $("flyHud"), rul = $("flyRul"), modes = $("flyModes"), ret = $("flyRet");
   const LO = 5, HI = 23.7, xOf = km => clamp((Math.log10(Math.max(km, 1e5)) - LO)/(HI - LO), 0, 1);
+  // v187: три режима главы — “Сколько лететь” (fly), “Свет из прошлого” (sky), “Звезда рождения” (born)
+  let md = "fly", born = null;
+  const curD = () => md === "born" ? (born ? born.star : FLY_BORN[0]) : FLY_DEST[dI];
+  const NOWY = () => { const d = new Date(), y0 = new Date(d.getFullYear(), 0, 1); return d.getFullYear() + (d - y0)/(FLY_YR*1000); };
+  // “1,3 секунды”, “8 минут 19 секунд”, “444 года”, “2,5 млн лет”
+  const agoT = y => y < 2 ? fmtT(y*FLY_YR) : bp(y, "year", "years", "years");
+  // момент в прошлом: год нашей эры, год до н. э. или “столько-то лет назад”
+  function yrLab(ago){
+    if (ago < 2) return EN ? "now" : "now";
+    // дальше тысячи лет год известен лишь примерно (◐ расстояния) — округляем до десятков и сотен
+    if (ago < 12000){ const r = ago >= 5000 ? 100 : ago >= 1000 ? 10 : 1, x = NOWY() - ago, y = r > 1 ? Math.round(x/r)*r : Math.floor(x), a = r > 1 ? "≈" : "";
+      return y >= 1 ? a + (EN ? String(y) : y + " year") : a + (EN ? (r > 1 ? -y : 1 - y) + " BC" : (r > 1 ? -y : 1 - y) + " BC"); }
+    return bp(ago, "year ago", "years ago", "years ago");
+  }
+  // событие календаря, которое уже случилось к моменту “ago лет назад” (самое позднее из таких)
+  function evOn(ago){ let b = null; for (const e of CHR_EV) if (e.ago > 0 && e.ago >= ago*.999 && (!b || e.ago < b.ago)) b = e; return b; }
+  // событие календаря рядом с моментом (в пределах ×1,6, по логарифму)
+  function evNear(y){ let b = null, bd = Math.log(1.6); for (const e of CHR_EV){ if (!(e.ago > 0)) continue; const k = Math.abs(Math.log(e.ago/y)); if (k < bd){ bd = k; b = e; } } return b; }
+  const destLab = d => md === "fly" ? fmtD(d.km) : agoT(flyLt(d));
   function lists(){
     lst.innerHTML = FLY_GRP.map((g, gi) => `<div class="fl-g"><span class="mono fl-gh">${esc(g)}</span>${FLY_DEST.map((d, i) => d.g !== gi ? "" :
-      `<button class="fl-d" data-i="${i}" data-hover><b>${esc(d.nm)}</b><span>${esc(fmtD(d.km))}</span></button>`).join("")}</div>`).join("");
+      `<button class="fl-d" data-i="${i}" data-hover><b>${esc(d.nm)}</b><span>${esc(destLab(d))}</span></button>`).join("")}</div>`).join("");
     lst.querySelectorAll("[data-i]").forEach(b => b.onclick = () => pick(+b.dataset.i, vI, true));
     vbox.innerHTML = FLY_VEH.map((v, i) => `<button class="fl-v" data-v="${i}" aria-pressed="false" data-hover>${esc(v.nm)}</button>`).join("");
     vbox.querySelectorAll("[data-v]").forEach(b => b.onclick = () => pick(dI, +b.dataset.v, true));
     rul.innerHTML = `<i class="fl-rl"></i>` + FLY_DEST.map((d, i) => `<span class="fl-m${i % 2 ? " lo" : ""}" data-i="${i}" style="left:${(xOf(d.km)*100).toFixed(2)}%"><em></em><b>${esc(d.nm)}</b></span>`).join("") + `<span class="fl-ship" id="flyShip"></span>`;
   }
+  const relabel = () => lst.querySelectorAll("[data-i]").forEach(b => { b.querySelector("span").textContent = destLab(FLY_DEST[+b.dataset.i]); });
   // подписи шкалы: соседние ближе 22 px наползают друг на друга — прячем, оставляя цель и уже пройденные первыми
   function rulLab(){
     const W = rul.clientWidth; if (!W) return;
     const ms = [...rul.querySelectorAll(".fl-m")], x = ms.map(m => xOf(FLY_DEST[+m.dataset.i].km)*W);
-    const pri = i => (+ms[i].dataset.i === dI ? 2 : 0) + (FLY_DEST[+ms[i].dataset.i].g === 2 ? .5 : 0);
+    const pri = i => (md !== "born" && +ms[i].dataset.i === dI ? 2 : 0) + (FLY_DEST[+ms[i].dataset.i].g === 2 ? .5 : 0);
     const ord = ms.map((m, i) => i).sort((a, b) => pri(b) - pri(a) || a - b), shown = [];
     ord.forEach(i => { const ok = shown.every(j => Math.abs(x[j] - x[i]) >= 22); ms[i].classList.toggle("nolab", !ok); if (ok) shown.push(i); });
   }
   function sync(){
-    rul.querySelectorAll(".fl-m").forEach(m => m.classList.toggle("tgt", +m.dataset.i === dI)); rulLab();
+    rul.querySelectorAll(".fl-m").forEach(m => m.classList.toggle("tgt", md !== "born" && +m.dataset.i === dI)); rulLab();
     lst.querySelectorAll("[data-i]").forEach(b => b.classList.toggle("on", +b.dataset.i === dI));
     vbox.querySelectorAll("[data-v]").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.v === vI)));
+    modes.querySelectorAll("[data-m]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.m === md)));
   }
-  function result(){
+  function goLab(){
+    const g = $("flyGo"), again = flying || u >= 1;
+    g.textContent = again ? (EN ? "Again ↺" : "Again ↺") : md === "fly" ? (EN ? "Fly ▶" : "Fly ▶") : md === "sky" ? (EN ? "Point the telescope ▶" : "Point the telescope ▶") : (EN ? "Watch the light travel ▶" : "Watch the light travel ▶");
+    g.hidden = md === "born" && !born;
+  }
+  function result(){ if (md === "sky") return resultSky(); if (md === "born") return resultBorn();
     const D = FLY_DEST[dI], V = FLY_VEH[vI], R = at(D.km, D.km, V), y = R.T/FLY_YR;
     const edge = D.kind === "edge";
     let h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(V.nm)} → ${esc(D.nm)}</span></div>
@@ -15676,14 +15789,123 @@ const FLY = (() => {
               <p class="tm-pr">${esc((EN ? "◐ Fuel: even an ideal photon rocket would need a fuel mass " : "◐ Fuel: even an ideal photon rocket would need fuel ") + (EN ? big(mr - 1) + " times the ship's own mass." : bp(mr - 1, "time", "times", "time") + " times the mass of the ship itself."))}</p>`; }
     }
     h += `<h4>${esc(EN ? "Destination" : "Target")}</h4><p class="tm-pr">${esc(D.note)}</p><h4>${esc(EN ? "Vehicle" : "Vehicle")}</h4><p class="tm-pr">${esc(V.note)}</p>`;
-    card.innerHTML = h;
-    const ev = card.querySelector(".fl-ev"); if (ev) ev.onclick = () => { navMark(); closeFly(); RT.go({ t:"cal", ago: +ev.dataset.ago }); };
+    h += `<p class="tm-pr"><button class="tm-link fl-tosky" data-hover>${esc(EN ? "When did its light set out? →" : "When did the light we see from here set out? →")}</button></p>`;
+    card.innerHTML = h; wire();
   }
+  // общие кнопки карточки
+  function wire(){
+    const ev = card.querySelector(".fl-ev"); if (ev) ev.onclick = () => { navMark(); closeFly(); RT.go({ t:"cal", ago: +ev.dataset.ago }); };
+    const tf = card.querySelector(".fl-tofly"); if (tf) tf.onclick = () => setMode("fly");
+    const ts = card.querySelector(".fl-tosky"); if (ts) ts.onclick = () => setMode("sky");
+  }
+  /* ---------- “Свет из прошлого” ---------- */
+  function resultSky(){
+    const D = FLY_DEST[dI], y = flyLt(D), edge = D.kind === "edge", e = y >= 4 ? evNear(y) : null;
+    let h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(EN ? "Light from the past" : "Light from the past")} · ${esc(D.nm)}</span></div>
+      <h3>${esc(agoT(y) + (EN ? " ago" : " ago"))}</h3>
+      <p class="tm-ago2">${esc(y >= 2 && y < 12000 ? (EN ? "The light set out in " : "The light set out: ") + yrLab(y) : fmtD(D.km))}</p>`;
+    if (FLY_THEN[D.id]) h += `<p class="tm-lead">${esc(FLY_THEN[D.id])}</p>`;
+    if (e) h += `<p class="tm-pr">${esc(EN ? "On Earth at that time, in the Cosmic Calendar: " : "On Earth at that time, in the Cosmic Calendar: ")}<button class="tm-link fl-ev" data-ago="${e.ago}" data-hover>${esc(e.nm)} →</button></p><p class="tm-pr">${esc(e.lead)}</p>`;
+    h += `<h4>${esc(EN ? "And what do they see from there?" : "And what do they see from there?")}</h4><p class="tm-pr">${esc(edge
+      ? (EN ? "No one there can see the Earth: our light will never reach that region — the expansion carries it away faster." : "No one there can see the Earth: our light will never reach that region — the expansion carries it away faster.")
+      : (EN ? "An observer there today sees the Earth as it was " : "An observer there today sees the Earth as it was ") + agoT(y) + (EN ? " ago" : " ago") + (y < 2 ? (EN ? " — almost now." : " — almost now.") : "." + (e ? (EN ? " In the Cosmic Calendar that is the time of “" : " In the Cosmic Calendar that is the time of “") + e.nm + "”." : "")))}</p>`;
+    h += `<h4>${esc(EN ? "Destination" : "Target")}</h4><p class="tm-pr">${esc(D.note)}</p>`;
+    h += `<p class="tm-pr">${esc(EN ? "Looking at the sky, we look into the past: everything we see has already happened." : "Looking at the sky, we look into the past: everything we see has already happened.")}</p>`;
+    if (D.kind !== "edge") h += `<p class="tm-pr"><button class="tm-link fl-tofly" data-hover>${esc(EN ? "How long would it take to fly there? →" : "How long would it take to fly there? →")}</button></p>`;
+    card.innerHTML = h; wire();
+  }
+  function hudSky(p){
+    const D = FLY_DEST[dI], Y = flyLt(D), q = clamp((p - .15)/.85, 0, 1), rest = !flying && u <= 0;
+    const ago = Y < 3000 ? Y*(1 - q) : Math.exp((1 - q)*Math.log(1 + Y)) - 1, done = q >= 1;   // до 3 000 лет годы идут ровно, дальше — по логарифму
+    const t = k => hud.querySelector(".fl-t" + k);
+    if (rest){ t(1).textContent = (EN ? "The light set out " : "The light set out ") + agoT(Y) + (EN ? " ago" : " ago"); t(2).textContent = ""; t(3).textContent = D.nm; }
+    else if (Y < 2){ t(1).textContent = (EN ? "Light on the way: " : "Light on the way: ") + fmtT((Y - ago)*FLY_YR) + (EN ? " of " : " of ") + fmtT(Y*FLY_YR);
+      t(2).textContent = done ? (EN ? "This light is in your eyes now" : "This light is in your eyes now") : ""; t(3).textContent = D.nm + " → " + (EN ? "Earth" : "Earth"); }
+    else { const e = evOn(ago);
+      t(1).textContent = done ? (EN ? "Today" : "Today") : yrLab(ago);
+      t(2).textContent = done ? (EN ? "This light is in your eyes now" : "This light is in your eyes now") : e ? (EN ? "On Earth: " : "On Earth: ") + e.nm : "";
+      t(3).textContent = (EN ? "The light set out: " : "The light set out: ") + yrLab(Y) + (done ? "" : (EN ? " · still to go: " : " · still to go: ") + fmtD(ago*FLY_LY)); }
+    t(4).textContent = "";
+    photon(D.km*(rest ? 1 : ago/Y), D.km, !rest);   // для края путь света (13,8 млрд лет) короче нынешнего расстояния — шкала по доле пути
+    hud.classList.remove("edge");
+    return null;
+  }
+  // огонёк света на шкале: от цели к Земле
+  function photon(rem, from, on){
+    const ship = $("flyShip"); if (ship) ship.style.left = (xOf(rem)*100).toFixed(2) + "%";
+    rul.querySelectorAll(".fl-m").forEach(m => { const k = FLY_DEST[+m.dataset.i].km; m.classList.toggle("past", on && k >= rem*.9999 && k <= from*1.0001); });
+  }
+  /* ---------- “Звезда вашего рождения” ---------- */
+  function bornOf(y, m){
+    const cy = new Date().getFullYear();
+    if (!(y >= 1900 && y <= cy)) return null;
+    const t0 = new Date(y, m ? m - 1 : 6, m ? 15 : 1).getTime(), A = (Date.now() - t0)/(FLY_YR*1000);
+    if (A < 0) return null;
+    let S = FLY_BORN[0]; if (A >= 3.5) for (const b of FLY_BORN) if (Math.abs(b.ly - A) < Math.abs(S.ly - A)) S = b;
+    return { y, m, A, star: S };
+  }
+  function resultBorn(){
+    let h = `<div class="tm-bar"><span class="mono eyebrow tm-cat">${esc(EN ? "The star of your birth" : "The star of your birth")}</span></div>`;
+    if (!born){
+      h += `<p class="tm-lead">${esc(EN ? "Enter your year of birth, and we will find the star whose light set out when you were born and is only now reaching the Earth. Its distance in light-years equals your age ●." : "Enter your year of birth, and we will find the star whose light set out when you were born and is only now reaching the Earth. Its distance in light-years equals your age ●.")}</p>
+        <p class="tm-pr">${esc(EN ? "The year stays on this page and is not sent anywhere. You can keep it only by pressing “Save” — in this browser." : "The year is not sent anywhere. You can keep it only with the “Save” button — in this browser.")}</p>`;
+      card.innerHTML = h; return;
+    }
+    const S = born.star, A = born.A, yb = born.y, young = A < 3.5;
+    h += `<h3>${esc(S.nm)}</h3><p class="tm-ago2">${esc(fmtD(S.km))}</p>`;
+    if (young) h += `<p class="tm-lead">${esc((EN ? "Your star has not come yet: even the nearest bright star, Alpha Centauri, is 4.37 light-years away. Its light that set out in the year of your birth will arrive in " : "Your star has not come yet: even the nearest bright star, Alpha Centauri, is 4.37 light-years away. Its light that set out in the year of your birth will arrive in ") + Math.round(yb + .5 + S.ly) + (EN ? "." : "."))}</p>`;
+    else {
+      const dep = Math.floor(NOWY() - S.ly), close = Math.abs(S.ly - A) < 1.2;
+      h += `<p class="tm-lead">${esc(close
+        ? (EN ? "The light reaching us from " + S.nm + " tonight set out in the year you were born — and has been travelling to the Earth your whole life." : "The light reaching us today from " + S.nm + " set out in the year you were born — and has been travelling to the Earth your whole life.")
+        : (EN ? "The light of " + S.nm + " arriving now set out in " + dep + " — the bright star closest to your year of birth." : "The light of " + S.nm + " arriving now set out in " + dep + " — the bright star closest to your year of birth."))}</p>`;
+      if (close) h += `<p class="tm-pr">${esc(EN ? "And the light of the Earth from the year of your birth is reaching " + S.nm + " right now." : "And the light of the Earth from the year of your birth is reaching it right now.")}</p>`;
+    }
+    const nx = FLY_BORN.find(b => b.ly > A + .5 && b !== S);
+    if (nx) h += `<p class="tm-pr">${esc((EN ? "Next: the light of " + nx.nm + " that set out in your year of birth will arrive in " : "Next: " + nx.nm + " — its light that set out in your year of birth will arrive in ") + Math.round(yb + .5 + nx.ly) + (EN ? "." : "."))}</p>`;
+    const life = FLY_BORN.filter(b => b.ly < A && b !== S);
+    if (life.length) h += `<h4>${esc(EN ? "Stars of your life" : "Stars of your life")}</h4><p class="tm-pr">${esc(EN ? "The light you see from them today set out when you were already alive:" : "The light you see from them today set out when you were already alive:")}</p>
+      <p class="fl-life">${life.map(b => `<span>${esc(b.nm)} <i>${esc(EN ? "age " + Math.floor(A - b.ly) : Math.floor(A - b.ly) < 1 ? "first year" : "age " + bp(Math.floor(A - b.ly), "year", "years", "years"))}</i></span>`).join("")}</p>`;
+    const e = CHR_EV.filter(x => x.ago > 0 && x.ago <= A + .5).sort((a, b) => b.ago - a.ago)[0];
+    if (e) h += `<p class="tm-pr">${esc(EN ? "The first Cosmic Calendar event of your lifetime: " : "The first Cosmic Calendar event of your lifetime: ")}<button class="tm-link fl-ev" data-ago="${e.ago}" data-hover>${esc(e.nm)} →</button></p>`;
+    const sv = (jrLoad().born || {}), same = sv.y === born.y && (sv.m || 0) === (born.m || 0);
+    h += `<div class="tm-gos"><button class="btn fl-save" data-hover${same ? " disabled" : ""}>${esc(same ? (EN ? "Saved in “My Astrolabe”" : "Saved in “My Astrolabe”") : (EN ? "Save in “My Astrolabe”" : "Save in “My Astrolabe”"))}</button></div>`;
+    card.innerHTML = h; wire();
+    const b = card.querySelector(".fl-save"); if (b) b.onclick = () => { const db = jrLoad(); db.born = { y: born.y, m: born.m || 0, s: S.nm, ly: S.ly }; jrSave(); jrMark("born", "star", S.nm); resultBorn(); };
+  }
+  function hudBorn(p){
+    const t = k => hud.querySelector(".fl-t" + k);
+    if (!born){ t(1).textContent = EN ? "The star of your birth" : "The star of your birth"; t(2).textContent = t(3).textContent = t(4).textContent = ""; photon(0, 0, false); return null; }
+    const S = born.star, Y = S.ly, rest = !flying && u <= 0, q = clamp((p - .15)/.85, 0, 1), ago = Y*(1 - q), done = q >= 1;
+    if (rest){ t(1).textContent = S.nm; t(2).textContent = (EN ? "Its light set out: " : "Its light set out: ") + yrLab(Y); t(3).textContent = fmtD(S.km); t(4).textContent = ""; }
+    else { const a = born.A - ago, e = evOn(ago);
+      t(1).textContent = done ? (EN ? "Today" : "Today") : yrLab(ago);
+      t(2).textContent = done ? (EN ? "The light of your birth has arrived" : "The light of your birth has arrived") : e && e.ago < Y + 1 ? (EN ? "On Earth: " : "On Earth: ") + e.nm : "";
+      t(3).textContent = (EN ? "The light of " : "The light of ") + S.nm + (EN ? ": covered " : ": covered ") + fmtD((Y - ago)*FLY_LY) + (EN ? " of " : " of ") + fmtD(Y*FLY_LY);
+      t(4).textContent = a >= 0 ? (EN ? "You are " + Math.floor(a) + (Math.floor(a) === 1 ? " year old" : " years old") : "You are " + bp(Math.floor(a), "year", "years", "years")) : ""; }
+    photon(rest ? S.km : ago*FLY_LY, S.km, !rest);
+    hud.classList.remove("edge");
+    return null;
+  }
+  function bornGo(){
+    const y = parseInt($("flyBY").value, 10), m = parseInt($("flyBM").value, 10) || 0, b = bornOf(y, m), msg = $("flyBMsg");
+    if (!b){ msg.textContent = EN ? "Enter a year from 1900 to " + new Date().getFullYear() : "Enter a year from 1900 to" + new Date().getFullYear(); born = null; resultBorn(); goLab(); return; }
+    msg.textContent = ""; born = b; u = uT = 0; flying = false; arr = 0; resultBorn(); go();
+  }
+  $("flyBGo").onclick = bornGo;
+  $("flyBY").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); bornGo(); } });
+  function setMode(m){
+    md = m; box.classList.toggle("fl-sky", m !== "fly"); box.classList.toggle("fl-bornm", m === "born");
+    if (m === "born" && !born){ const sv = jrLoad().born; if (sv && sv.y){ $("flyBY").value = sv.y; $("flyBM").value = sv.m || ""; born = bornOf(sv.y, sv.m); } }
+    relabel(); pick(dI, vI, true);
+  }
+  modes.querySelectorAll("[data-m]").forEach(b => b.onclick = () => setMode(b.dataset.m));
   function pick(d, v, user){
     dI = d; vI = v; sync(); result();
-    const D = FLY_DEST[dI]; if (D.map) BMAP.want(D.map);
-    if (user){ u = uT = 0; flying = false; arr = 0; hudSet(0); $("flyGo").textContent = EN ? "Fly ▶" : "Fly ▶"; }
+    const D = curD(); if (D.map) BMAP.want(D.map);
+    if (user){ u = uT = 0; flying = false; arr = 0; hudAny(0); goLab(); }
   }
+  const hudAny = p => md === "sky" ? hudSky(p) : md === "born" ? hudBorn(p) : hudSet(p);
   function hudSet(p){
     const D = FLY_DEST[dI], V = FLY_VEH[vI], L = Math.log(1 + D.km/1000), s = D.km*(Math.exp(p*L) - 1)/(Math.exp(L) - 1), R = at(s, D.km, V);
     const T = R.T, edge = D.kind === "edge";
@@ -15710,24 +15932,29 @@ const FLY = (() => {
     return R;
   }
   function go(){
+    if (md === "born" && !born){ $("flyBY").focus(); return; }
     if (!flying && u >= 1){ u = uT = 0; arr = 0; }
-    flying = true; uT = 1; $("flyGo").textContent = EN ? "Again ↺" : "Again ↺";
+    flying = true; uT = 1; goLab();
     try { Music.portal(true); } catch(e){}
-    jrMark("fly", FLY_DEST[dI].id + ":" + FLY_VEH[vI].id, FLY_DEST[dI].nm);
+    if (md === "fly") jrMark("fly", FLY_DEST[dI].id + ":" + FLY_VEH[vI].id, FLY_DEST[dI].nm);
+    else if (md === "sky") jrMark("sky", FLY_DEST[dI].id, FLY_DEST[dI].nm);
   }
   $("flyGo").onclick = () => { if (flying && u < 1) { u = uT = 1; } else go(); };
 
   /* ---------- кадр ---------- */
+  const V3 = new THREE.Vector3();
   function frame(now){
     raf = open ? requestAnimationFrame(frame) : 0; if (!open) return;
     const dt = Math.min(.12, (now - last)/1000 || 0); last = now;   // на медленной видеокарте полёт не растягивается вдвое
-    const D = FLY_DEST[dI], V = FLY_VEH[vI];
-    if (flying && u < 1){ u = Math.min(1, u + dt/(V.acc ? 11 : 9)); if (u >= 1) flying = false; }
-    const p = u < 1 ? .5 - .5*Math.cos(Math.PI*u) : 1;                   // мягкий старт и подлёт
-    const R = hudSet(p);
-    // цель: строится, когда выбрана; растёт на подлёте
+    const D = curD(), V = FLY_VEH[vI], sky = md !== "fly";
+    if (flying && u < 1){ u = Math.min(1, u + dt/(sky ? (md === "born" ? 9 : flyLt(D) < 2 ? 6 : 10) : V.acc ? 11 : 9)); if (u >= 1){ flying = false; goLab(); } }
+    const p = sky ? u : u < 1 ? .5 - .5*Math.cos(Math.PI*u) : 1;                   // мягкий старт и подлёт
+    const R = hudAny(p);
+    // цель: строится, когда выбрана; растёт на подлёте (в “Свете” — наводка телескопа: из точки в кадр)
     if (tgtKind !== D.id + (BMAP.has(D.map) ? "+" : "")){ if (tgt){ scn.remove(tgt); tgt.traverse(o => { if (o.geometry && !o.isSprite) o.geometry.dispose(); if (o.material) o.material.dispose(); }); } tgt = makeTarget(D); tgt.position.set(0, 0, -18); scn.add(tgt); tgtKind = D.id + (BMAP.has(D.map) ? "+" : ""); }
-    arr += ((p > .82 ? 1 : 0) - arr)*Math.min(1, dt*(p > .82 ? 1.2 : 4));
+    const aim = sky ? (u > 0 ? smooth(0, .15, p) : 0) : 0;
+    if (sky) arr += ((.3 + .7*aim) - arr)*Math.min(1, dt*3);
+    else arr += ((p > .82 ? 1 : 0) - arr)*Math.min(1, dt*(p > .82 ? 1.2 : 4));
     const A = smooth(0, 1, arr);
     tgt.scale.setScalar(Math.exp((A - 1)*3.2)); tgt.rotation.y += dt*.05;
     tgt.traverse(o => { if (o.isPoints && o.material.uniforms.uA){ o.material.uniforms.uA.value = A; o.material.uniforms.uT.value = now/1000; } });
@@ -15735,11 +15962,12 @@ const FLY = (() => {
     if (tgt.userData.mesh){ bodyA(tgt.userData.mesh, A); tgt.userData.mesh.material.uniforms.uSpin.value = now/1000*.05; }
     if (tgt.userData.pulsar) tgt.userData.pulsar.material.opacity = A*(.4 + .6*Math.max(0, Math.sin(now/1000*TAU*3)));   // ✧ мигание — замедленный пульсар (настоящий — 30 раз в секунду)
     // небо: аберрация и Доплер — только в режиме 1 g (и чуть-чуть у паруса); у остальных скоростей звёзды неподвижны
-    const eta = V.acc ? R.eta : V.beta && V.beta < 1 && u > 0 && u < 1 ? R.eta : 0;
+    const eta = sky ? 0 : V.acc ? R.eta : V.beta && V.beta < 1 && u > 0 && u < 1 ? R.eta : 0;
     stars.material.uniforms.uEta.value = Math.min(eta, 16);
     stars.rotation.z += dt*.004;
+    if (sky && flying && p < .15) stars.rotation.x += dt*.12*(1 - p/.15);   // телескоп поворачивается к цели
     // пыль туннеля — ощущение движения: её скорость от темпа роста логарифма пути
-    const mv = flying ? 1 : 0; dust.material.uniforms.uK.value += (mv - dust.material.uniforms.uK.value)*Math.min(1, dt*2);
+    const mv = flying && !sky ? 1 : 0; dust.material.uniforms.uK.value += (mv - dust.material.uniforms.uK.value)*Math.min(1, dt*2);
     dust.material.uniforms.uF.value += dt*(.35 + 1.4*Math.sin(Math.PI*u))*mv;
     // реликтовое излучение впереди: при Доплере e^η его 2,7 К становятся видимым светом
     const Tc = 2.725*Math.exp(Math.min(eta, 16)), vis = smooth(5.6, 7.4, eta);
@@ -15748,27 +15976,33 @@ const FLY = (() => {
       cmb.material.color.copy(c); }
     cmb.material.opacity = vis*.95; cmb.scale.setScalar(2.5 + 4*vis);
     rend.render(scn, cam);
+    // перекрестие телескопа — над целью на экране; при наводке сжимается
+    if (sky){ V3.set(0, 0, -18).project(cam); const w = cvs.clientWidth, hh = cvs.clientHeight;
+      ret.style.transform = `translate(${((V3.x + 1)/2*w).toFixed(1)}px,${((1 - V3.y)/2*hh).toFixed(1)}px) scale(${(1 + 1.6*(1 - aim)).toFixed(3)})`; ret.style.opacity = (u > 0 ? .35 + .65*aim : .3).toFixed(2); }
   }
-  function openF(d, v){
+  function openF(d, v, m){
     if (!built) build();
     if (!lst.children.length) lists();
     open = flyOn = true; size();
-    pick(d != null ? d : dI, v != null ? v : vI, true);
+    if (d != null) dI = d; if (v != null) vI = v;
+    if (m && m !== md) setMode(m); else pick(dI, vI, true);
     if (!raf){ last = performance.now(); raf = requestAnimationFrame(frame); }
   }
   function close(){ if (!open) return; open = flyOn = false; box.classList.remove("open"); box.setAttribute("aria-hidden", "true"); setTimeout(() => { if (!open) teardown(); }, 900); }
   addEventListener("resize", () => { if (open) size(); });
   addEventListener("keydown", e => { if (open && e.key === "Escape"){ e.stopPropagation(); if (!chBack("fly")) closeFly(); } }, true);
-  return { open: openF, close, get on(){ return open; }, get u(){ return u; }, get d(){ return FLY_DEST[dI].id; }, get v(){ return FLY_VEH[vI].id; },
+  return { open: openF, close, get on(){ return open; }, get u(){ return u; }, get m(){ return md; }, get d(){ return FLY_DEST[dI].id; }, get v(){ return FLY_VEH[vI].id; },
            idx: id => FLY_DEST.findIndex(x => x.id === id), vdx: id => FLY_VEH.findIndex(x => x.id === id), go };
 })();
 const chFly = $("chFly");
-function openFly(d, v){ chFrom("fly"); closeChapters(); toggleMenu(false); surface(); chFly.classList.add("open"); chFly.setAttribute("aria-hidden", "false");
-  FLY.open(typeof d === "string" ? Math.max(0, FLY.idx(d)) : d, typeof v === "string" ? Math.max(0, FLY.vdx(v)) : v); $("flyClose").focus({ preventScroll:true }); }
+function openFly(d, v, m){ chFrom("fly"); closeChapters(); toggleMenu(false); surface(); chFly.classList.add("open"); chFly.setAttribute("aria-hidden", "false");
+  FLY.open(typeof d === "string" ? Math.max(0, FLY.idx(d)) : d, typeof v === "string" ? Math.max(0, FLY.vdx(v)) : v, m || "fly"); $("flyClose").focus({ preventScroll:true }); }
 function closeFly(){ FLY.close(); }
 $("flyClose").onclick = () => { if (!chBack("fly")) closeFly(); };
-$("mFly").onclick = () => openFly();
-$("btnFly").onclick = () => FLY.on ? closeFly() : openFly();
+$("mFly").onclick = () => openFly(null, null, "fly");
+$("mSky").onclick = () => openFly(null, null, "sky");
+$("mBorn").onclick = () => openFly(null, null, "born");
+$("btnFly").onclick = () => FLY.on ? closeFly() : openFly(null, null, "fly");
 /* ---------- “Лестница измерений” — тексты ступеней (12а: 0D–3D; 4D–6D и эпилог — в 12б–12г) ----------
    m-метки: s ● установлено/математика, h ◐ гипотеза/модель, t ○ символ/учение традиции. */
 const DIM_STEPS = [
@@ -21587,7 +21821,7 @@ function loop(now){
 // Новое место (другая глава, станция-погружение, кольцо) — новая запись истории; смена слоя или события внутри — замена записи.
 // Адрес разбирается строго: только известные виды мест, ключи и значения из списков сайта — иначе адрес игнорируется.
 const NAVH = (() => {
-  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[], fly:["d"] };
+  const POS = { j:["id","d"], cal:["ago"], tree:["id"], th:["id"], dm:["n"], bio:[], path:[], s:["i"], po:["i"], in:["i"], ref:["tab"], compass:[], mine:[], routes:[], iz:[], fly:["d"], sky:["d"] };
   const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   const ID = v => typeof v === "string" && /^[\w>.-]{1,48}$/.test(v) && !(v in Object.prototype);
   const INT = (v, a, b) => { const n = Number(v); return v !== "" && Number.isInteger(n) && n >= a && n <= b ? n : null; };
@@ -21635,6 +21869,7 @@ const NAVH = (() => {
     else if (t === "po"){ r.i = INT(o.i, 0, 1); if (r.i == null) return null; }
     else if (t === "ref"){ const tb = o.tab == null ? "guide" : o.tab; if (!tabs().includes(tb)) return null; r.tab = tb; }
     else if (t === "fly"){ if (o.d != null){ if (!ID(o.d) || FLY.idx(o.d) < 0) return null; r.d = o.d; } if (o.v != null){ if (!ID(o.v) || FLY.vdx(o.v) < 0) return null; r.v = o.v; } }
+    else if (t === "sky"){ if (o.d != null){ if (!ID(o.d) || o.d !== "born" && FLY.idx(o.d) < 0) return null; r.d = o.d; } }
     else if (!["path", "compass", "mine", "routes", "iz"].includes(t)) return null;
     return r;
   }

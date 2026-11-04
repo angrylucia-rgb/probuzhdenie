@@ -229,6 +229,26 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
 
 /* v186: «Сколько лететь» */
 .ch-fly{background:#020309}
+.ch-fly .time-in{display:flex;flex-direction:column}.ch-fly .time-in>.tm-scroll{flex:1 1 0;min-height:0}
+.fl-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.fl-modes button{font-size:12.5px;line-height:1.2;text-align:center;color:var(--muted);padding:6px 6px;border:1px solid transparent;border-radius:999px;transition:color .3s,border-color .3s,background .3s}
+.fl-modes button:hover{color:var(--brass)}
+.fl-modes button[aria-selected="true"]{color:var(--ink);border-color:var(--brass);background:rgba(214,172,94,.12)}
+.fl-born{display:none;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.fl-bornm .fl-born{display:flex}.fl-bornm .fl-dest,.fl-sky .fl-vehs{display:none}
+.fl-bl{display:grid;gap:4px}.fl-bl span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.fl-bl input,.fl-bl select{font:400 16px var(--display);color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:112px}
+.fl-bl select{width:auto}.fl-bl select option{background:#0a0c14;color:var(--ink)}
+.fl-bmsg{font-size:11px;color:#ffb070;align-self:center}
+#flyGo[hidden]{display:none}
+.fl-ret{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;opacity:0;will-change:transform}
+.ch-fly:not(.fl-sky) .fl-ret{display:none}
+.fl-ret i{position:absolute;left:-70px;top:-70px;width:140px;height:140px;border:1px solid rgba(159,208,255,.5);border-radius:50%}
+.fl-ret i::before,.fl-ret i::after{content:"";position:absolute;--c:rgba(159,208,255,.55)}
+.fl-ret i::before{left:-16px;right:-16px;top:50%;height:1px;background:linear-gradient(90deg,var(--c) 0 26px,transparent 26px calc(100% - 26px),var(--c) calc(100% - 26px))}
+.fl-ret i::after{top:-16px;bottom:-16px;left:50%;width:1px;background:linear-gradient(180deg,var(--c) 0 26px,transparent 26px calc(100% - 26px),var(--c) calc(100% - 26px))}
+.fl-sky .fl-ship{background:#ffe9a0;box-shadow:0 0 12px #ffd070,0 0 3px #fff}
+.fl-life{display:flex;flex-wrap:wrap;gap:6px}.fl-life span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;color:var(--ink)}.fl-life i{font-style:normal;color:var(--faint);font-size:11px;margin-left:4px}
 #flyCv{position:absolute;inset:0;width:100%;height:100%;display:block}
 .fl-dest{display:grid;gap:10px;max-height:30vh;overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(214,172,94,.35) transparent;padding-right:6px;border-top:1px solid var(--line);padding-top:10px}
 .fl-g{display:grid;gap:2px}
@@ -268,4 +288,6 @@ body.bh-dive .ch-human,body.bh-dive .ui,body.bh-dive .cur,body.bh-dive .dot{opac
   .fl-rul{left:calc(var(--pad) + 6px);right:calc(var(--pad) + 6px);top:44%;bottom:auto}
   .fl-m b{display:none}
   .fl-dest{max-height:18vh}
+  .fl-ret i{left:-50px;top:-50px;width:100px;height:100px}
+  .fl-modes button{font-size:11.5px;padding:5px 4px}
 }

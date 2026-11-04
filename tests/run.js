@@ -123,7 +123,7 @@ test('moon-flight', async () => {
   clean(p); await p.done();
 });
 
-/* ---------- «Сколько лететь»: адрес, расчёт, полёт, смена цели, выход; английская версия ---------- */
+/* ---------- «Глубокий космос»: полёт (адрес, расчёт, смена цели), «Свет из прошлого», «Звезда рождения», выход; английская версия ---------- */
 test('fly', async () => {
   const p = await page(); await p.goto(B + '/#/fly/prox?v=g1'); await ready(p);
   let s = await until(p, s => s.open.includes('chFly'), 60000); ok(s.open.includes('chFly'), 'глава не открылась по адресу: ' + JSON.stringify(s));
@@ -136,8 +136,21 @@ test('fly', async () => {
   await p.evaluate(() => [...document.querySelectorAll('#flyDest .fl-d')].find(b => /Андромеды/.test(b.textContent)).click());
   s = await until(p, s => s.h === '#/fly/and?v=g1', 15000); ok(s.h === '#/fly/and?v=g1', 'адрес после смены цели: ' + s.h);
   ok(/28,6 года/.test(await p.evaluate(() => document.getElementById('flyCard').innerText)), 'на борту до Андромеды не 28,6 года');
+  // «Свет из прошлого»: Плеяды — 444 года, ≈1582 год; свет доходит «сегодня»
+  await p.evaluate(() => [...document.querySelectorAll('#flyModes [data-m]')].find(b => b.dataset.m === 'sky').click());
+  await p.evaluate(() => [...document.querySelectorAll('#flyDest .fl-d')].find(b => /Плеяды/.test(b.textContent)).click());
+  s = await until(p, s => s.h === '#/sky/ple', 15000); ok(s.h === '#/sky/ple', 'адрес «Света из прошлого»: ' + s.h);
+  const sk = await p.evaluate(() => document.getElementById('flyCard').innerText); ok(/444 года назад/.test(sk) && /Свет вышел: 158[23] год/.test(sk), 'карточка Плеяд: ' + sk.slice(0, 160));
+  await p.evaluate(() => document.getElementById('flyGo').click());
+  await p.waitForFunction(() => document.querySelector('#flyHud .fl-t1').textContent === 'Сегодня', null, { timeout: 120000 });
+  // «Звезда рождения»: 1990 → Арктур (36,7 св. года)
+  await p.evaluate(() => [...document.querySelectorAll('#flyModes [data-m]')].find(b => b.dataset.m === 'born').click());
+  await p.fill('#flyBY', '1990'); await p.selectOption('#flyBM', '7'); await p.click('#flyBGo');
+  await p.waitForFunction(() => /Арктур/.test(document.getElementById('flyCard').innerText), null, { timeout: 15000 });
+  s = await until(p, s => s.h === '#/sky/born', 15000); ok(s.h === '#/sky/born', 'адрес «Звезды рождения»: ' + s.h);
+  ok(!/1990/.test(await p.evaluate(() => location.href)), 'год рождения попал в адрес');
   await p.evaluate(() => document.getElementById('flyClose').click());
-  s = await until(p, s => !s.open.includes('chFly') && !/fly/.test(s.h), 15000); ok(!s.open.includes('chFly') && !/fly/.test(s.h), 'выход из главы: ' + JSON.stringify(s));
+  s = await until(p, s => !s.open.includes('chFly') && !/fly|sky/.test(s.h), 15000); ok(!s.open.includes('chFly') && !/fly|sky/.test(s.h), 'выход из главы: ' + JSON.stringify(s));
   clean(p); await p.done();
   const e = await page(); await e.goto(B + '/en/#/fly/moon?v=car'); await ready(e);
   s = await until(e, s => s.open.includes('chFly'), 60000); ok(s.open.includes('chFly'), 'EN: глава не открылась');
@@ -152,7 +165,8 @@ test('context-loss', async () => {
   let nav = 0; p.on('framenavigated', f => { if (f === p.mainFrame()) nav++; });
   const r = await p.evaluate(async () => { const c = document.getElementById('gl'), gl = c.getContext('webgl2') || c.getContext('webgl'), x = gl.getExtension('WEBGL_lose_context');
     x.loseContext(); await new Promise(r => setTimeout(r, 800)); const v = getComputedStyle(document.getElementById('nogl')).display; x.restoreContext(); return v; });
-  await sleep(3000); ok(r === 'grid', 'сообщение не показано'); ok(nav >= 1, 'страница не перезапустилась');
+  for (let i = 0; i < 24 && !nav; i++) await sleep(500);   // перезапуск — после события webglcontextrestored, на программной графике до нескольких секунд
+  ok(r === 'grid', 'сообщение не показано'); ok(nav >= 1, 'страница не перезапустилась');
   await p.done();
 });
 

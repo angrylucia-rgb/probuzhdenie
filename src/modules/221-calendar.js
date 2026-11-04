@@ -322,13 +322,15 @@ const CHR = (() => {
       + `<div class="tm-gos">` + (e.st ? `<button class="btn tm-go" data-st="${e.st}" data-hover>Станция «${STN[e.st] || e.st}» →</button>` : "")
       + (EV2TH[e.id] ? `<button class="btn tm-go tm-th" data-th="${EV2TH[e.id]}" data-hover>В Нити мысли: ${esc(TH_FIG.find(f => f.id === EV2TH[e.id]).nm)} →</button>` : "")
       + (EV2TREE[e.id] ? `<button class="btn tm-go tm-tree" data-tr="${EV2TREE[e.id]}" data-hover>В Древе жизни: ${esc(TREE_NAME(EV2TREE[e.id]))} →</button>` : "")
-      + (() => { const b = (e.c === "ear" || e.c === "hum") && typeof bioOfEvent === "function" ? bioOfEvent(e) : null; return b ? `<button class="btn tm-go tm-bio" data-bio="${b.id}" data-hover>В Биосфере: пласт «${esc(b.nm)}» →</button>` : ""; })() + `</div>`;
+      + (() => { const b = (e.c === "ear" || e.c === "hum") && typeof bioOfEvent === "function" ? bioOfEvent(e) : null; return b ? `<button class="btn tm-go tm-bio" data-bio="${b.id}" data-hover>В Биосфере: пласт «${esc(b.nm)}» →</button>` : ""; })()
+      + (() => { const d = skyOfAgo(e.ago); return d ? `<button class="btn tm-go tm-sky" data-sky="${d.id}" data-hover>Свет того времени: ${esc(d.nm)} →</button>` : ""; })() + `</div>`;
     box.classList.remove("swap"); void box.offsetWidth; box.classList.add("swap");
     if (!cycOn) $("tmScroll").scrollTop = 0;
     const go = box.querySelector(".tm-go[data-st]"); if (go) go.onclick = () => { const id = go.dataset.st; close(); openJourney(id); };
     const gth = box.querySelector(".tm-th"); if (gth) gth.onclick = () => { const id = gth.dataset.th; navMark(); close(); openThought(id); };
     const gb = box.querySelector(".tm-bio"); if (gb) gb.onclick = () => { const id = gb.dataset.bio; navMark(); close(); openBio(id); };
     const gt = box.querySelector(".tm-tree"); if (gt) gt.onclick = () => { const id = gt.dataset.tr; navMark(); close(); openTree(id); };
+    const gs = box.querySelector(".tm-sky"); if (gs) gs.onclick = () => { const id = gs.dataset.sky; navMark(); close(); RT.go({ t:"sky", d: id }); };
     box.querySelectorAll("[data-nv]").forEach(b => b.onclick = () => goEv(idx + +b.dataset.nv));
   }
   // перейти к событию по номеру: стрелка встаёт на него (как учебник — листать событие за событием)
