@@ -163,7 +163,7 @@ test('fly', async () => {
 test('atlas', async () => {
   const p = await page(); await p.goto(B + '/#/atl/q3c'); await ready(p);
   let s = await until(p, s => s.open.includes('chAtl'), 60000); ok(s.open.includes('chAtl'), 'атлас не открылся по адресу');
-  await p.waitForFunction(() => /Квазар 3C 273/.test(document.getElementById('atlCard').innerText) && document.querySelectorAll('#atlGrid .at-c').length === 6, null, { timeout: 30000 });
+  await p.waitForFunction(() => /Квазар 3C 273/.test(document.getElementById('atlCard').innerText) && document.querySelectorAll('#atlGrid .at-c').length === 12, null, { timeout: 30000 });
   await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[1].click());
   s = await until(p, s => s.h === '#/atl/ori', 15000); ok(s.h === '#/atl/ori', 'адрес после выбора туманности: ' + s.h);
   await p.evaluate(() => document.getElementById('atlB').click());
@@ -175,6 +175,16 @@ test('atlas', async () => {
   await p.evaluate(() => { const r = document.getElementById('atlR'); r.value = 700; r.dispatchEvent(new Event('input')); });
   await p.waitForFunction(() => /^\+7 /.test(document.getElementById('atlTv').textContent), null, { timeout: 60000 });
   ok(/^\+0 /.test(t0), 'начало симуляции: ' + t0);
+  // вторая шестёрка: поймать луч пульсара Паруса, линза под курсором, звук и контраст реликтового излучения
+  await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[8].click()); await sleep(1200);
+  await p.evaluate(() => document.getElementById('atlB').click());
+  ok(/из 1$/.test(await p.evaluate(() => document.getElementById('atlTv').textContent)), 'счёт «Поймать луч» не обновился');
+  await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[10].click()); await sleep(1200);
+  await p.mouse.move(900, 380); await p.mouse.move(820, 420); await sleep(800);
+  await p.evaluate(() => document.querySelectorAll('#atlGrid .at-c')[11].click()); await sleep(1200);
+  await p.evaluate(() => { document.getElementById('atlB').click(); document.getElementById('atlB2').click(); }); await sleep(1500);
+  await p.evaluate(() => document.getElementById('atlB2').click());
+  s = await until(p, s => s.h === '#/atl/cmb', 15000); ok(s.h === '#/atl/cmb', 'адрес реликтового излучения: ' + s.h);
   await p.evaluate(() => document.getElementById('atlClose').click());
   s = await until(p, s => !s.open.includes('chAtl') && !/atl/.test(s.h), 15000); ok(!s.open.includes('chAtl') && !/atl/.test(s.h), 'выход из атласа: ' + JSON.stringify(s));
   clean(p); await p.done();
