@@ -151,87 +151,8 @@ nep:`float spin = uTime*0.30*(1.0 - 0.5*abs(lat));
   p = q;`
 };
 
-// v184: подробные поверхности для страниц тел — по картам BMAP (136-body-maps.js). Точка несёт свой участок
-// поверхности (карта читается по исходному position), а рисуется повернутой (p) — так поверхность вращается
-// вместе с планетой, а терминатор и отсечение задней стороны считаются по итоговому p (B_TAIL, B_LIMB).
-// Строятся только при подлёте к телу: обзор системы рисуют прежние лёгкие шары.
-const HD_HOV = `vec3 cu = uCur; float dd = length(p - cu), w = uHov*exp(-dd*dd*6.0); night += w*0.30;`;
-const HD_CHUNK = {
-mer:`vec4 m = mapT(position);
-  col = mix(vec3(0.62,0.58,0.53), vec3(0.40,0.43,0.50), m.b)*(0.02 + 1.45*m.r);
-  col *= 1.0 + 1.5*(m.g*2.0 - 1.0); col += vec3(0.10,0.09,0.08)*m.a;
-  col *= 0.9 + 0.2*h31(nrm*301.0); p = position; ${HD_HOV}`,
-ven:`float spin = uTime*0.10;
-  vec3 q = position; q.xz = rot(spin*(0.55 + 0.75*abs(lat)))*q.xz;
-  // облака: верхний ярус с Y-образной тёмной полосой (ультрафиолет), полярный вихрь
-  float cl = fbm(q*3.6), st = fbm(q*9.0 + vec3(3.0));
-  float lo = atan(q.x, q.z), y = q.y;
-  float yb = exp(-pow((abs(y) - 0.18 - 0.5*clamp(0.5 + 0.5*sin(lo), 0.0, 1.0)*0.35)*7.0, 2.0))*smoothstep(-0.2, 0.6, sin(lo + 0.8));
-  col = mix(vec3(1.0,0.94,0.74), vec3(0.72,0.50,0.22), cl*0.45 + yb*0.35 + st*0.12);
-  col = mix(col, vec3(0.84,0.72,0.46), smoothstep(0.75, 0.98, abs(y))*0.5);
-  p = position; ${HD_HOV}`,
-mar:`float spin = uTime*0.04; vec4 m = mapT(position);
-  vec3 c = mix(vec3(0.92,0.54,0.30), vec3(0.26,0.17,0.14), m.b);
-  col = c*(0.05 + 1.35*m.r)*(1.0 + 1.3*(m.g*2.0 - 1.0));
-  col = mix(col, vec3(0.97,0.96,0.95), m.a);
-  col *= 0.9 + 0.2*h31(nrm*301.0);
-  p = position; p.xz = rot(spin)*p.xz; ${HD_HOV}`,
-jup:`float la = asin(clamp(nrm.y, -1.0, 1.0));
-  float spin = uTime*(0.34 + 0.04*sin(la*9.0) + 0.05*cos(la*2.0));          // полосы вращаются с разной скоростью — струйные течения
-  vec4 m = mapT(position);
-  vec3 c = mix(vec3(0.97,0.91,0.78), vec3(0.60,0.39,0.23), m.g);
-  c = mix(c, vec3(0.82,0.36,0.20), m.b*0.85);                               // Большое Красное Пятно
-  c = mix(c, vec3(1.0,0.98,0.94), m.a*0.85);                                // белые овалы
-  c = mix(c, vec3(0.58,0.62,0.70), smoothstep(0.72, 0.95, abs(nrm.y))*0.55); // голубоватые полярные области
-  col = c*clamp(0.62 + 1.7*(m.r - 0.7), 0.15, 1.3)*(0.92 + 0.16*h31(nrm*211.0));   // контраст полос растянут
-  p = position; p.xz = rot(spin)*p.xz; ${HD_HOV}`,
-sat:`float spin = uTime*0.24; vec4 m = mapT(position);
-  vec3 c = mix(vec3(0.99,0.94,0.80), vec3(0.78,0.64,0.40), m.g);
-  c = mix(c, vec3(0.56,0.64,0.72), m.b);                                    // полярная шапка и шестиугольник
-  c = mix(c, vec3(1.0,0.97,0.88), m.a*0.6);
-  col = c*clamp(0.70 + 2.0*(m.r - 0.8), 0.2, 1.3);
-  p = position; p.xz = rot(spin)*p.xz;
-  col *= 1.0 - 0.45*smoothstep(0.10, 0.02, abs(p.y + 0.06))*step(0.0, -p.z);   // тень колец
-  ${HD_HOV}`,
-ura:`float spin = uTime*0.18; vec4 m = mapT(position);
-  col = mix(vec3(0.36,0.70,0.78), vec3(0.78,0.98,1.0), clamp((m.r - 0.8)*4.0 + 0.5, 0.0, 1.0));
-  col = mix(col, vec3(0.95,1.0,1.0), m.a*0.7);
-  p = position; p.xz = rot(spin)*p.xz; ${HD_HOV}`,
-nep:`float la = asin(clamp(nrm.y, -1.0, 1.0)); float spin = uTime*(0.30 - 0.08*cos(la*2.0)); vec4 m = mapT(position);
-  col = mix(vec3(0.05,0.16,0.62), vec3(0.40,0.66,1.0), clamp((m.r - 0.62)*4.0 + 0.5, 0.0, 1.0));
-  col = mix(col, vec3(0.04,0.07,0.26), m.b*0.9);                            // Большое Тёмное Пятно
-  col = mix(col, vec3(0.96,0.99,1.0), m.a*0.85);                            // метановые облака
-  p = position; p.xz = rot(spin)*p.xz; ${HD_HOV}`,
-eur:`vec4 m = mapT(position);
-  col = vec3(0.96,0.95,0.92)*(0.20 + 0.95*m.r);
-  col = mix(col, vec3(0.45,0.22,0.11), clamp(m.b*1.3, 0.0, 1.0));            // линии — двойные хребты
-  col = mix(col, vec3(0.74,0.55,0.42), m.a*0.55);                           // хаос и ведомое полушарие
-  col *= 1.0 + 0.9*(m.g*2.0 - 1.0);
-  p = position; p.xz = rot(uTime*0.03)*p.xz;`
-};
-// свет как у лёгких шаров обзора (ночная сторона чуть видна), но по итоговому p; задняя сторона отсечена,
-// край диска слегка приглушён — иначе при сложении света плотный шар обводится белым кольцом
-const HD_TAIL = `
-  vec3 pn = normalize(p);
-  float lit = dot(pn, vec3(cos(uSolid), 0.0, sin(uSolid)));
-  a = (0.10 + 0.90*smoothstep(-0.25, 0.35, lit) + night)*(0.88 + 0.12*fract(aSeed*9.0))*0.33;
-  a *= uSharp*(1.0 + uHov*(0.30 + 0.22*sin(uTime*2.4)));
-  s *= 1.0 + uFocus*0.4;
-  float fz = normalize((modelViewMatrix*vec4(pn, 0.0)).xyz).z;
-  a *= smoothstep(-0.08, 0.22, fz)*(0.55 + 0.45*clamp(fz, 0.0, 1.0));`;
+// v185: подробные тела страниц — сплошные шары с картой (137-body-mesh.js); здесь только какие карты им нужны
 const HD_MAP = { mer:"mer", mar:"mar", jup:"jup", sat:"sat", ura:"ura", nep:"nep", eur:"eur" };
-// шар страницы тела: n точек, карта tx (или без карты — для Венеры)
-function hdBall(n, k, tx){
-  const o = pts(n*Q, (i, o, nn) => {
-      const v = fib(i, nn), j = .012;
-      const x = v[0] + gauss()*j, y = v[1] + gauss()*j, z = v[2] + gauss()*j, L = Math.hypot(x, y, z) || 1;
-      o.p = [x/L, y/L, z/L]; o.s = .7 + Math.random()*.55; },
-    `vec3 nrm = normalize(position); float lat = nrm.y; float night = 0.0;
-     ${HD_CHUNK[k]}
-     ${HD_TAIL}`, 1, S_DECL);
-  if (tx && tx !== true) o.material.uniforms.uMap.value = tx;
-  return o;
-}
 
 // у Земли своя станция, поэтому её шар подробнее делать незачем; остальным даём много частиц
 const S_DENSE = { ear:3200 };
@@ -525,19 +446,19 @@ const SOLAR_BUILD = g => {
       bd.core.scale.setScalar(1.9*(1 + hv*.30)*spK);
       bd.pg.scale.setScalar(bd.pl.d*(1 + hv*.34));   // сама планета тоже подрастает под курсором
       bd.om.opacity = .16*orbF*(1 + hv*1.6);
-      // v184: подробная поверхность — только на подлёте к этой планете (её страница); карта строится заранее, при наведении
+      // v184–185: подробная поверхность — только на подлёте к этой планете (её страница); карта строится заранее, при наведении
       const k = bd.pl.k;
-      if (HD_CHUNK[k] && (hv > .3 || on) && HD_MAP[k]) BMAP.want(HD_MAP[k]);
+      if (BODY_COL[k] && (hv > .3 || on) && HD_MAP[k]) BMAP.want(HD_MAP[k]);
       const hdk = on ? smooth(.25, .8, ap) : 0;
-      if (hdk > 0 && !bd.hd && HD_CHUNK[k]){ const tx = HD_MAP[k] ? BMAP.get(HD_MAP[k]) : true;
-        if (tx){ bd.hd = hdBall(k === "jup" || k === "sat" ? 80000 : 60000, k, tx); bd.pg.add(bd.hd); bd.hdK = 0; } }
+      if (hdk > 0 && !bd.hd && BODY_COL[k]){ const tx = HD_MAP[k] ? BMAP.get(HD_MAP[k]) : true;
+        if (tx){ bd.hd = bodyMesh(k, tx); bd.pg.add(bd.hd); bd.hdK = 0; } }
       if (bd.hd){
         bd.hdK += ((hdk > 0 ? 1 : 0) - bd.hdK)*Math.min(1, dt*2.5);
         const x = Math.min(bd.hdK, hdk), hu = bd.hd.material.uniforms;
         bd.hd.visible = x > .003;
-        hu.uSharp.value = f*dtl*born*x*.62; hu.uSize.value = .36 + .28*ap; hu.uHov.value = hv; hu.uFocus.value = ap;
-        hu.uPush.value = .10; hu.uRad.value = .5; hu.uCur.value.copy(bd.cur); hu.uSolid.value = u.uSolid.value;
+        bodyA(bd.hd, f*born*x*st.vis); hu.uSolid.value = u.uSolid.value; hu.uSpin.value = T0*(BODY_SPIN[k] || 0);
         u.uSharp.value *= 1 - x; bd.sph.visible = x < .997;
+        bd.core.material.opacity *= 1 - x; bd.halo.material.opacity *= 1 - x;
       }
     }
     // Луна обходит Землю (условно), гаснет вместе с прочими телами

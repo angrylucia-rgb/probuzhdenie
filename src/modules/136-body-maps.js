@@ -53,12 +53,13 @@ const BMAP = (() => {
     const lo2 = lo + Math.atan2(Math.sin(az)*Math.sin(s)*Math.cos(la), Math.cos(s) - Math.sin(la)*Math.sin(la2));
     return [la2/D2R, lo2/D2R]; }
   // упаковка в текстуру: R — альбедо, G — рельеф, освещённый с востока (у Луны Солнце справа), B, A — маски
-  function pack(M, shadeK, gData){
+  // упаковка: R — альбедо, G — высота рельефа (0,5 — уровень; по ней шейдер шара строит нормаль под любым Солнцем)
+  // или, у газовых гигантов (gData), — данные цвета; B, A — маски тела
+  function pack(M, hk, gData){
     const { w, h } = M, out = new Uint8Array(w*h*4);
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++){
-      const i = y*w + x, e = y*w + (x + 1) % w, ww = y*w + (x - 1 + w) % w;
-      const sh = shadeK ? Math.tanh(-(M.H[e] - M.H[ww])*shadeK/Math.max(.15, M.cl[y])) : 0;
-      out[i*4] = Math.max(0, Math.min(255, M.A[i]*255)); out[i*4 + 1] = gData ? Math.max(0, Math.min(255, M.H[i]*255)) : 128 + sh*127;
+    for (let i = 0; i < w*h; i++){
+      out[i*4] = Math.max(0, Math.min(255, M.A[i]*255));
+      out[i*4 + 1] = Math.max(0, Math.min(255, (gData ? M.H[i] : .5 + .5*Math.tanh(M.H[i]*hk))*255));
       out[i*4 + 2] = Math.max(0, Math.min(255, M.B[i]*255)); out[i*4 + 3] = Math.max(0, Math.min(255, M.C[i]*255));
     }
     const t = new THREE.DataTexture(out, w, h, THREE.RGBAFormat, THREE.UnsignedByteType);
@@ -82,7 +83,7 @@ const BMAP = (() => {
   }
   function rays(M, lat, lon, R, L, n, amp, r){
     for (let k = 0; k < n; k++){
-      const az = r()*2*Math.PI, len = L*(.35 + .65*r()), wd = R*(.25 + .35*r()), st = Math.max(wd*.7, .004);
+      const az = r()*2*Math.PI, len = L*(.35 + .65*r()), wd = R*(.35 + .5*r()), st = Math.max(wd*.7, .004);
       for (let s = R*1.2; s < len; s += st){
         const [la, lo] = dest(lat, lon, az, s), f = amp*Math.pow(1 - s/len, 1.3)*(.6 + .4*r());
         each(M, la, lo, wd*(1 + s/len), (i, t) => { const b = f*(1 - t*t); M.A[i] += (1 - M.A[i])*b*.55; M.C[i] = Math.max(M.C[i], b); });
@@ -145,7 +146,7 @@ const BMAP = (() => {
     // моря: альбедо и маска с неровным краем (соседние пятна сливаются в одно море)
     const mar = new Float32Array(N), malb = new Float32Array(N);
     for (const [la, lo, D, al] of MARE){ each(M, la, lo, MR(D)*1.75, (i, t) => {
-      const e = t*1.5 + .9*(Nf[i] - .5) + .25*(M.A[i] - .6), k = sm(1.1, .78, e);
+      const e = t*1.5 + .9*(Nf[i] - .5) + .25*(M.A[i] - .6), k = sm(1.25, .68, e);
       if (k > mar[i]){ malb[i] = al; mar[i] = k; } }); yield; }
     for (let i = 0; i < N; i++){ const k = mar[i]; if (k <= 0) continue;
       M.A[i] += (malb[i] + .10*(Nf[i] - .5) + .2*(M.A[i] - .6) - M.A[i])*k; M.H[i] *= 1 - .7*k; M.B[i] = k; }
@@ -166,10 +167,10 @@ const BMAP = (() => {
     for (const [la, lo, D, ty, L, n] of CRAT){
       const R = MR(D);
       crater(M, la, lo, R, ty === "d" ? { floor: .17, dep: .6, rim: .6 } : ty === "o" ? { dep: .3, rim: .22 } : ty === "r" || ty === "b" ? { dep: 1, rim: .8, young: ty === "b" ? .9 : .75 } : { dep: .8, rim: .55 });
-      if (L) rays(M, la, lo, R, L/1737, n, ty === "b" ? .45 : .7, r);
+      if (L) rays(M, la, lo, R, L/1737, n, ty === "b" ? .3 : .45, r);
       yield;
     }
-    return pack(M, 3.2);
+    return pack(M, 1.6);
   }
 
   // общие шаги: шумовая основа (альбедо и рельеф) и россыпь кратеров со степенным распределением размеров
@@ -217,7 +218,7 @@ const BMAP = (() => {
     for (const [la, lo, D, ty, L, n] of NAM){ const R = ME(D);
       crater(M, la, lo, R, ty === "o" ? { dep: .3, rim: .25 } : ty === "n" ? { dep: .8, rim: .55 } : { dep: 1, rim: .8, young: .8 });
       if (L) rays(M, la, lo, R, L/2440, n, .65, r); yield; }
-    return pack(M, 3.2);
+    return pack(M, 1.6);
   }
 
   /* ===== Марс (радиус 3390 км) ===== */
@@ -249,23 +250,27 @@ const BMAP = (() => {
     // полярные шапки: северная — летняя остаточная, южная — смещена к 45° з. д.
     each(M, 90, 0, 9*D2R, (i, t) => { M.C[i] = Math.max(M.C[i], sm(1, .7, t)); });
     each(M, -87, -45, 5*D2R, (i, t) => { M.C[i] = Math.max(M.C[i], sm(1, .6, t)); });
-    return pack(M, 3);
+    return pack(M, 1.6);
   }
 
   /* ===== Газовые гиганты: полосы по широтам ===== */
   // профиль: [широта от, до, яркость, коричневость, рыжесть]; между зонами — плавные переходы и вихри
+  // значение профиля на широте la с плавными переходами между полосами (ширина перехода w, градусы)
+  function profAt(prof, la, w){
+    let j = prof.findIndex(p => la >= p[0] && la < p[1]); if (j < 0) j = prof.length - 1;
+    let q = prof[j].slice(2); const lo = prof[j][0], hi = prof[j][1];
+    if (j + 1 < prof.length && hi - la < w){ const t = .5*(1 - (hi - la)/w); q = q.map((v, k) => v + (prof[j + 1][k + 2] - v)*t); }
+    if (j > 0 && la - lo < w){ const t = .5*(1 - (la - lo)/w); q = q.map((v, k) => v + (prof[j - 1][k + 2] - v)*t); }
+    return q;
+  }
   function* bands(M, prof, turb, seed){
-    const r = rng(seed);
     for (let y = 0; y < M.h; y++){
       const la = ((y + .5)/M.h - .5)*180;
-      let b = prof[prof.length - 1];
-      for (const p of prof) if (la >= p[0] && la < p[1]){ b = p; break; }
       for (let x = 0; x < M.w; x++){ const i = y*M.w + x, dx = M.cl[y]*M.so[x], dy = M.sl[y], dz = M.cl[y]*M.co[x];
-        const tw = fbm(dx*4 + seed, dy*24, dz*4, 3), ed = fbm(dx*9, dy*9 + seed, dz*9, 2);
-        // край полосы рвётся вихрями: широту сдвигаем шумом
-        const la2 = la + turb*(tw - .5)*6;
-        let q = b; for (const p of prof) if (la2 >= p[0] && la2 < p[1]){ q = p; break; }
-        M.A[i] = q[2] + .10*(ed - .5); M.H[i] = q[3] + .12*(tw - .5); M.B[i] = q[4]; }
+        const tw = fbm(dx*4 + seed, dy*20, dz*4, 3), t2 = fbm(dx*14, dy*40 + seed, dz*14, 2), ed = fbm(dx*9, dy*9 + seed, dz*9, 2);
+        // край полосы рвётся вихрями: широту сдвигаем шумом двух масштабов
+        const q = profAt(prof, la + turb*((tw - .5)*4.5 + (t2 - .5)*2.2), 1.6);
+        M.A[i] = q[0] + .08*(ed - .5) + .05*(t2 - .5); M.H[i] = q[1] + .10*(tw - .5); M.B[i] = q[2]; }
       if (y % 24 === 23) yield;
     }
   }
@@ -327,7 +332,7 @@ const BMAP = (() => {
     for (const [la, lo, D] of [[9.7, 86.3, 120], [-5, 100, 300], [20, 120, 260], [-30, 60, 220], [5, -160, 200]]) each(M, la, lo, D/2/1561*1.3, (i, t) => { const [x, y, z] = dirOf(M, i), f = sm(1, .5, t)*fbm(x*40, y*40, z*40, 2); M.C[i] = Math.max(M.C[i], f); M.A[i] -= .1*f; });
     // кратер Пуйл (25° ю. ш., 271° з. д.) с яркими лучами
     crater(M, -25.2, 88.6, 26/2/1561, { dep: 1, rim: .7, young: .9 }); rays(M, -25.2, 88.6, 13/1561, 1000/1561, 14, .8, r);
-    return pack(M, 2.5);
+    return pack(M, 3);
   }
 
   const GEN = { moon, mer, mar, jup, sat, ura, nep, eur };
