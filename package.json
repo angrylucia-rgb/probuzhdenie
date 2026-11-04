@@ -1,0 +1,14 @@
+{
+  "name": "cosmolabe",
+  "private": true,
+  "description": "Космолябия · Атлас пробуждения — сборка и автотесты",
+  "scripts": {
+    "build": "cd src && DIST=../dist python3 build3.py",
+    "test": "node tests/run.js"
+  },
+  "devDependencies": {
+    "acorn": "8.12.1",
+    "acorn-walk": "8.3.4",
+    "playwright": "1.56.0"
+  }
+}

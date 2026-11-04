@@ -1,6 +1,12 @@
 # python3 merge.py <файл партии> — строки «номер<TAB>перевод» по _todo_map.json → en.json
 import json, sys, os
 H = os.path.dirname(os.path.abspath(__file__))
+if len(sys.argv) > 2 and sys.argv[1] == '--json':   # v182: слить готовый словарь {ключ: перевод} (derive_runs.js); существующие ключи не трогаем
+    p = os.path.join(H, 'en.json'); D = json.load(open(p, encoding='utf-8')); A = json.load(open(sys.argv[2], encoding='utf-8'))
+    n = 0
+    for k, v in A.items():
+        if k not in D: D[k] = v; n += 1
+    json.dump(D, open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=0); print('added', n, 'total', len(D)); sys.exit(0)
 L = json.load(open(os.path.join(H, '_todo_map.json'), encoding='utf-8'))
 p = os.path.join(H, 'en.json'); D = json.load(open(p, encoding='utf-8')) if os.path.exists(p) else {}
 n = 0; bad = []

@@ -1,7 +1,7 @@
 // Извлекает из base.html все строки с кириллицей: JS-литералы и шаблоны (acorn) + текст и атрибуты HTML вне <script>/<style>.
 // Выход: i18n/segments.json — [{k: исходный текст (raw), t: тип, at: смещение в base.html, ctx: ближайший код}]
 const fs = require('fs'), req = m => { try { return require(m); } catch(e){ return require('/tmp/claude-0/node_modules/' + m); } }, acorn = req('acorn'), walk = req('acorn-walk'); // npm i acorn acorn-walk
-const src = fs.readFileSync(process.argv[2] || '/home/claude/site/base.html', 'utf8');
+const src = fs.readFileSync(process.argv[2] || __dirname + '/../base.html', 'utf8');
 const CY = /[А-Яа-яЁё]/;
 const si = src.indexOf('<script>'), se = src.lastIndexOf('</script>');
 const js = src.slice(si + 8, se), off = si + 8;
@@ -22,8 +22,11 @@ while ((m = re.exec(html))){
   else if (CY.test(s)) { const lead = s.match(/^\s*/)[0].length, trail = s.match(/\s*$/)[0].length; segs.push({ t: 'html', at: at + lead, end: at + s.length - trail, k: s.slice(lead, s.length - trail) }); }
 }
 segs.sort((a, b) => a.at - b.at);
-fs.writeFileSync(process.argv[3] || '/home/claude/site/i18n/segments.json', JSON.stringify(segs));
+// v182: у фрагментов JS с разметкой — фразы-«прогоны» (см. runs.js): ключи, которые не ломаются от правок соседних тегов
+const { runs } = require('./runs.js');
+for (const s of segs) if (s.t === 'js' || s.t === 'tpl'){ const r = runs(s.k); if (r) s.r = r.map(x => ({ at: s.at + x.s, end: s.at + x.e, k: x.k, a: x.a })); }
+fs.writeFileSync(process.argv[3] || __dirname + '/segments.json', JSON.stringify(segs));
 const uniq = new Set(segs.map(s => s.k));
 let chars = 0; uniq.forEach(k => chars += k.length);
 const by = {}; segs.forEach(s => by[s.t] = (by[s.t] || 0) + 1);
-console.log('segments', segs.length, 'unique', uniq.size, 'unique chars', chars, by);
+console.log('segments', segs.length, 'unique', uniq.size, 'unique chars', chars, by, 'with runs', segs.filter(s => s.r).length);

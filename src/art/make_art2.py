@@ -1,5 +1,5 @@
 # Рисунки существ (PNG с прозрачностью, после cut_bg.py) → art/img/<код>.webp + маска частиц в data/bio.json
-# + запись в BIO_ART внутри base.html (мастер-исходник с v127). Запуск: python3 make_art2.py <папка png> [коды...]
+# + запись в BIO_ART в modules/269-data-bio-masks-art.js (мастер-исходник — modules/, с v182). Запуск: python3 make_art2.py <папка png> [коды...]
 import sys, os, re, json, numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +27,8 @@ def bleed(rgb, al, it=12):
         grow = (~ok) & (cnt > 0); rgb[grow] = acc[grow]/cnt[grow][:, None]; ok = ok | grow
     return rgb
 data = json.load(open(os.path.join(SITE, "data/bio.json"), encoding="utf-8"))
-base = open(os.path.join(SITE, "base.html"), encoding="utf-8").read()
+ARTF = os.path.join(SITE, "modules", "269-data-bio-masks-art.js")   # v182: исходник разрезан на modules/
+base = open(ARTF, encoding="utf-8").read()
 m0 = re.search(r"const BIO_ART = (\{.*?\});\n", base); art = json.loads(m0.group(1))
 for f in sorted(os.listdir(SRC)):
     k = f[:-4]
@@ -48,5 +49,5 @@ for f in sorted(os.listdir(SRC)):
     print(k, (W, H), (W2, H2), os.path.getsize(os.path.join(HERE, "img", k + ".webp"))//1024, "KB")
 json.dump(data, open(os.path.join(SITE, "data/bio.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 base = base[:m0.start(1)] + json.dumps(art, ensure_ascii=False, separators=(",", ":")) + base[m0.end(1):]
-open(os.path.join(SITE, "base.html"), "w", encoding="utf-8").write(base)
+open(ARTF, "w", encoding="utf-8").write(base)
 print("art:", len(art))

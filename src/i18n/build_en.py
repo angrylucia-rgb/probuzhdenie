@@ -24,10 +24,21 @@ def translate(b):
     segs = json.load(open(os.path.join(H, '_tmp_segs.json'), encoding='utf-8'))
     D = load(os.path.join(H, 'en.json'), {})
     out = []; last = 0; miss = {}
+    RO = os.environ.get('I18N_RUNS_ONLY')   # проверка: переводить фрагменты с разметкой только по фразам
     for s in segs:
-        t = D.get(s['k'])
-        if t is None: miss[s['k']] = miss.get(s['k'], 0) + 1; continue
         q = b[s['at'] - 1] if s['t'] == 'js' else ''
+        t = None if RO and s.get('r') else D.get(s['k'])
+        if t is None and s.get('r'):
+            # v182: фрагмент целиком не найден (например, рядом поменяли разметку) — переводим его фразы по отдельности
+            rs = [(r, D.get(r['k'])) for r in s['r']]
+            for r, rt in rs:
+                if rt is None: miss[r['k']] = miss.get(r['k'], 0) + 1
+            for r, rt in rs:
+                if rt is None: continue
+                if r['a']: rt = rt.replace('"', '&quot;')
+                out.append(b[last:r['at']]); out.append(esc(rt, s['t'], q)); last = r['end']
+            continue
+        if t is None: miss[s['k']] = miss.get(s['k'], 0) + 1; continue
         out.append(b[last:s['at']]); out.append(esc(t, s['t'], q)); last = s['end']
     out.append(b[last:]); return ''.join(out), miss, len(segs)
 if __name__ == '__main__':

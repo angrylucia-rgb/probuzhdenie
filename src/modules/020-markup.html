@@ -1,0 +1,317 @@
+</style>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="vign" aria-hidden="true"></div>
+<div class="shade" id="shade" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="intro" id="intro">
+  <span class="mono eyebrow">Карта вселенной · 12 станций · 2 перехода</span>
+  <h1>Космолябия</h1>
+  <p>Путь по кольцу астролябии: от Единого — в частицу, из пустоты — обратно в Единое.</p>
+  <button class="begin" id="begin" data-hover><span class="mono">Начать путь</span></button>
+</div>
+
+<section class="portal" id="portal" aria-live="polite" hidden>
+  <span class="mono eyebrow" id="poEye"></span>
+  <h2 id="poTitle"></h2>
+  <div class="po-scale" id="poScale"></div>
+  <p id="poText"></p>
+  <p class="po-note" id="poNote"></p>
+</section>
+
+<div class="ui" id="ui">
+  <div class="bar">
+    <div class="brand">Космолябия<small>Атлас пробуждения</small></div>
+    <div class="acts">
+      <nav class="tlang mono" id="tLang" aria-label="Язык сайта"><a data-l="ru" lang="ru" hreflang="ru" title="Русский" data-hover>RU</a><i aria-hidden="true">·</i><a data-l="en" lang="en" hreflang="en" title="English" data-hover>EN</a></nav>
+      <div class="qk" id="qk">
+        <button class="act mono" id="qkBtn" aria-haspopup="true" aria-expanded="false" aria-controls="qkList" data-hover><span class="lbl">Разделы</span><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.4"/><circle cx="11" cy="3" r="1.4"/><circle cx="3" cy="11" r="1.4"/><circle cx="11" cy="11" r="1.4"/><circle cx="7" cy="7" r="1.4"/></svg></button>
+        <div class="qk-list" id="qkList" role="menu" aria-label="Разделы">
+          <button class="act mono qk-it" role="menuitem" id="btnHuman" aria-pressed="false" data-hover><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="6" cy="3" r="2"/><path d="M1 13c0-4 2-6 5-6s5 2 5 6"/></svg><span class="qk-tx"><span class="lbl">Человек</span><small>от тонких тел — к органам и скелету</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnEarth" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M1.5 5.5h11M1.5 8.5h11M7 1c-2.4 3.4-2.4 8.6 0 12M7 1c2.4 3.4 2.4 8.6 0 12"/></svg><span class="qk-tx"><span class="lbl">Земля</span><small>сквозь стихии и камень — к ядру</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnIz" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="2.2" fill="currentColor"/><path d="M1.2 7c1.6-3.4 10-3.4 11.6 0M1.2 7c1.6 3.4 10 3.4 11.6 0"/></svg><span class="qk-tx"><span class="lbl">Изнанка</span><small>мир за горизонтом чёрной дыры</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnPath" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M7 1v6l4 2"/></svg><span class="qk-tx"><span class="lbl">Путь</span><small>восемь этапов: узнать, прожить, осмыслить</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnTime" aria-pressed="false" data-hover><svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 1h9M1.5 13h9M2.5 1c0 3.5 3.5 4 3.5 6s-3.5 2.5-3.5 6M9.5 1c0 3.5-3.5 4-3.5 6s3.5 2.5 3.5 6"/></svg><span class="qk-tx"><span class="lbl">Время</span><small>космический календарь</small></span></button>
+          <button class="act mono qk-it" role="menuitem" id="btnTree" aria-pressed="false" data-hover><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.4" fill="currentColor"/><path d="M7 7L3 3M7 7l4-4M7 7v6M3 3L1.5 4.5M3 3l.5-2M11 3l1.5 1.5M11 3l-.5-2M7 13l-2 .5M7 13l2 .5"/></svg><span class="qk-tx"><span class="lbl">Древо</span><small>древо жизни: родство всего живого</small></span></button>
+        </div>
+      </div>
+      <button class="act mono" id="btnSearch" aria-label="Поиск по сайту (Ctrl+K)" data-hover><span class="lbl">Поиск</span><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.3"/><path d="M8.7 8.7L12 12"/></svg></button>
+      <button class="act mono" id="sound" aria-pressed="false" data-hover><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="lbl">Музыка</span></button>
+      <button class="act mono" id="menuBtn" data-hover><span class="lbl">Станции</span><span class="burger" aria-hidden="true"><i></i><i></i></span></button>
+    </div>
+  </div>
+
+  <div class="gauge" id="gauge" aria-hidden="true">
+    <span class="cap mono">Масштаб, м</span>
+    <div class="axis"></div>
+    <div class="mark" id="gmark"></div>
+  </div>
+
+  <section class="st" id="st" aria-live="polite" hidden>
+    <div class="st-num"><b id="stNum">I</b><span>станция из XII</span></div>
+    <h2 class="st-name" id="stName"></h2>
+    <p class="st-sub" id="stSub"></p>
+    <p class="st-lede" id="stLede"></p>
+    <div class="st-row">
+      <button class="enter" id="enter" data-hover><span>Погрузиться в станцию</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
+      <button class="enter alt" id="toHuman" hidden data-hover><span>Карта человека</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
+      <button class="enter alt" id="toEarth" hidden data-hover><span>Погружение в Землю</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
+      <button class="enter alt" id="toBH" hidden data-hover><span>К центру — чёрная дыра</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
+      <button class="enter alt" id="toDims" hidden data-hover><span>Лестница измерений</span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M1 7h12M8 2l5 5-5 5"/></svg></button>
+      <span class="scale-now" id="stScale"></span>
+    </div>
+    <p class="st-snd" id="stSnd"></p>
+    <span class="st-hint" id="stHint">Наведите на объект и нажмите — чтобы погрузиться</span>
+  </section>
+
+  <div class="foot" id="foot">
+    <div class="hint mono" id="hint"><i></i><span>Листайте — идти по кольцу</span></div>
+    <div class="right">
+      <div class="count" id="count" hidden>01<small>из 12</small></div>
+      <svg class="mini" id="mini" viewBox="-66 -66 132 132" role="group" aria-label="Кольцо станций"></svg>
+    </div>
+  </div>
+</div>
+
+<nav class="menu" id="menu" aria-label="Навигация" aria-hidden="true">
+  <button class="close mono" id="menuClose" data-hover>Закрыть ✕</button>
+  <div class="menu-in mp">
+    <header class="mp-head">
+      <div class="mp-top"><span class="mono eyebrow">Карта Космолябии</span><span class="mp-tr"><button type="button" class="mp-share" id="mpShare" title="Скопировать ссылку на место, где вы сейчас" data-hover><span>Ссылка</span><span class="mp-shx"> на это место</span></button><nav class="mp-lang" aria-label="Язык сайта"><a data-l="ru" lang="ru" hreflang="ru" title="Русский" data-hover>RU</a><a data-l="en" lang="en" hreflang="en" title="English" data-hover>EN</a></nav></span></div>
+      <p class="mp-lead">Сайт устроен как спуск по масштабам: от Абсолюта — через Вселенную, Солнце, Землю и человека — к атому и Пустоте. <span class="mp-d">Слева — 12 станций по порядку, справа — с чего начать и темы, которые проходят через многие станции.</span><span class="mp-m">Ниже — с чего начать, 12 станций по порядку и темы, которые проходят через многие станции.</span></p>
+      <button class="mp-srch" id="mSrch" data-hover><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Поиск по сайту</span><kbd class="mono">Ctrl K</kbd></button>
+    </header>
+    <section class="mp-spine" aria-label="Станции кольца">
+      <div class="mp-cap mono"><span>Станции · от большого к малому</span><span>масштаб</span></div>
+      <button class="mp-abs" id="mAbs" data-hover><span class="mono">Погружение · все станции</span><b>Сквозной путь</b><span>пройти все 12 станций подряд, с развилками →</span></button>
+      <ol id="menuList" class="mp-list"></ol>
+      <p class="mp-legend mono"><span><i class="lg-here"></i>вы здесь</span><span><i class="lg-seen"></i>уже были</span><span>↳ — погружение вглубь станции</span></p>
+    </section>
+    <aside class="mp-side">
+      <section class="mp-grp mp-start">
+        <h3 class="mono mp-h">С чего начать</h3>
+        <button class="mp-it mp-first" id="mCompass" data-hover><span class="mp-badge mono">впервые здесь?</span><b>Компас пути</b><span>Минута вопросов — и маршрут под ваш интерес, время и состояние</span></button>
+        <button class="mp-it" id="mRoutes" data-hover><b>Маршруты</b><span>Готовые экскурсии: «Откуда я?», «Из чего я сделан?», «Свет»…</span></button>
+        <button class="mp-it" id="mRef" data-hover><b>Как пользоваться</b><span>Короткая инструкция, сравнение традиций, принципы, источники</span></button>
+      </section>
+      <section class="mp-grp mp-atl">
+        <h3 class="mono mp-h">Сквозные темы</h3>
+        <p class="mp-note">Проходят через несколько станций — при наведении они подсвечиваются слева</p>
+        <button class="mp-it" id="mTime" data-span="1-6" data-hover><span class="mp-k mono">время</span><b>Космический календарь</b><span>13,8 млрд лет в одном году</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mTree" data-span="5-7" data-hover><span class="mp-k mono">родство</span><b>Древо жизни</b><span>От общего предка — к растениям, грибам, животным и человеку</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mBio" data-span="5" data-hover><span class="mp-k mono">жизнь в камне</span><b>Биосфера</b><span>4,5 млрд лет жизни в пластах, больше 140 существ, биомы Земли</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mThought" data-span="0-11" data-hover><span class="mp-k mono">идеи</span><b>Нить мысли</b><span>Традиции и наука — от Ригведы до LIGO</span><i class="mp-rng"></i></button>
+        <button class="mp-it" id="mDims" data-span="2,10" data-hover><span class="mp-k mono">пространство</span><b>Лестница измерений</b><span>Точка, линия, плоскость, наш мир — и что за ним</span><i class="mp-rng"></i></button>
+      </section>
+      <section class="mp-grp">
+        <h3 class="mono mp-h">Практика</h3>
+        <button class="mp-it" id="mPath" data-span="6" data-hover><b>Путь из восьми этапов</b><span>Узнать, почувствовать, прожить, осмыслить</span></button>
+        <button class="mp-it" id="mJournal" data-span="5-7" data-hover><b>Журнал натуралиста</b><span>Опыты своими руками: отбор, клетка, фотосинтез</span></button>
+      </section>
+      <section class="mp-grp">
+        <h3 class="mono mp-h">Моё</h3>
+        <button class="mp-it" id="mMine" data-hover><b>Моя астролябия</b><span>Что вы уже прошли — хранится только в этом браузере</span></button>
+      </section>
+    </aside>
+    <footer class="mp-foot mono"><span>© 2026 __OWNER__</span><button id="mLegal" data-hover>Правовая информация</button><button id="mTerms" data-hover>Соглашение</button><button id="mPriv" data-hover>Конфиденциальность</button><span class="mp-age" title="Возрастная категория">12+</span></footer>
+    <div class="mp-hold" hidden>
+      <button class="mp-chip" id="mBH" data-hover><span class="mono">↳</span>К центру Галактики · в Изнанку</button>
+      <button class="mp-chip" id="mEarth" data-hover><span class="mono">↳</span>Погружение в Землю — к ядру</button>
+      <button class="mp-chip" id="mHuman" data-hover><span class="mono">↳</span>Погружение в человека — от тонких тел к скелету</button>
+    </div>
+  </div>
+</nav>
+
+<button class="tomenu mono" id="toMenu" data-hover hidden><span aria-hidden="true">←</span> Станции</button>
+<div class="reticle" id="reticle" aria-hidden="true"><svg viewBox="-100 -100 200 200"><circle class="r1" r="96"/><circle class="r2" r="84"/><g class="ticks" id="rticks"></g></svg><span class="rlab mono" id="rlab">Погрузиться</span></div>
+<div class="reveal" id="reveal" aria-hidden="true"></div>
+<div class="loopfx" id="loopFx" aria-hidden="true"></div>
+<div class="ebound mono" id="eBound" aria-hidden="true"></div>
+<button class="moonbtn" id="moonBtn" aria-label="Луна — погрузиться" tabindex="-1" data-hover><canvas id="moonCv" width="120" height="120" aria-hidden="true"></canvas><span class="mono">Луна</span></button>
+<div class="ptip" id="ptip" aria-live="polite"><span class="mono pk"></span><b></b><p class="pd"></p><p class="pn"></p></div>
+
+<div class="film" id="film" aria-hidden="true" role="dialog" aria-label="Фильм эпохи">
+  <video id="filmV" playsinline preload="none"></video>
+  <div class="film-ui">
+    <button class="film-x" id="filmX" aria-label="Закрыть фильм" data-hover><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="film-bar" id="filmBar" aria-hidden="true"><i id="filmP"></i></div>
+    <button class="film-snd" id="filmS" aria-label="Звук" aria-pressed="true" data-hover><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path class="off" d="M17 9l5 6M22 9l-5 6"/></svg></button>
+  </div>
+</div>
+
+<section class="interior" id="interior" aria-hidden="true" aria-label="Станция изнутри">
+  <div class="in-panel">
+    <button class="back mono" id="surface" data-hover>↑ Всплыть на кольцо</button>
+    <header class="in-head">
+      <span class="mono eyebrow" id="inNum"></span>
+      <h2 id="inName"></h2>
+      <p class="in-sub" id="inSub"></p>
+      <span class="mono in-scale" id="inScale"></span>
+    </header>
+    <nav class="in-arc" aria-label="Разделы станции"><svg id="inArc" viewBox="0 0 440 74"></svg></nav>
+    <div class="in-wrap"><div class="in-body" id="inBody" tabindex="0" aria-label="Содержание станции"></div><div class="vscale" id="vscale" aria-hidden="true"><svg id="vsvg"></svg><div class="vthumb" id="vthumb"><b></b><i></i></div></div></div>
+    <div class="in-nav"><button id="inPrev" data-hover></button><button id="inNext" data-hover></button></div>
+  </div>
+</section>
+
+<aside class="chapter ch-human" id="chHuman" aria-hidden="true" aria-label="Погружение в человека">
+  <button class="back mono" id="hBack" data-hover>↑ Всплыть на кольцо</button>
+  <div class="hd-grid">
+    <nav class="depth" aria-label="Глубина погружения"><svg id="dsvg"></svg></nav>
+    <div class="hd-main">
+      <header class="hd-head">
+        <span class="mono eyebrow" id="hdEye"></span>
+        <h2 id="hdName"></h2>
+        <p class="hd-sub" id="hdSub"></p>
+        <span class="mono hd-hint" id="hdHint">Листайте над фигурой — глубже</span>
+      </header>
+      <div class="hd-body" id="hdBody" aria-live="polite"></div>
+      <div class="hd-nav"><button id="hdUp" data-hover></button><button id="hdDown" data-hover></button></div>
+    </div>
+  </div>
+</aside>
+
+<section class="chapter ch-path" id="chPath" aria-hidden="true" aria-label="Глава: путь">
+  <button class="close mono" id="pathClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="path-in">
+    <header class="path-head">
+      <span class="mono eyebrow">Глава · Октава погружения</span>
+      <h2>Восемь этапов: круг, пройденный собой</h2>
+      <p class="lede">Этапы идут по кольцу: от Единого через космос к человеку, вглубь материи, в пустоту и обратно. Нулевой этап — порог, седьмой — начало нового витка. В каждом этапе четыре шага.</p>
+    </header>
+    <div class="stages" id="stages"></div>
+    <aside class="breath" aria-label="Практика дыхания">
+      <span class="mono eyebrow">Практика</span>
+      <h3>Дыхание сердца</h3>
+      <p>Шесть дыханий в минуту: вдох 5 секунд, выдох 5 секунд. Такой ритм повышает вариабельность сердечного ритма. С включённой музыкой на вдохе звучит колокольчик.</p>
+      <div class="circ"><div class="orb" id="orb"></div></div>
+      <div class="phase" id="phase">Готовы?</div>
+      <div class="cnt" id="cnt">0 из 30 дыханий</div>
+      <button class="btn" id="breathBtn" data-hover>Начать 5 минут</button>
+    </aside>
+  </div>
+</section>
+
+<section class="chapter ch-time" id="chTime" aria-hidden="true" aria-label="Космический календарь">
+  <canvas id="tcv" aria-label="Астролябия времени: вложенные кольца календаря"></canvas>
+  <button class="close mono" id="timeClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Космический календарь<span class="tm-hide-m"> · 13,8 млрд лет в году</span></span><button class="tm-max-btn" id="tmMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <div class="tm-now" title="Большой взрыв — 1 января, 00:00. Сейчас — полночь 31 декабря. Каждое следующее кольцо — последнее деление предыдущего, развёрнутое на весь круг.">
+      <span class="mono tm-ring" id="tmRing"></span>
+      <div class="tm-date"><span id="tmDay"></span> <span class="tm-clock" id="tmClock"></span></div>
+      <div class="tm-sub"><span class="tm-ago" id="tmAgo"></span><span class="mono tm-unit" id="tmUnit"></span></div>
+      <div class="tm-track"><i id="tmBar"></i></div>
+    </div>
+    <div class="tm-ctl"><button class="btn" id="tmPlay" aria-pressed="false" data-hover>Прожить год</button><button class="tm-link" id="tmReset" data-hover>⟲ К началу</button><button class="tm-tog" id="tmCycBtn" aria-pressed="false" data-hover>Циклы традиций</button></div>
+    <div class="tm-age"><label for="tmAge">Ваш возраст</label><input id="tmAge" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="—"><button class="tm-link" id="tmAgeGo" hidden data-hover>Показать</button><span id="tmAgeOut"></span></div>
+    <div class="tm-scroll" id="tmScroll"><article class="tm-card" id="tmCard" aria-live="polite"></article><section class="tm-cyc" id="tmCyc" hidden></section></div>
+  </div>
+</section></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-tree" id="chTree" aria-hidden="true" aria-label="Древо жизни">
+  <canvas id="treeCv" aria-label="Радиальное древо жизни: общий предок в центре, сегодняшний день — внешний край"></canvas>
+  <canvas id="treeLab" aria-hidden="true"></canvas>
+  <button class="close mono" id="treeClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Древо жизни<span class="tm-hide-m"> · 4 млрд лет родства</span></span><button class="tm-max-btn" id="trMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <div class="tm-ctl"><span class="tr-path"><span class="mono">Путь к нам</span><button id="trPrev" aria-label="Предыдущий шаг" data-hover>←</button><span class="mono" id="trStep">1/11</span><button id="trNext" aria-label="Следующий шаг" data-hover>→</button></span><button class="btn" id="trWalk" aria-pressed="false" data-hover>▶ Пройти путь</button><button class="tm-link" id="trHome" data-hover>⟲ Всё древо</button></div>
+    <span class="mono tm-hint tr-hint">Клик по узлу — ветвь · тяните — поворот · колесо — ближе · ← → — шаги пути</span>
+    <div class="tm-scroll" id="trScroll"><article class="tm-card" id="trCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-thought" id="chThought" aria-hidden="true" aria-label="Нить мысли">
+  <svg id="thSvg" aria-label="Река идей: верхний берег — опыт, нижний — измерение"></svg>
+  <button class="close mono" id="thClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Нить мысли<span class="tm-hide-m"> · опыт и измерение</span></span><span class="th-hbtn"><button class="tm-link" id="thHome" data-hover>⟲ Вся река</button><button class="tm-max-btn" id="thMax" aria-pressed="false" data-hover>⤢ Читать</button><button class="tm-max-btn th-fold-btn" id="thFold" data-hover>▾ Свернуть</button></span></div>
+    <span class="mono tm-hint tr-hint th-hint">Клик — карточка · колесо — ближе · тяните — сдвиг · ← → — по времени</span>
+    <div class="tm-scroll" id="thScroll"><article class="tm-card" id="thCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-dims" id="chDims" aria-hidden="true" aria-label="Лестница измерений">
+  <canvas id="dimCv" aria-label="Объект ступени из золотых частиц: точка, отрезок, квадрат, куб"></canvas>
+  <canvas id="dimLab" aria-hidden="true"></canvas>
+  <button class="close mono" id="dmClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Лестница измерений<span class="tm-hide-m"> · 0D → 6D</span></span><button class="tm-max-btn" id="dmMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <nav class="dm-ladder" id="dmLadder" aria-label="Ступени"></nav>
+    <div class="tm-ctl" id="dmTools"></div>
+    <span class="mono tm-hint tr-hint" id="dmHint"></span>
+    <div class="tm-scroll" id="dmScroll"><article class="tm-card" id="dmCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-time ch-bio" id="chBio" aria-hidden="true" aria-label="Биосфера">
+  <canvas class="bio-rock" id="bioRock" aria-hidden="true"></canvas>
+  <div class="bio-sky" id="bioSky" aria-hidden="true"></div>
+  <canvas id="bioCv" aria-label="Пласт породы: окаменелости, которые оживают и собираются в существ из частиц"></canvas>
+  <button class="bio-fold" id="bioFold" aria-pressed="false" aria-label="Скрыть текст и смотреть панораму" title="Скрыть текст" data-hover>‹</button>
+  <canvas id="bioLab" aria-hidden="true"></canvas>
+  <canvas id="bioSim" aria-label="Живая модель опыта"></canvas>
+  <nav class="bio-col" id="bioCol" aria-label="Колонна пластов: сверху — сегодня, внизу — древнейшие"></nav>
+  <button class="close mono" id="bioClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="time-in">
+    <div class="tm-head"><span class="mono eyebrow">Биосфера<span class="tm-hide-m"> · пласты камня</span></span><button class="tm-max-btn" id="bioMax" aria-pressed="false" data-hover>⤢ Читать</button></div>
+    <div class="tm-ctl" id="bioTools"><button class="tm-tog" id="bioXBack" hidden data-hover>← Назад</button><button class="tm-tog" id="bioGalB" aria-pressed="false" data-hover>Галерея существ</button><button class="tm-tog" id="bioMechB" aria-pressed="false" data-hover>Механизмы эволюции</button><button class="tm-tog" id="bioBasB" aria-pressed="false" data-hover>Основы биологии</button><button class="tm-tog" id="bioBmB" aria-pressed="false" data-hover>Биомы Земли</button><button class="tm-tog" id="bioLife" aria-pressed="false" hidden data-hover>Оживить окаменелости</button><button class="tm-tog" id="bioFilm" hidden data-hover>▶ Фильм эпохи</button></div>
+    <span class="mono tm-hint tr-hint" id="bioHint"></span>
+    <div class="tm-scroll" id="bioScroll"><article class="tm-card" id="bioCard" aria-live="polite"></article></div>
+  </div>
+</section>
+
+<section class="chapter ch-compass" id="chCompass" aria-hidden="true" aria-label="Компас пути">
+  <button class="close mono" id="cpClose" data-hover>Закрыть ✕</button>
+  <div class="cp-in"><div class="cp-body" id="cpBody"></div></div>
+</section>
+
+<aside class="cp-invite" id="cpInvite" aria-hidden="true"><span>Не знаете, с чего начать? <b>Компас пути</b> — одна минута.</span><button class="btn" id="cpInvGo" data-hover>Открыть</button><button class="rb-x" id="cpInvX" aria-label="Закрыть приглашение" data-hover>✕</button></aside>
+
+<section class="chapter ch-mine" id="chMine" aria-hidden="true" aria-label="Моя астролябия">
+  <button class="close mono" id="mnClose" data-hover>Закрыть ✕</button>
+  <div class="mn-in" id="mnBody"></div>
+</section>
+
+<section class="chapter ch-routes" id="chRoutes" aria-hidden="true" aria-label="Маршруты">
+  <button class="close mono" id="routesClose" data-hover>Закрыть ✕</button>
+  <div class="rt-in">
+    <span class="mono eyebrow">Экскурсии сквозь весь сайт</span>
+    <h2>Маршруты</h2>
+    <p class="lede">Каждый маршрут — ответ на один вопрос. Шаг за шагом он ведёт через кольцо станций, погружения, Космический календарь и Древо жизни. Полоса маршрута остаётся с вами, куда бы вы ни перешли.</p>
+    <button class="rt-compass" id="rtCompass" data-hover><span class="mono eyebrow">Компас пути</span><b>Собрать свой маршрут</b><span>Шесть вопросов — около минуты</span></button>
+    <div class="rt-list" id="routeList"></div>
+  </div>
+</section>
+
+<div class="srch" id="srch" aria-hidden="true" role="dialog" aria-label="Поиск по сайту">
+  <div class="sr-box">
+    <div class="sr-top"><svg width="16" height="16" viewBox="0 0 13 13" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.3"/><path d="M8.7 8.7L12 12"/></svg><input id="srchIn" type="text" placeholder="Станции, слои, события, группы Древа…" autocomplete="off" spellcheck="false"><span class="mono sr-k">Esc</span></div>
+    <div class="sr-res" id="srchRes"></div>
+  </div>
+</div>
+
+<aside class="routebar" id="routeBar" aria-hidden="true" aria-label="Маршрут">
+  <div class="rb-top"><span class="mono rb-name" id="rbName"></span><span class="mono rb-step" id="rbStep"></span><button class="rb-x" id="rbFold" data-hover>Свернуть ▴</button><button class="rb-x" id="rbClose" aria-label="Выйти из маршрута" data-hover>✕</button></div>
+  <div class="rb-body"><h3 id="rbH"></h3><p id="rbTx"></p></div>
+  <div class="rb-nav"><button class="rb-btn" id="rbPrev" data-hover>← Назад</button><button class="rb-again" id="rbAgain" data-hover>↺ к месту шага</button><button class="rb-btn rb-next" id="rbNext" data-hover>Дальше →</button></div>
+</aside>
+
+<section class="chapter ch-ref" id="chRef" aria-hidden="true" aria-label="Справочник">
+  <button class="close mono" id="refClose" data-hover>Вернуться на кольцо ✕</button>
+  <div class="ref-in">
+    <nav class="ref-tabs" id="refTabs" aria-label="Разделы справочника">
+      <button class="reftab on" data-tab="guide" data-hover>Как пользоваться</button>
+      <button class="reftab" data-tab="rosetta" data-hover>Розеттский камень</button>
+      <button class="reftab" data-tab="principles" data-hover>Десять принципов</button>
+      <button class="reftab" data-tab="sounds" data-hover>Звуки кольца</button>
+      <button class="reftab" data-tab="sources" data-hover>Источники</button>
+      <button class="reftab" data-tab="legal" data-hover>Правовая информация</button>
+    </nav>
+    <div class="ref-body" id="refBody"></div>
+  </div>
+</section>
+

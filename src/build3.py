@@ -1,5 +1,5 @@
 import os, json, shutil
-# Мастер-исходник — base.html (шаблон со всеми вписанными скриптами). Отдельные .js в src/ репозитория неполные.
+# Мастер-исходник — modules/* (склеиваются в base.html, см. modules.py).
 libs=['shaders/CopyShader.js','shaders/LuminosityHighPassShader.js','postprocessing/EffectComposer.js','postprocessing/RenderPass.js','postprocessing/ShaderPass.js','postprocessing/UnrealBloomPass.js']
 def scripts(threep, exp): return '\n'.join([f'<script src="{threep}"></script>']+[f'<script src="{exp}{l}"></script>' for l in libs])
 ORIGIN = 'https://probuzhdenie-pied.vercel.app'  # при покупке домена — поменять здесь (и в vercel.json не нужно)
@@ -107,8 +107,9 @@ def build(base, art, prevf, lang):
     open(DIST + '/robots.txt', 'w').write(''.join(f'User-agent: {a}\n' for a in AI) + 'Disallow: /\n\nUser-agent: *\nAllow: /\n\nSitemap: ' + ORIGIN + '/sitemap.xml\n')
 
 
-import subprocess
-build(open('base.html').read(), 'astrolabia.html', 'preview.html', 'ru')
+import subprocess, modules
+# v182: мастер-исходник — modules/*: base.html собирается из них (править base.html вручную нельзя — см. modules.py)
+build(modules.build(), 'astrolabia.html', 'preview.html', 'ru')
 # английская версия: i18n/build_en.py → i18n/base_en.html (правки кода + словарь en.json)
 subprocess.run(['python3', 'i18n/build_en.py'], check=True)
 en = open('i18n/base_en.html').read().replace('«', '“').replace('»', '”')

@@ -1,5 +1,15 @@
 node_modules/
-src/node_modules/
-src/preview.html
+# производные файлы сборки (исходник — src/modules/)
+src/base.html
 src/astrolabia.html
+src/astrolabia_en.html
+src/preview.html
+src/preview_en.html
+src/i18n/base_en.html
+src/i18n/segments.json
+src/i18n/missing.json
+src/i18n/_*
+src/i18n/batches/
+__pycache__/
+src/node_modules/
 .DS_Store
