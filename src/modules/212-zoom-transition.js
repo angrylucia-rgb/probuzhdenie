@@ -128,8 +128,11 @@ $("hBack").onclick = closeHuman;
 $("btnHuman").onclick = () => humanOpen && jKind === "h" ? closeHuman() : openHuman();
 $("btnEarth").onclick = () => humanOpen && jKind === "e" ? closeHuman() : openEarth();
 $("toEarth").onclick = openEarth;
-$("moonBtn").onclick = () => jGo("moon");
-// значок Луны — из частиц, как все объекты сайта: точки сферы, моря темнее, фаза — серп, свет справа
+$("moonBtn").onclick = () => jGo("moon");   // с Земли — полёт (213-moon-flight.js), см. flashTo
+// значок Луны — из частиц, как все объекты сайта: точки сферы, моря темнее, фаза — серп, свет справа.
+// v183: рисунок вынесен в moonDots(): тот же рисунок крупно рисует полёт к Луне (213-moon-flight.js) —
+// он начинается ровно со значка, поэтому подмена незаметна. warm 0…1 — тон тёплого света сцены Луны.
+let moonDots = null;
 (() => {
   const cv = $("moonCv"), c = cv.getContext("2d"), mb = $("moonBtn"), N = 2200, P = [];
   const MARIA = [[.35, .55, .42], [.2, -.1, .3], [-.25, .35, .28], [.05, .95, .22], [-.45, -.2, .2], [.6, -.35, .18]];   // [широта, долгота, радиус] морей
@@ -140,20 +143,30 @@ $("moonBtn").onclick = () => jGo("moon");
   const HALO = Array.from({ length: 90 }, () => { const a = Math.random()*6.2832, r = 1.08 + Math.random()*.32; return [Math.cos(a)*r, Math.sin(a)*r, Math.random()*6.28]; });
   let hov = 0; mb.addEventListener("pointerenter", () => hov = 1); mb.addEventListener("pointerleave", () => hov = 0);
   let h = 0, last = 0;
-  (function draw(t){ requestAnimationFrame(draw);
-    if (!mb.classList.contains("on")) return;
-    const dt = Math.min(.1, (t - last)/1000 || 0); last = t; h += (hov - h)*Math.min(1, dt*4);
-    const W = cv.width, R = W*.4, cx = W/2, cy = W/2, a = t/1000*.08, ca = Math.cos(a), sa = Math.sin(a);
-    c.clearRect(0, 0, W, W);
-    const g = c.createRadialGradient(cx, cy, R*.85, cx, cy, W*.49); g.addColorStop(0, `rgba(235,226,200,${.08 + .07*h})`); g.addColorStop(1, "rgba(235,226,200,0)"); c.fillStyle = g; c.beginPath(); c.arc(cx, cy, W*.49, 0, 6.2832); c.fill();
-    for (const [hx, hy, hs] of HALO){ const al = .12 + .1*Math.sin(t/1000*.9 + hs) + .1*h; if (al <= 0) continue; c.fillStyle = `rgba(240,228,196,${al})`; c.beginPath(); c.arc(cx + hx*R, cy + hy*R, W/150, 0, 6.2832); c.fill(); }
+  // R — радиус диска в пикселях холста; размеры точек и ореола пропорциональны R (у значка R = 0,4 ширины)
+  moonDots = (c, cx, cy, R, t, h, warm = 0, al = 1) => {
+    // крупно (полёт): точки мельче относительно диска, под ними — мягкая подложка с терминатором, без ореола
+    const big = smooth(60, 200, R), a = t/1000*.08, ca = Math.cos(a), sa = Math.sin(a), u = R/48*(1 - .4*big), hw = 1 - warm;
+    if (big > 0){ const f = big*al, gr = c.createLinearGradient(cx - R*.35, 0, cx + R, 0);
+      gr.addColorStop(0, "rgba(60,34,22,0)"); gr.addColorStop(.3, `rgba(150,100,78,${.3*f})`); gr.addColorStop(1, `rgba(245,205,180,${.5*f})`);
+      c.fillStyle = gr; c.beginPath(); c.arc(cx, cy, R, 0, 6.2832); c.fill(); }
+    const g = c.createRadialGradient(cx, cy, R*.85, cx, cy, R*1.225); g.addColorStop(0, `rgba(235,226,200,${(.08 + .07*h)*al*hw})`); g.addColorStop(1, "rgba(235,226,200,0)"); c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R*1.225, 0, 6.2832); c.fill();
+    for (const [hx, hy, hs] of HALO){ const ah = (.12 + .1*Math.sin(t/1000*.9 + hs) + .1*h)*al*hw; if (ah <= 0) continue; c.fillStyle = `rgba(240,228,196,${ah})`; c.beginPath(); c.arc(cx + hx*R, cy + hy*R, R/60, 0, 6.2832); c.fill(); }
     const L = [.86, .18, .47];                                   // направление на Солнце — серп справа
+    // тёплый тон — как Луна на слое станции: светлые точки персиковые, ободок у терминатора почти белый
+    const cr = 245 + 10*warm, cg = 238 - 30*warm, cb = 220 - 45*warm;
     for (const p of P){ const x = p.x*ca + p.z*sa, z = -p.x*sa + p.z*ca, y = p.y; if (z < 0) continue;
       const lam = Math.max(0, x*L[0] + y*L[1] + z*L[2]), earth = .05, b = (lam*lam*.9 + earth)*p.alb*(.85 + .15*Math.sin(t/1000*1.3 + p.s))*(1 + .35*h);
       if (b < .03) continue;
-      const lum = Math.min(1, b*1.25), rr = (.55 + .8*Math.min(1, b))*p.k*W/120;
-      c.fillStyle = `rgba(${245*lum + 10|0},${238*lum + 8|0},${220*lum + 6|0},${Math.min(1, .25 + b)})`;
+      const lum = Math.min(1, b*1.25), rr = (.55 + .8*Math.min(1, b))*p.k*u;
+      c.fillStyle = `rgba(${cr*lum + 10|0},${cg*lum + 8|0},${cb*lum + 6|0},${Math.min(1, .25 + b)*al})`;
       c.beginPath(); c.arc(cx + x*R, cy - y*R, rr, 0, 6.2832); c.fill(); }
+  };
+  moonDots.hov = () => h;
+  (function draw(t){ requestAnimationFrame(draw);
+    if (!mb.classList.contains("on")) return;
+    const dt = Math.min(.1, (t - last)/1000 || 0); last = t; h += (hov - h)*Math.min(1, dt*4);
+    const W = cv.width; c.clearRect(0, 0, W, W); moonDots(c, W/2, W/2, W*.4, t, h);
   })(0);
 })();
 // ветка «Чёрная дыра»: с кольца — сначала страница Галактики, затем сразу полёт к ядру

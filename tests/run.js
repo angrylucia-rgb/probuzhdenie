@@ -109,6 +109,20 @@ test('chapter-back', async () => {
   clean(p); await p.done();
 });
 
+/* ---------- полёт Земля ↔ Луна: без вспышки, обратно — на тот же слой ---------- */
+test('moon-flight', async () => {
+  const p = await page(); await p.goto(B + '/#/j/earth/2'); await ready(p);
+  await p.waitForFunction(() => document.getElementById('moonBtn').classList.contains('on'), null, { timeout: 60000 });
+  await p.evaluate(() => { window.__fx = 0; const fx = document.getElementById('loopFx'); (function f(){ window.__fx = Math.max(window.__fx, +getComputedStyle(fx).opacity || 0); requestAnimationFrame(f); })(); document.getElementById('moonBtn').click(); });
+  let s = await until(p, s => s.h === '#/j/moon/0', 90000); ok(s.h === '#/j/moon/0', 'не долетели до Луны: ' + s.h);
+  await p.waitForFunction(() => getComputedStyle(document.querySelector('.moonfly')).opacity === '0', null, { timeout: 60000 });
+  await p.mouse.move(800, 400); for (let i = 0; i < 4; i++){ await p.mouse.wheel(0, -500); await sleep(300); }
+  s = await until(p, s => s.h === '#/j/earth/2', 90000); ok(s.h === '#/j/earth/2', 'вернулись не на тот слой: ' + s.h);
+  await p.waitForFunction(() => document.getElementById('moonBtn').classList.contains('on'), null, { timeout: 60000 });
+  const fx = await p.evaluate(() => window.__fx); ok(fx < .05, 'была вспышка: ' + fx);
+  clean(p); await p.done();
+});
+
 /* ---------- сбой видеокарты: сообщение и перезапуск ---------- */
 test('context-loss', async () => {
   const p = await page(); await p.goto(B + '/'); await ready(p);

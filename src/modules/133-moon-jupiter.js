@@ -245,7 +245,10 @@ const makeBodyDive = g => {
   let cur = null, curD = 0, theiaPh = 0;
   const tv = new THREE.Vector3();
 
+  const ws = new THREE.Vector3();
   return {
+    // v183: где Луна слоя 0 в мире и какого она радиуса — по ним полёт с Земли совмещает свой рисунок с настоящей Луной
+    moonPt(v){ moon0.getWorldPosition(v); moon0.getWorldScale(ws); return ws.x; },   // шар — единичный, радиус 2,3 задан масштабом
     ext(){ if (!cur) return null;
       const E = EXT[cur], k = clamp(Math.round(curD), 0, E.length - 1); return E[k]; },
     update(kind, d, vis, t, dt){

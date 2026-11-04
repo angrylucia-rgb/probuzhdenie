@@ -426,6 +426,9 @@ function startTransit(dir){
   const to = dir > 0 ? JOURNEYS[jId].next() : jPrevId();
   if (!to) return;
   if (to === "iz"){ bhDiveStart(); return; }
+  // v183: Луна, открытая с Земли: назад со слоя «Луна» — обратным полётом на тот же слой Земли;
+  // дальше с последнего слоя («↓ Земля») — тоже на тот слой Земли, с которого улетели (вспышкой: Луны в кадре уже нет)
+  if (jId === "moon" && to === "earth" && jHist[jHist.length - 1] === "earth" && JRET.earth != null){ flashTo("earth", -1); return; }
   // для зум-пар вместо вспышки — натуральный пролёт камеры внутрь (см. ZOOM_PAIRS)
   if (zoomPair(jId, to)) startZoom(to, dir); else flashTo(to, dir);
 }
@@ -468,11 +471,14 @@ function flashTo(to, dir){
   // v173: Триединство ↔ Первоимпульс — без вспышки: треугольник сам перестраивается в узел (и обратно)
   const triTr = (jId === "abs" && to === "g1") || (jId === "g1" && to === "abs");
   if (triTr && typeof ABS !== "undefined") ABS.noFlash();
-  tr = { t:0, dir, to, from:jId, jumped:false, morph: morphPair(jId, to), soft, dreamTr, tri: triTr,
+  // v183: Земля ↔ Луна — полёт без вспышки (213-moon-flight.js): назад — только со слоя «Луна», где она в кадре
+  const mf = (jId === "earth" && to === "moon" && dir > 0) || (jId === "moon" && to === "earth" && dir < 0 && depth < .5);
+  tr = { t:0, dir, to, from:jId, jumped:false, morph: morphPair(jId, to), soft, dreamTr, tri: triTr, mf, d0: Math.min(0, depth),
          // глубина, на которой сцену Земли держат во время растворения. Назад мы приходим со стороны
          // «Атома», и depth там уже ушёл в минус — брать его нельзя, иначе Земля проступит глобусом
          eD: dir < 0 ? 15.2 : Math.min(Math.max(0, depth), 15.9), fe: dir > 0 ? 1 : 0, fg: dir > 0 ? 0 : 1, dip: 1 };
-  if (!soft && !dreamTr && !triTr){
+  if (mf) MF.begin();
+  if (!soft && !dreamTr && !triTr && !mf){
     const c = FXC[JOURNEYS[to].st], fx = $("loopFx"), at = W < 760 ? "50% 28%" : "62% 50%";
     fx.style.background = to === "abs" ? "#fffdf8" : `radial-gradient(circle at ${at},rgba(255,250,240,.97),${c} 32%,rgba(20,18,40,.55) 70%,rgba(5,6,12,.35) 100%)`;
   }
@@ -486,7 +492,7 @@ function jumpRing(st, dir){
 function transitTick(dt, now){
   if (!tr) return;
   tr.t += dt;
-  const TJ = tr.tri ? (tr.dir > 0 ? .2 : 1.85) : tr.dreamTr ? .05 : tr.soft ? .45 : .6;
+  const TJ = tr.mf ? MF.TJ(tr.dir) : tr.tri ? (tr.dir > 0 ? .2 : 1.85) : tr.dreamTr ? .05 : tr.soft ? .45 : .6;
   if (!tr.jumped && tr.t > TJ){
     tr.jumped = true;
     if (tr.dir > 0) jHist.push(jId); else if (tr.dir < 0) jHist.pop(); else jHist = [];
@@ -500,10 +506,13 @@ function transitTick(dt, now){
     // а не с последнего; назад (dir < 0) — наоборот, с последнего
     // назад из ветки (Луна, Юпитер) — на слой «Солнечная система», а не в ядро Солнца
     depth = depthT = tr.dir < 0 ? (tr.from === "moon" || tr.from === "jup" || tr.from === "dream" ? Math.min(DMAX - 1, JRET[tr.to] || 0) : DMAX - 1) : tr.dir > 0 ? 0 : (JOURNEYS[tr.to].start || 0);
+    // полёт к Луне: она ещё вдали (слой 0 «на подходе»), дальше подлёт доводит глубину до 0 (MF.tick)
+    if (tr.mf && tr.dir > 0){ depth = -MF.D_FAR; depthT = 0; }
     shownLevel = -1; hSel = -1; lastDepthInput = now;
     stations[6].api.focus("c", -1);
     jumpRing(jSt, tr.dir || 1);
-    drawDepth(); renderLevel(Math.round(depth)); depthMark(); syncBtns();
+    drawDepth(); renderLevel(Math.max(0, Math.round(depth))); depthMark(); syncBtns();
+    if (tr.mf) MF.jumped();
     Music.end();
   }
   if (tr.soft){
@@ -513,7 +522,8 @@ function transitTick(dt, now){
     tr.fg = tr.dir > 0 ? (tr.jumped ? inn : 0) : (tr.jumped ? out : 1);
     tr.dip = 1 - .94*smooth(0, .28, tr.t)*(1 - smooth(1.6, 2.3, tr.t));
   }
-  const lo = tr.soft || tr.dreamTr || tr.tri ? 0 : (tr.t < .6 ? smooth(0, .6, tr.t) : 1 - smooth(.75, 2.2, tr.t));
+  if (tr.mf) MF.tick();
+  const lo = tr.soft || tr.dreamTr || tr.tri || tr.mf ? 0 : (tr.t < .6 ? smooth(0, .6, tr.t) : 1 - smooth(.75, 2.2, tr.t));
   $("loopFx").style.opacity = String(lo);
-  if (tr.t > (tr.tri ? (tr.dir > 0 ? 3.1 : 2.1) : tr.dreamTr ? .4 : tr.soft ? 2.4 : 2.2)){ if (tr.soft) softEnd(); tr = null; $("loopFx").style.opacity = "0"; }
+  if (tr.t > (tr.mf ? MF.DUR : tr.tri ? (tr.dir > 0 ? 3.1 : 2.1) : tr.dreamTr ? .4 : tr.soft ? 2.4 : 2.2)){ if (tr.soft) softEnd(); if (tr.mf) MF.end(); tr = null; $("loopFx").style.opacity = "0"; }
 }

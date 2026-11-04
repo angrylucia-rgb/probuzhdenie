@@ -456,6 +456,7 @@ const SOLAR_BUILD = g => {
   };
 
   st.moonSp = moonSp;
+  st.moonPt = v => BODY.moonPt(v);
   upd.api = st;
   st.pick = pick;
   st.bodies = bodies;

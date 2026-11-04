@@ -537,7 +537,7 @@ float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smooth
       `a = 0.35*(0.45 + 1.8*nearK(p)); a *= fogK(p, 0.6, 80.0);`), D => smooth(13.95, 14.25, D)*(1 - smooth(14.5, 14.62, D)));
   }
   // 15 · кристалл → атом → гем
-  const L15 = {}; let softK = 0;
+  const L15 = {}; let softK = 0; let FLY = null;
   { const g = LAY[15], sh = SHOW(15), latG = new THREE.Group(), atomG = new THREE.Group(), hemeG = new THREE.Group(), rbcG = new THREE.Group();
     sh.add(latG); sh.add(atomG);
     const at = [], a0 = 2.4, cz = 1.96;
@@ -704,6 +704,7 @@ float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smooth
   return {
     // мягкий переход «Железо → Атом»: атом продолжает расти, пока растворяется
     soft(k){ softK = k; },
+    fly(q){ FLY = q; },
     boundary(D, bio){ let best = null, bd = 1; for (const [b, t] of (bio ? BND_BIO : BND)){ const d = Math.abs(D - b); if (d < bd){ bd = d; best = t; } } return { text:best, o:M*(1 - smooth(.07, .24, bd)) }; },
     update(D, hE, T, px, py, portrait, bio){
       const dt = Math.min(.05, Math.max(0, T - lastT)); lastT = T;
@@ -730,6 +731,7 @@ float nearK(vec3 q){ vec4 fv = modelViewMatrix*vec4(q, 1.0); return 1.0 - smooth
       BIO.position.z = zc; BIO.visible = !!bio;
       desc.rotation.z = Math.sin(T*.05)*.04;
       root.rotation.set(-py*.03, px*.05, 0);
+      if (FLY) root.quaternion.premultiply(FLY);   // v183: полёт к Луне — мир Земли поворачивается, будто камера доворачивает на Луну
       // уровень 15 — бесконечное приближение
       const x15 = smooth(14.55, 15, D);
       L15.s = 1 + 4*x15; L15.lat.scale.setScalar(L15.s);

@@ -132,6 +132,7 @@ function loop(now){
     P.pos.lerp(HP.pos, dE); P.tgt.lerp(HP.tgt, dE);
   }
   if (!reduce && !coarse){ px += (nx - px)*.04; py += (ny - py)*.04; }
+  MF.cam(P);   // v183: полёт к Луне — камера доворачивает на неё
   camera.position.copy(P.pos); camera.up.copy(P.up); camera.lookAt(P.tgt);
   camera.getWorldDirection(fwd); right.crossVectors(fwd, camera.up).normalize(); camUp.crossVectors(right, fwd).normalize();
   const par = e*(1 - Math.max(hE, dE)*.6);
@@ -147,6 +148,7 @@ function loop(now){
   camera.updateProjectionMatrix();
   bgMat.uniforms.uC.value.set(portrait ? .5 : .58 + .1*uiHide, portrait ? .62 + .12*uiHide : .55);
   camera.updateMatrixWorld();
+  MF.draw();
 
   // наведение на объект станции
   const frac0 = Math.abs(pos - Math.round(pos));
@@ -283,6 +285,7 @@ function loop(now){
     // во время пролёта обе станции пары рисуются по своим правилам, а не по правилу «не текущая — тусклее»
     const zv = zoomVis(i);
     if (zv) v = zv.o;
+    const mv = MF.vis(i); if (mv != null) v = mv;
     // мягкий переход: станция «Атом» держится в центре кадра и перетекает со сценой Земли
     // глобус станции «Земля» на время растворения убираем: обычно его закрывает собственный фон
     // сцены Земли, а на переходе этот фон приглушён — и глобус проступил бы поверх атома
@@ -314,7 +317,7 @@ function loop(now){
                     st.H.depth = humanOpen && jKind === "g" && jId === "g4" ? Math.max(0, depth) : 0;
                     // ветки станции V: Луна, Юпитер и Европа — свои сцены в той же группе станции
                     st.H.body = humanOpen && (jId === "moon" || jId === "jup") ? jId : null;
-                    st.H.bd = st.H.body ? Math.max(0, depth) : 0; }
+                    st.H.bd = st.H.body ? (tr && tr.mf ? depth : Math.max(0, depth)) : 0; }   // на полёте к Луне слой 0 стоит «на подходе» (глубина < 0)
       // станция VIII двухслойная: 0 — спираль, 1 — одна молекула из неё
       // на пролёте «Молекула → Атом» станцию держим в состоянии молекулы: после подмены путешествия
       // jSt уже 8, и без этого спираль вернулась бы прямо посреди полёта
@@ -454,7 +457,7 @@ function loop(now){
   // на мягком переходе «Железо → Атом» сцена Земли не гаснет в один кадр: глубину замораживаем
   // на последнем слое, а видимость уводим плавно — ровно пока разгорается станция «Атом»
   const softTr = tr && tr.soft;
-  const eHv = jKind === "e" ? (softTr ? hE*tr.fe : hE) : (softTr ? tr.fe : 0);
+  const eHv = (jKind === "e" ? (softTr ? hE*tr.fe : hE) : (softTr ? tr.fe : 0))*MF.earthVis();
   const eDp = jKind === "e" ? dPos : (softTr ? tr.eD : dPos);
   EARTH.soft(softTr ? (tr.dir > 0 ? smooth(.10, 1.45, tr.t) : 1 - smooth(.30, 1.75, tr.t)) : 0);
   const Me = EARTH.update(eDp, eHv, T, px, py, portrait, earthBranch === "bio");
